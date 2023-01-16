@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { GameInformation } from '@app/classes/game-information';
+import { GAME_CARDS_TO_DISPLAY } from '../pages.constants';
 
 @Component({
     selector: 'app-game-selection',
@@ -6,7 +8,29 @@ import { Component, OnInit } from '@angular/core';
     styleUrls: ['./game-selection.component.scss'],
 })
 export class GameSelectionComponent implements OnInit {
-    constructor() {}
+    gameCards: GameInformation[] = [];
+    currentGameCards: GameInformation[] = [];
+    index: number = 0;
 
-    ngOnInit(): void {}
+    ngOnInit(): void {
+        this.selectGameCards();
+    }
+
+    selectGameCards(): void {
+        this.currentGameCards = this.gameCards.slice(this.index, Math.min(this.index + GAME_CARDS_TO_DISPLAY, this.gameCards.length));
+    }
+
+    next(): void {
+        if (this.index + GAME_CARDS_TO_DISPLAY <= this.gameCards.length) {
+            this.index += GAME_CARDS_TO_DISPLAY;
+            this.selectGameCards();
+        }
+    }
+
+    previous(): void {
+        if (this.index - GAME_CARDS_TO_DISPLAY >= 0) {
+            this.index -= GAME_CARDS_TO_DISPLAY;
+            this.selectGameCards();
+        }
+    }
 }

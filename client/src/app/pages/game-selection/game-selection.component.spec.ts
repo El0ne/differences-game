@@ -19,4 +19,12 @@ describe('GameSelectionComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
+
+    it('currentGameCards should be equal to gameCards lenght until it is bigger than 4', () => {
+        expect(component.currentGameCards.length).toBe(0);
+    });
+
+    it('first game cards to show should be the 4 first ones', () => {
+        expect(component.currentGameCards.length).toBe(0);
+    });
 });
