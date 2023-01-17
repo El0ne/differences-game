@@ -1,5 +1,5 @@
-<div class="game-card-component">
-    <p *ngFor="let gameCard of currentGameCards">{{gameCard}}</p>
+<div class="game-card-container">
+    <div *ngFor="let gameCard of currentGameCards">{{gameCard}}</div>
 </div>
-<button type="button" (click)="previous()">-</button>
-<button type="button" (click)="next()">+</button>
+<button type="button" (click)="previous()" id="previous-button">-</button>
+<button type="button" (click)="next()" id="next-button">+</button>
