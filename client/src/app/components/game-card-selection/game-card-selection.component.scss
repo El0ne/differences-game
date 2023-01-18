@@ -1,100 +1,178 @@
-/* The switch - the box around the slider 
-.switch {
+.difficulty-container {
+    position: absolute;
+    top: 3%;
+    left: 26%;
+    width: 55%;
+    height: 10%;
+    display: table;
+    border: solid 1px black;
+    border-radius: 15px;
+    background-color: rgba(255, 0, 0, 0.5);
+}
+
+#difficulty {
+    font-size: large;
+    font-weight: bold;
     position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
 }
-
-/* Hide default HTML checkbox 
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-/* The slider 
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: 0.4s;
-    transition: 0.4s;
-}
-
-.slider:before {
-    position: absolute;
-    content: '';
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    -webkit-transition: 0.4s;
-    transition: 0.4s;
-}
-
-input:checked + .slider {
-    background-color: #2196f3;
-}
-
-input:focus + .slider {
-    box-shadow: 0 0 1px #2196f3;
-}
-
-input:checked + .slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(26px);
-}
-
-/* Rounded sliders 
-.slider.round {
-    border-radius: 34px;
-}
-
-.slider.round:before {
-    border-radius: 50%;
-}
-*/
-
 .nom {
     font-size: xx-large;
-    padding-top: 3%;
-    padding-left: 3%;
-    height: 150px;
+    position: absolute;
+    font-weight: bold;
+    top: 5%;
+    left: 5%;
 }
 
+.row {
+    display: flex;
+}
+
+.column {
+    flex: 50%;
+    position: relative;
+    height: 20rem;
+    width: 30rem;
+}
+#top3-container {
+    position: absolute;
+    width: 13em;
+    top: 25%;
+    left: 18%;
+}
+
+.left-icon {
+    position: absolute;
+    top: 25%;
+    left: 32%;
+}
+
+.right-icon {
+    position: absolute;
+    top: 25%;
+    right: 20%;
+}
+
+.top3 {
+    height: 1.5em;
+    position: relative;
+    text-align: center;
+    border: solid black 1px;
+    background: #c39ced;
+    border-radius: 10px;
+    font-style: italic;
+}
 .flex-row {
     display: flex;
-    flex-direction: row;
-    grid-row: 3;
+    position: absolute;
+    bottom: 25%;
+    left: 18.5%;
+    height: 9rem;
+    width: 11.5rem;
+}
+
+.ranking {
+    height: 7rem;
+    width: 5.5rem;
+    border: 1px black solid;
+    list-style: none;
+    position: relative;
+    text-align: left;
+    font-size: small;
+    padding: 0;
+    counter-reset: my-awesome-counter;
+}
+
+.gametype {
+    text-align: center;
+    font-style: italic;
+}
+
+.solo {
+    background-color: #3849ff;
+    border: #3849ff 1px solid;
 }
 
 .vs {
-    list-style-type: none;
+    background-color: #fa5c5c;
+    border: #fa5c5c 1px solid;
 }
 
+.times {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    padding-bottom: 1em;
+    font-size: smaller;
+}
 .card {
-    height: 350px;
-    width: 550px;
-    border: 1px solid #000000;
-    display: grid;
-    grid-template-columns: 50% 50%;
-    grid-template-rows: 33% 50% 10%;
+    height: 20rem;
+    width: 30rem;
+    border-style: solid;
+    border-width: 2px;
+    border-color: black;
+    box-shadow: 5px 10px;
 }
 
-.picture {
-    grid-row: 2;
-}
-.container {
-    grid-column: 2;
+.picture-container {
+    position: absolute;
+    height: 10rem;
+    width: 10rem;
+    bottom: 5%;
 }
 
-.button {
-    grid-row: 3;
+.photo {
+    position: relative;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    width: 15rem;
+    height: 11rem;
+    bottom: 60%;
+    left: 5%;
+}
+
+/* CSS https://getcssscan.com/css-buttons-examples */
+.play-button {
+    font-size: 16px;
+    font-weight: 200;
+    letter-spacing: 1px;
+    padding: 13px 50px 13px;
+    outline: 0;
+    border: 1px solid black;
+    cursor: pointer;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0);
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    bottom: 5%;
+    left: 15%;
+}
+
+.play-button:after {
+    content: '';
+    background-color: #ffe54c;
+    width: 100%;
+    z-index: -1;
+    position: absolute;
+    height: 100%;
+    top: 7px;
+    left: 7px;
+    transition: 0.2s;
+}
+
+.play-button:hover:after {
+    top: 0px;
+    left: 0px;
+}
+
+.ranking li {
+    counter-increment: my-awesome-counter;
+}
+.ranking li::before {
+    content: counter(my-awesome-counter) '.';
+    color: rgb(60, 111, 222);
+    font-weight: bold;
 }

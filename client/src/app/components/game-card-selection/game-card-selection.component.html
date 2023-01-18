@@ -1,21 +1,44 @@
 <div class="card">
-    <div class="nom">Nom de la fiche</div>
-    <img src="https://www.w3schools.com/images/w3schools_green.jpg" class="picture" />
-    <div class="container">
-        <button>Difficile</button>
-        <div class="flex-row">
-            <ol type="1" class="solo">
-                <li>First</li>
-                <li>Second</li>
-                <li>Third</li>
-            </ol>
-            <ul class="vs">
-                <li>1</li>
-                <li>2</li>
-                <li>3</li>
-            </ul>
+    <div class="row">
+        <div class="column">
+            <p class="nom">Nom de la fiche</p>
+            <div class="picture-container">
+                <img src="https://i.picsum.photos/id/455/640/480.jpg?hmac=jyyuDkvltF5e4BY9rrBhW--AjwPeqm3R2-Kv8UWSU7g" class="photo" />
+            </div>
+            <button class="play-button">Jouer</button>
+        </div>
+        <div class="column">
+            <div class="difficulty-container">
+                <p id="difficulty">Difficile</p>
+            </div>
+            <div id="top3-container">
+                <div class="top3">- TOP 3 -</div>
+            </div>
+            <div class="left-icon">
+                <mat-icon>whatshot</mat-icon>
+            </div>
+            <div class="right-icon">
+                <mat-icon>whatshot</mat-icon>
+            </div>
+            <div class="flex-row">
+                <ol class="ranking">
+                    <p class="gametype solo">SOLO</p>
+                    <div class="times">
+                        <li>1:00 temp</li>
+                        <li>1:00 Temp</li>
+                        <li>1:00 Temp</li>
+                    </div>
+                </ol>
+                <ol class="ranking">
+                    <p class="gametype vs">1 VS 1</p>
+                    <div class="times">
+                        <li>1:00 temper</li>
+                        <li>1:00 Temp</li>
+                        <li>1:00 Temp</li>
+                    </div>
+                </ol>
+            </div>
+            <button class="play-button">Créer</button>
         </div>
     </div>
-    <button class="button">Jouer</button>
-    <button class="button">Créer</button>
 </div>
