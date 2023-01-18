@@ -10,14 +10,11 @@ import { GAME_CARDS_TO_DISPLAY } from '../pages.constants';
 export class GameSelectionComponent implements OnInit {
     gameCards: GameInformation[] = [];
     index: number = 0;
-    endIndex: number;
+    endIndex: number = 0;
     nextButton: HTMLButtonElement;
     previousButton: HTMLButtonElement;
 
     ngOnInit(): void {
-        for (let i: number = 0; i < 6; i++) {
-            this.gameCards.push(new GameInformation());
-        }
         this.nextButton = (<HTMLButtonElement>document.getElementById("next-button")); //ou faire des getElementById chaque fois?
         this.previousButton = (<HTMLButtonElement>document.getElementById("previous-button"));
         this.next();
@@ -26,7 +23,6 @@ export class GameSelectionComponent implements OnInit {
 
     selectGameCards(): void {
         this.endIndex = Math.min(this.index + GAME_CARDS_TO_DISPLAY, this.gameCards.length);
-        this.switchButtons();
     }
 
     next(): void {
@@ -34,6 +30,7 @@ export class GameSelectionComponent implements OnInit {
             this.index += GAME_CARDS_TO_DISPLAY;
             this.selectGameCards();
         }
+        this.switchButtons();
     }
 
     previous(): void {
@@ -41,10 +38,11 @@ export class GameSelectionComponent implements OnInit {
             this.index -= GAME_CARDS_TO_DISPLAY;
             this.selectGameCards();
         }
+        this.switchButtons();
     }
 
     switchButtons() {
-        let isLastGameCardReached: boolean = this.endIndex === this.gameCards.length
+        let isLastGameCardReached: boolean = this.endIndex === this.gameCards.length;
             this.nextButton.disabled = isLastGameCardReached;
         let isIndexAtBeggin: boolean = this.index === 0;
             this.previousButton.disabled = isIndexAtBeggin;
