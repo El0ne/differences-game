@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { GameInformation } from '@app/classes/game-information';
-import { GAME_CARDS_TO_DISPLAY } from '../pages.constants';
+import { GAME_CARDS_TO_DISPLAY } from '../pages-constants';
 
 @Component({
     selector: 'app-game-selection',
