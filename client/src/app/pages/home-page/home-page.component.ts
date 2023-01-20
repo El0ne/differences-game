@@ -1,23 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
     selector: 'app-home-page',
     templateUrl: './home-page.component.html',
     styleUrls: ['./home-page.component.scss'],
 })
-export class HomePageComponent implements OnInit {
-    constructor() {}
-
-    ngOnInit(): void {}
-
+export class HomePageComponent {
     // TODO : IMPLEMENT FUNCTIONS TO MATCH WANTED BEHAVIOUR
     showClassic() {
-        console.log('click working 1');
+        // TODO : Implement function
     }
     showLimitedTime() {
-        console.log('click working 2');
+        // TODO : Implement function
     }
     showConfig() {
-        console.log('click working 3');
+        // TODO : Implement function
     }
 }
