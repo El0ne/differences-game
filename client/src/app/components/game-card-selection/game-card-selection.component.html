@@ -1,15 +1,22 @@
 <div class="card">
     <div class="row">
         <div class="column">
-            <p class="nom">Nom de la fiche</p>
+            <p class="nom">{{ gameCard.name }}</p>
             <div class="picture-container">
-                <img src="https://i.picsum.photos/id/455/640/480.jpg?hmac=jyyuDkvltF5e4BY9rrBhW--AjwPeqm3R2-Kv8UWSU7g" class="photo" />
+                <img [src]="gameCard.image" class="photo" />
             </div>
             <button class="play-button">Jouer</button>
         </div>
         <div class="column">
-            <div class="difficulty-container">
-                <p id="difficulty">Difficile</p>
+            <div *ngIf="gameCard.difficulty === 'Difficile'">
+                <div class="difficult-container">
+                    <p id="difficulty">{{ gameCard.difficulty }}</p>
+                </div>
+            </div>
+            <div *ngIf="gameCard.difficulty === 'Facile'">
+                <div class="easy-container">
+                    <p id="difficulty">{{ gameCard.difficulty }}</p>
+                </div>
             </div>
             <div id="top3-container">
                 <div class="top3">- TOP 3 -</div>
@@ -24,17 +31,13 @@
                 <ol class="ranking">
                     <p class="gametype solo">SOLO</p>
                     <div class="times">
-                        <li>1:00 temp</li>
-                        <li>1:00 Temp</li>
-                        <li>1:00 Temp</li>
+                        <li *ngFor="let time of gameCard.soloTimes">{{ time }}</li>
                     </div>
                 </ol>
                 <ol class="ranking">
                     <p class="gametype vs">1 VS 1</p>
                     <div class="times">
-                        <li>1:00 temper</li>
-                        <li>1:00 Temp</li>
-                        <li>1:00 Temp</li>
+                        <li *ngFor="let time of gameCard.multiTimes">{{ time }}</li>
                     </div>
                 </ol>
             </div>
