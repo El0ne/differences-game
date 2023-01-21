@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-home-page',
@@ -6,14 +7,15 @@ import { Component } from '@angular/core';
     styleUrls: ['./home-page.component.scss'],
 })
 export class HomePageComponent {
+    constructor(private router: Router) {}
     // TODO : IMPLEMENT FUNCTIONS TO MATCH WANTED BEHAVIOUR
     showClassic() {
-        // TODO : Implement function
+        this.router.navigate(['/test']); // TODO : REPLACE PLACEHOLDER BY ACTUAL PATH
     }
     showLimitedTime() {
-        // TODO : Implement function
+        this.router.navigate(['/test']); // TODO : REPLACE PLACEHOLDER BY ACTUAL PATH
     }
     showConfig() {
-        // TODO : Implement function
+        this.router.navigate(['/test']); // TODO : REPLACE PLACEHOLDER BY ACTUAL PATH
     }
 }
