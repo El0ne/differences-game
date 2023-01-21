@@ -1,0 +1,184 @@
+.options {
+    border-style: solid;
+
+    width: 100%;
+    height: 10%;
+
+    display: flex;
+    flex-direction: row;
+}
+
+#home {
+    border-style: solid;
+    height: 90px;
+    width: 90px;
+}
+
+#exit {
+    border-style: solid;
+    height: 90px;
+    width: 90px;
+}
+
+#info {
+    border-style: solid;
+    height: 90px;
+    width: 90px;
+    margin-left: auto;
+}
+
+.flex-game {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding-top: 5%;
+}
+
+#original {
+    border-style: solid;
+    width: 640px;
+    height: 480px;
+}
+
+.game-options {
+    //border-style: solid;
+    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    width: 31rem;
+    height: 35rem;
+}
+
+#score {
+    align-self: center;
+    //justify-content: space-around;
+    //align-items: center;
+    padding: 2%;
+}
+
+#timer {
+    //border-style: solid;
+    align-self: center;
+    padding-top: 10.7rem;
+    //padding: 5%;
+}
+
+.timer-box {
+    width: 360px;
+    height: 100px;
+    background: linear-gradient(135deg, #14ffe9, #ffeb3b, #ff00e0);
+    border-radius: 10px;
+}
+
+.timer-box .display {
+    position: relative;
+    top: 50%;
+    left: 50%;
+    z-index: 999;
+    transform: translate(-50%, -50%);
+    background: #1b1b1b;
+    width: 345px;
+    height: 85px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.timer-box .display #time {
+    line-height: 85px;
+    color: #fff;
+    font-size: 50px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+#hint {
+    border-style: solid;
+    align-self: end;
+}
+
+#differences {
+    border-style: solid;
+    width: 640px;
+    height: 480px;
+
+    float: right;
+}
+
+// référence : https://codepen.io/Vivekp1118/pen/YzLOOVG
+@import url('https://fonts.googleapis.com/css2?family=Silkscreen&display=swap');
+
+.container {
+    max-width: 6rem;
+    max-height: 4rem;
+    background: #4c1d95;
+    border-radius: 12px;
+    border: 3px solid white;
+    display: flex;
+    align-self: center;
+    justify-content: space-around;
+    align-items: center;
+    color: white;
+    padding: 68px 82px;
+    gap: 100px;
+    box-shadow: 0px 0px 3px black;
+}
+.row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.col-heading h1 {
+    font-family: 'Verdana';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 40px;
+    line-height: 36px;
+    text-align: center;
+
+    color: white;
+}
+.col-display {
+    width: 155px;
+    height: 120px;
+    background: #080001;
+    border-radius: 5px;
+    font-family: 'Silkscreen', cursive;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 90px;
+    line-height: 110px;
+    text-align: center;
+    color: #f94f6d;
+}
+
+.add {
+    width: 45px;
+    height: 45px;
+    border: 2px solid white;
+    border-radius: 5px;
+    font-family: 'Silkscreen', cursive;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 28px;
+    text-align: center;
+    color: white;
+    line-height: 35px;
+    background: transparent;
+}
+@media only screen and (max-width: 600px) {
+    body {
+        overflow-y: scroll;
+        padding: 20px 0px;
+        height: auto;
+    }
+    .container {
+        margin: auto auto;
+        padding-block: 30px;
+        flex-direction: column;
+        gap: 10px;
+        max-height: 100%;
+    }
+}
