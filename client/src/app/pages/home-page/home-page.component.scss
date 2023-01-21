@@ -1,5 +1,5 @@
 body {
-    background-color: black;
+    background-image: url('../../../assets/Purple-Bubble-Wallpapers.jpg');
 }
 
 #game-title {
@@ -9,6 +9,7 @@ body {
     color: aqua;
     font-weight: bold;
     height: 15%;
+    width: 100%;
     text-align: center;
     font-size: xx-large;
 }
@@ -17,7 +18,6 @@ body {
     display: flex;
     justify-content: center;
     flex-direction: column;
-    background-color: aqua;
     width: 35%;
     height: 40%;
     margin: auto;

@@ -10,12 +10,12 @@ export class HomePageComponent {
     constructor(private router: Router) {}
     // TODO : IMPLEMENT FUNCTIONS TO MATCH WANTED BEHAVIOUR
     showClassic() {
-        this.router.navigate(['/test']); // TODO : REPLACE PLACEHOLDER BY ACTUAL PATH
+        this.router.navigate(['/home']); // TODO : REPLACE PLACEHOLDER BY ACTUAL PATH
     }
     showLimitedTime() {
-        this.router.navigate(['/test']); // TODO : REPLACE PLACEHOLDER BY ACTUAL PATH
+        this.router.navigate(['/home']); // TODO : REPLACE PLACEHOLDER BY ACTUAL PATH
     }
     showConfig() {
-        this.router.navigate(['/test']); // TODO : REPLACE PLACEHOLDER BY ACTUAL PATH
+        this.router.navigate(['/home']); // TODO : REPLACE PLACEHOLDER BY ACTUAL PATH
     }
 }
