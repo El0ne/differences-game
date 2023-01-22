@@ -20,14 +20,14 @@ export class GameSelectionComponent implements OnInit {
         this.endIndex = Math.min(this.index + GAME_CARDS_TO_DISPLAY, this.gameCards.length);
     }
 
-    next(): void {
+    nextCards(): void {
         if (this.index + GAME_CARDS_TO_DISPLAY < this.gameCards.length) {
             this.index += GAME_CARDS_TO_DISPLAY;
             this.selectGameCards();
         }
     }
 
-    previous(): void {
+    previousCards(): void {
         if (this.index - GAME_CARDS_TO_DISPLAY >= 0) {
             this.index -= GAME_CARDS_TO_DISPLAY;
             this.selectGameCards();
