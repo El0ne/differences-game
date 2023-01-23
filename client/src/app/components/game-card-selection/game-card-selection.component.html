@@ -5,7 +5,7 @@
             <div class="picture-container">
                 <img [src]="gameCard.image" class="photo" />
             </div>
-            <button id="playSolo" class="play-button" (click)="playSolo()">Jouer</button>
+            <button class="play-button" routerLink="/soloGame">Jouer</button>
         </div>
         <div class="column">
             <div *ngIf="gameCard.difficulty === 'Difficile'">
@@ -41,7 +41,7 @@
                     </div>
                 </ol>
             </div>
-            <button id="playOneVsOne" class="play-button" (click)="playOneVsOne()">Créer</button>
+            <button class="play-button" routerLink="/waitingRoom">Créer</button>
         </div>
     </div>
 </div>

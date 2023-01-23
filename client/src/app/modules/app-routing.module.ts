@@ -8,9 +8,15 @@ const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
     { path: 'home', component: MainPageComponent },
     { path: 'material', component: MaterialPageComponent },
-    { path: 'gameCard', component: GameCardSelectionComponent },
-    { path: 'soloGame', component: SoloGameComponent },
+    { path: 'gameCard', component: MainPageComponent },
+    { path: 'soloGame', component: MainPageComponent },
+    { path: 'waitingRoom', component: MainPageComponent },
+    /*
+    Utiliser ces paths au lieu, lorsque ces composantes seront creees!
+    { path: 'gameCard', component: GameCardComponent },
+    { path: 'soloGame', component: PlaySoloComponent },
     { path: 'waitingRoom', component: WaitingRoomComponent },
+    */
     { path: 'selection', component: GameSelectionComponent },
     { path: '**', redirectTo: '/home' },
 ];
