@@ -2,9 +2,9 @@
     <div id="game-title">Trouvez Les Différences</div>
     <img id="poly-logo" src="../../../assets/Spotthedifference.webp" />
     <div id="button-container">
-        <div class="buttons" id="classic" (click)="showClassic()">Mode Classique</div>
-        <div class="buttons" id="limitedTime" (click)="showLimitedTime()">Mode Temps Limité</div>
-        <div class="buttons" id="config" (click)="showConfig()">Configuration</div>
+        <div [routerLink]="['/classic']" class="buttons">Mode Classique</div>
+        <div [routerLink]="['/limited']" class="buttons">Mode Temps Limité</div>
+        <div [routerLink]="['/config']" class="buttons">Configuration</div>
     </div>
     <p id="team-details">Équipe 103: Alexis Nicolas, Elouan Guyon, Jasper Lai, Julien Légaré, Taha-Chahine Hamitouche, Sam Younan</p>
 </body>
