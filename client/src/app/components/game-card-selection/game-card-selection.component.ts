@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { game } from '@app/game-card';
 
 @Component({
@@ -8,7 +9,15 @@ import { game } from '@app/game-card';
 })
 export class GameCardSelectionComponent implements OnInit {
     gameCard = game;
-    constructor() {}
+    constructor(private router: Router) {}
 
     ngOnInit(): void {}
+
+    playSolo(): void {
+        this.router.navigate(['/soloGame']);
+    }
+
+    playOneVsOne(): void {
+        this.router.navigate(['/waitingRoom']);
+    }
 }
