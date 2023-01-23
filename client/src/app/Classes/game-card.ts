@@ -1,4 +1,4 @@
-import { RankingBoard } from './Classes/ranking-board';
+import { RankingBoard } from './ranking-board';
 
 export class GameCard {
     name: string;
