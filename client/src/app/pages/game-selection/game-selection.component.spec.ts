@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-// import { By } from '@angular/platform-browser';
-import { GameInformation } from '@app/classes/game-information';
+import { By } from '@angular/platform-browser';
+import { GAME_CARDS_TO_DISPLAY } from '../pages-constants';
 
 import { GameSelectionComponent } from './game-selection.component';
 
@@ -22,59 +22,62 @@ describe('GameSelectionComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('slice of gameCards should be equal to gameCards lenght until it is bigger than 4', () => {
-        for (let i = 0; i < 4; i++) {
-            expect(component.endIndex - component.index).toBe(i);
-            component.gameCards.push(new GameInformation());
-            component.selectGameCards();
-        }
-        component.gameCards.push(new GameInformation());
+    it('show-next-cards-button should put the end Index at 4 more than index until there is less than 4 other gameCards to show', () => {
+        component.endIndex = 4;
+        component.numberOfGameInformations = 5;
         component.selectGameCards();
-        expect(component.endIndex - component.index).toBe(4);
+        expect(component.endIndex).toBe(component.index + GAME_CARDS_TO_DISPLAY);
+        fixture.debugElement.query(By.css('#show-next-cards-button')).triggerEventHandler('click', null);
+        expect(component.endIndex).toBe(component.index + 1);
     });
 
-    it('show-next-cards-button should show the next 4 elements until there is fewer than 4 to show', () => {
-        for (let i = 0; i < 10; i++) {
-            component.gameCards.push(new GameInformation());
-        }
-        component.selectGameCards();
-        expect(component.endIndex - component.index).toBe(4);
-        component.nextCards();
-        expect(component.endIndex - component.index).toBe(4);
-        component.nextCards();
-        expect(component.endIndex - component.index).toBe(2);
+    it('show-previous-cards-button should not call selectGameCards() if index is 0', () => {
+        component.selectGameCards = jasmine.createSpy();
+        fixture.debugElement.query(By.css('#show-previous-cards-button')).triggerEventHandler('click', null);
+        expect(component.selectGameCards).not.toHaveBeenCalled();
     });
 
-    // it('nextCards() should show the next 4 cards in the list', () => {
-    //     for (let i = 0; i < 8; i++) {
-    //         const testInsertGameInformation: GameInformation = new GameInformation();
-    //         testInsertGameInformation.testNumber = 4;
-    //         component.gameCards.push(new GameInformation());
-    //     }
-    // });
+    it('show-previous-cards-button should call selectGameCards() if index is different than 0', () => {
+        component.index = 4;
+        component.endIndex = 5;
+        component.selectGameCards = jasmine.createSpy();
+        fixture.debugElement.query(By.css('#show-previous-cards-button')).triggerEventHandler('click', null);
+        expect(component.selectGameCards).toHaveBeenCalled();
+    });
 
-    it('show-previous-cards-button should be disabled on load', () => {
-        // fixture.nativeElement.querySelector('#show-previous-cards-button').disabled;
+    it('show-next-cards-button should not call selectGameCards() if EndIndex is equal to numberOfGameInformations', () => {
+        component.selectGameCards = jasmine.createSpy();
+        fixture.debugElement.query(By.css('#show-next-cards-button')).triggerEventHandler('click', null);
+        expect(component.selectGameCards).not.toHaveBeenCalled();
+    });
+
+    it('show-next-cards-button should call selectGameCards() if endIndex is different than numberOfGameInformations', () => {
+        component.endIndex = 4;
+        component.numberOfGameInformations = 5;
+        component.selectGameCards = jasmine.createSpy();
+        fixture.debugElement.query(By.css('#show-next-cards-button')).triggerEventHandler('click', null);
+        expect(component.selectGameCards).toHaveBeenCalled();
+    });
+
+    it('show-previous-cards-button should be disabled with index = 0', () => {
         expect(fixture.nativeElement.querySelector('#show-previous-cards-button').disabled).toBeTruthy();
     });
 
     it('show-previous-cards-button should be activated if there is previous gameInformations to show', () => {
-        for (let i = 0; i < 5; i++) {
-            component.gameCards.push(new GameInformation());
-        }
-        component.nextCards();
+        component.index = 4;
+        component.endIndex = 8;
         expect(fixture.nativeElement.querySelector('#show-previous-cards-button').disabled).toBeFalsy();
     });
 
     it('show-next-cards-button should be disabled on load for 4 or less gameInformations available', () => {
+        component.endIndex = 4;
+        component.numberOfGameInformations = 4;
         expect(fixture.nativeElement.querySelector('#show-next-cards-button').disabled).toBeTruthy();
     });
 
     it('show-next-cards-button should be activated if there is more gameInformations to show', () => {
-        for (let i = 0; i < 9; i++) {
-            component.gameCards.push(new GameInformation());
-        }
-        component.nextCards();
-        expect(fixture.nativeElement.querySelector('#show-next-cards-button').disabled).toBeFalsy();
+        component.endIndex = 4;
+        component.numberOfGameInformations = 5;
+        expect(fixture.debugElement.nativeElement.querySelector('#show-next-cards-button').disabled).toBeFalsy();
     });
 });
