@@ -1,6 +1,12 @@
-<div class="game-card-container">
-    <div *ngFor="let gameCard of gameCards | slice: index:endIndex">{{ gameCard }}</div>
+<div class="game-cards-container">
+    <div *ngFor="let gameCard of gameCards | slice: index:endIndex" class="card-container">{{ gameCard }}</div>
+
+    <button type="button" (click)="previousCards()" id="show-previous-cards-button" class="navigate-cards-buttons"
+        [disabled]="index === 0">
+        -
+    </button>
+    <button type="button" (click)="nextCards()" id="show-next-cards-button" class="navigate-cards-buttons"
+        [disabled]="endIndex === gameCards.length">
+        +
+    </button>
 </div>
-<button type="button" (click)="previousCards()" id="show-previous-cards-button" [disabled]="index === 0">-</button>
-<button type="button" (click)="nextCards()" id="show-next-cards-button"
-    [disabled]="endIndex === gameCards.length">+</button>
