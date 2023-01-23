@@ -5,7 +5,7 @@
             <div class="picture-container">
                 <img [src]="gameCard.image" class="photo" />
             </div>
-            <button class="play-button">Jouer</button>
+            <button class="play-button" routerLink="/soloGame">Jouer</button>
         </div>
         <div class="column">
             <div [ngClass]="{ 'difficult-container': gameCard.difficulty === 'Difficile', 'easy-container': gameCard.difficulty === 'Facile' }">
@@ -34,7 +34,7 @@
                     </div>
                 </ol>
             </div>
-            <button class="play-button">Créer</button>
+            <button class="play-button" routerLink="/waitingRoom">Créer</button>
         </div>
     </div>
 </div>
