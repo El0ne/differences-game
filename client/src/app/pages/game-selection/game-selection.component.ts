@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { GameInformation } from '@app/classes/game-information';
 import { GAME_CARDS_TO_DISPLAY } from '../pages-constants';
 
@@ -12,8 +13,12 @@ export class GameSelectionComponent implements OnInit {
     numberOfGameInformations = 0;
     index: number = 0;
     endIndex: number = 0;
+    pageMode: string | null;
+
+    constructor(private route: ActivatedRoute) {}
 
     ngOnInit(): void {
+        this.pageMode = this.route.snapshot.paramMap.get('gameMode');
         // TODO appel a mongoDB pour recuperer infos pour numberOfGameInformations
         // for (let i = 0; i < 10; i++) {
         //     this.gameCards.push(new GameInformation());

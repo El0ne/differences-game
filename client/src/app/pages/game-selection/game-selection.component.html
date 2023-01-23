@@ -1,5 +1,9 @@
 <div class="game-cards-container">
-    <div *ngFor="let gameCard of gameCards | slice: index:endIndex" class="card-container">{{ gameCard }}</div>
+    <div *ngFor="let gameCard of gameCards | slice: index:endIndex" class="card-container">
+        <div *ngIf="pageMode === 'classic'">
+            {{ gameCard }}
+        </div>
+    </div>
 
     <button type="button" (click)="previousCards()" id="show-previous-cards-button" class="navigate-cards-buttons"
         [disabled]="index === 0">
