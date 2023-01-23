@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { GAME_CARDS_TO_DISPLAY } from '../pages-constants';
+import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
 
 import { GameSelectionComponent } from './game-selection.component';
 

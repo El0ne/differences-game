@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { GameInformation } from '@app/classes/game-information';
-import { GAME_CARDS_TO_DISPLAY } from '../pages-constants';
+import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
 
 @Component({
     selector: 'app-game-selection',
