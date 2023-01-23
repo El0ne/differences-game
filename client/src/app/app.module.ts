@@ -7,6 +7,8 @@ import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
+import { BestTimeComponent } from './components/best-time/best-time.component';
+import { GameCardSelectionComponent } from './components/game-card-selection/game-card-selection.component';
 import { GameSelectionComponent } from './pages/game-selection/game-selection.component';
 import { HomePageComponent } from './pages/home-page/home-page.component';
 
@@ -17,7 +19,7 @@ import { HomePageComponent } from './pages/home-page/home-page.component';
  * Otherwise Angular Cli will not know in which module to put new component
  */
 @NgModule({
-    declarations: [AppComponent, HomePageComponent, MaterialPageComponent, GameSelectionComponent],
+    declarations: [AppComponent, HomePageComponent, MaterialPageComponent, GameSelectionComponent, BestTimeComponent, GameCardSelectionComponent],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],
     bootstrap: [AppComponent],

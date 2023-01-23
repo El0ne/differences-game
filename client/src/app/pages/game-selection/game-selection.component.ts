@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { GameInformation } from '@app/classes/game-information';
+import { game, GameCardInformation } from '@app/Classes/game-card';
 import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
 
 @Component({
@@ -9,7 +9,7 @@ import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
     styleUrls: ['./game-selection.component.scss'],
 })
 export class GameSelectionComponent implements OnInit {
-    gameCards: GameInformation[] = [];
+    gameCardInformations: GameCardInformation[] = [game, game, game, game];
     numberOfGameInformations = 0;
     index: number = 0;
     endIndex: number = 0;
@@ -20,10 +20,7 @@ export class GameSelectionComponent implements OnInit {
     ngOnInit(): void {
         this.pageMode = this.route.snapshot.paramMap.get('gameMode');
         // TODO appel a mongoDB pour recuperer infos pour numberOfGameInformations
-        // for (let i = 0; i < 10; i++) {
-        //     this.gameCards.push(new GameInformation());
-        // }
-        // this.numberOfGameInformations = 9;
+        this.numberOfGameInformations = 4;
         this.selectGameCards();
     }
 

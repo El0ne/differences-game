@@ -1,7 +1,7 @@
 <div class="game-cards-container">
-    <div *ngFor="let gameCard of gameCards | slice: index:endIndex" class="card-container">
+    <div *ngFor="let gameCardInformation of gameCardInformations | slice: index:endIndex" class="card-container">
         <div *ngIf="pageMode === 'classic'">
-            {{ gameCard }}
+            <app-game-card-selection [gameCardInformation]="gameCardInformation"></app-game-card-selection>
         </div>
     </div>
 
