@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-
-const SECONDS_IN_MINUTE = 60;
-const TEN = 10;
+import { SECONDS_IN_MINUTE, TEN } from './second-constants';
 
 @Injectable({
     providedIn: 'root',
