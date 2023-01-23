@@ -1,32 +1,22 @@
 <body>
-    <div class="options">
-        <div class="button">
-            <div class="icon">
-                <!-- changer pour bon icons -->
-                <i class="fa-solid fa-house"></i>
-            </div>
-            <span>Accueil</span>
+    <div class="nav-bar">
+        <div class="options">
+            <button class="option-buttons home-button" type="button">
+                <img class="logo" src="../../../assets/icons8-home-page-48.png" />
+            </button>
+            <button class="option-buttons" type="button">
+                <img class="logo" src="../../../assets/icons8-info-48.png" />
+            </button>
         </div>
-
-        <div class="button">
-            <div class="icon">
-                <!-- changer pour bons icons -->
-                <i class="fa-solid fa-xmark"></i>
-            </div>
-            <span>Quitter</span>
-        </div>
-
-        <div class="button">
-            <!-- changer pour bons icons -->
-            <div class="icon">
-                <i class="fa-solid fa-circle-info"></i>
-            </div>
-            <span>Informations</span>
+        <div class="info-option">
+            <button class="option-buttons" type="button">
+                <img class="logo" src="../../../assets/icons8-close-window-50.png" />
+            </button>
         </div>
     </div>
 
     <div class="flex-game">
-        <img id="original" src="https://www.w3schools.com/images/lamp.jpg" />
+        <img id="original" src="../../../assets/temporary-image.webp" />
         <div class="game-options">
             <div id="score">
                 <!-- référence : https://codepen.io/Vivekp1118/pen/YzLOOVG -->
@@ -40,6 +30,11 @@
                     </div>
                 </div>
             </div>
+            <div class="test">
+                <button class="hint" type="button">
+                    <img class="hint-logo" src="../../../assets/loupe.png" />
+                </button>
+            </div>
             <div id="timer">
                 <div class="timer-box">
                     <div class="display">
@@ -47,9 +42,7 @@
                     </div>
                 </div>
             </div>
-
-            <div id="hint" (click)="test()">icon</div>
         </div>
-        <img id="differences" src="https://www.w3schools.com/images/lamp.jpg" />
+        <img id="differences" src="../../../assets/temporary-image.webp" />
     </div>
 </body>
