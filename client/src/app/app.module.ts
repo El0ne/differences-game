@@ -8,6 +8,7 @@ import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { GameSelectionComponent } from './pages/game-selection/game-selection.component';
+import { HomePageComponent } from './pages/home-page/home-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -16,7 +17,7 @@ import { GameSelectionComponent } from './pages/game-selection/game-selection.co
  * Otherwise Angular Cli will not know in which module to put new component
  */
 @NgModule({
-    declarations: [AppComponent, MaterialPageComponent, GameSelectionComponent],
+    declarations: [AppComponent, HomePageComponent, MaterialPageComponent, GameSelectionComponent],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],
     bootstrap: [AppComponent],
