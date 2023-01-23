@@ -1,15 +1,25 @@
+import { RankingBoard } from './Classes/ranking-board';
+
 export interface GameCard {
     name: string;
     difficulty: string;
     image: string;
-    soloTimes: string[];
-    multiTimes: string[];
+    soloTimes: RankingBoard[];
+    multiTimes: RankingBoard[];
 }
 
 export const game = {
     name: 'Miss Boots',
-    difficulty: 'Difficile',
+    difficulty: 'Facile',
     image: 'https://i.picsum.photos/id/455/640/480.jpg?hmac=jyyuDkvltF5e4BY9rrBhW--AjwPeqm3R2-Kv8UWSU7g',
-    soloTimes: ['1:00 Inull', '1:30 Second', '1:45 Third'],
-    multiTimes: ['1:25 First', '1:34 Seconda', '1:55 Third'],
+    soloTimes: [
+        { time: 60, name: 'Inull' },
+        { time: 90, name: 'second' },
+        { time: 105, name: 'third' },
+    ],
+    multiTimes: [
+        { time: 63, name: 'First' },
+        { time: 92, name: 'second' },
+        { time: 115, name: 'third' },
+    ],
 };

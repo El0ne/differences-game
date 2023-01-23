@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { game } from '@app/game-card';
+import { Component, Input } from '@angular/core';
+import { game } from 'src/app/game-card';
 
 @Component({
     selector: 'app-game-card-selection',
@@ -7,5 +7,6 @@ import { game } from '@app/game-card';
     styleUrls: ['./game-card-selection.component.scss'],
 })
 export class GameCardSelectionComponent {
-    gameCard = game;
+    @Input() gameCard: GameCardSelectionComponent;
+    gameCardTest = game;
 }
