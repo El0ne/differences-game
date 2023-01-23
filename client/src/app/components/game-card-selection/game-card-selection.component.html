@@ -8,15 +8,8 @@
             <button class="play-button">Jouer</button>
         </div>
         <div class="column">
-            <div *ngIf="gameCard.difficulty === 'Difficile'">
-                <div class="difficult-container">
-                    <p id="difficulty">{{ gameCard.difficulty }}</p>
-                </div>
-            </div>
-            <div *ngIf="gameCard.difficulty === 'Facile'">
-                <div class="easy-container">
-                    <p id="difficulty">{{ gameCard.difficulty }}</p>
-                </div>
+            <div [ngClass]="{ 'difficult-container': gameCard.difficulty === 'Difficile', 'easy-container': gameCard.difficulty === 'Facile' }">
+                <p id="difficulty">{{ gameCard.difficulty }}</p>
             </div>
             <div id="top3-container">
                 <div class="top3">- TOP 3 -</div>
