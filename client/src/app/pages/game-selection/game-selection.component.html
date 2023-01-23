@@ -1,6 +1,0 @@
-<div class="game-card-container">
-    <!-- <div *ngFor="let gameCard of currentGameCards">{{gameCard}}</div> -->
-    <div *ngFor="let gameCard of gameCards | slice: index:endIndex">{{ gameCard }}</div>
-</div>
-<button type="button" (click)="previous()" id="previous-button" [disabled]="index === 0">-</button>
-<button type="button" (click)="next()" id="next-button" [disabled]="endIndex === gameCards.length">+</button>
