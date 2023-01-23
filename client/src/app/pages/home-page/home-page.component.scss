@@ -1,11 +1,12 @@
 body {
-    background-image: url('../../../assets/tumblr_31757bfdc5213668887c3d759574c703_4b7ce3c8_500.webp');
+    //image coming from tumblr_31757bfdc5213668887c3d759574c703_4b7ce3c8_500.webp
+    background-image: url('../../../assets/background-gif.webp');
     background-repeat: repeat;
     background-size: cover;
     overflow: hidden;
 }
 
-#poly-logo {
+#logo {
     display: flex;
     justify-content: center;
     flex-direction: column;
@@ -28,6 +29,7 @@ body {
     animation: rotateAngle 6s linear infinite;
 }
 
+//Code from https://codepen.io/lisilinhart/pen/OJRoRJe
 .buttons {
     display: block;
     position: relative;
@@ -90,6 +92,7 @@ body {
     }
 }
 
+//Code from https://codepen.io/lisilinhart/pen/OJRoRJe
 @keyframes rotateAngle {
     0% {
         transform: rotateY(0deg) rotateX(10deg);
@@ -110,6 +113,7 @@ body {
     }
 }
 
+//Code from https://codepen.io/lisilinhart/pen/OJRoRJe
 @keyframes translateWobble {
     0% {
         opacity: 0;
@@ -140,6 +144,7 @@ body {
         transform: translate3d(calc(var(--z) * 100px), calc(var(--z) * 100px), calc(var(--z) * 100px));
     }
 }
+
 #team-details {
     color: white;
     font-weight: bold;
