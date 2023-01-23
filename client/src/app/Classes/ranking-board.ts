@@ -1,4 +1,4 @@
-export interface RankingBoard {
+export class RankingBoard {
     name: string;
     time: number;
 }

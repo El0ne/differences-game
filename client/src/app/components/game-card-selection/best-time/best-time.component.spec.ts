@@ -26,9 +26,9 @@ describe('BestTimeComponent', () => {
 
     it('should call the time service', () => {
         const time = 60;
-        const ans = '1:00';
-        spyOn(service, 'convert').and.returnValue(ans);
-        expect(component.timesConverted(time)).toEqual(ans);
+        const expected = '1:00';
+        spyOn(service, 'convert').and.returnValue(expected);
+        expect(component.timesConverted(time)).toEqual(expected);
         expect(service.convert).toHaveBeenCalled();
     });
 });

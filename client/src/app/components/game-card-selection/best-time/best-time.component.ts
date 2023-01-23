@@ -11,9 +11,9 @@ import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to
 export class BestTimeComponent {
     @Input() rankingBoard: RankingBoard[];
 
-    constructor(private timeConverter: SecondToMinuteService) {}
+    constructor(private service: SecondToMinuteService) {}
 
-    timesConverted(time: number) {
-        return this.timeConverter.convert(time);
+    timesConverted(time: number): string {
+        return this.service.convert(time);
     }
 }
