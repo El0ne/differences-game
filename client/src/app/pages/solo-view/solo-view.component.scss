@@ -1,12 +1,48 @@
 body {
     background: linear-gradient(#92089c, #a80d43);
-    //
+    overflow: hidden;
+}
+
+.info-card {
+    top: 15%;
+    left: 33%;
+    width: 33%;
+    height: 45%;
+    border-style: solid;
+    border-color: #00e6f6;
+    z-index: 1;
+    position: fixed;
+    background: linear-gradient(#92089c, #a80d43);
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.title {
+    font-family: 'Verdana';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 40px;
+    line-height: 36px;
+    text-align: center;
+    color: white;
+}
+
+.description {
+    font-weight: 300;
+}
+
+#info-quit {
+    bottom: 3%;
+    right: 3%;
+    position: absolute;
 }
 
 .nav-bar {
-    border-style: solid;
     display: flex;
-    width: 100%;
     justify-content: space-between;
     padding: 0.5rem;
 }
@@ -31,7 +67,7 @@ body {
     border: 0;
     color: #fff;
     letter-spacing: 3px;
-    box-shadow: 6px 0px 0px #05aab6;
+    box-shadow: 6px 0px 0px #00e6f6;
     outline: transparent;
     position: relative;
     user-select: none;
@@ -62,6 +98,10 @@ body {
 .option-buttons:hover:after {
     animation: 1s glitch;
     animation-timing-function: steps(2, end);
+}
+
+.option-buttons:hover {
+    cursor: pointer;
 }
 
 @keyframes glitch {
@@ -131,12 +171,12 @@ body {
 
 #original {
     border-style: solid;
-    width: 640px;
-    height: 480px;
+    border-color: #00e6f6;
+    width: 33%;
+    height: 25%;
 }
 
 .game-options {
-    //border-style: solid;
     display: inline-block;
     display: flex;
     flex-direction: column;
@@ -146,22 +186,16 @@ body {
 
 #score {
     align-self: center;
-    //justify-content: space-around;
-    //align-items: center;
     padding: 2%;
 }
 
 #timer {
-    //border-style: solid;
     align-self: center;
-    //padding-top: 10.7rem;
-    //padding: 5%;
 }
 
 .timer-box {
     width: 360px;
     height: 100px;
-    //background: linear-gradient(135deg, #14ffe9, #ffeb3b, #ff00e0);
     background: #00e6f6;
     border-radius: 10px;
 }
@@ -170,7 +204,6 @@ body {
     position: relative;
     top: 50%;
     left: 50%;
-    z-index: 999;
     transform: translate(-50%, -50%);
     background: #1b1b1b;
     width: 345px;
@@ -195,7 +228,7 @@ body {
 .hint {
     height: 90px;
     width: 90px;
-    border-color: rgba(255, 255, 255, 0);
+    border-style: hidden;
     align-self: end;
     background-color: rgba(255, 255, 255, 0);
 }
@@ -214,9 +247,9 @@ body {
 
 #differences {
     border-style: solid;
-    width: 640px;
-    height: 480px;
-
+    border-color: #00e6f6;
+    width: 33%;
+    height: 25%;
     float: right;
 }
 

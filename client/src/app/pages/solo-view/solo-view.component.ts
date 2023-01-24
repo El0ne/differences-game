@@ -6,11 +6,12 @@ import { Component, OnInit } from '@angular/core';
     styleUrls: ['./solo-view.component.scss'],
 })
 export class SoloViewComponent implements OnInit {
+    showTextBox: boolean = false;
     constructor() {}
 
     ngOnInit(): void {}
 
-    test() {
-        console.log('hey');
+    toggleTextBox() {
+        this.showTextBox = !this.showTextBox;
     }
 }

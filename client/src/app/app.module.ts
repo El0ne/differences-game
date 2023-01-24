@@ -7,7 +7,7 @@ import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
-import { SoloViewComponent } from './solo-view/solo-view.component';
+import { SoloViewComponent } from './pages/solo-view/solo-view.component';
 
 /**
  * Main module that is used in main.ts.
