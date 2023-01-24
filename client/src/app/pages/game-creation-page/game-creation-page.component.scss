@@ -1,0 +1,50 @@
+body {
+}
+
+#title-container {
+    width: 100%;
+    height: 3rem;
+    border-style: solid;
+    margin-bottom: 8%;
+}
+.upload-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+.title {
+}
+
+.original-container {
+    border-style: solid;
+}
+
+.difference-container {
+    border-style: solid;
+}
+.tools-container {
+    border-style: solid;
+    width: 10%;
+    height: 480px;
+}
+
+.original-image {
+    width: 640px;
+    height: 480px;
+    margin: 15px;
+    border-style: solid;
+}
+
+.different-image {
+    border-style: solid;
+    width: 640px;
+    height: 480px;
+    margin: 15px;
+}
+
+button {
+    width: 2rem;
+    height: 2rem;
+    margin: 1%;
+}
