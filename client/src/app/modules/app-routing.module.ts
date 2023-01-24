@@ -6,7 +6,7 @@ import { HomePageComponent } from '@app/pages/home-page/home-page.component';
 const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
     { path: 'home', component: HomePageComponent },
-    { path: 'gameSelection/:gameMode', component: GameSelectionComponent },
+    { path: 'stage-selection/:gameMode', component: GameSelectionComponent },
     { path: '**', redirectTo: '/home' },
 ];
 

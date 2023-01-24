@@ -9,16 +9,16 @@ import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
     styleUrls: ['./game-selection.component.scss'],
 })
 export class GameSelectionComponent implements OnInit {
-    gameCardInformations: GameCardInformation[] = [game, game, game, game];
+    gameCardInformations: GameCardInformation[] = [game, game, game, game]; // TODO vider lorsque la BD est implementee
     numberOfGameInformations = 0;
     index: number = 0;
     endIndex: number = 0;
-    pageMode: string | null;
+    gameMode: string | null;
 
     constructor(private route: ActivatedRoute) {}
 
     ngOnInit(): void {
-        this.pageMode = this.route.snapshot.paramMap.get('gameMode');
+        this.gameMode = this.route.snapshot.paramMap.get('gameMode');
         // TODO appel a mongoDB pour recuperer infos pour numberOfGameInformations
         this.numberOfGameInformations = 4;
         this.selectGameCards();
