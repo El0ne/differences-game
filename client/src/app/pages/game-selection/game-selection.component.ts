@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { GameCardInformation } from '@app/Classes/game-card';
+import { GameOrConfigSelectionService } from '@app/services/game-or-config-selection/game-or-config-selection.service';
 import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
 
 @Component({
@@ -9,18 +9,19 @@ import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
     styleUrls: ['./game-selection.component.scss'],
 })
 export class GameSelectionComponent implements OnInit {
-    gameCardInformations: GameCardInformation[] = []; // [(game, game, game, game)]; // TODO vider lorsque la BD est implementee
+    gameCardInformations: GameCardInformation[] = []; // [game, game, game, game]; // TODO vider lorsque la BD est implementee
     numberOfGameInformations = 0;
     index: number = 0;
     endIndex: number = 0;
-    gameMode: string | null;
+    isConfig: boolean | null;
 
-    constructor(private route: ActivatedRoute) {}
+    constructor(public gameOrConfigService: GameOrConfigSelectionService) {
+        this.isConfig = gameOrConfigService.getConfigView();
+    }
 
     ngOnInit(): void {
-        this.gameMode = this.route.snapshot.paramMap.get('gameMode');
         // TODO appel a mongoDB pour recuperer infos pour numberOfGameInformations
-        // this.numberOfGameInformations = 4;
+        // this.numberOfGameInformations = gameCardInformations.lenght;
         this.selectGameCards();
     }
 

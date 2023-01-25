@@ -47,6 +47,8 @@ describe('GameSelectionComponent', () => {
     });
 
     it('show-next-cards-button should not call selectGameCards() if EndIndex is equal to numberOfGameInformations', () => {
+        component.endIndex = 4;
+        component.numberOfGameInformations = 4;
         component.selectGameCards = jasmine.createSpy();
         fixture.debugElement.query(By.css('#show-next-cards-button')).triggerEventHandler('click', null);
         expect(component.selectGameCards).not.toHaveBeenCalled();
