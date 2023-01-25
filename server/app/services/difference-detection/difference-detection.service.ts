@@ -15,15 +15,43 @@ export class DifferenceDetectionService {
 
     async createHexArray(image: string): Promise<number[]> {
         const numArray: number[] = [];
-        await Jimp.read(`${this.pathToHere}/${image}`, (err, img) => {
-            for (let i = 0; i < 600; i++) {
-                for (let j = 0; j < 600; j++) {
-                    numArray.push(img.getPixelColour(i, j));
-                }
-                console.log(i);
-            }
-            console.log('numArray', numArray);
+        // soit on met jimp read await et on en sort jamais soit on le met pas et on retrun numArray vide
+        // await Jimp.read(`${this.pathToHere}/${image}`, (err, img) => {
+        //     // for (let i = 0; i < 600; i++) {
+        //     //     for (let j = 0; j < 600; j++) {
+        //     //         numArray.push(img.getPixelColour(i, j));
+        //     //     }
+        //     //     // console.log(i);
+        //     // }
+        //     // // console.log('numArray', numArray);
+        //     img.scan(0, 0, 600, 600, function (x, y, index) {
+        //         numArray.push(this.bitmap.data[index]);
+        //     });
+        //     console.log(numArray);
+        // });
+
+        // Jimp.read(`${this.pathToHere}/${image}`)
+        //     .then((img) => {
+        //         // for (let i = 0; i < 600; i++) {
+        //         //     for (let j = 0; j < 600; j++) {
+        //         //         numArray.push(img.getPixelColour(i, j));
+        //         //     }
+        //         // }
+        //         // console.log(numArray);
+        //         img.scan(0, 0, 600, 600, function (x, y, index) {
+        //             numArray.push(this.bitmap.data[index]);
+        //         });
+        //         console.log(numArray);
+        //     })
+        //     .catch((err) => {
+        //         console.log(err);
+        //     });
+
+        const img = await Jimp.read(`${this.pathToHere}/${image}`);
+        img.scan(0, 0, img.bitmap.width, img.bitmap.height, function (x, y, idx) {
+            numArray.push(this.bitmap.data[idx]);
         });
+
         console.log('numArray done');
         return numArray;
     }
@@ -39,5 +67,6 @@ export class DifferenceDetectionService {
         }
         console.log('made it');
         console.log(differenceArray);
+        console.log('first');
     }
 }
