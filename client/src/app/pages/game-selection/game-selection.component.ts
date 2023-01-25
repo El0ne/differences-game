@@ -44,4 +44,8 @@ export class GameSelectionComponent implements OnInit {
             this.selectGameCards();
         }
     }
+
+    showsFirstCards(): boolean {
+        return this.index === 0;
+    }
 }

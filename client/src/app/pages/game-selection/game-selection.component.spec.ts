@@ -79,6 +79,7 @@ describe('GameSelectionComponent', () => {
     it('show-next-cards-button should be activated if there is more gameInformations to show', () => {
         component.endIndex = 4;
         component.numberOfGameInformations = 5;
+        component.selectGameCards();
         expect(fixture.debugElement.nativeElement.querySelector('#show-next-cards-button').disabled).toBeFalsy();
     });
 });
