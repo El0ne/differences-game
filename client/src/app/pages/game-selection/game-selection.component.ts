@@ -21,7 +21,7 @@ export class GameSelectionComponent implements OnInit {
 
     ngOnInit(): void {
         // TODO appel a mongoDB pour recuperer infos pour numberOfGameInformations
-        // this.numberOfGameInformations = gameCardInformations.lenght;
+        // this.numberOfGameInformations = gameCardInformations.lenght; //pour tester la vue des composantes
         this.selectGameCards();
     }
 

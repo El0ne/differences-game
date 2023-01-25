@@ -61,28 +61,4 @@ describe('GameSelectionComponent', () => {
         fixture.debugElement.query(By.css('#show-next-cards-button')).triggerEventHandler('click', null);
         expect(component.selectGameCards).toHaveBeenCalled();
     });
-
-    // it('show-previous-cards-button should be disabled with index = 0', () => {
-    //     expect(fixture.nativeElement.querySelector('#show-previous-cards-button').disabled).toBeTruthy();
-    // });
-
-    // it('show-previous-cards-button should be activated if there is previous gameInformations to show', () => {
-    //     component.index = 4;
-    //     component.endIndex = 8;
-    //     expect(fixture.nativeElement.querySelector('#show-previous-cards-button').disabled).toBeFalsy();
-    // });
-
-    // it('show-next-cards-button should be disabled on load for 4 or less gameInformations available', () => {
-    //     component.endIndex = 4;
-    //     component.numberOfGameInformations = 4;
-    //     expect(fixture.nativeElement.querySelector('#show-next-cards-button').disabled).toBeTruthy();
-    // });
-
-    // it('show-next-cards-button should be activated if there is more gameInformations to show', () => {
-    //     component.endIndex = 4;
-    //     component.numberOfGameInformations = 5;
-    //     console.log(component.endIndex);
-    //     console.log(component.isShowingLastCard());
-    //     expect(fixture.debugElement.nativeElement.querySelector('#show-next-cards-button').disabled).toBeFalsy();
-    // });
 });
