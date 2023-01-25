@@ -2,6 +2,8 @@ import { AppModule } from '@app/app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ExampleController } from './controllers/example/example.controller';
+import { DifferenceDetectionService } from './services/difference-detection/difference-detection.service';
 
 const bootstrap = async () => {
     const app = await NestFactory.create(AppModule);
@@ -16,8 +18,12 @@ const bootstrap = async () => {
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api/docs', app, document);
     SwaggerModule.setup('', app, document);
-
     await app.listen(process.env.PORT);
 };
 
-bootstrap();
+// Todo Comment and uncomment those lines
+const service = new DifferenceDetectionService();
+const controller = new ExampleController(service);
+controller.exampleInfo();
+console.log('first');
+// bootstrap();
