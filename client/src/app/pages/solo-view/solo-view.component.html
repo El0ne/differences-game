@@ -31,9 +31,16 @@
     <div class="flex-game">
         <img id="original" src="../../../assets/temporary-image.webp" />
         <div class="game-options">
+            <div id="timer">
+                <div class="timer-box">
+                    <div class="display">
+                        <div id="time">01:00</div>
+                    </div>
+                </div>
+            </div>
+
             <div id="score">
                 <!-- référence : https://codepen.io/Vivekp1118/pen/YzLOOVG -->
-
                 <div class="container">
                     <div class="row">
                         <div class="col col-heading">
@@ -43,19 +50,24 @@
                     </div>
                 </div>
             </div>
-            <div class="test">
-                <button class="hint" type="button">
-                    <img class="hint-logo" src="../../../assets/loupe.png" />
-                </button>
-            </div>
-            <div id="timer">
-                <div class="timer-box">
-                    <div class="display">
-                        <div id="time">01:00</div>
+
+            <div class="text-box">
+                <div class="text-area">
+                    <div *ngFor="let message of messages">
+                        <div class="message">{{ message }}</div>
                     </div>
+                </div>
+                <div class="answer-area">
+                    <input type="text" class="input-field" placeholder="Enter your message" [(ngModel)]="messageContent" />
+                    <button class="send-button" (click)="sendMessage()"></button>
                 </div>
             </div>
         </div>
         <img id="differences" src="../../../assets/temporary-image.webp" />
+        <div class="test">
+            <button class="hint" type="button">
+                <img class="hint-logo" src="../../../assets/loupe.png" />
+            </button>
+        </div>
     </div>
 </body>

@@ -24,7 +24,7 @@ body {
 .title {
     font-family: 'Verdana';
     font-style: normal;
-    font-weight: 700;
+    font-weight: 200;
     font-size: 40px;
     line-height: 36px;
     text-align: center;
@@ -32,7 +32,7 @@ body {
 }
 
 .description {
-    font-weight: 300;
+    font-weight: 50;
 }
 
 #info-quit {
@@ -45,6 +45,7 @@ body {
     display: flex;
     justify-content: space-between;
     padding: 0.5rem;
+    height: 6%;
 }
 .home-button {
     margin-right: 5%;
@@ -53,9 +54,76 @@ body {
     display: flex;
 }
 
+.middle-options {
+    border-style: solid;
+    display: inline-block;
+}
+
 .info-option {
     margin-right: 2%;
 }
+
+.text-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: lightgray;
+    height: 100%;
+    width: 75%;
+    border-style: solid;
+    border-radius: 25px;
+    overflow: hidden;
+}
+
+.text-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    height: 80%;
+    width: 90%;
+    margin-bottom: 5px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.answer-area {
+    margin-top: 5px;
+    width: 95%;
+    display: flex;
+    justify-content: center;
+}
+
+.input-field {
+    border-radius: 5px;
+    margin-right: 5px;
+    width: 75%;
+}
+
+.message {
+    background-color: #00e6f6;
+    border-radius: 5px;
+    margin: 5px;
+    width: auto;
+}
+
+.send-button {
+    background-image: url(../../../assets/send-icon.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-color: #00e6f6;
+    border-radius: 50%;
+    width: 8%;
+}
+
+.send-button:hover {
+    background-color: #00b7c4;
+    cursor: pointer;
+}
+
 .option-buttons,
 .option-buttons:after {
     width: 150px;
@@ -162,6 +230,10 @@ body {
     }
 }
 .flex-game {
+    height: 80%;
+    width: 100%;
+    position: absolute;
+    top: 5%;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -172,16 +244,17 @@ body {
 #original {
     border-style: solid;
     border-color: #00e6f6;
-    width: 33%;
-    height: 25%;
+    width: 640px;
+    height: 480px;
 }
 
 .game-options {
     display: inline-block;
     display: flex;
     flex-direction: column;
+    align-items: center;
     width: 31rem;
-    height: 35rem;
+    height: 100%;
 }
 
 #score {
@@ -201,6 +274,7 @@ body {
 }
 
 .timer-box .display {
+    display: inline-block;
     position: relative;
     top: 50%;
     left: 50%;
@@ -221,13 +295,15 @@ body {
 }
 
 .test {
-    display: flex;
+    position: absolute;
+    bottom: -5%;
+    right: 10px;
     justify-content: center;
-    margin: 2.5rem;
+    margin: 1rem;
 }
 .hint {
-    height: 90px;
-    width: 90px;
+    height: 50px;
+    width: 50px;
     border-style: hidden;
     align-self: end;
     background-color: rgba(255, 255, 255, 0);
@@ -248,8 +324,8 @@ body {
 #differences {
     border-style: solid;
     border-color: #00e6f6;
-    width: 33%;
-    height: 25%;
+    width: 640px;
+    height: 480px;
     float: right;
 }
 
