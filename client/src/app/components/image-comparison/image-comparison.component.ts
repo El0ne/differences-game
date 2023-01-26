@@ -11,8 +11,12 @@ export class ImageComparisonComponent implements OnInit {
     ngOnInit(): void {
         const canvas: HTMLCanvasElement = this.myCanvas.nativeElement;
         const context = canvas.getContext('2d');
+        const image = new Image();
+        image.src = './images/smiley.jpeg';
         if (context) {
-            this.drawRectangle(context);
+            image.onload = function () {
+                context.drawImage(image, 0, 0);
+            };
         }
     }
 
