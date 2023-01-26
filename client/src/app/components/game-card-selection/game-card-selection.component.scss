@@ -1,24 +1,19 @@
-.difficult-container {
-    position: absolute;
-    top: 3%;
-    left: 26%;
-    width: 55%;
-    height: 10%;
+.difficulty-container {
+    flex-basis: 10%;
+    margin-left: 20%;
+    margin-right: 10%;
+    margin-top: 3%;
+    margin-bottom: 7%;
+    padding: 5%;
     display: table;
     border: solid 3px black;
     border-radius: 15px;
-    background-color: rgba(255, 0, 0, 0.5);
 }
 
-.easy-container {
-    position: absolute;
-    top: 3%;
-    left: 26%;
-    width: 55%;
-    height: 10%;
-    display: table;
-    border: solid 3px black;
-    border-radius: 15px;
+.difficult {
+    background-color: rgba(255, 0, 0, 0.5);
+}
+.easy {
     background-color: rgba(0, 255, 0, 0.5);
 }
 
@@ -31,75 +26,66 @@
     vertical-align: middle;
 }
 .nom {
+    flex-basis: 25%;
     font-size: xx-large;
-    position: absolute;
+    position: relative;
     font-weight: bold;
-    top: 5%;
-    left: 5%;
+    margin-top: 5%;
+    margin-left: 5%;
 }
 
 .row {
     display: flex;
+    flex-direction: row;
+    height: 100%;
 }
 
 .column {
-    flex: 50%;
-    position: relative;
-    height: 20rem;
-    width: 30rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
 }
 #top3-container {
-    position: absolute;
-    width: 13em;
-    top: 25%;
-    left: 18%;
-}
+    flex-basis: 15%;
+    margin-top: 5%;
+    margin-left: 15%;
+    margin-right: 5%;
 
-.left-icon {
-    position: absolute;
-    top: 25%;
-    left: 32%;
-}
-
-.right-icon {
-    position: absolute;
-    top: 25%;
-    right: 20%;
-}
-
-.top3 {
-    height: 1.5em;
-    position: relative;
-    text-align: center;
     border: solid black 2px;
     background: #c39ced;
     border-radius: 10px;
+}
+
+.mat-icon {
+    vertical-align: middle;
+}
+
+.top3 {
+    margin-top: 2%;
     font-style: italic;
+    text-align: center;
+    vertical-align: middle;
+    font-weight: bold;
 }
 .flex-row {
+    flex-basis: 10%;
     display: flex;
-    position: absolute;
-    bottom: 25%;
-    left: 18.5%;
-    height: 9rem;
-    width: 11.5rem;
+    flex-direction: row;
+    margin-left: 17.5%;
+    margin-right: 7%;
 }
 
 .ranking {
-    height: 7rem;
-    width: 5.5rem;
     border: 2px black solid;
-    list-style: none;
-    position: relative;
-    text-align: left;
-    font-size: small;
+    flex-basis: 50%;
     padding: 0;
-    counter-reset: my-awesome-counter;
 }
 
 .gametype {
     text-align: center;
     font-style: italic;
+    font-weight: bold;
 }
 
 .solo {
@@ -113,55 +99,50 @@
 }
 
 .times {
-    padding-left: 1.5em;
-    padding-right: 1em;
-    padding-bottom: 1em;
+    padding-left: 5%;
+    padding-bottom: 20%;
     font-size: smaller;
+    list-style-position: inside;
 }
 .card {
-    height: 20rem;
-    width: 30rem;
     border-style: solid;
     border-width: 2px;
     border-color: black;
     box-shadow: 5px 10px;
     position: relative;
-}
-
-.picture-container {
-    position: absolute;
-    height: 10rem;
-    width: 10rem;
-    bottom: 5%;
+    background-color: rgba(255, 255, 255, 0.301);
 }
 
 .photo {
+    flex-basis: 75%;
     position: relative;
     border: 1px solid #ddd;
     border-radius: 4px;
     padding: 5px;
-    width: 15rem;
-    height: 11rem;
-    bottom: 60%;
-    left: 5%;
+    width: 100%;
+    height: 90%;
+    margin-top: 5%;
+    margin-bottom: 5%;
+    margin-left: 5%;
 }
 
 /* CSS https://getcssscan.com/css-buttons-examples */
 .play-button {
+    flex-basis: 50%;
     font-size: 16px;
     font-weight: 200;
     letter-spacing: 1px;
-    padding: 13px 50px 13px;
+    padding: 2%;
+    margin: 3%;
     outline: 0;
     border: 3px solid black;
     cursor: pointer;
-    position: absolute;
+    position: relative;
     background-color: rgba(0, 0, 0, 0);
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
     bottom: 5%;
-    left: 15%;
 }
 
 .play-button:after {
@@ -179,13 +160,4 @@
 .play-button:hover:after {
     top: 0px;
     left: 0px;
-}
-
-.ranking li {
-    counter-increment: my-awesome-counter;
-}
-.ranking li::before {
-    content: counter(my-awesome-counter) '.';
-    color: rgb(60, 111, 222);
-    font-weight: bold;
 }

@@ -2,28 +2,26 @@
     <div class="row">
         <div class="column">
             <p class="nom">{{ gameCardTest.name }}</p>
-            <div class="picture-container">
-                <img [src]="gameCardTest.image" class="photo" />
-            </div>
-            <button class="play-button" routerLink="/soloGame">Jouer</button>
+            <img [src]="gameCardTest.image" class="photo" />
         </div>
         <div class="column">
             <div
+                class="difficulty-container"
                 [ngClass]="{
-                    'difficult-container': gameCardTest.difficulty === 'Difficile',
-                    'easy-container': gameCardTest.difficulty === 'Facile'
+                    difficult: gameCardTest.difficulty === 'Difficile',
+                    easy: gameCardTest.difficulty === 'Facile'
                 }"
             >
-                <p id="difficulty">{{ gameCardTest.difficulty }}</p>
+                <p id="difficulty">
+                    {{ gameCardTest.difficulty }}
+                </p>
             </div>
             <div id="top3-container">
-                <div class="top3">- TOP 3 -</div>
-            </div>
-            <div class="left-icon">
-                <mat-icon>whatshot</mat-icon>
-            </div>
-            <div class="right-icon">
-                <mat-icon>whatshot</mat-icon>
+                <div class="top3">
+                    <mat-icon>whatshot</mat-icon>
+                    - TOP 3 -
+                    <mat-icon>whatshot</mat-icon>
+                </div>
             </div>
             <div class="flex-row">
                 <ol class="ranking">
@@ -39,7 +37,10 @@
                     </div>
                 </ol>
             </div>
-            <button class="play-button" routerLink="/waitingRoom">Créer</button>
         </div>
+    </div>
+    <div class="row">
+        <button class="play-button play" routerLink="/soloGame">Jouer</button>
+        <button class="play-button create" routerLink="/waitingRoom">Créer</button>
     </div>
 </div>
