@@ -2,10 +2,10 @@
     <div class="info-card" *ngIf="showTextBox">
         <div class="info">
             <p class="title">Nom du jeu</p>
-            <div class="title description">difficulté : facile</div>
-            <div class="title description">joueurs présents : 1</div>
-            <div class="title description">nombre de différences : 2</div>
-            <div class="title description">temps perdu par indice/gagné par différence : x</div>
+            <div class="title">difficulté : facile</div>
+            <div class="title">joueurs présents : 1</div>
+            <div class="title">nombre de différences : 2</div>
+            <div class="title">temps perdu par indice/gagné par différence : x</div>
         </div>
         <button class="option-buttons" id="info-quit" type="button" (click)="toggleTextBox()">
             <img class="logo" src="../../../assets/icons8-close-window-50.png" />
@@ -58,13 +58,13 @@
                     </div>
                 </div>
                 <div class="answer-area">
-                    <input type="text" class="input-field" placeholder="Enter your message" [(ngModel)]="messageContent" />
+                    <input type="text" class="input-field" placeholder="Entrez votre message" [(ngModel)]="messageContent" />
                     <button class="send-button" (click)="sendMessage()"></button>
                 </div>
             </div>
         </div>
         <img id="differences" src="../../../assets/temporary-image.webp" />
-        <div class="test">
+        <div class="hint-button">
             <button class="hint" type="button">
                 <img class="hint-logo" src="../../../assets/loupe.png" />
             </button>

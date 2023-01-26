@@ -1,18 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
     selector: 'app-solo-view',
     templateUrl: './solo-view.component.html',
     styleUrls: ['./solo-view.component.scss'],
 })
-export class SoloViewComponent implements OnInit {
+export class SoloViewComponent {
     showTextBox: boolean = false;
     messages: string[] = [];
     messageContent: string = '';
-
-    constructor() {}
-
-    ngOnInit(): void {}
 
     toggleTextBox() {
         this.showTextBox = !this.showTextBox;
@@ -21,7 +17,7 @@ export class SoloViewComponent implements OnInit {
     sendMessage() {
         const maxLength = 200;
         if (this.messageContent.length === 0 || this.messageContent.length > maxLength) {
-            window.alert('message not of correct length');
+            window.alert("Votre message n'est pas valide");
         } else {
             this.messages.push(this.messageContent);
         }
