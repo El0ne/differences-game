@@ -1,5 +1,6 @@
 <body>
     <div class="info-card" *ngIf="showTextBox">
+        <!-- TODO : Make sure that the info card has access to the game's info-->
         <div class="info">
             <p class="title">Nom du jeu</p>
             <div class="title">difficulté : facile</div>
@@ -8,28 +9,28 @@
             <div class="title">temps perdu par indice/gagné par différence : x</div>
         </div>
         <button class="option-buttons" id="info-quit" type="button" (click)="toggleTextBox()">
-            <img class="logo" src="../../../assets/icons8-close-window-50.png" />
+            <img class="logo" src="{{ paths.quit }}" />
         </button>
     </div>
 
     <div class="nav-bar">
         <div class="options">
             <button class="option-buttons home-button" type="button" routerLink="/home">
-                <img class="logo" src="../../../../assets/icons8-home-page-48.png" />
+                <img class="logo" src="{{ paths.home }}" />
             </button>
             <button class="option-buttons" type="button" (click)="toggleTextBox()">
-                <img class="logo" src="../../../../assets/icons8-info-48.png" />
+                <img class="logo" src="{{ paths.info }}" />
             </button>
         </div>
         <div class="info-option">
             <button class="option-buttons" type="button">
-                <img class="logo" src="../../../../assets/icons8-close-window-50.png" />
+                <img class="logo" src="{{ paths.quit }}" />
             </button>
         </div>
     </div>
 
     <div class="flex-game">
-        <img id="original" src="../../../assets/temporary-image.webp" />
+        <img id="original" src="{{ paths.temp }}" />
         <div class="game-options">
             <div id="timer">
                 <div class="timer-box">
@@ -56,6 +57,9 @@
                     <div *ngFor="let message of messages">
                         <div class="message">{{ message }}</div>
                     </div>
+                    <div class="error-message" *ngIf="showErrorMessage" (click)="untoggleErrorMessage()">
+                        Votre message ne respecte pas le bon format. Cliquez ici pour enlever ce message.
+                    </div>
                 </div>
                 <div class="answer-area">
                     <input type="text" class="input-field" placeholder="Entrez votre message" [(ngModel)]="messageContent" />
@@ -63,10 +67,10 @@
                 </div>
             </div>
         </div>
-        <img id="differences" src="../../../assets/temporary-image.webp" />
+        <img id="differences" src="{{ paths.temp }}" />
         <div class="hint-button">
             <button class="hint" type="button">
-                <img class="hint-logo" src="../../../assets/loupe.png" />
+                <img class="hint-logo" src="{{ paths.hint }}" />
             </button>
         </div>
     </div>
