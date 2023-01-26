@@ -5,13 +5,7 @@
             <img [src]="gameCardTest.image" class="photo" />
         </div>
         <div class="column">
-            <div
-                class="difficulty-container"
-                [ngClass]="{
-                    difficult: gameCardTest.difficulty === 'Difficile',
-                    easy: gameCardTest.difficulty === 'Facile'
-                }"
-            >
+            <div class="difficulty-container" [ngClass]="gameCardTest.difficulty === 'Difficile' ? 'difficult' : 'easy'">
                 <p id="difficulty">
                     {{ gameCardTest.difficulty }}
                 </p>
