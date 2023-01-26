@@ -6,7 +6,7 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 @ApiTags('Example')
 @Controller('example')
 export class ExampleController {
-    // Todo replace service with ExampleService
+    // TODO replace service with ExampleService
     constructor(private readonly exampleService: DifferenceDetectionService) {}
 
     @Get('/')
@@ -18,7 +18,7 @@ export class ExampleController {
         return await this.exampleService.compareImages();
     }
 
-    // Todo Uncomment all those lines
+    // TODO Uncomment all those lines
     // @ApiOkResponse({
     //     description: 'Return information about http api',
     //     type: Message,

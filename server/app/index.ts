@@ -21,9 +21,8 @@ const bootstrap = async () => {
     await app.listen(process.env.PORT);
 };
 
-// Todo Comment and uncomment those lines
+// TODO Comment and uncomment those lines
 const service = new DifferenceDetectionService();
 const controller = new ExampleController(service);
 controller.exampleInfo();
-console.log('first');
 // bootstrap();
