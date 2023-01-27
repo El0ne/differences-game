@@ -3,7 +3,7 @@
     <div class="upload-container">
         <div class="original-container">
             <div class="original-image"></div>
-            <input type="file" id="upload-different" />
+            <input type="file" id="upload-different" (change)="getFileInfo($event)" />
             <button id="reset-original">X</button>
         </div>
 
@@ -11,7 +11,7 @@
 
         <div class="difference-container">
             <div class="different-image"></div>
-            <input type="file" id="upload-different" />
+            <input type="file" id="upload-different" onChange="console.log(event.target.files)" />
             <button class="reset-different">X</button>
         </div>
     </div>

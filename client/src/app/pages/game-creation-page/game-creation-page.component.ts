@@ -8,5 +8,19 @@ import { Component, OnInit } from '@angular/core';
 export class GameCreationPageComponent implements OnInit {
     constructor() {}
 
+    getFileInfo(e: Event) {
+        const target = e.target as HTMLInputElement;
+        const file: File = (target.files as FileList)[0];
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+            const img = new Image();
+            img.src = reader.result as string;
+            img.onload = () => {
+                console.log(img.naturalWidth, img.naturalHeight);
+            };
+        };
+    }
+
     ngOnInit(): void {}
 }
