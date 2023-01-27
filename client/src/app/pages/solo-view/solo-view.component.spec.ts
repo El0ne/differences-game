@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MESSAGES_LENGTH } from './solo-view-constants';
 
 import { SoloViewComponent } from './solo-view.component';
 
@@ -20,10 +21,16 @@ describe('SoloViewComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('showTextBox attribute should be turned to true when toggleTextBox is called', () => {
+    it('showTextBox attribute should turn to true when toggleTextBox is called and showTextBox is false', () => {
         component.showTextBox = false;
         component.toggleTextBox();
         expect(component.showTextBox).toBeTrue();
+    });
+
+    it('showTextBox attribute should turn to false when toggleTextBox is called and showTextBox is true', () => {
+        component.showTextBox = true;
+        component.toggleTextBox();
+        expect(component.showTextBox).toBeFalse();
     });
 
     it('showErrorMessage attribute should be turned to true if toggleErrorMessage is called and showErrorMessage is false', () => {
@@ -54,6 +61,16 @@ describe('SoloViewComponent', () => {
         const spy = spyOn(component, 'toggleErrorMessage');
 
         component.messageContent = '';
+        component.sendMessage();
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('sendMessage should call toggleErrorMessage if message is too long', () => {
+        const spy = spyOn(component, 'toggleErrorMessage');
+
+        const longString = new Array(MESSAGES_LENGTH.maxLength + 2).join('a');
+
+        component.messageContent = longString;
         component.sendMessage();
         expect(spy).toHaveBeenCalled();
     });
