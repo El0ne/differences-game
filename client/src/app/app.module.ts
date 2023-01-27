@@ -7,8 +7,8 @@ import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
-import { HomePageComponent } from './pages/home-page/home-page.component';
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
+import { HomePageComponent } from './pages/home-page/home-page.component';
 
 /**
  * Main module that is used in main.ts.
