@@ -1,0 +1,24 @@
+.game-cards-container {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: 45% 45% 10%;
+    height: 100%;
+}
+
+.card-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.navigate-cards-buttons {
+    grid-row: 3 / 4;
+}
+
+#show-previous-cards-button {
+    grid-column: 1 / 2;
+}
+
+#show-next-cards-button {
+    grid-column: 2 / 3;
+}

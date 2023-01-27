@@ -1,20 +1,18 @@
 <div class="card">
     <div class="row">
         <div class="column">
-            <p class="nom">{{ gameCardTest.name }}</p>
+            <p class="nom">{{ gameCardInformation.name }}</p>
             <div class="picture-container">
-                <img [src]="gameCardTest.image" class="photo" />
+                <img [src]="gameCardInformation.image" class="photo" />
             </div>
             <button class="play-button" routerLink="/soloGame">Jouer</button>
         </div>
         <div class="column">
-            <div
-                [ngClass]="{
-                    'difficult-container': gameCardTest.difficulty === 'Difficile',
-                    'easy-container': gameCardTest.difficulty === 'Facile'
-                }"
-            >
-                <p id="difficulty">{{ gameCardTest.difficulty }}</p>
+            <div [ngClass]="{
+                    'difficult-container': gameCardInformation.difficulty === 'Difficile',
+                    'easy-container': gameCardInformation.difficulty === 'Facile'
+                }">
+                <p id="difficulty">{{ gameCardInformation.difficulty }}</p>
             </div>
             <div id="top3-container">
                 <div class="top3">- TOP 3 -</div>
@@ -29,13 +27,13 @@
                 <ol class="ranking">
                     <p class="gametype solo">SOLO</p>
                     <div class="times">
-                        <app-best-time [rankingBoard]="gameCardTest.soloTimes"></app-best-time>
+                        <app-best-time [rankingBoard]="gameCardInformation.soloTimes"></app-best-time>
                     </div>
                 </ol>
                 <ol class="ranking">
                     <p class="gametype vs">1 VS 1</p>
                     <div class="times">
-                        <app-best-time [rankingBoard]="gameCardTest.multiTimes"></app-best-time>
+                        <app-best-time [rankingBoard]="gameCardInformation.multiTimes"></app-best-time>
                     </div>
                 </ol>
             </div>
