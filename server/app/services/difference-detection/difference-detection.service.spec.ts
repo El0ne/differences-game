@@ -5,6 +5,7 @@ import { DifferenceDetectionService } from './difference-detection.service';
 
 describe('DifferenceDetectionService', () => {
     let service: DifferenceDetectionService;
+    let createDifferenceImageSpy;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -12,6 +13,7 @@ describe('DifferenceDetectionService', () => {
         }).compile();
 
         service = module.get<DifferenceDetectionService>(DifferenceDetectionService);
+        createDifferenceImageSpy = jest.spyOn(service, 'createDifferenceImage').mockImplementation();
     });
 
     it('should be defined', () => {
@@ -40,7 +42,6 @@ describe('DifferenceDetectionService', () => {
     });
 
     it('compareImages() should call createDifferenceImage ', async () => {
-        const createDifferenceImageSpy = jest.spyOn(service, 'createDifferenceImage').mockImplementation();
         await service.compareImages();
         expect(createDifferenceImageSpy).toBeCalled();
     });
