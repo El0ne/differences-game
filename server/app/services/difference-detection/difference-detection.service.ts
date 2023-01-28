@@ -4,11 +4,11 @@ import * as Jimp from 'jimp';
 import { IMAGE_HEIGHT, IMAGE_WIDTH, PATH_TO_IMAGES } from './difference-detection.constants';
 @Injectable()
 export class DifferenceDetectionService {
-    // TODO Replace when I receive array from soloGameView
-    // firstImageArray: number[];
-    // secondImageArray: number[];
-    firstImage: string = 'image_2_diff.bmp';
-    secondImage: string = 'image_7_diff.bmp';
+    // TODO Remove images when I receive array from soloGameView
+    firstImageArray: number[];
+    secondImageArray: number[];
+    firstImage: string = 'image_12_diff.bmp';
+    secondImage: string = 'image_2_diff.bmp';
 
     differenceArray: boolean[] = [];
 
@@ -19,8 +19,18 @@ export class DifferenceDetectionService {
         for (const rgbColor of img.bitmap.data) numArray.push(rgbColor);
         return numArray;
     }
+    async compareImages(): Promise<void> {
+        // TODO Remove when I receive array from soloGameView
+        this.firstImageArray = await this.createArray(this.firstImage);
+        this.secondImageArray = await this.createArray(this.secondImage);
+        for (let i = 0; i < this.firstImageArray.length; i++) {
+            if (this.firstImageArray[i] !== this.secondImageArray[i]) this.differenceArray.push(false);
+            else this.differenceArray.push(true);
+        }
+        this.createDifferenceImage();
+    }
 
-    createDifferenceImage() {
+    createDifferenceImage(): void {
         const image = new Jimp(IMAGE_WIDTH, IMAGE_HEIGHT, 'white', (err) => {
             if (err) throw err;
         });
@@ -47,15 +57,5 @@ export class DifferenceDetectionService {
         image.bitmap.data[pixelIndex] = 0x00;
         image.bitmap.data[pixelIndex + 1] = 0x00;
         image.bitmap.data[pixelIndex + 2] = 0x00;
-    }
-    async compareImages() {
-        // TODO Remove when I receive array from soloGameView
-        const firstImage = await this.createArray(this.firstImage);
-        const secondImage = await this.createArray(this.secondImage);
-        for (let i = 0; i < firstImage.length; i++) {
-            if (firstImage[i] !== secondImage[i]) this.differenceArray.push(false);
-            else this.differenceArray.push(true);
-        }
-        this.createDifferenceImage();
     }
 }
