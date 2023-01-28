@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { GameCardInformation } from '@app/Classes/game-card';
+import { GameCardInformation } from '@common/game-card';
 
 @Component({
     selector: 'app-game-card-selection',

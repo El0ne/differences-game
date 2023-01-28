@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { RankingBoard } from '@app/Classes/ranking-board';
 import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
+import { RankingBoard } from '@common/ranking-board';
 
 @Component({
     selector: 'app-best-time',
