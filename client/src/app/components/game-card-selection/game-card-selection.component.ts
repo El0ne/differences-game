@@ -8,4 +8,5 @@ import { GameCardInformation } from '@app/Classes/game-card';
 })
 export class GameCardSelectionComponent {
     @Input() gameCardInformation: GameCardInformation;
+    @Input() isConfig: boolean | null;
 }
