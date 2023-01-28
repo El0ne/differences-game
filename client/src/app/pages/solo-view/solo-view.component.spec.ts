@@ -74,4 +74,13 @@ describe('SoloViewComponent', () => {
         component.sendMessage();
         expect(spy).toHaveBeenCalled();
     });
+
+    it('sendMessage should call untoggleErrorMessage if errorMessage is too true', () => {
+        const spy = spyOn(component, 'untoggleErrorMessage');
+        component.showErrorMessage = true;
+        component.messageContent = 'test message';
+
+        component.sendMessage();
+        expect(spy).toHaveBeenCalled();
+    });
 });

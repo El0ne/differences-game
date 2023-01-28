@@ -7,7 +7,7 @@ import { MESSAGES_LENGTH, PATHS } from './solo-view-constants';
     styleUrls: ['./solo-view.component.scss'],
 })
 export class SoloViewComponent {
-    readonly paths = PATHS;
+    readonly paths = PATHS; // TODO : Verify with Nikolay if typing is fine for constants
 
     showErrorMessage: boolean = false;
     showTextBox: boolean = false;

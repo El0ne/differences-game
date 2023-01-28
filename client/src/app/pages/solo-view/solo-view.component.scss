@@ -1,5 +1,11 @@
+:host {
+    --basic-border: #00e6f6;
+    --linear-background-color-1: #92089c;
+    --linear-background-color-2: #a80d43;
+}
+
 body {
-    background: linear-gradient(#92089c, #a80d43); //background: linear-gradient(var(--test1), var(--test2));
+    background: linear-gradient(var(--linear-background-color-1), var(--linear-background-color-2));
 }
 .info-card {
     top: 15%;
@@ -7,10 +13,10 @@ body {
     width: 33%;
     height: 45%;
     border-style: solid;
-    border-color: #00e6f6;
+    border-color: var(--basic-border);
     z-index: 1;
     position: fixed;
-    background: linear-gradient(#92089c, #a80d43);
+    background: linear-gradient(var(--linear-background-color-1), var(--linear-background-color-2));
 }
 
 .info {
