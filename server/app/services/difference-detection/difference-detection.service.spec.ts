@@ -5,8 +5,6 @@ import { DifferenceDetectionService } from './difference-detection.service';
 
 describe('DifferenceDetectionService', () => {
     let service: DifferenceDetectionService;
-    let createArraySpy;
-    let createDifferenceImageSpy;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -14,14 +12,13 @@ describe('DifferenceDetectionService', () => {
         }).compile();
 
         service = module.get<DifferenceDetectionService>(DifferenceDetectionService);
-        createDifferenceImageSpy = jest.spyOn(service, 'createDifferenceImage').mockImplementation();
     });
 
     it('should be defined', () => {
         expect(service).toBeDefined();
     });
 
-    it('should be defined', async () => {
+    it('createArray() should create an array of numbers that represents the rgba values of all pixels', async () => {
         const bmpImage = 'image_12_diff.bmp';
         const NUM_OF_PIXELS = IMAGE_WIDTH * IMAGE_HEIGHT;
         const INFO_BY_PIXEL = 4;
@@ -37,16 +34,26 @@ describe('DifferenceDetectionService', () => {
     });
 
     it('compareImages() should call createArray twice', async () => {
-        createArraySpy = jest.spyOn(service, 'createArray').mockImplementation(async () => Promise.resolve([1, 2, 3]));
+        const createArraySpy = jest.spyOn(service, 'createArray').mockImplementation(async () => Promise.resolve([1, 2, 3]));
         await service.compareImages();
         expect(createArraySpy).toHaveBeenCalledTimes(2);
     });
 
     it('compareImages() should call createDifferenceImage ', async () => {
+        const createDifferenceImageSpy = jest.spyOn(service, 'createDifferenceImage').mockImplementation();
         await service.compareImages();
         expect(createDifferenceImageSpy).toBeCalled();
     });
 
+    // TODO Don't know how to test it
+    // it('createDifferenceImage should set pixels to white and or to black according to the differenceArray bool values', () => {
+    //     service.differenceArray = [true, true, true, false];
+    //     service.createDifferenceImage();
+    //     const setPixelWhiteSpy = jest.spyOn(service, 'setPixelWhite').mockImplementation();
+    //     const setPixelBlackSpy = jest.spyOn(service, 'setPixelBlack').mockImplementation();
+    //     expect(setPixelBlackSpy).toBeCalledTimes(1);
+    //     expect(setPixelWhiteSpy).toBeCalledTimes(3);
+    // });
     it('arePixelSameRGB should return true if none of the 3 following rgb values differ from the 2 compared images', () => {
         service.differenceArray = [true, true, true, false];
         const index = 0;
