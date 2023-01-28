@@ -2,20 +2,20 @@
     <div id="title-container"><span class="title">Création de partie</span></div>
     <div class="upload-container">
         <div class="original-container">
-            <div class="original-image"></div>
-            <button id="upload-original">↑</button>
+            <div class="original-image"><img id="og-image" [src]="url1" /></div>
+            <input type="file" (change)="uploadOriginal($event)" accept="image/jpeg, image/jpg" id="upload-original" />
             <button id="reset-original">X</button>
         </div>
 
         <div class="tools-container"></div>
 
         <div class="difference-container">
-            <div class="different-image"></div>
-            <button id="upload-different">↑</button>
+            <div class="different-image"><img id="diff-image" [src]="url2" /></div>
+            <input type="file" (change)="uploadOriginal($event)" accept="image/jpeg, image/jpg" id="upload-different" />
             <button class="reset-different">X</button>
         </div>
     </div>
     <div class="button-container">
-        <button id="upload-button-both">📁</button>
+        <input type="file" (change)="uploadOriginal($event)" accept="image/jpeg, image/jpg" id="upload-original" />
     </div>
 </body>
