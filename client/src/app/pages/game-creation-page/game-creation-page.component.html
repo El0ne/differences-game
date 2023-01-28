@@ -6,7 +6,7 @@
                 <img src="{{ urlOriginal }}" />
             </div>
             <input type="file" id="upload-original" (change)="fileValidation($event)" />
-            <button id="reset-original">X</button>
+            <button id="reset-original" (click)="clear($event)">X</button>
         </div>
 
         <div class="tools-container"></div>
@@ -16,7 +16,7 @@
                 <img src="{{ urlDifferent }}" />
             </div>
             <input type="file" id="upload-different" (change)="fileValidation($event)" />
-            <button class="reset-different">X</button>
+            <button id="reset-different" (click)="clear($event)">X</button>
         </div>
     </div>
     <div class="button-container">
