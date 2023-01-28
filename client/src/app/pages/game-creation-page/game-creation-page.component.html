@@ -2,20 +2,24 @@
     <div id="title-container"><span class="title">Création de partie</span></div>
     <div class="upload-container">
         <div class="original-container">
-            <div class="original-image"><img id="og-image" [src]="url1" /></div>
-            <input type="file" (change)="uploadOriginal($event)" accept="image/jpeg, image/jpg" id="upload-original" />
-            <button id="reset-original">X</button>
+            <div class="original-image">
+                <img src="{{ urlOriginal }}" />
+            </div>
+            <input type="file" id="upload-original" (change)="fileValidation($event)" accept="image/bmp" />
+            <button id="reset-original" (click)="clear($event)">X</button>
         </div>
 
         <div class="tools-container"></div>
 
         <div class="difference-container">
-            <div class="different-image"><img id="diff-image" [src]="url2" /></div>
-            <input type="file" (change)="uploadOriginal($event)" accept="image/jpeg, image/jpg" id="upload-different" />
-            <button class="reset-different">X</button>
+            <div class="different-image">
+                <img src="{{ urlDifferent }}" />
+            </div>
+            <input type="file" id="upload-different" (change)="fileValidation($event)" accept="image/bmp" />
+            <button id="reset-different" (click)="clear($event)">X</button>
         </div>
     </div>
     <div class="button-container">
-        <input type="file" (change)="uploadOriginal($event)" accept="image/jpeg, image/jpg" id="upload-original" />
+        <input type="file" id="upload-both" (change)="fileValidation($event)" accept="image/bmp" />
     </div>
 </body>
