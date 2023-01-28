@@ -1,30 +1,25 @@
 import { Injectable } from '@nestjs/common';
 // import Jimp from 'jimp'; this import wont work
 import * as Jimp from 'jimp';
+import { IMAGE_HEIGHT, IMAGE_WIDTH, PATH_TO_IMAGES } from './difference-detection.constants';
 @Injectable()
 export class DifferenceDetectionService {
-    width = 640;
-    height = 480;
-    differenceArray: boolean[] = [];
+    firstImage: string = 'image_2_diff.bmp';
+    secondImage: string = 'image_2_diff.bmp';
 
-    pathToHere = './app/services/difference-detection/images';
+    differenceArray: boolean[] = [];
 
     async createArray(image: string): Promise<number[]> {
         const numArray: number[] = [];
-        const img = await Jimp.read(`${this.pathToHere}/${image}`);
-        // console.log('before image size', img.bitmap.data.length);
-        // console.log('img.bitmap.height', img.bitmap.height);
-        // console.log('img.bitmap.width', img.bitmap.width);
+        const img = await Jimp.read(`${PATH_TO_IMAGES}/${image}`);
         for (const rgbColor of img.bitmap.data) numArray.push(rgbColor);
-        // console.log('numArray', numArray.length);
         return numArray;
     }
 
     createDifferenceImage() {
-        const img = new Jimp(this.width, this.height, 'green', (err) => {
+        const img = new Jimp(IMAGE_WIDTH, IMAGE_HEIGHT, 'white', (err) => {
             if (err) throw err;
         });
-        // console.log('after image size', img.bitmap.data.length);
         img.scan(0, 0, img.bitmap.width, img.bitmap.height, (x, y, idx) => {
             if (this.arePixelSameColor(idx)) {
                 this.setPixelWhite(img, idx);
@@ -32,7 +27,7 @@ export class DifferenceDetectionService {
                 this.setPixelBlack(img, idx);
             }
         });
-        img.write(`${this.pathToHere}/difference-image.bmp`);
+        img.write(`${PATH_TO_IMAGES}/difference-image.bmp`);
     }
 
     arePixelSameColor(pixelIndex: number): boolean {
@@ -50,13 +45,12 @@ export class DifferenceDetectionService {
         image.bitmap.data[pixelIndex + 2] = 0x00;
     }
     async compareImages() {
-        const base = await this.createArray('image_12_diff.bmp');
-        const modified = await this.createArray('image_7_diff.bmp');
-        for (let i = 0; i < base.length; i++) {
-            if (base[i] !== modified[i]) this.differenceArray.push(false);
+        const firstImage = await this.createArray(this.firstImage);
+        const secondImage = await this.createArray(this.secondImage);
+        for (let i = 0; i < firstImage.length; i++) {
+            if (firstImage[i] !== secondImage[i]) this.differenceArray.push(false);
             else this.differenceArray.push(true);
         }
-        // console.log(this.differenceArray);
         this.createDifferenceImage();
     }
 }
