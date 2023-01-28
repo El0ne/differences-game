@@ -9,10 +9,10 @@ export class GameCardInformation {
 }
 
 export const game = {
-    name: 'Miss Boots',
-    difficulty: 'Facile',
+    name: 'Library',
+    difficulty: 'Difficile',
     // TODO: modifie pour image qui vient du serveur
-    image: 'https://i.picsum.photos/id/455/640/480.jpg?hmac=jyyuDkvltF5e4BY9rrBhW--AjwPeqm3R2-Kv8UWSU7g',
+    image: '/assets/444-640x480.jpg',
     soloTimes: [
         { time: 60, name: 'Inull' },
         { time: 90, name: 'second' },
