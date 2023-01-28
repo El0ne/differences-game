@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameOrConfigSelectionService } from '@app/services/game-or-config-selection/game-or-config-selection.service';
-import { game, GameCardInformation } from '@common/game-card';
+import { GameCardInformation } from '@common/game-card';
 import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
 
 @Component({
@@ -10,7 +10,7 @@ import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
     styleUrls: ['./game-selection.component.scss'],
 })
 export class GameSelectionComponent implements OnInit {
-    gameCardInformations: GameCardInformation[] = [game, game, game, game]; // TODO vider lorsque la BD est implementee
+    gameCardInformations: GameCardInformation[] = []; // [game, game, game, game]; // TODO vider lorsque la BD est implementee
     numberOfGameInformations = 0;
     index: number = 0;
     endIndex: number = 0;
@@ -22,14 +22,16 @@ export class GameSelectionComponent implements OnInit {
 
     ngOnInit(): void {
         // TODO appel a mongoDB pour recuperer infos pour numberOfGameInformations
-        this.numberOfGameInformations = this.gameCardInformations.length; // pour tester la vue des composantes
+        // this.numberOfGameInformations = this.gameCardInformations.length; // pour tester la vue des composantes
+        this.gameCardService.getNumbnerOfGameCardInformation().subscribe((data) => {
+            this.numberOfGameInformations = data;
+        });
         this.selectGameCards();
     }
 
     selectGameCards(): void {
         // TODO appel mongo db
-        const req = this.gameCardService.getGameCardsInformations(this.index, this.endIndex);
-        req.subscribe((data) => {
+        this.gameCardService.getGameCardsInformations(this.index, this.endIndex).subscribe((data) => {
             this.gameCardInformations = data;
         });
         this.endIndex = Math.min(this.index + GAME_CARDS_TO_DISPLAY, this.numberOfGameInformations);

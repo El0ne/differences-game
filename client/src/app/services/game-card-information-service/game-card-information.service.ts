@@ -23,4 +23,8 @@ export class GameCardInformationService {
     //     });
     //     return yo;
     // }
+
+    getNumbnerOfGameCardInformation(): Observable<number> {
+        return this.http.get<number>(`${STAGE}/info`);
+    }
 }
