@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameOrConfigSelectionService } from '@app/services/game-or-config-selection/game-or-config-selection.service';
 import { game, GameCardInformation } from '@common/game-card';
 import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
@@ -15,7 +16,7 @@ export class GameSelectionComponent implements OnInit {
     endIndex: number = 0;
     isConfig: boolean | null;
 
-    constructor(public gameOrConfigService: GameOrConfigSelectionService) {
+    constructor(public gameOrConfigService: GameOrConfigSelectionService, public gameCardService: GameCardInformationService) {
         this.isConfig = gameOrConfigService.getConfigView();
     }
 
@@ -27,6 +28,10 @@ export class GameSelectionComponent implements OnInit {
 
     selectGameCards(): void {
         // TODO appel mongo db
+        const req = this.gameCardService.getGameCardsInformations(this.index, this.endIndex);
+        req.subscribe((data) => {
+            this.gameCardInformations = data;
+        });
         this.endIndex = Math.min(this.index + GAME_CARDS_TO_DISPLAY, this.numberOfGameInformations);
     }
 
