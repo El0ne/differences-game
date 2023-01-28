@@ -12,9 +12,9 @@ export class ImageComparisonComponent implements OnInit {
         const canvas: HTMLCanvasElement = this.myCanvas.nativeElement;
         const context = canvas.getContext('2d');
         const image = new Image();
-        image.src = './images/smiley.jpeg';
+        image.src = 'https://www.trbimg.com/img-563bb6ac/turbine/ct-tests-ten-things-perspec-1108-20151105';
         if (context) {
-            image.onload = function () {
+            image.onload = () => {
                 context.drawImage(image, 0, 0);
             };
         }
