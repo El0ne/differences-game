@@ -124,39 +124,3 @@
     margin-top: 5%;
     margin-left: 5%;
 }
-
-/* CSS https://getcssscan.com/css-buttons-examples */
-.play-button {
-    flex-basis: 50%;
-    font-size: 16px;
-    font-weight: 200;
-    letter-spacing: 1px;
-    padding: 2%;
-    margin: 3%;
-    outline: 0;
-    border: 3px solid black;
-    cursor: pointer;
-    position: relative;
-    background-color: rgba(0, 0, 0, 0);
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: manipulation;
-    bottom: 5%;
-}
-
-.play-button:after {
-    content: '';
-    background-color: #ffe54c;
-    width: 100%;
-    z-index: -1;
-    position: absolute;
-    height: 100%;
-    top: 7px;
-    left: 7px;
-    transition: 0.2s;
-}
-
-.play-button:hover:after {
-    top: 0px;
-    left: 0px;
-}
