@@ -14,12 +14,19 @@ describe('DifferenceDetectionService', () => {
         }).compile();
 
         service = module.get<DifferenceDetectionService>(DifferenceDetectionService);
-        createArraySpy = jest.spyOn(service, 'createArray').mockImplementation(async () => Promise.resolve([1, 2, 3]));
-        createDifferenceImageSpy = jest.spyOn(service, 'createArray').mockImplementation(async () => Promise.resolve([1, 2, 3]));
+        createDifferenceImageSpy = jest.spyOn(service, 'createDifferenceImage').mockImplementation();
     });
 
     it('should be defined', () => {
         expect(service).toBeDefined();
+    });
+
+    it('should be defined', async () => {
+        const bmpImage = 'image_12_diff.bmp';
+        const NUM_OF_PIXELS = IMAGE_WIDTH * IMAGE_HEIGHT;
+        const INFO_BY_PIXEL = 4;
+        const array = await service.createArray(bmpImage);
+        expect(array.length).toEqual(NUM_OF_PIXELS * INFO_BY_PIXEL);
     });
 
     it('compareImages() should set differenceArray to the same length as firstImageArray (and secondImageArray)', async () => {
@@ -30,6 +37,7 @@ describe('DifferenceDetectionService', () => {
     });
 
     it('compareImages() should call createArray twice', async () => {
+        createArraySpy = jest.spyOn(service, 'createArray').mockImplementation(async () => Promise.resolve([1, 2, 3]));
         await service.compareImages();
         expect(createArraySpy).toHaveBeenCalledTimes(2);
     });
@@ -39,7 +47,6 @@ describe('DifferenceDetectionService', () => {
         expect(createDifferenceImageSpy).toBeCalled();
     });
 
-    // it('createDifferenceImage should create a Jimp image object');
     it('arePixelSameRGB should return true if none of the 3 following rgb values differ from the 2 compared images', () => {
         service.differenceArray = [true, true, true, false];
         const index = 0;
