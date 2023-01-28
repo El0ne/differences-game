@@ -1,13 +1,13 @@
 <div class="card">
     <div class="row">
         <div class="column">
-            <p class="nom">{{ gameCardTest.name }}</p>
-            <img [src]="gameCardTest.image" class="photo" />
+            <p class="nom">{{ gameCardInformation.name }}</p>
+            <img [src]="gameCardInformation.image" class="photo" />
         </div>
         <div class="column">
-            <div class="difficulty-container" [ngClass]="gameCardTest.difficulty === 'Difficile' ? 'difficult' : 'easy'">
+            <div class="difficulty-container" [ngClass]="gameCardInformation.difficulty === 'Difficile' ? 'difficult' : 'easy'">
                 <p id="difficulty">
-                    {{ gameCardTest.difficulty }}
+                    {{ gameCardInformation.difficulty }}
                 </p>
             </div>
             <div id="top3-container">
@@ -21,13 +21,13 @@
                 <ol class="ranking">
                     <p class="gametype solo">SOLO</p>
                     <div class="times">
-                        <app-best-time [rankingBoard]="gameCardTest.soloTimes"></app-best-time>
+                        <app-best-time [rankingBoard]="gameCardInformation.soloTimes"></app-best-time>
                     </div>
                 </ol>
                 <ol class="ranking">
                     <p class="gametype vs">1 VS 1</p>
                     <div class="times">
-                        <app-best-time [rankingBoard]="gameCardTest.multiTimes"></app-best-time>
+                        <app-best-time [rankingBoard]="gameCardInformation.multiTimes"></app-best-time>
                     </div>
                 </ol>
             </div>
