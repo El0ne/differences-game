@@ -114,3 +114,7 @@ body {
     top: 0px;
     left: 0px;
 }
+
+.play-button:disabled::after {
+    background-color: rgba(0, 0, 0, 0);
+}
