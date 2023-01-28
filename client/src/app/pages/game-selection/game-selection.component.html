@@ -9,12 +9,17 @@
         </div>
     </div>
 
-    <button type="button" (click)="previousCards()" id="show-previous-cards-button" class="navigate-cards-buttons"
-        [disabled]="isShowingFirstCard()">
-        -
-    </button>
-    <button type="button" (click)="nextCards()" id="show-next-cards-button" class="navigate-cards-buttons"
-        [disabled]="isShowingLastCard()">
-        +
-    </button>
+    <div class="navigate-cards-container">
+        <button type="button" (click)="previousCards()" id="show-previous-cards-button"
+            class="play-button navigate-cards-buttons" [disabled]="isShowingFirstCard()">
+            Show previous
+        </button>
+        <button type="button" *ngIf="isConfig" id="create-a-stage-button" class="play-button navigate-cards-buttons">
+            Create a stage
+        </button>
+        <button type="button" (click)="nextCards()" id="show-next-cards-button"
+            class="play-button navigate-cards-buttons" [disabled]="isShowingLastCard()">
+            Show next
+        </button>
+    </div>
 </div>
