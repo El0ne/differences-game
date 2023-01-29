@@ -11,7 +11,23 @@
                 <input type="file" id="upload-original" (change)="fileValidation($event)" accept="image/bmp" />
             </div>
 
-            <div class="tools-container"></div>
+            <div class="tools-container">
+                <div class="row-tools">
+                    <button><img class="btn-image" src="../../../assets/undo.png" /></button>
+                    <button><img class="btn-image" src="../../../assets/black-rectangle.png" /></button>
+                </div>
+                <div class="row-tools">
+                    <button>✎</button>
+                    <button><img class="btn-image" src="../../../assets/eraser.png" /></button>
+                </div>
+                <div class="row-tools">
+                    <button><img class="btn-image" src="../../../assets/copy.png" /></button>
+                    <button><img class="btn-image" src="../../../assets/invert-tool.png" /></button>
+                </div>
+                <input type="color" id="color-picker" />
+                <label for="color-picker">Choisir une couleur</label>
+                <input type="range" />
+            </div>
 
             <div class="difference-container">
                 <div class="different-image">
