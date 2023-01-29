@@ -3,20 +3,20 @@
     <div class="upload-container">
         <div class="original-container">
             <div class="original-image">
-                <img src="{{ urlOriginal }}" />
+                <canvas #canvas1 width="640px" height="480px"></canvas>
             </div>
-            <input type="file" id="upload-original" (change)="fileValidation($event)" accept="image/bmp" />
             <button id="reset-original" (click)="clear($event)">X</button>
+            <input type="file" id="upload-original" (change)="fileValidation($event)" accept="image/bmp" />
         </div>
 
         <div class="tools-container"></div>
 
         <div class="difference-container">
             <div class="different-image">
-                <img src="{{ urlDifferent }}" />
+                <canvas #canvas2 width="640px" height="480px"></canvas>
             </div>
-            <input type="file" id="upload-different" (change)="fileValidation($event)" accept="image/bmp" />
             <button id="reset-different" (click)="clear($event)">X</button>
+            <input type="file" id="upload-different" (change)="fileValidation($event)" accept="image/bmp" />
         </div>
     </div>
     <div class="button-container">
