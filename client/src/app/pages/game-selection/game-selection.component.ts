@@ -36,7 +36,6 @@ export class GameSelectionComponent implements OnInit {
             this.index += GAME_CARDS_TO_DISPLAY;
             this.selectGameCards();
         }
-        console.log('nextCard called');
     }
 
     previousCards(): void {
@@ -48,12 +47,10 @@ export class GameSelectionComponent implements OnInit {
     }
 
     isShowingFirstCard(): boolean {
-        console.log('this.index === 0', this.index === 0);
         return this.index === 0;
     }
 
     isShowingLastCard(): boolean {
-        console.log('this.index === this.numberOfGameInformations', this.index === this.numberOfGameInformations);
         return this.endIndex === this.numberOfGameInformations;
     }
 }
