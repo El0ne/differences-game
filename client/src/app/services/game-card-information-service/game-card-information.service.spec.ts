@@ -1,6 +1,6 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { games } from '@app/mock/game-cards';
+import { GAMES } from '@app/mock/game-cards';
 import { GAME_CARDS_TO_DISPLAY } from '@app/pages/game-selection/game-selection-constants';
 import { STAGE } from '@app/services/server-routes';
 
@@ -22,19 +22,19 @@ describe('GameCardInformationService', () => {
 
     it('getNumberOfGameCardInformation() should return a number', () => {
         service.getNumberOfGameCardInformation().subscribe((res) => {
-            expect(res).toEqual(games.length);
+            expect(res).toEqual(GAMES.length);
         });
 
         const req = httpController.expectOne(`${STAGE}/info`);
-        req.flush(games.length);
+        req.flush(GAMES.length);
     });
 
     it('getGameCardsInformations() should return a array of GameCardInformation', () => {
         service.getGameCardsInformations(0, GAME_CARDS_TO_DISPLAY).subscribe((res) => {
-            expect(res).toEqual(games.slice(0, GAME_CARDS_TO_DISPLAY));
+            expect(res).toEqual(GAMES.slice(0, GAME_CARDS_TO_DISPLAY));
         });
 
         const req = httpController.expectOne(`${STAGE}?index=0&endIndex=4`);
-        req.flush(games.slice(0, GAME_CARDS_TO_DISPLAY));
+        req.flush(GAMES.slice(0, GAME_CARDS_TO_DISPLAY));
     });
 });

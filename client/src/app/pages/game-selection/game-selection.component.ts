@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { games } from '@app/mock/game-cards';
+import { GAMES } from '@app/mock/game-cards';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameCardInformation } from '@common/game-card';
 import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
@@ -11,7 +11,7 @@ import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
     styleUrls: ['./game-selection.component.scss'],
 })
 export class GameSelectionComponent implements OnInit {
-    gameCardInformations: GameCardInformation[] = games; // TODO vider lorsque la BD est implementee
+    gameCardInformations: GameCardInformation[] = GAMES; // TODO vider lorsque la BD est implementee
     numberOfGameInformations = this.gameCardInformations.length; // TODO initialiser a 0
     index: number = 0;
     endIndex: number = 0;

@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
-import { games } from '@app/mock/game-cards';
+import { GAMES } from '@app/mock/game-cards';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameCardInformation } from '@common/game-card';
 import { Subject } from 'rxjs';
@@ -25,7 +25,7 @@ describe('GameSelectionComponent', () => {
 
         testGameCardsInformation = new Subject<GameCardInformation[]>();
         mockService.getGameCardsInformations = () => {
-            testGameCardsInformation.next(games.slice(0, GAME_CARDS_TO_DISPLAY));
+            testGameCardsInformation.next(GAMES.slice(0, GAME_CARDS_TO_DISPLAY));
             return testGameCardsInformation.asObservable();
         };
 

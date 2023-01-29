@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatIconModule } from '@angular/material/icon';
 import { BestTimeComponent } from '@app/components/best-time/best-time.component';
-import { games } from '@app/mock/game-cards';
+import { GAMES } from '@app/mock/game-cards';
 import { GameCardInformation } from '@common/game-card';
 
 import { GameCardSelectionComponent } from './game-card-selection.component';
@@ -21,7 +21,7 @@ describe('GameCardSelectionComponent', () => {
         component.gameCardInformation = new GameCardInformation();
         fixture.detectChanges();
 
-        component.gameCardInformation = games[0];
+        component.gameCardInformation = GAMES[0];
     });
 
     it('should create', () => {
