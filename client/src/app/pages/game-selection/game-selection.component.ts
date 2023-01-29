@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
-import { GameOrConfigSelectionService } from '@app/services/game-or-config-selection/game-or-config-selection.service';
 import { GameCardInformation } from '@common/game-card';
 import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
 
@@ -16,11 +16,10 @@ export class GameSelectionComponent implements OnInit {
     endIndex: number = 0;
     isConfig: boolean | null;
 
-    constructor(public gameOrConfigService: GameOrConfigSelectionService, public gameCardService: GameCardInformationService) {
-        this.isConfig = gameOrConfigService.getConfigView();
-    }
+    constructor(public gameCardService: GameCardInformationService, public router: Router) {}
 
     ngOnInit(): void {
+        this.isConfig = this.router.url === '/config';
         // TODO appel a mongoDB pour recuperer infos pour numberOfGameInformations
         // this.numberOfGameInformations = this.gameCardInformations.length; // pour tester la vue des composantes
         this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {

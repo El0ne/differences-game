@@ -22,6 +22,8 @@ describe('GameSelectionComponent', () => {
             return testNumber.asObservable();
         };
 
+        // const mockRouter = jasmine.createSpyObj(RouterTestingModule, ['url']);
+
         testGameCardsInformation = new Subject<GameCardInformation[]>();
         mockService.getGameCardsInformations = () => {
             testGameCardsInformation.next([game, game, game, game]);
@@ -41,6 +43,18 @@ describe('GameSelectionComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('isConfig should be true if the route is /config', () => {
+        spyOnProperty(component.router, 'url', 'get').and.returnValue('/config');
+        component.ngOnInit();
+        expect(component.isConfig).toBeTruthy();
+    });
+
+    it('isConfig should be false if the route is /select-stage', () => {
+        spyOnProperty(component.router, 'url', 'get').and.returnValue('/select-stage');
+        component.ngOnInit();
+        expect(component.isConfig).toBeFalsy();
     });
 
     it('selectGameCards() should put the endIndex at 4 more than index until there is less than 4 other gameCards to show', () => {
