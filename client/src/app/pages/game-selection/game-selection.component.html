@@ -1,5 +1,5 @@
 <div class="game-cards-container">
-    <div *ngFor="let gameCardInformation of gameCardInformations | slice: 0:4" class="card-container">
+    <div *ngFor="let gameCardInformation of gameCardInformations | slice: index:endIndex" class="card-container">
         <app-game-card-selection [gameCardInformation]="gameCardInformation" [isConfig]="isConfig"></app-game-card-selection>
     </div>
 
