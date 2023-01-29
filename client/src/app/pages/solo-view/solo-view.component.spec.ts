@@ -58,29 +58,29 @@ describe('SoloViewComponent', () => {
     });
 
     it('sendMessage should call toggleErrorMessage if message is empty', () => {
-        const spy = spyOn(component, 'toggleErrorMessage');
+        const toggleErrorMessageSpy = spyOn(component, 'toggleErrorMessage');
 
         component.messageContent = '';
         component.sendMessage();
-        expect(spy).toHaveBeenCalled();
+        expect(toggleErrorMessageSpy).toHaveBeenCalled();
     });
 
     it('sendMessage should call toggleErrorMessage if message is too long', () => {
-        const spy = spyOn(component, 'toggleErrorMessage');
+        const toggleErrorMessageSpy = spyOn(component, 'toggleErrorMessage');
 
         const longString = new Array(MESSAGES_LENGTH.maxLength + 2).join('a');
 
         component.messageContent = longString;
         component.sendMessage();
-        expect(spy).toHaveBeenCalled();
+        expect(toggleErrorMessageSpy).toHaveBeenCalled();
     });
 
     it('sendMessage should call untoggleErrorMessage if errorMessage is too true', () => {
-        const spy = spyOn(component, 'untoggleErrorMessage');
+        const untoggleErrorMessageSpy = spyOn(component, 'untoggleErrorMessage');
         component.showErrorMessage = true;
         component.messageContent = 'test message';
 
         component.sendMessage();
-        expect(spy).toHaveBeenCalled();
+        expect(untoggleErrorMessageSpy).toHaveBeenCalled();
     });
 });
