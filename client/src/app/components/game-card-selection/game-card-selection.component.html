@@ -33,12 +33,12 @@
             </div>
         </div>
     </div>
-    <div class="row" *ngIf="isConfig; else notConfig">
-        <button class="play-button play">Créer</button>
+    <div class="row" *ngIf="isConfig">
+        <button class="play-button play">Supprimer</button>
         <button class="play-button create">Réinitialiser</button>
     </div>
-    <ng-template #notConfig class="row">
+    <div class="row" *ngIf="!isConfig">
         <button class="play-button play" routerLink="/soloGame">Jouer</button>
-        <button class="play-button create" routerLink="/waitingRoom">Créer</button>
-    </ng-template>
+        <button class="play-button create" routerLink="/waitingRoom">Joindre</button>
+    </div>
 </div>

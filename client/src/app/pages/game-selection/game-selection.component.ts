@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { GameCardInformation } from '@app/Classes/game-card';
+import { game, game2, GameCardInformation } from '@app/Classes/game-card';
 import { GameOrConfigSelectionService } from '@app/services/game-or-config-selection/game-or-config-selection.service';
 import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
 
@@ -9,8 +9,8 @@ import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
     styleUrls: ['./game-selection.component.scss'],
 })
 export class GameSelectionComponent implements OnInit {
-    gameCardInformations: GameCardInformation[] = []; // [game, game, game, game]; // TODO vider lorsque la BD est implementee
-    numberOfGameInformations = 0;
+    gameCardInformations: GameCardInformation[] = [game, game, game, game2, game, game2]; // TODO vider lorsque la BD est implementee
+    numberOfGameInformations = this.gameCardInformations.length;
     index: number = 0;
     endIndex: number = 0;
     isConfig: boolean | null;
