@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { game, GameCardInformation } from '@common/game-card';
@@ -29,7 +30,7 @@ describe('GameSelectionComponent', () => {
 
         TestBed.configureTestingModule({
             declarations: [GameSelectionComponent],
-            imports: [RouterTestingModule],
+            imports: [RouterTestingModule, MatIconModule],
             providers: [{ provide: GameCardInformationService, useValue: mockService }],
         }).compileComponents();
 
