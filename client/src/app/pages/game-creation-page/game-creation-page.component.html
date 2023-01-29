@@ -1,22 +1,25 @@
 <body>
     <div id="title-container"><span class="title">Création de partie</span></div>
-    <div class="upload-container">
-        <div class="original-container">
-            <div class="original-image">
-                <canvas #canvas1 width="640px" height="480px"></canvas>
+    <div class="container">
+        <input type="text" class="game-title" placeholder="Donnez un titre à votre partie..." />
+        <div class="upload-container">
+            <div class="original-container">
+                <div class="original-image">
+                    <canvas #canvas1 width="640px" height="480px"></canvas>
+                </div>
+                <button id="reset-original" (click)="clear($event)">X</button>
+                <input type="file" id="upload-original" (change)="fileValidation($event)" accept="image/bmp" />
             </div>
-            <button id="reset-original" (click)="clear($event)">X</button>
-            <input type="file" id="upload-original" (change)="fileValidation($event)" accept="image/bmp" />
-        </div>
 
-        <div class="tools-container"></div>
+            <div class="tools-container"></div>
 
-        <div class="difference-container">
-            <div class="different-image">
-                <canvas #canvas2 width="640px" height="480px"></canvas>
+            <div class="difference-container">
+                <div class="different-image">
+                    <canvas #canvas2 width="640px" height="480px"></canvas>
+                </div>
+                <button id="reset-different" (click)="clear($event)">X</button>
+                <input type="file" id="upload-different" (change)="fileValidation($event)" accept="image/bmp" />
             </div>
-            <button id="reset-different" (click)="clear($event)">X</button>
-            <input type="file" id="upload-different" (change)="fileValidation($event)" accept="image/bmp" />
         </div>
     </div>
     <div class="button-container">
