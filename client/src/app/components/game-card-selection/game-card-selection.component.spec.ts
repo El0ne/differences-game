@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { game, GameCardInformation } from '@app/Classes/game-card';
+import { MatIconModule } from '@angular/material/icon';
+import { BestTimeComponent } from '@app/components/best-time/best-time.component';
+import { game, GameCardInformation } from '@common/game-card';
 
 import { GameCardSelectionComponent } from './game-card-selection.component';
 
@@ -9,7 +11,8 @@ describe('GameCardSelectionComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [GameCardSelectionComponent],
+            declarations: [GameCardSelectionComponent, BestTimeComponent],
+            imports: [MatIconModule],
         }).compileComponents();
 
         fixture = TestBed.createComponent(GameCardSelectionComponent);

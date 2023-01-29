@@ -1,16 +1,36 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { game, GameCardInformation } from '@common/game-card';
+import { Subject } from 'rxjs';
 import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
 import { GameSelectionComponent } from './game-selection.component';
 
 describe('GameSelectionComponent', () => {
     let component: GameSelectionComponent;
     let fixture: ComponentFixture<GameSelectionComponent>;
+    let mockService: GameCardInformationService;
+    let testNumber: Subject<number>;
+    let testGameCardsInformation: Subject<GameCardInformation[]>;
 
-    beforeEach(async () => {
-        await TestBed.configureTestingModule({
+    beforeEach(() => {
+        testNumber = new Subject<number>();
+        mockService = jasmine.createSpyObj('GameCardInformationService', ['getGameCardsInformation', 'getNumberOfGameCardInformation']);
+        mockService.getNumberOfGameCardInformation = () => {
+            testNumber.next(GAME_CARDS_TO_DISPLAY);
+            return testNumber.asObservable();
+        };
+
+        testGameCardsInformation = new Subject<GameCardInformation[]>();
+        mockService.getGameCardsInformations = () => {
+            testGameCardsInformation.next([game, game, game, game]);
+            return testGameCardsInformation.asObservable();
+        };
+
+        TestBed.configureTestingModule({
             declarations: [GameSelectionComponent],
             imports: [RouterTestingModule],
+            providers: [{ provide: GameCardInformationService, useValue: mockService }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(GameSelectionComponent);

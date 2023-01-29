@@ -15,16 +15,7 @@ export class GameCardInformationService {
         return this.http.get<GameCardInformation[]>(STAGE, options);
     }
 
-    // async getGameCardsInformations(index: number, endIndex: number): Promise<GameCardInformation[]> {
-    //     let yo: GameCardInformation[] = [];
-    //     const req = await this.http.get<GameCardInformation[]>(`${STAGE}/${index}/${endIndex}`);
-    //     req.subscribe((data) => {
-    //         yo = data;
-    //     });
-    //     return yo;
-    // }
-
-    getNumbnerOfGameCardInformation(): Observable<number> {
+    getNumberOfGameCardInformation(): Observable<number> {
         return this.http.get<number>(`${STAGE}/info`);
     }
 }
