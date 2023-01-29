@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { GameCardInformation } from '@app/Classes/game-card';
+import { game, GameCardInformation } from '@app/Classes/game-card';
 
 @Component({
     selector: 'app-game-card-selection',
@@ -10,5 +10,8 @@ export class GameCardSelectionComponent {
     @Input() gameCardInformation: GameCardInformation;
     @Input() isConfig: boolean | null;
 
-    // TODO: ajouter la logique pour que le reset des temps et le delete se fait
+    gameCardInformationTest = game;
+    isConfigTest = true;
+
+    // TODO: ajouter la logique pour que le reset des temps et le delete se fait pour le sprint 2
 }
