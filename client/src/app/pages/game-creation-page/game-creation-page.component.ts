@@ -13,28 +13,30 @@ export class GameCreationPageComponent {
 
     constructor() {}
 
-    ngOnInit(): void {
-        // const canvas = this.myCanvas.nativeElement;
-        // const context = canvas.getContext('2d');
-        // if (context) {
-        //     this.#drawRectangle(context);
-        // }
-    }
+    ngOnInit(): void {}
 
     // #drawRectangle(context: CanvasRenderingContext2D) {
     //     context.fillRect(20, 20, 100, 100);
     // }
 
     clear(e: Event) {
+        const ogCanvas: HTMLCanvasElement = this.myOgCanvas.nativeElement;
+        const diffCanvas: HTMLCanvasElement = this.myDiffCanvas.nativeElement;
+
+        const ogContext = ogCanvas.getContext('2d');
+        const diffContext = diffCanvas.getContext('2d');
+
         const target = e.target as HTMLInputElement;
         if (target.id === 'reset-original') {
-            this.urlOriginal = '';
+            // this.urlOriginal = '';
             const input = document.getElementById('upload-original') as HTMLInputElement;
             input.value = '';
+            if (ogContext) ogContext.clearRect(0, 0, 640, 480);
         } else {
-            this.urlDifferent = '';
+            // this.urlDifferent = '';
             const input = document.getElementById('upload-different') as HTMLInputElement;
             input.value = '';
+            if (diffContext) diffContext.clearRect(0, 0, 640, 480);
         }
     }
 
