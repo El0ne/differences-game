@@ -8,4 +8,7 @@ import { GameCardInformation } from '@common/game-card';
 })
 export class GameCardSelectionComponent {
     @Input() gameCardInformation: GameCardInformation;
+    @Input() isConfig: boolean | null;
+
+    // TODO: ajouter la logique pour que le reset des temps et le delete se fait pour le sprint 2
 }

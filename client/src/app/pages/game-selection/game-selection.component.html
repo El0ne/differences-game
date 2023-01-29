@@ -1,12 +1,7 @@
 <div class="game-cards-container">
     <div *ngFor="let gameCardInformation of gameCardInformations | slice: index:endIndex" class="card-container">
-        <div *ngIf="isConfig">
-            <app-game-card-selection [gameCardInformation]="gameCardInformation"></app-game-card-selection>
-        </div>
-
-        <div *ngIf="!isConfig">
-            <app-game-card-selection [gameCardInformation]="gameCardInformation"></app-game-card-selection>
-        </div>
+        <app-game-card-selection [gameCardInformation]="gameCardInformation"
+            [isConfig]="isConfig"></app-game-card-selection>
     </div>
 
     <div class="navigate-cards-container">
