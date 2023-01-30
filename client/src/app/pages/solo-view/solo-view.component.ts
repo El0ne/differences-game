@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ClickEventsService } from '@app/services/click-events/click-events.service';
+import { mockArray } from './mock-array';
 import { MESSAGES_LENGTH, PATHS } from './solo-view-constants';
 
 @Component({
@@ -14,11 +15,14 @@ export class SoloViewComponent implements OnInit {
     showTextBox: boolean = false;
     messages: string[] = [];
     messageContent: string = '';
+    differenceArray: boolean[];
 
-    constructor(private service: ClickEventsService) {}
+    constructor(private service: ClickEventsService) {
+        this.differenceArray = mockArray;
+    }
 
     ngOnInit() {
-        const image = new Image();
+        const image = new Image(); // TODO : Double when there's a different image
         image.src = PATHS.temp;
         image.onload = () => {
             const diffCanvas = document.getElementById('differences') as HTMLCanvasElement;
@@ -32,7 +36,7 @@ export class SoloViewComponent implements OnInit {
     }
 
     getCoord(e: MouseEvent) {
-        this.service.getCoordInImage(e);
+        this.service.isDifferent(e, this.differenceArray);
     }
 
     toggleInfoCard() {
