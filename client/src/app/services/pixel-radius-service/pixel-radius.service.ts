@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
     providedIn: 'root',
 })
 export class PixelRadiusService {
-    getPixelsAroundPixelInOneDimensionalArray(pixelLocation: number, radiusSize: number): number[] {
+    getAdjacentPixels(pixelLocation: number, radiusSize: number): number[] {
         // utiliser les constantes globales a la place
         const imageWidth = 640;
         const imageHeight = 480;
