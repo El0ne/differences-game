@@ -1,1 +1,2 @@
-export const STAGE = 'game-cards-informations';
+const SERVER_URL = 'http://localhost:3000/api/';
+export const STAGE = `${SERVER_URL}stage`;
