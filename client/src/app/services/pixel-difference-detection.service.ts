@@ -16,16 +16,18 @@ export class PixelDifferenceDetectionService {
         return pixelsAroundMyPixel;
     }
 
-    comparePixels(
-        firstPixelCoordinateX: number,
-        firstPixelCoordinateY: number,
-        secondPixelCoordinateX: number,
-        secondPixelCoordinateY: number,
-    ): boolean {
-        if (firstPixelCoordinateX === secondPixelCoordinateX && firstPixelCoordinateY === secondPixelCoordinateY) {
-            return true;
-        } else {
-            return false;
+    getPixelsAroundPixelInOneDimensionalArray(pixelLocation: number, radiusSize: number): number[] {
+        const imageWidth = 640;
+        const pixelCoordinateX = pixelLocation % imageWidth;
+        const pixelCoordinateY = Math.floor(pixelLocation / imageWidth);
+        const pixelsAroundMyPixel: number[] = [];
+        if (pixelCoordinateX - radiusSize >= 0 && pixelCoordinateX + radiusSize < imageWidth) {
+            for (let i = pixelCoordinateX - radiusSize; i <= pixelCoordinateX + radiusSize; i++) {
+                for (let j = pixelCoordinateY - radiusSize; j <= pixelCoordinateY + radiusSize; j++) {
+                    pixelsAroundMyPixel.push(j * imageWidth + i);
+                }
+            }
         }
+        return pixelsAroundMyPixel;
     }
 }

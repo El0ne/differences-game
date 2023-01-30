@@ -25,24 +25,4 @@ describe('PixelDifferenceDetectionService', () => {
         const returnedPixelsAroundMyPixel = service.getPixelsAroundPixel(pixelCoordinateX, pixelCoordinateY, radiusSize);
         expect(returnedPixelsAroundMyPixel).toEqual(expectedPixelsAroundMyPixel);
     });
-
-    it('comparePixels function should return true if the pixels X and Y coordinates are the same', () => {
-        const firstPixelCoordinateX = 5;
-        const firstPixelCoordinateY = 5;
-        const secondPixelCoordinateX = 5;
-        const secondPixelCoordinateY = 5;
-        const expectedResult = true;
-        const result = service.comparePixels(firstPixelCoordinateX, firstPixelCoordinateY, secondPixelCoordinateX, secondPixelCoordinateY);
-        expect(result).toEqual(expectedResult);
-    });
-
-    it('comparePixels function should return false if the pixels X and Y coordinates are not the same', () => {
-        const firstPixelCoordinateX = 1;
-        const firstPixelCoordinateY = 2;
-        const secondPixelCoordinateX = 3;
-        const secondPixelCoordinateY = 4;
-        const expectedResult = false;
-        const result = service.comparePixels(firstPixelCoordinateX, firstPixelCoordinateY, secondPixelCoordinateX, secondPixelCoordinateY);
-        expect(result).toEqual(expectedResult);
-    });
 });
