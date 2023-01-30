@@ -80,7 +80,7 @@ body {
 }
 
 /* CSS https://getcssscan.com/css-buttons-examples */
-.play-button {
+.normal-button {
     flex-basis: 50%;
     font-size: 16px;
     font-weight: 200;
@@ -98,7 +98,7 @@ body {
     bottom: 5%;
 }
 
-.play-button:after {
+.normal-button:after {
     content: '';
     background-color: #ffe54c;
     width: 100%;
@@ -110,11 +110,11 @@ body {
     transition: 0.2s;
 }
 
-.play-button:hover:after {
+.normal-button:hover:after {
     top: 0px;
     left: 0px;
 }
 
-.play-button:disabled::after {
+.normal-button:disabled::after {
     background-color: rgba(0, 0, 0, 0);
 }

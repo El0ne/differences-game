@@ -6,15 +6,15 @@
 
     <div class="navigate-cards-container">
         <button type="button" (click)="previousCards()" id="show-previous-cards-button"
-            class="play-button navigate-cards-buttons" [disabled]="isShowingFirstCard()">
+            class="normal-button navigate-cards-buttons" [disabled]="isShowingFirstCard()">
             <mat-icon>arrow_back</mat-icon>
         </button>
-        <button type="button" *ngIf="isConfig" id="create-a-stage-button" class="play-button navigate-cards-buttons"
+        <button type="button" *ngIf="isConfig" id="create-a-stage-button" class="normal-button navigate-cards-buttons"
             [routerLink]="['/creatingGame']">
             Create a stage
         </button>
         <button type=" button" (click)="nextCards()" id="show-next-cards-button"
-            class="play-button navigate-cards-buttons" [disabled]="isShowingLastCard()">
+            class="normal-button navigate-cards-buttons" [disabled]="isShowingLastCard()">
             <mat-icon>arrow_forward</mat-icon>
         </button>
     </div>
