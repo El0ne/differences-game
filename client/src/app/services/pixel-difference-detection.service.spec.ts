@@ -26,15 +26,22 @@ describe('PixelDifferenceDetectionService', () => {
         expect(returnedPixelsAroundMyPixel).toEqual(expectedPixelsAroundMyPixel);
     });
 
-    /*
     it('getPixelsAroundPixelInOneDimensionalArray function should return an array of pixels around a pixel', () => {
         const pixelLocation = 645;
         const radiusSize = 1;
-        const expectedPixelsAroundMyPixel = [4, 644, 1284, 5, 645, 1285, 6, 646, 1286];
+        const expectedPixelsAroundMyPixel = [4, 5, 6, 644, 645, 646, 1284, 1285, 1286];
         const returnedPixelsAroundMyPixel = service.getPixelsAroundPixelInOneDimensionalArray(pixelLocation, radiusSize);
         expect(returnedPixelsAroundMyPixel).toEqual(expectedPixelsAroundMyPixel);
     });
-    */
 
-    // include tests for exception cases management in X and Y
+    it('getPixelsAroundPixelInOneDimensionalArray function should return an array of pixels around a pixel located near the border of image', () => {
+        const pixelLocation = 642;
+        const radiusSize = 3;
+        const expectedPixelsAroundMyPixel = [
+            0, 1, 2, 3, 4, 5, 640, 641, 642, 643, 644, 645, 1280, 1281, 1282, 1283, 1284, 1285, 1920, 1921, 1922, 1923, 1924, 1925, 2560, 2561, 2562,
+            2563, 2564, 2565,
+        ];
+        const returnedPixelsAroundMyPixel = service.getPixelsAroundPixelInOneDimensionalArray(pixelLocation, radiusSize);
+        expect(returnedPixelsAroundMyPixel).toEqual(expectedPixelsAroundMyPixel);
+    });
 });

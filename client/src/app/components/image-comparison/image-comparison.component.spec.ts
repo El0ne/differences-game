@@ -29,6 +29,7 @@ describe('ImageComparisonComponent', () => {
         }
     });
 
+    /*
     it('getMyImageData should return an array of pixels', () => {
         const testCanvas: HTMLCanvasElement = component.myCanvas.nativeElement;
         const context = testCanvas.getContext('2d');
@@ -63,4 +64,5 @@ describe('ImageComparisonComponent', () => {
             };
         }
     });
+    */
 });

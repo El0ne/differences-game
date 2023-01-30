@@ -25,6 +25,7 @@ export class ImageComparisonComponent implements OnInit {
         context.fillRect(100, 100, this.squareDimensions, this.squareDimensions);
     }
 
+    /*
     getMyImageData(image: HTMLImageElement): Uint8ClampedArray {
         const myCanvas = document.createElement('canvas');
         myCanvas.height = image.height;
@@ -51,7 +52,9 @@ export class ImageComparisonComponent implements OnInit {
         }
         return differentPixels;
     }
+*/
 
+    /// //////////////////////////////////////// ne fonctionne pas encore ///////////////////////////////////////////
     /*
     generateDifferenceImage(image1: HTMLImageElement, image2: HTMLImageElement): HTMLImageElement {
         const differentPixels = this.compareImages(image1, image2);
