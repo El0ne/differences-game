@@ -4,19 +4,8 @@ import { Injectable } from '@angular/core';
     providedIn: 'root',
 })
 export class PixelRadiusService {
-    constructor() {}
-
-    getPixelsAroundPixel(pixelCoordinateX: number, pixelCoordinateY: number, radiusSize: number): number[] {
-        const pixelsAroundMyPixel: number[] = [];
-        for (let i = pixelCoordinateX - radiusSize; i <= pixelCoordinateX + radiusSize; i++) {
-            for (let j = pixelCoordinateY - radiusSize; j <= pixelCoordinateY + radiusSize; j++) {
-                pixelsAroundMyPixel.push(i, j);
-            }
-        }
-        return pixelsAroundMyPixel;
-    }
-
     getPixelsAroundPixelInOneDimensionalArray(pixelLocation: number, radiusSize: number): number[] {
+        // utiliser les constantes globales a la place
         const imageWidth = 640;
         const imageHeight = 480;
         const pixelCoordinateX = pixelLocation % imageWidth;
