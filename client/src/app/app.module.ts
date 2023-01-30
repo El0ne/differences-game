@@ -13,6 +13,7 @@ import { GameCreationPageComponent } from './pages/game-creation-page/game-creat
 import { GameSelectionComponent } from './pages/game-selection/game-selection.component';
 import { HomePageComponent } from './pages/home-page/home-page.component';
 import { SoloViewComponent } from './pages/solo-view/solo-view.component';
+import { TestComponent } from './components/test/test.component';
 
 /**
  * Main module that is used in main.ts.
@@ -30,6 +31,7 @@ import { SoloViewComponent } from './pages/solo-view/solo-view.component';
         GameCardSelectionComponent,
         SoloViewComponent,
         GameCreationPageComponent,
+        TestComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],

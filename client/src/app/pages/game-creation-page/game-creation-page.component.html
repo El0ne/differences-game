@@ -1,12 +1,15 @@
 <body>
-    <button id="previous" routerLink="/config">Retour</button>
+    <div class="header-button-container">
+        <button id="previous" routerLink="/config">Retour</button>
+        <button id="save" routerLink="/config"><img class="save-image" src="../../../assets/save.png" /></button>
+    </div>
     <div id="title-container">
         <div class="line title">____________</div>
         <div class="title">Création de partie</div>
         <div class="line title">____________</div>
     </div>
     <div class="central">
-        <input type="text" class="game-title container" placeholder="Donnez un titre à votre partie" />
+        <input type="text" class="game-title game-container" placeholder="Donnez un titre à votre partie" />
         <div class="upload-container">
             <div class="original container">
                 <div class="original image">
@@ -19,26 +22,45 @@
                 </label>
             </div>
 
-            <div class="tools-container">
-                <div class="row-tools">
-                    <button><img class="btn-image" src="../../../assets/undo.png" /></button>
-                    <button><img class="btn-image" src="../../../assets/black-rectangle.png" /></button>
+            <div class="middle-container">
+                <div class="diff-counter">
+                    <div class="diff-counter-container">
+                        <div class="diff-counter-title">Nombre de différences :</div>
+                        <div class="count">01</div>
+                    </div>
                 </div>
-                <div class="row-tools">
-                    <button>✎</button>
-                    <button><img class="btn-image" src="../../../assets/eraser.png" /></button>
-                </div>
-                <div class="row-tools">
-                    <button><img class="btn-image" src="../../../assets/copy.png" /></button>
-                    <button><img class="btn-image" src="../../../assets/invert-tool.png" /></button>
-                </div>
-                <div class="color-container">
-                    <input type="color" id="color-picker" value="#ff124f" />
-                    <label for="color-picker">Choisir une couleur</label>
-                </div>
-                <div class="diff-range-container">
-                    <input type="range" id="radius-range" />
-                    <label for="radius-range">Rayon du détecteur de différence</label>
+                <div class="tools-container">
+                    <div class="row-tools">
+                        <button><img class="btn-image" src="../../../assets/undo.png" /></button>
+                        <button><img class="btn-image" src="../../../assets/black-rectangle.png" /></button>
+                    </div>
+                    <div class="row-tools">
+                        <button><img class="btn-image" src="../../../assets/pencil.png" /></button>
+                        <button><img class="btn-image" src="../../../assets/eraser.png" /></button>
+                    </div>
+                    <div class="row-tools">
+                        <button><img class="btn-image" src="../../../assets/copy.png" /></button>
+                        <button><img class="btn-image" src="../../../assets/invert-tool.png" /></button>
+                    </div>
+                    <div class="color-container">
+                        <input type="color" id="color-picker" value="#ff124f" />
+                        <label for="color-picker">Choisir une couleur</label>
+                    </div>
+                    <div class="diff-range-container">
+                        <div class="range-container">
+                            <input
+                                type="range"
+                                id="radius-range"
+                                min="0"
+                                max="15"
+                                value="0"
+                                step="3"
+                                oninput="this.nextElementSibling.value = this.value"
+                            />
+                            <output>0</output>
+                        </div>
+                        <label for="radius-range">Rayon du détecteur de différence</label>
+                    </div>
                 </div>
             </div>
             <div class="difference container">

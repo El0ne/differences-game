@@ -10,6 +10,15 @@ export class GameCreationPageComponent {
     @ViewChild('canvas2') myDiffCanvas: ElementRef;
     urlOriginal: string;
     urlDifferent: string;
+    nbDiff: number = 0;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    diffCountStop: any = setInterval(() => {
+        this.nbDiff++;
+        if (this.nbDiff === 9) {
+            clearInterval(this.diffCountStop);
+        }
+    }, 10);
 
     constructor() {}
 
