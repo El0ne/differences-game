@@ -11,14 +11,21 @@
     align-items: center;
 }
 
-.navigate-cards-buttons {
+.navigate-cards-container {
+    display: grid;
+    grid-template-columns: 1 1 1;
     grid-row: 3 / 4;
+    grid-column: 1 / 3;
 }
 
 #show-previous-cards-button {
     grid-column: 1 / 2;
 }
 
-#show-next-cards-button {
+#create-a-stage-button {
     grid-column: 2 / 3;
+}
+
+#show-next-cards-button {
+    grid-column: 3 / 4;
 }

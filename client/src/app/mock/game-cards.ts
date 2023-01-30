@@ -1,14 +1,4 @@
-import { RankingBoard } from './ranking-board';
-
-export class GameCardInformation {
-    name: string;
-    difficulty: string;
-    image: string;
-    soloTimes: RankingBoard[];
-    multiTimes: RankingBoard[];
-}
-
-export const game = {
+const GAME1 = {
     name: 'Library',
     difficulty: 'Difficile',
     // TODO: modifie pour image qui vient du serveur
@@ -25,7 +15,7 @@ export const game = {
     ],
 };
 
-export const game2 = {
+const GAME2 = {
     name: 'game2',
     difficulty: 'Difficile',
     // TODO: modifie pour image qui vient du serveur
@@ -41,3 +31,5 @@ export const game2 = {
         { time: 115, name: 'third' },
     ],
 };
+
+export const GAMES = [GAME1, GAME1, GAME2, GAME1, GAME1, GAME2];

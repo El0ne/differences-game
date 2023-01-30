@@ -19,7 +19,8 @@
             </div>
         </div>
         <div class="column">
-            <div class="difficulty-container" [ngClass]="gameCardInformation.difficulty === 'Difficile' ? 'difficult' : 'easy'">
+            <div class="difficulty-container"
+                [ngClass]="gameCardInformation.difficulty === 'Difficile' ? 'difficult' : 'easy'">
                 <p id="difficulty">
                     {{ gameCardInformation.difficulty }}
                 </p>
@@ -47,12 +48,12 @@
             </div>
         </div>
     </div>
-    <div class="row config" *ngIf="isConfig">
-        <button class="play-button play">Supprimer</button>
-        <button class="play-button create">Réinitialiser</button>
+    <div class="row" *ngIf="isConfig">
+        <button class="normal-button play">Supprimer</button>
+        <button class="normal-button create">Réinitialiser</button>
     </div>
     <div class="row" *ngIf="!isConfig">
-        <button class="play-button play" routerLink="/soloGame">Jouer</button>
-        <button class="play-button create" routerLink="/waitingRoom">Joindre</button>
+        <button class="normal-button play" routerLink="/soloGame">Jouer</button>
+        <button class="normal-button create" routerLink="/waitingRoom">Joindre</button>
     </div>
 </div>
