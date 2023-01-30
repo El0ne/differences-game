@@ -1,25 +1,23 @@
 import { Injectable } from '@angular/core';
+import { IMAGE_HEIGHT, IMAGE_WIDTH } from './pixel-radius-constants..constants';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PixelRadiusService {
     getAdjacentPixels(pixelLocation: number, radiusSize: number): number[] {
-        // utiliser les constantes globales a la place
-        const imageWidth = 640;
-        const imageHeight = 480;
-        const pixelCoordinateX = pixelLocation % imageWidth;
-        const pixelCoordinateY = Math.floor(pixelLocation / imageWidth);
+        const pixelCoordinateX = pixelLocation % IMAGE_WIDTH;
+        const pixelCoordinateY = Math.floor(pixelLocation / IMAGE_WIDTH);
         const pixelsAroundMyPixel: number[] = [];
 
         const leftExtremity = Math.max(pixelCoordinateX - radiusSize, 0);
-        const rightExtremity = Math.min(pixelCoordinateX + radiusSize, imageWidth);
+        const rightExtremity = Math.min(pixelCoordinateX + radiusSize, IMAGE_WIDTH);
         const downExtremity = Math.max(pixelCoordinateY - radiusSize, 0);
-        const upExtremity = Math.min(pixelCoordinateY + radiusSize, imageHeight);
+        const upExtremity = Math.min(pixelCoordinateY + radiusSize, IMAGE_HEIGHT);
 
         for (let j = downExtremity; j <= upExtremity; j++) {
             for (let i = leftExtremity; i <= rightExtremity; i++) {
-                pixelsAroundMyPixel.push(j * imageWidth + i);
+                pixelsAroundMyPixel.push(j * IMAGE_WIDTH + i);
             }
         }
 
