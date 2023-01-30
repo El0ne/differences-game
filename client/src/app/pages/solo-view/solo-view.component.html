@@ -31,7 +31,7 @@
     </div>
 
     <div class="flex-game">
-        <img id="original" src="{{ paths.temp }}" />
+        <canvas id="original" width="640" height="480" (click)="getCoordInImage($event)"></canvas>
         <div class="game-options">
             <div id="timer">
                 <div class="timer-box">
@@ -68,7 +68,7 @@
                 </div>
             </div>
         </div>
-        <img id="differences" src="{{ paths.temp }}" />
+        <canvas id="differences" width="640" height="480" (click)="getCoordInImage($event)"></canvas>
         <div class="hint-button">
             <button class="hint" type="button">
                 <img class="hint-logo" src="{{ paths.hint }}" />
