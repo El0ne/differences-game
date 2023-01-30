@@ -12,7 +12,7 @@ import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
 })
 export class GameSelectionComponent implements OnInit {
     gameCardInformations: GameCardInformation[] = GAMES; // TODO vider lorsque la BD est implementee
-    numberOfGameInformations = this.gameCardInformations.length; // TODO initialiser a 0
+    numberOfGameInformations = this.gameCardInformations.length; // TODO initialiser a 0 lorsque le service est fonctionnel
     index: number = 0;
     endIndex: number = 0;
     isConfig: boolean | null;
