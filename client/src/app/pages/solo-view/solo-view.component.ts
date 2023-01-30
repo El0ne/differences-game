@@ -14,7 +14,7 @@ export class SoloViewComponent {
     messages: string[] = [];
     messageContent: string = '';
 
-    toggleTextBox() {
+    toggleInfoCard() {
         this.showTextBox = !this.showTextBox;
     }
 

@@ -21,15 +21,15 @@ describe('SoloViewComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('showTextBox attribute should turn to true when toggleTextBox is called and showTextBox is false', () => {
+    it('showTextBox attribute should turn to true when toggleInfoCard is called and showTextBox is false', () => {
         component.showTextBox = false;
-        component.toggleTextBox();
+        component.toggleInfoCard();
         expect(component.showTextBox).toBeTrue();
     });
 
-    it('showTextBox attribute should turn to false when toggleTextBox is called and showTextBox is true', () => {
+    it('showTextBox attribute should turn to false when toggleInfoCard is called and showTextBox is true', () => {
         component.showTextBox = true;
-        component.toggleTextBox();
+        component.toggleInfoCard();
         expect(component.showTextBox).toBeFalse();
     });
 
