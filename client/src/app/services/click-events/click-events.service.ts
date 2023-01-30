@@ -1,16 +1,14 @@
 import { Injectable } from '@angular/core';
-import 'rxjs/add/observable/fromEvent';
-import { Observable } from 'rxjs/Observable';
 
 @Injectable({
     providedIn: 'root',
 })
 export class ClickEventsService {
-    isDifference: boolean = false;
-
-    differenceCheck() {
-        Observable.fromEvent(document.body, 'mousemove').subscribe((e) => {
-            console.log(e.pageX, e.pageY);
-        });
+    getCoordInImage(e: MouseEvent) {
+        const canvas = e.target as HTMLCanvasElement;
+        const rect = canvas.getBoundingClientRect();
+        const x = Math.floor(e.clientX - rect.left);
+        const y = Math.floor(e.clientY - rect.top);
+        console.log(x, y); // TODO: Replace by return when logic for differences is ready
     }
 }
