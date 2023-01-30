@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
+import { BestTimeComponent } from '@app/components/best-time/best-time.component';
+import { GameCardSelectionComponent } from '@app/components/game-card-selection/game-card-selection.component';
 import { GAMES } from '@app/mock/game-cards';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameCardInformation } from '@common/game-card';
@@ -30,7 +32,7 @@ describe('GameSelectionComponent', () => {
         };
 
         TestBed.configureTestingModule({
-            declarations: [GameSelectionComponent],
+            declarations: [GameSelectionComponent, GameCardSelectionComponent, BestTimeComponent],
             imports: [RouterTestingModule, MatIconModule],
             providers: [{ provide: GameCardInformationService, useValue: mockService }],
         }).compileComponents();
