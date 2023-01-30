@@ -1,14 +1,22 @@
 <body>
-    <div id="title-container"><span class="title">Création de partie</span></div>
-    <div class="container">
-        <input type="text" class="game-title" placeholder="Donnez un titre à votre partie..." />
+    <button id="previous">Retour</button>
+    <div id="title-container">
+        <div class="line title">____________</div>
+        <div class="title">Création de partie</div>
+        <div class="line title">____________</div>
+    </div>
+    <div class="central">
+        <input type="text" class="game-title container" placeholder="Donnez un titre à votre partie" />
         <div class="upload-container">
-            <div class="original-container">
-                <div class="original-image">
+            <div class="original container">
+                <div class="original image">
                     <canvas #canvas1 width="640px" height="480px"></canvas>
                 </div>
                 <button id="reset-original" (click)="clear($event)">X</button>
-                <input type="file" id="upload-original" (change)="fileValidation($event)" accept="image/bmp" />
+                <label for="upload-original">
+                    Choisir une image de 640*480 de format bmp
+                    <input type="file" id="upload-original" class="photo-upload" (change)="fileValidation($event)" accept="image/bmp" />
+                </label>
             </div>
 
             <div class="tools-container">
@@ -33,17 +41,22 @@
                     <label for="radius-range">Rayon du détecteur de différence</label>
                 </div>
             </div>
-
-            <div class="difference-container">
-                <div class="different-image">
+            <div class="difference container">
+                <div class="different image">
                     <canvas #canvas2 width="640px" height="480px"></canvas>
                 </div>
                 <button id="reset-different" (click)="clear($event)">X</button>
-                <input type="file" id="upload-different" (change)="fileValidation($event)" accept="image/bmp" />
+                <label for="upload-original">
+                    Choisir une image de 640*480 de format bmp
+                    <input type="file" id="upload-different" class="photo-upload" (change)="fileValidation($event)" accept="image/bmp" />
+                </label>
             </div>
         </div>
-    </div>
-    <div class="button-container">
-        <input type="file" id="upload-both" (change)="fileValidation($event)" accept="image/bmp" />
+        <div class="button-container">
+            <label for="upload-original">
+                Choisir une image de 640*480 de format bmp
+                <input type="file" id="upload-both" class="photo-upload" (change)="fileValidation($event)" accept="image/bmp" />
+            </label>
+        </div>
     </div>
 </body>
