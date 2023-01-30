@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { game, game2, GameCardInformation } from '@app/Classes/game-card';
-import { GameOrConfigSelectionService } from '@app/services/game-or-config-selection/game-or-config-selection.service';
+import { Router } from '@angular/router';
+import { GAMES } from '@app/mock/game-cards';
+import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { GameCardInformation } from '@common/game-card';
 import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
 
 @Component({
@@ -9,29 +11,30 @@ import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
     styleUrls: ['./game-selection.component.scss'],
 })
 export class GameSelectionComponent implements OnInit {
-    gameCardInformations: GameCardInformation[] = [game, game, game, game2, game, game2]; // TODO vider lorsque la BD est implementee
-    numberOfGameInformations = this.gameCardInformations.length;
+    gameCardInformations: GameCardInformation[] = GAMES; // TODO vider lorsque la BD est implementee
+    numberOfGameInformations = this.gameCardInformations.length; // TODO initialiser a 0 lorsque le service est fonctionnel
     index: number = 0;
     endIndex: number = 0;
     isConfig: boolean | null;
 
-    constructor(public gameOrConfigService: GameOrConfigSelectionService) {
-        this.isConfig = gameOrConfigService.getConfigView();
-    }
+    constructor(public gameCardService: GameCardInformationService, public router: Router) {}
 
     ngOnInit(): void {
-        // TODO appel a mongoDB pour recuperer infos pour numberOfGameInformations
-        // this.numberOfGameInformations = gameCardInformations.lenght; //pour tester la vue des composantes
+        this.isConfig = this.router.url === '/config';
+        this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
+            this.numberOfGameInformations = data;
+        });
         this.selectGameCards();
     }
 
     selectGameCards(): void {
-        // TODO appel mongo db
+        this.gameCardService.getGameCardsInformations(this.index, this.endIndex).subscribe((data) => {
+            this.gameCardInformations = data;
+        });
         this.endIndex = Math.min(this.index + GAME_CARDS_TO_DISPLAY, this.numberOfGameInformations);
     }
 
     nextCards(): void {
-        // TODO appel a mongoDB pour prendre les 4 images suivantes
         if (!this.isShowingLastCard()) {
             this.index += GAME_CARDS_TO_DISPLAY;
             this.selectGameCards();
@@ -39,7 +42,6 @@ export class GameSelectionComponent implements OnInit {
     }
 
     previousCards(): void {
-        // TODO appel a mongoDB pour prendre les 4 images precedentes
         if (!this.isShowingFirstCard()) {
             this.index -= GAME_CARDS_TO_DISPLAY;
             this.selectGameCards();
