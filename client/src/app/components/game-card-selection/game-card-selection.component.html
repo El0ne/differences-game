@@ -1,0 +1,59 @@
+<div class="card">
+    <div class="row">
+        <div class="column">
+            <p class="nom">{{ gameCardInformation.name }}</p>
+            <img [src]="gameCardInformation.image" class="photo" />
+        </div>
+        <div class="column configuration" *ngIf="isConfig">
+            <div>
+                Temps de pénalité pour l'utilisation d'un indice :
+                <div>5 secondes</div>
+            </div>
+            <div>
+                Temps initial du compte à rebours :
+                <div>30 secondes</div>
+            </div>
+            <div>
+                Temps gagné avec la découverte d'une différence :
+                <div>5 secondes</div>
+            </div>
+        </div>
+        <div class="column">
+            <div class="difficulty-container"
+                [ngClass]="gameCardInformation.difficulty === 'Difficile' ? 'difficult' : 'easy'">
+                <p id="difficulty">
+                    {{ gameCardInformation.difficulty }}
+                </p>
+            </div>
+            <div id="top3-container">
+                <div class="top3">
+                    <mat-icon>whatshot</mat-icon>
+                    - TOP 3 -
+                    <mat-icon>whatshot</mat-icon>
+                </div>
+            </div>
+            <div class="flex-row">
+                <ol class="ranking">
+                    <p class="gametype solo">SOLO</p>
+                    <div class="times">
+                        <app-best-time [rankingBoard]="gameCardInformation.soloTimes"></app-best-time>
+                    </div>
+                </ol>
+                <ol class="ranking">
+                    <p class="gametype vs">1 VS 1</p>
+                    <div class="times">
+                        <app-best-time [rankingBoard]="gameCardInformation.multiTimes"></app-best-time>
+                    </div>
+                </ol>
+            </div>
+        </div>
+    </div>
+    <div class="row" *ngIf="isConfig">
+        <button class="normal-button play">Supprimer</button>
+        <button class="normal-button create">Réinitialiser</button>
+    </div>
+    <div class="row" *ngIf="!isConfig">
+        <button class="normal-button play" routerLink="/soloGame">Jouer</button>
+        <button class="normal-button create" routerLink="/waitingRoom">Joindre</button>
+    </div>
+</div>

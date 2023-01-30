@@ -1,0 +1,136 @@
+.difficulty-container {
+    flex-basis: 10%;
+    margin-left: 20%;
+    margin-right: 10%;
+    margin-top: 5%;
+    padding: 5%;
+    display: table;
+    border: solid 3px black;
+    border-radius: 15px;
+}
+
+.configuration {
+    font-size: large;
+    padding-left: 5%;
+}
+
+.configuration > div {
+    padding-top: 15%;
+    padding-left: 10%;
+    font-weight: bold;
+}
+.difficult {
+    background-color: rgba(255, 0, 0, 0.5);
+}
+.easy {
+    background-color: rgba(0, 255, 0, 0.5);
+}
+
+#difficulty {
+    font-size: large;
+    font-weight: bold;
+    position: relative;
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+}
+.nom {
+    flex-basis: 15%;
+    font-size: xx-large;
+    position: relative;
+    font-weight: bold;
+    margin-top: 10%;
+    margin-left: 5%;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+#top3-container {
+    flex-basis: 15%;
+    margin-top: 5%;
+    margin-left: 15%;
+    margin-right: 5%;
+
+    border: solid black 2px;
+    background: #c39ced;
+    border-radius: 10px;
+}
+
+.mat-icon {
+    vertical-align: middle;
+}
+
+.top3 {
+    margin-top: 2%;
+    font-style: italic;
+    text-align: center;
+    vertical-align: middle;
+    font-weight: bold;
+}
+.flex-row {
+    flex-basis: 10%;
+    display: flex;
+    flex-direction: row;
+    margin-left: 17.5%;
+    margin-right: 7%;
+}
+
+.ranking {
+    border: 2px black solid;
+    flex-basis: 50%;
+    padding: 0;
+}
+
+.gametype {
+    text-align: center;
+    font-style: italic;
+    font-weight: bold;
+}
+
+.solo {
+    background-color: #3849ff;
+    border: #3849ff 1px solid;
+}
+
+.vs {
+    background-color: #fa5c5c;
+    border: #fa5c5c 1px solid;
+}
+
+.times {
+    padding-left: 5%;
+    padding-bottom: 20%;
+    font-size: smaller;
+    list-style-position: inside;
+}
+.card {
+    height: 25rem;
+    width: 35rem;
+    border-style: solid;
+    border-width: 2px;
+    border-color: black;
+    box-shadow: 5px 10px;
+    position: relative;
+    background-color: rgba(255, 255, 255, 0.301);
+}
+
+.photo {
+    flex-basis: 75%;
+    position: relative;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    width: 100%;
+    height: 90%;
+    margin-top: 5%;
+    margin-left: 5%;
+}
