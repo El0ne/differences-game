@@ -9,6 +9,16 @@
     border-radius: 15px;
 }
 
+.configuration {
+    font-size: large;
+    padding-left: 5%;
+}
+
+.configuration > div {
+    padding-top: 15%;
+    padding-left: 10%;
+    font-weight: bold;
+}
 .difficult {
     background-color: rgba(255, 0, 0, 0.5);
 }
