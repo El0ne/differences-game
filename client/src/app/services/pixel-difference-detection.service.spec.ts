@@ -25,4 +25,16 @@ describe('PixelDifferenceDetectionService', () => {
         const returnedPixelsAroundMyPixel = service.getPixelsAroundPixel(pixelCoordinateX, pixelCoordinateY, radiusSize);
         expect(returnedPixelsAroundMyPixel).toEqual(expectedPixelsAroundMyPixel);
     });
+
+    /*
+    it('getPixelsAroundPixelInOneDimensionalArray function should return an array of pixels around a pixel', () => {
+        const pixelLocation = 645;
+        const radiusSize = 1;
+        const expectedPixelsAroundMyPixel = [4, 644, 1284, 5, 645, 1285, 6, 646, 1286];
+        const returnedPixelsAroundMyPixel = service.getPixelsAroundPixelInOneDimensionalArray(pixelLocation, radiusSize);
+        expect(returnedPixelsAroundMyPixel).toEqual(expectedPixelsAroundMyPixel);
+    });
+    */
+
+    // include tests for exception cases management in X and Y
 });
