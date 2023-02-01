@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ClickEventsService } from '@app/services/click-events/click-events.service';
 import { mockArray } from './mock-array';
 import { MESSAGES_LENGTH, PATHS } from './solo-view-constants';
@@ -8,9 +8,10 @@ import { MESSAGES_LENGTH, PATHS } from './solo-view-constants';
     templateUrl: './solo-view.component.html',
     styleUrls: ['./solo-view.component.scss'],
 })
-export class SoloViewComponent implements OnInit {
+export class SoloViewComponent {
     readonly paths = PATHS; // TODO : Verify with Nikolay if typing is fine for constants
 
+    errorFromChildComponent: string;
     showErrorMessage: boolean = false;
     showTextBox: boolean = false;
     messages: string[] = [];
@@ -20,7 +21,7 @@ export class SoloViewComponent implements OnInit {
     constructor(private service: ClickEventsService) {
         this.differenceArray = mockArray;
     }
-
+    /*
     ngOnInit() {
         const image = new Image(); // TODO : Double when there's a different image
         image.src = PATHS.temp;
@@ -34,7 +35,11 @@ export class SoloViewComponent implements OnInit {
             ctx2.drawImage(image, 0, 0);
         };
     }
+    */
 
+    handler(differenceDetected: string) {
+        this.errorFromChildComponent = differenceDetected;
+    }
     getCoord(e: MouseEvent) {
         this.service.isDifferent(e, this.differenceArray);
     }

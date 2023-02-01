@@ -252,11 +252,12 @@ body {
     padding-top: 5%;
 }
 
-#original {
+app-click-event {
     border-style: solid;
     border-color: var(--basic-border);
     width: 640px;
     height: 480px;
+    float: right;
 }
 
 .game-options {

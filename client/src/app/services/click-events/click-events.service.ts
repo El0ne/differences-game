@@ -12,11 +12,13 @@ export class ClickEventsService {
         return [x, y];
     }
 
-    isDifferent(e: MouseEvent, differenceArray: boolean[]) {
+    isDifferent(e: MouseEvent, differenceArray: boolean[]): boolean {
         if (!this.isADifference(differenceArray, this.getCoordInImage(e)[0], this.getCoordInImage(e)[1])) {
             this.emitSound();
+            return true;
         } else {
             console.log('not ding');
+            return false;
         }
     }
 

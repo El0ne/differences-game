@@ -31,7 +31,9 @@
     </div>
 
     <div class="flex-game">
-        <canvas id="original" width="640" height="480" (click)="getCoord($event)"></canvas>
+        <!-- <canvas id="original" width="640" height="480" (click)="getCoord($event)"></canvas> -->
+        <app-click-event [differenceArray]="differenceArray" [id]="1" (differenceDetected)="handler($event)"></app-click-event>
+        <div>{{ errorFromChildComponent }}</div>
         <div class="game-options">
             <div id="timer">
                 <div class="timer-box">
@@ -68,7 +70,8 @@
                 </div>
             </div>
         </div>
-        <canvas id="differences" width="640" height="480" (click)="getCoord($event)"></canvas>
+        <!-- <canvas id="differences" width="640" height="480" (click)="getCoord($event)"></canvas> -->
+        <app-click-event [differenceArray]="differenceArray" [id]="2" (differenceDetected)="handler($event)"></app-click-event>
         <div class="hint-button">
             <button class="hint" type="button">
                 <img class="hint-logo" src="{{ paths.hint }}" />
