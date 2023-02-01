@@ -1,11 +1,14 @@
+import { IMAGE_HEIGHT, IMAGE_WIDTH } from '@app/services/constants/pixel.constants';
+import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { Injectable } from '@nestjs/common';
-import { IMAGE_HEIGHT, IMAGE_WIDTH } from './pixel-radius.constants';
 
 @Injectable()
 export class PixelRadiusService {
+    constructor(private pixelPositionService: PixelPositionService) {}
+
     getAdjacentPixels(pixelLocation: number, radius: number): number[] {
-        const xCoordinate = pixelLocation % IMAGE_WIDTH;
-        const yCoordinate = Math.floor(pixelLocation / IMAGE_WIDTH);
+        const xCoordinate = this.pixelPositionService.getXCoordinate(pixelLocation);
+        const yCoordinate = this.pixelPositionService.getYCoordinate(pixelLocation);
         const adjacentPixels: number[] = [];
 
         const left = Math.max(xCoordinate - radius, 0);
