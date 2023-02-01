@@ -3,22 +3,21 @@ import { IMAGE_HEIGHT, IMAGE_WIDTH } from './pixel-radius.constants';
 
 @Injectable()
 export class PixelRadiusService {
-    getAdjacentPixels(pixelLocation: number, radiusSize: number): number[] {
-        const pixelCoordinateX = pixelLocation % IMAGE_WIDTH;
-        const pixelCoordinateY = Math.floor(pixelLocation / IMAGE_WIDTH);
-        const pixelsAroundMyPixel: number[] = [];
+    getAdjacentPixels(pixelLocation: number, radius: number): number[] {
+        const xCoordinate = pixelLocation % IMAGE_WIDTH;
+        const yCoordinate = Math.floor(pixelLocation / IMAGE_WIDTH);
+        const adjacentPixels: number[] = [];
 
-        const leftExtremity = Math.max(pixelCoordinateX - radiusSize, 0);
-        const rightExtremity = Math.min(pixelCoordinateX + radiusSize, IMAGE_WIDTH);
-        const downExtremity = Math.max(pixelCoordinateY - radiusSize, 0);
-        const upExtremity = Math.min(pixelCoordinateY + radiusSize, IMAGE_HEIGHT);
+        const left = Math.max(xCoordinate - radius, 0);
+        const right = Math.min(xCoordinate + radius, IMAGE_WIDTH);
+        const down = Math.max(yCoordinate - radius, 0);
+        const up = Math.min(yCoordinate + radius, IMAGE_HEIGHT);
 
-        for (let j = downExtremity; j <= upExtremity; j++) {
-            for (let i = leftExtremity; i <= rightExtremity; i++) {
-                pixelsAroundMyPixel.push(j * IMAGE_WIDTH + i);
+        for (let i = down; i <= up; i++) {
+            for (let j = left; j <= right; j++) {
+                adjacentPixels.push(i * IMAGE_WIDTH + j);
             }
         }
-
-        return pixelsAroundMyPixel;
+        return adjacentPixels;
     }
 }
