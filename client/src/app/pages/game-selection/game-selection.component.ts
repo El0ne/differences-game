@@ -1,4 +1,4 @@
-import { Component, OnChanges, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { GAMES } from '@app/mock/game-cards';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
@@ -10,7 +10,7 @@ import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
     templateUrl: './game-selection.component.html',
     styleUrls: ['./game-selection.component.scss'],
 })
-export class GameSelectionComponent implements OnInit, OnChanges {
+export class GameSelectionComponent implements OnInit {
     gameCardInformations: GameCardInformation[] = GAMES; // TODO vider lorsque la BD est implementee
     numberOfGameInformations = 0; // this.gameCardInformations.length; // TODO initialiser a 0 lorsque le service est fonctionnel
     index: number = 0;
@@ -23,12 +23,8 @@ export class GameSelectionComponent implements OnInit, OnChanges {
         this.isConfig = this.router.url === '/config';
         this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
             this.numberOfGameInformations = data;
+            this.selectGameCards();
         });
-        this.selectGameCards();
-    }
-
-    async ngOnChanges(): Promise<void> {
-        await this.selectGameCards();
     }
 
     async selectGameCards(): Promise<void> {
