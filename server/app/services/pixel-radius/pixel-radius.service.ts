@@ -1,9 +1,7 @@
-import { Injectable } from '@angular/core';
-import { IMAGE_HEIGHT, IMAGE_WIDTH } from './pixel-radius-constants..constants';
+import { Injectable } from '@nestjs/common';
+import { IMAGE_HEIGHT, IMAGE_WIDTH } from './pixel-radius.constants';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Injectable()
 export class PixelRadiusService {
     getAdjacentPixels(pixelLocation: number, radiusSize: number): number[] {
         const pixelCoordinateX = pixelLocation % IMAGE_WIDTH;

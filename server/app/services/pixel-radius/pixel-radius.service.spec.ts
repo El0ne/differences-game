@@ -1,22 +1,19 @@
-import { TestBed } from '@angular/core/testing';
-import {
-    EXPECTED_PIXELS_WITH_RADIUS_OF_0,
-    EXPECTED_PIXELS_WITH_RADIUS_OF_1,
-    EXPECTED_PIXELS_WITH_RADIUS_OF_3,
-} from './pixel-radius-constants..constants';
-
+import { Test, TestingModule } from '@nestjs/testing';
+import { EXPECTED_PIXELS_WITH_RADIUS_OF_0, EXPECTED_PIXELS_WITH_RADIUS_OF_1, EXPECTED_PIXELS_WITH_RADIUS_OF_3 } from './pixel-radius.constants';
 import { PixelRadiusService } from './pixel-radius.service';
-
 describe('PixelRadiusService', () => {
     let service: PixelRadiusService;
 
-    beforeEach(() => {
-        TestBed.configureTestingModule({});
-        service = TestBed.inject(PixelRadiusService);
+    beforeEach(async () => {
+        const module: TestingModule = await Test.createTestingModule({
+            providers: [PixelRadiusService],
+        }).compile();
+
+        service = module.get<PixelRadiusService>(PixelRadiusService);
     });
 
-    it('should be created', () => {
-        expect(service).toBeTruthy();
+    it('should be defined', () => {
+        expect(service).toBeDefined();
     });
 
     it('getAdjacentPixels function should return an array of pixels around a pixel', () => {
