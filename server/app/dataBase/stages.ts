@@ -32,4 +32,4 @@ const GAME2 = {
     ],
 };
 
-export const GAMES = [GAME1, GAME1, GAME2, GAME1, GAME1, GAME2];
+export const GAMES = [GAME1, GAME1, GAME2, GAME1, GAME1, GAME2, GAME1, GAME1, GAME2, GAME1, GAME1, GAME2];

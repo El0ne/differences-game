@@ -18,8 +18,4 @@ export class GameCardInformationService {
     getNumberOfGameCardInformation(): Observable<number> {
         return this.http.get<number>(`${STAGE}/info`);
     }
-
-    getTest(): Observable<GameCardInformation[]> {
-        return this.http.get<GameCardInformation[]>(`${STAGE}`);
-    }
 }

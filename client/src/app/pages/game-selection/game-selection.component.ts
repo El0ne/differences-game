@@ -22,6 +22,7 @@ export class GameSelectionComponent implements OnInit {
         this.isConfig = this.router.url === '/config';
         this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
             this.numberOfGameInformations = data;
+            this.endIndex = Math.min(this.numberOfGameInformations, 4);
             this.selectGameCards();
         });
     }
@@ -29,17 +30,15 @@ export class GameSelectionComponent implements OnInit {
     async selectGameCards(): Promise<void> {
         this.gameCardService.getGameCardsInformations(this.index, this.endIndex).subscribe((data) => {
             this.gameCardInformations = data;
-        });
-        this.gameCardService.getTest().subscribe((data) => {
             console.log('data', data);
         });
-
         this.endIndex = Math.min(this.index + GAME_CARDS_TO_DISPLAY, this.numberOfGameInformations);
     }
 
     nextCards(): void {
         if (!this.isShowingLastCard()) {
             this.index += GAME_CARDS_TO_DISPLAY;
+            this.endIndex += Math.min(this.numberOfGameInformations, GAME_CARDS_TO_DISPLAY);
             this.selectGameCards();
         }
     }
@@ -47,6 +46,7 @@ export class GameSelectionComponent implements OnInit {
     previousCards(): void {
         if (!this.isShowingFirstCard()) {
             this.index -= GAME_CARDS_TO_DISPLAY;
+            this.endIndex -= GAME_CARDS_TO_DISPLAY;
             this.selectGameCards();
         }
     }
