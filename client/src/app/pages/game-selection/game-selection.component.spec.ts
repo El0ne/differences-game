@@ -79,7 +79,6 @@ describe('GameSelectionComponent', () => {
 
     it('previousCards() should call selectGameCards() if index is different than 0', () => {
         component.index = 4;
-        // component.endIndex = 5;
         component.selectGameCards = jasmine.createSpy();
         component.previousCards();
         expect(component.selectGameCards).toHaveBeenCalled();
