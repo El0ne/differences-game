@@ -10,7 +10,7 @@ export class StageController {
     test(@Query('index') index: number, @Query('endIndex') endIndex: number): GameCardInformation[] {
         console.log('index', index);
         console.log('endIndex', endIndex);
-        return this.gameCardService.getGameCards(index, endIndex); // create service that has getGameCards function that gets data from file
+        return this.gameCardService.getGameCards(index, endIndex);
     }
 
     @Get('info')
