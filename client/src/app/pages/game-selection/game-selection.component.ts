@@ -13,7 +13,7 @@ export class GameSelectionComponent implements OnInit {
     gameCardInformations: GameCardInformation[] = []; //GAMES; // TODO vider lorsque la BD est implementee
     numberOfGameInformations = 0; // this.gameCardInformations.length; // TODO initialiser a 0 lorsque le service est fonctionnel
     index: number = 0;
-    endIndex: number = 0;
+    // endIndex: number = 0;
     isConfig: boolean | null;
 
     constructor(public gameCardService: GameCardInformationService, public router: Router) {}
@@ -22,23 +22,24 @@ export class GameSelectionComponent implements OnInit {
         this.isConfig = this.router.url === '/config';
         this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
             this.numberOfGameInformations = data;
-            this.endIndex = Math.min(this.numberOfGameInformations, 4);
+            // this.endIndex = Math.min(this.numberOfGameInformations, 4);
             this.selectGameCards();
         });
     }
 
     async selectGameCards(): Promise<void> {
-        this.gameCardService.getGameCardsInformations(this.index, this.endIndex).subscribe((data) => {
+        const endIndex = Math.min(this.numberOfGameInformations, this.index + 4);
+        this.gameCardService.getGameCardsInformations(this.index, endIndex).subscribe((data) => {
             this.gameCardInformations = data;
-            console.log('data', data);
+            console.log('this.gameCardInformations', this.gameCardInformations);
         });
-        this.endIndex = Math.min(this.index + GAME_CARDS_TO_DISPLAY, this.numberOfGameInformations);
+        // this.endIndex = Math.min(this.index + GAME_CARDS_TO_DISPLAY, this.numberOfGameInformations);
     }
 
     nextCards(): void {
         if (!this.isShowingLastCard()) {
             this.index += GAME_CARDS_TO_DISPLAY;
-            this.endIndex += Math.min(this.numberOfGameInformations, GAME_CARDS_TO_DISPLAY);
+            // this.endIndex += Math.min(this.numberOfGameInformations, GAME_CARDS_TO_DISPLAY);
             this.selectGameCards();
         }
     }
@@ -46,7 +47,7 @@ export class GameSelectionComponent implements OnInit {
     previousCards(): void {
         if (!this.isShowingFirstCard()) {
             this.index -= GAME_CARDS_TO_DISPLAY;
-            this.endIndex -= GAME_CARDS_TO_DISPLAY;
+            // this.endIndex -= GAME_CARDS_TO_DISPLAY;
             this.selectGameCards();
         }
     }
@@ -56,6 +57,6 @@ export class GameSelectionComponent implements OnInit {
     }
 
     isShowingLastCard(): boolean {
-        return this.endIndex === this.numberOfGameInformations;
+        return this.index + 4 >= this.numberOfGameInformations;
     }
 }
