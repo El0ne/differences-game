@@ -17,7 +17,7 @@ const GAME1 = {
 
 const GAME2 = {
     name: 'game2',
-    difficulty: 'Difficile',
+    difficulty: 'Facile',
     // TODO: modifie pour image qui vient du serveur
     image: '/assets/444-640x480.jpg',
     soloTimes: [

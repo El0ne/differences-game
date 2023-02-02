@@ -1,5 +1,5 @@
 import { GAMES } from '@app/dataBase/stages';
-import { GameCardService } from '@app/services/game-card/game-card/game-card.service';
+import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameCardInformation } from '@common/game-card';
 import { Controller, Get, Query } from '@nestjs/common';
 
