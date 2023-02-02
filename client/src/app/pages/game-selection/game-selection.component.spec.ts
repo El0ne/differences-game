@@ -107,7 +107,7 @@ describe('GameSelectionComponent', () => {
         expect(component.isShowingFirstCard()).toBeTruthy();
     });
 
-    it('isShowingLastCard() should return false unless index plus for is greater or equal than numberOfGameInformations', () => {
+    it('isShowingLastCard() should return false unless index plus 4 is greater or equal than numberOfGameInformations', () => {
         component.numberOfGameInformations = 10;
         component.index = 4;
         expect(component.isShowingLastCard()).toBeFalsy();
