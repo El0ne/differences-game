@@ -1,5 +1,6 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { PATHS } from '@app/pages/solo-view/solo-view-constants';
+import { HEIGHT, WAIT_TIME, WIDTH } from './click-event-constant';
 
 @Component({
     selector: 'app-click-event',
@@ -8,9 +9,9 @@ import { PATHS } from '@app/pages/solo-view/solo-view-constants';
 })
 export class ClickEventComponent implements OnInit {
     @Input() differenceArray: boolean[];
-    @Output() differenceDetected: EventEmitter<string> = new EventEmitter<string>();
     @Input() id: number;
-    different: boolean;
+    @Input() original: string;
+    timeout: boolean;
 
     constructor() {}
 
@@ -23,14 +24,15 @@ export class ClickEventComponent implements OnInit {
             const context = canvas.getContext('2d') as CanvasRenderingContext2D;
             context.drawImage(image, 0, 0);
         };
+        this.timeout = true;
     }
 
-    getCoordInImage(e: MouseEvent) {
+    getCoordInImage(e: MouseEvent): number[] {
         const canvas = e.target as HTMLCanvasElement;
         const rect = canvas.getBoundingClientRect();
         const x = Math.floor(e.clientX - rect.left);
         const y = Math.floor(e.clientY - rect.top);
-        return [x, y];
+        return new Array(x, y);
     }
 
     isDifferent(e: MouseEvent, differenceArray: boolean[]): boolean {
@@ -44,7 +46,7 @@ export class ClickEventComponent implements OnInit {
     }
 
     isADifference(array: boolean[], x: number, y: number) {
-        const posToCheck = y * 640 + x;
+        const posToCheck = y * WIDTH + x;
         return array[posToCheck];
     }
 
@@ -53,10 +55,25 @@ export class ClickEventComponent implements OnInit {
         sound.play();
     }
 
-    coordChecker(e: MouseEvent) {
-        this.different = this.isDifferent(e, this.differenceArray);
-        if (this.different) {
-            this.differenceDetected.emit('Error');
+    displayError(e: MouseEvent) {
+        if (this.timeout) {
+            const error = this.isDifferent(e, this.differenceArray);
+            if (error) {
+                this.timeout = false;
+                const canvas = e.target as HTMLCanvasElement;
+                const rect = canvas.getBoundingClientRect();
+                const x = Math.floor(e.clientX - rect.left);
+                const y = Math.floor(e.clientY - rect.top);
+                const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+                context.font = '30px Arial';
+                context.fillStyle = 'red';
+                context.textAlign = 'center';
+                context.fillText('Error', x, y);
+                setTimeout(() => {
+                    context.clearRect(0, 0, WIDTH, HEIGHT);
+                    this.timeout = true;
+                }, WAIT_TIME);
+            }
         }
     }
 }

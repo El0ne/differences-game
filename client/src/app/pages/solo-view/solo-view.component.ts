@@ -11,7 +11,6 @@ import { MESSAGES_LENGTH, PATHS } from './solo-view-constants';
 export class SoloViewComponent {
     readonly paths = PATHS; // TODO : Verify with Nikolay if typing is fine for constants
 
-    errorFromChildComponent: string;
     showErrorMessage: boolean = false;
     showTextBox: boolean = false;
     messages: string[] = [];
@@ -37,9 +36,6 @@ export class SoloViewComponent {
     }
     */
 
-    handler(differenceDetected: string) {
-        this.errorFromChildComponent = differenceDetected;
-    }
     getCoord(e: MouseEvent) {
         this.service.isDifferent(e, this.differenceArray);
     }
