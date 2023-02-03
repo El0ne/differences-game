@@ -5,12 +5,12 @@ import * as path from 'path';
 @Injectable()
 export class GameCardService {
     jsonPath = path.join(process.cwd(), '/app/dataBase/game-cards-informations.json');
+    content = fs.readFileSync(this.jsonPath, 'utf8');
+
     getGameCards(startIndex: number, endIndex: number): GameCardInformation[] {
-        const content = fs.readFileSync(this.jsonPath, 'utf8');
-        return JSON.parse(content).gameCardsInformations.slice(startIndex, endIndex);
+        return JSON.parse(this.content).gameCardsInformations.slice(startIndex, endIndex);
     }
     getGameCardsNumber(): number {
-        const content = fs.readFileSync(this.jsonPath, 'utf8');
-        return JSON.parse(content).gameCardsInformations.length;
+        return JSON.parse(this.content).gameCardsInformations.length;
     }
 }
