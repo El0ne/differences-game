@@ -7,10 +7,10 @@ import { Controller, Get, Query } from '@nestjs/common';
 export class StageController {
     constructor(private gameCardService: GameCardService) {}
     @Get()
-    test(@Query('index') index: number, @Query('endIndex') endIndex: number): GameCardInformation[] {
+    async test(@Query('index') index: number, @Query('endIndex') endIndex: number): Promise<GameCardInformation[]> {
         console.log('index', index);
         console.log('endIndex', endIndex);
-        return this.gameCardService.getGameCards(index, endIndex);
+        return await this.gameCardService.getGameCards(index, endIndex);
     }
 
     @Get('info')
