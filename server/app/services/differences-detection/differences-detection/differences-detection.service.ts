@@ -36,13 +36,15 @@ export class DifferencesDetectionService {
     }
 
     findPixelDifferenceIndex(pixelIndex: number, visitedPixels: number[][]): number /* usable for the game to find which pixel was cliqued*/ {
-        visitedPixels.forEach((difference, differenceIndex) => {
-            if (difference.includes(pixelIndex)) return differenceIndex;
-        });
+        for (const differenceIndex of visitedPixels.keys()) {
+            if (visitedPixels[differenceIndex].includes(pixelIndex)) {
+                return differenceIndex;
+            }
+        }
         return visitedPixels.length;
     }
 
     isAVisitedPixel(pixelIndex: number, visitedPixels: number[][]): boolean {
-        return this.findPixelDifferenceIndex(pixelIndex, visitedPixels) === visitedPixels.length;
+        return this.findPixelDifferenceIndex(pixelIndex, visitedPixels) !== visitedPixels.length;
     }
 }
