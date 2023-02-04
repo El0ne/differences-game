@@ -1,7 +1,7 @@
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameCardInformation } from '@common/game-card';
+import { GameInformation } from '@common/game-information';
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
-
 @Controller('stage')
 export class StageController {
     constructor(private gameCardService: GameCardService) {}
@@ -16,8 +16,7 @@ export class StageController {
     }
 
     @Post('/')
-    createGame(@Body() game) {
-        this.gameCardService.createGameCard(game);
-        console.log(game);
+    createGame(@Body() game: GameInformation) {
+        return this.gameCardService.createGameCard(game);
     }
 }

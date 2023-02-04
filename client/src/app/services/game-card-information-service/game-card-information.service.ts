@@ -1,8 +1,8 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { GameInformation } from '@app/model/game-information';
 import { STAGE } from '@app/services/server-routes';
 import { GameCardInformation } from '@common/game-card';
+import { GameInformation } from '@common/game-information';
 import { Observable } from 'rxjs';
 
 @Injectable({

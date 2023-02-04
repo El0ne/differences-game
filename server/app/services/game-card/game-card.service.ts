@@ -1,4 +1,5 @@
 import { GameCardInformation } from '@common/game-card';
+import { GameInformation } from '@common/game-information';
 import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -18,14 +19,15 @@ export class GameCardService {
         return JSON.parse(content).gameCardsInformations.length;
     }
 
-    createGameCard(game): void {
+    createGameCard(game): GameCardInformation {
         const allGameCards = this.getAllGameCards();
         const newGame = this.generateGameCard(game);
         allGameCards.push(newGame);
         fs.writeFileSync(this.jsonPath, JSON.stringify({ gameCardsInformations: allGameCards }));
+        return newGame;
     }
 
-    generateGameCard(game): GameCardInformation {
+    generateGameCard(game: GameInformation): GameCardInformation {
         return {
             name: game.name,
             difficulty: 'Facile',
