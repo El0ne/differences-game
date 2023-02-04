@@ -5,28 +5,28 @@ import { Injectable } from '@nestjs/common';
 export class DifferencesDetectionService {
     constructor(private pixelRadiusService: PixelRadiusService) {}
 
-    async getNumberOfDifferences(differencesArray: boolean[]): Promise<number[][]> {
+    getDifferencesList(differencesArray: boolean[]): number[][] {
         const visitedPixels: number[][] = [];
         const queue: number[] = [];
         let numberOfDifferences = 0;
 
-        differencesArray.forEach(async (different, index) => {
+        for (const index of differencesArray.keys()) {
             if (this.isNewAndDifferentPixel(index, differencesArray, visitedPixels)) {
                 queue.push(index);
                 visitedPixels.push([index]);
-                numberOfDifferences++;
 
-                const currentPos = queue.shift();
                 while (queue.length !== 0) {
-                    for (const adjacentPixel of await this.pixelRadiusService.getAdjacentPixels(currentPos, 1)) {
+                    const currentPos = queue.shift();
+                    for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(currentPos, 1)) {
                         if (this.isNewAndDifferentPixel(adjacentPixel, differencesArray, visitedPixels)) {
                             visitedPixels[numberOfDifferences].push(adjacentPixel);
                             queue.push(adjacentPixel);
                         }
                     }
                 }
+                numberOfDifferences++;
             }
-        });
+        }
 
         return visitedPixels;
     }
@@ -35,7 +35,7 @@ export class DifferencesDetectionService {
         return differencesArray[index] && !this.isAVisitedPixel(index, visitedPixels);
     }
 
-    findPixelDifferenceIndex(pixelIndex: number, visitedPixels: number[][]): number /* usable for the game to find which pixel was cliqued*/ {
+    findPixelDifferenceIndex(pixelIndex: number, visitedPixels: number[][]): number /* usable for the game to find which pixel was clicked*/ {
         for (const differenceIndex of visitedPixels.keys()) {
             if (visitedPixels[differenceIndex].includes(pixelIndex)) {
                 return differenceIndex;

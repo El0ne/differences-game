@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+import { ImageDimentionsService } from '@app/services/image-dimentions/image-dimentions.service';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -6,21 +8,26 @@ import { DifferencesDetectionService } from './differences-detection.service';
 
 describe('DifferencesDetectionService', () => {
     let service: DifferencesDetectionService;
-    const DIFFERENT_PIXELS_LIST = [true, true, true, false, false, false, true, true, true];
-    const VISITED_PIXELS_TEST = [
-        [0, 1, 2],
-        [6, 7],
-    ];
-    const DIFFERENT_PIXEL = 1;
-    const NOT_DIFFERENT_PIXEL = 3;
-    const UNVISITED_DIFFERENT_PIXEL = 8;
+    let imageDimentionsService: ImageDimentionsService;
+    let DIFFERENT_PIXELS_LIST: boolean[];
+    let VISITED_PIXELS_TEST: number[][];
+    let DIFFERENT_PIXEL: number;
+    let NOT_DIFFERENT_PIXEL: number;
+    let UNVISITED_DIFFERENT_PIXEL: number;
 
     beforeEach(async () => {
+        DIFFERENT_PIXELS_LIST = [true, true, true, false, false, true, true, false, true];
+        VISITED_PIXELS_TEST = [[0, 1, 2, 5, 8], [6]];
+        DIFFERENT_PIXEL = 1;
+        NOT_DIFFERENT_PIXEL = 3;
+        UNVISITED_DIFFERENT_PIXEL = 8;
+
         const module: TestingModule = await Test.createTestingModule({
-            providers: [DifferencesDetectionService, PixelRadiusService, PixelPositionService],
+            providers: [DifferencesDetectionService, PixelRadiusService, PixelPositionService, ImageDimentionsService],
         }).compile();
 
         service = module.get<DifferencesDetectionService>(DifferencesDetectionService);
+        imageDimentionsService = module.get<ImageDimentionsService>(ImageDimentionsService);
     });
 
     it('should be defined', () => {
@@ -47,13 +54,18 @@ describe('DifferencesDetectionService', () => {
         expect(service.findPixelDifferenceIndex(NOT_DIFFERENT_PIXEL, VISITED_PIXELS_TEST)).toEqual(2);
     });
 
-    it('findPixelDifferenceIndex() should return the visitedPixels length if the index is not visited', () => {
-        expect(service.findPixelDifferenceIndex(NOT_DIFFERENT_PIXEL, VISITED_PIXELS_TEST)).toEqual(2);
-    });
-
     it('isNewAndDifferentPixel() should return true only if the the pixel is not visited and is a different pixel', () => {
         expect(service.isNewAndDifferentPixel(DIFFERENT_PIXEL, DIFFERENT_PIXELS_LIST, VISITED_PIXELS_TEST)).toBeFalsy();
         expect(service.isNewAndDifferentPixel(NOT_DIFFERENT_PIXEL, DIFFERENT_PIXELS_LIST, VISITED_PIXELS_TEST)).toBeFalsy();
+        VISITED_PIXELS_TEST[0].pop();
         expect(service.isNewAndDifferentPixel(UNVISITED_DIFFERENT_PIXEL, DIFFERENT_PIXELS_LIST, VISITED_PIXELS_TEST)).toBeTruthy();
+    });
+
+    it('getDifferencesList() should return an array of arrays that represent the indexes of the pixels chucks', () => {
+        stub(imageDimentionsService, 'getWidth').returns(3);
+        stub(imageDimentionsService, 'getHeight').returns(3);
+        const VISITED_PIXELS_END = VISITED_PIXELS_TEST;
+        VISITED_PIXELS_END[0][4] = 8;
+        expect(service.getDifferencesList(DIFFERENT_PIXELS_LIST)).toStrictEqual(VISITED_PIXELS_END);
     });
 });
