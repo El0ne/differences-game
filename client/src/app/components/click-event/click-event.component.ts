@@ -77,9 +77,11 @@ export class ClickEventComponent implements OnInit {
     isADifference(array: number[][], x: number, y: number): boolean {
         const posToCheck = y * 640 + x;
         for (const difference of array) {
+            console.log('here');
             for (const positions of difference) {
                 if (positions === posToCheck) {
                     this.lastDifferenceClicked = difference;
+
                     return true;
                 }
             }
@@ -106,7 +108,7 @@ export class ClickEventComponent implements OnInit {
                 context.textAlign = 'center';
                 context.fillText('Error', x, y);
                 setTimeout(() => {
-                    context.clearRect(0, 0, WIDTH, HEIGHT);
+                    context.clearRect(0, 0, WIDTH, HEIGHT); // TODO : check if any way to not use that
                     this.timeout = true;
                 }, WAIT_TIME);
             }
