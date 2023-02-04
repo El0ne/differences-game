@@ -23,7 +23,6 @@ export class GameCardInformationService {
     createGame(gameInfo: GameInformation): Observable<GameCardInformation> {
         const headers = { 'content-type': 'application/json' };
         const body = JSON.stringify(gameInfo);
-        console.log(body);
         return this.http.post<GameCardInformation>(STAGE, body, { headers });
     }
 }
