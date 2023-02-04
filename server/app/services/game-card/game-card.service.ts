@@ -28,6 +28,7 @@ export class GameCardService {
     }
 
     generateGameCard(game: GameInformation): GameCardInformation {
+        this.saveGameImage(game);
         return {
             name: game.name,
             difficulty: 'Facile',
@@ -43,5 +44,21 @@ export class GameCardService {
                 { time: 0, name: '--' },
             ],
         };
+    }
+
+    saveGameImage(gameInfo: GameInformation) {
+        console.log('called');
+        // const fileFormat =  this.chooseProperEncoding(playlist.thumbnail);
+        const thumbnailData = gameInfo.baseImage.replace('data:image/bmp;base64,', '');
+        const imageFileName = `assets/images/${gameInfo.name}.txt`;
+        const filePath = path.join(process.cwd() + `/${imageFileName}`);
+        // fs..writeFile(filePath, thumbnailData, {
+        //     encoding: 'base64',
+        // });
+        fs.writeFileSync(filePath, gameInfo.baseImage, {
+            // encoding: 'base64',
+        });
+
+        gameInfo.baseImage = imageFileName;
     }
 }
