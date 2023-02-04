@@ -16,8 +16,6 @@ export class ClickEventComponent implements OnInit {
     lastDifferenceClicked: number[];
     currentScore: number = 0;
 
-    constructor() {}
-
     ngOnInit(): void {
         const tag = this.id.toString();
         const image = new Image();
@@ -53,6 +51,7 @@ export class ClickEventComponent implements OnInit {
         }
     }
 
+    // TODO : Add effect, color the same thing on the other canvas and make sure the difference is deleted from the list so you can't click it twice
     differenceEffect(e: MouseEvent) {
         const canvas = e.target as HTMLCanvasElement;
         const context = canvas.getContext('2d') as CanvasRenderingContext2D;
