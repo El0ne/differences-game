@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { ClickEventsService } from '@app/services/click-events/click-events.service';
 import { MOCK_ARRAY } from './mock-array';
 import { MESSAGES_LENGTH, PATHS } from './solo-view-constants';
 
@@ -18,16 +17,12 @@ export class SoloViewComponent {
     differenceArray: number[][];
     currentScore: number = 0;
 
-    constructor(private service: ClickEventsService) {
+    constructor() {
         this.differenceArray = MOCK_ARRAY;
     }
 
     incrementScore() {
         this.currentScore += 1;
-    }
-
-    getCoord(e: MouseEvent) {
-        this.service.isDifferent(e, this.differenceArray);
     }
 
     toggleInfoCard() {
