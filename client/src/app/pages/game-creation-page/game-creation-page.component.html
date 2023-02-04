@@ -28,7 +28,7 @@
                 <button id="reset-original" (click)="clear($event)">X</button>
                 <label for="upload-original">
                     Choisir une image de 640*480 de format bmp
-                    <input type="file" id="upload-original" class="photo-upload" (change)="fileValidation($event)" accept="image/bmp" />
+                    <input #elouan type="file" id="upload-original" class="photo-upload" (change)="fileValidation($event)" accept="image/bmp" />
                 </label>
             </div>
 

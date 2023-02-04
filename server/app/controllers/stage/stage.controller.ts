@@ -20,4 +20,9 @@ export class StageController {
         // TODO ajouter appel au service qui va générer les images de différences
         return this.gameCardService.createGameCard(game);
     }
+
+    @Post('/image')
+    test(@Body qwe) {
+        console.log('qwe', qwe);
+    }
 }

@@ -1,5 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ImageSnippet } from '@app/model/image-snippet';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { ImageService } from '@app/services/image-service/image-service.service';
 import { GameCardInformation } from '@common/game-card';
 import { RankingBoard } from '@common/ranking-board';
 import { Observable } from 'rxjs';
@@ -13,6 +15,10 @@ import { ModalDiffPageService } from './modal-diff-page.service';
 export class GameCreationPageComponent implements OnInit {
     @ViewChild('canvas1') myOgCanvas: ElementRef;
     @ViewChild('canvas2') myDiffCanvas: ElementRef;
+
+    @ViewChild('elouan') firstImage;
+
+    selectedFile: ImageSnippet;
 
     display$: Observable<'open' | 'close'>;
 
@@ -29,7 +35,11 @@ export class GameCreationPageComponent implements OnInit {
     soloTimes: RankingBoard[];
     multiTimes: RankingBoard[];
 
-    constructor(private modalDiffService: ModalDiffPageService, public gameCardService: GameCardInformationService) {}
+    constructor(
+        private modalDiffService: ModalDiffPageService,
+        public gameCardService: GameCardInformationService,
+        private imageService: ImageService,
+    ) {}
 
     ngOnInit() {
         this.display$ = this.modalDiffService.watch();
@@ -119,11 +129,25 @@ export class GameCreationPageComponent implements OnInit {
     save(): void {
         // TODO ajouter verif que les images sont upload et qu'on a un nom pour le jeu
         const gameInfo = {
-            name: 'this.gameTitle',
+            name: this.gameTitle,
             baseImage: 'base',
             differenceImage: 'diff',
             radius: 3,
         };
         this.gameCardService.createGame(gameInfo).subscribe();
+    }
+
+    // from  https://www.freecodecamp.org/news/how-to-make-image-upload-easy-with-angular-1ed14cb2773b/
+    processFile(imageInput) {
+        const file: File = imageInput.files[0];
+        const reader = new FileReader();
+
+        reader.addEventListener('load', (event) => {
+            this.selectedFile = new ImageSnippet(event.target.result, file);
+
+            this.imageService.uploadImage(this.selectedFile.file).subscribe();
+        });
+
+        reader.readAsDataURL(file);
     }
 }
