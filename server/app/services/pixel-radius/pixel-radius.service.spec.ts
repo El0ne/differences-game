@@ -3,6 +3,7 @@ import {
     EXPECTED_PIXELS_WITH_RADIUS_OF_1,
     EXPECTED_PIXELS_WITH_RADIUS_OF_3,
 } from '@app/services/constants/pixel.constants';
+import { ImageDimentionsService } from '@app/services/image-dimentions/image-dimentions.service';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PixelRadiusService } from './pixel-radius.service';
@@ -11,7 +12,7 @@ describe('PixelRadiusService', () => {
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [PixelRadiusService, PixelPositionService],
+            providers: [PixelRadiusService, PixelPositionService, ImageDimentionsService],
         }).compile();
 
         service = module.get<PixelRadiusService>(PixelRadiusService);

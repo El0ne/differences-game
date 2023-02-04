@@ -1,3 +1,4 @@
+import { ImageDimentionsService } from '@app/services/image-dimentions/image-dimentions.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PixelPositionService } from './pixel-position.service';
 
@@ -6,7 +7,7 @@ describe('PixelPositionService', () => {
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [PixelPositionService],
+            providers: [PixelPositionService, ImageDimentionsService],
         }).compile();
 
         service = module.get<PixelPositionService>(PixelPositionService);

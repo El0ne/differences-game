@@ -17,9 +17,9 @@ describe('ImageDimentionsService', () => {
         expect(service).toBeDefined();
     });
 
-    it('constants should be the same as in the IMAGE_DIMENTIONS constant', () => {
-        expect(service.width).toBe(IMAGE_DIMENTIONS.width);
-        expect(service.height).toBe(IMAGE_DIMENTIONS.height);
-        expect(service.imageNumberOfPixels).toBe(IMAGE_DIMENTIONS.width * IMAGE_DIMENTIONS.height);
+    it('get methods should return good dimentions in function of IMAGE_DIMENTIONS constant', () => {
+        expect(service.getWidth()).toBe(IMAGE_DIMENTIONS.width);
+        expect(service.getHeight()).toBe(IMAGE_DIMENTIONS.height);
+        expect(service.getNumberOfPixels()).toBe(IMAGE_DIMENTIONS.width * IMAGE_DIMENTIONS.height);
     });
 });
