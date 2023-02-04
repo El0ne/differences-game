@@ -17,7 +17,7 @@ export class GameSelectionComponent implements OnInit {
 
     constructor(public gameCardService: GameCardInformationService, public router: Router) {}
 
-    async ngOnInit(): Promise<void> {
+    ngOnInit(): void {
         this.isConfig = this.router.url === '/config';
         this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
             this.numberOfGameInformations = data;
@@ -25,7 +25,7 @@ export class GameSelectionComponent implements OnInit {
         });
     }
 
-    async selectGameCards(): Promise<void> {
+    selectGameCards(): void {
         const endIndex = Math.min(this.numberOfGameInformations, this.index + GAME_CARDS_TO_DISPLAY);
         this.gameCardService.getGameCardsInformations(this.index, endIndex).subscribe((data) => {
             this.gameCardInformations = data;
