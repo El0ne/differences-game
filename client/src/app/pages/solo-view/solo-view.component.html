@@ -32,7 +32,7 @@
 
     <div class="flex-game">
         <!-- <canvas id="original" width="640" height="480" (click)="getCoord($event)"></canvas> -->
-        <app-click-event [differenceArray]="differenceArray" [id]="1" [original]="'original'"></app-click-event>
+        <app-click-event [differenceArray]="differenceArray" [id]="1" [original]="'original'" (incrementScore)="incrementScore()"></app-click-event>
         <div class="game-options">
             <div id="timer">
                 <div class="timer-box">
@@ -49,7 +49,7 @@
                         <div class="col col-heading">
                             <h1>SCORE</h1>
                         </div>
-                        <div class="col col-display" id="scoreHome">1</div>
+                        <div class="col col-display" id="scoreHome">{{ currentScore }}</div>
                     </div>
                 </div>
             </div>
@@ -70,7 +70,7 @@
             </div>
         </div>
         <!-- <canvas id="differences" width="640" height="480" (click)="getCoord($event)"></canvas> -->
-        <app-click-event [differenceArray]="differenceArray" [id]="2" [original]="'different'"></app-click-event>
+        <app-click-event [differenceArray]="differenceArray" [id]="2" [original]="'different'" (incrementScore)="incrementScore()"></app-click-event>
         <div class="hint-button">
             <button class="hint" type="button">
                 <img class="hint-logo" src="{{ paths.hint }}" />

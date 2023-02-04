@@ -16,25 +16,15 @@ export class SoloViewComponent {
     messages: string[] = [];
     messageContent: string = '';
     differenceArray: number[][];
+    currentScore: number = 0;
 
     constructor(private service: ClickEventsService) {
         this.differenceArray = MOCK_ARRAY;
     }
-    /*
-    ngOnInit() {
-        const image = new Image(); // TODO : Double when there's a different image
-        image.src = PATHS.temp;
-        image.onload = () => {
-            const diffCanvas = document.getElementById('differences') as HTMLCanvasElement;
-            const ctx1 = diffCanvas.getContext('2d') as CanvasRenderingContext2D;
-            ctx1.drawImage(image, 0, 0);
 
-            const originalCanvas = document.getElementById('original') as HTMLCanvasElement;
-            const ctx2 = originalCanvas.getContext('2d') as CanvasRenderingContext2D;
-            ctx2.drawImage(image, 0, 0);
-        };
+    incrementScore() {
+        this.currentScore += 1;
     }
-    */
 
     getCoord(e: MouseEvent) {
         this.service.isDifferent(e, this.differenceArray);

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { PATHS } from '@app/pages/solo-view/solo-view-constants';
 import { HEIGHT, WAIT_TIME, WIDTH } from './click-event-constant';
 
@@ -11,8 +11,10 @@ export class ClickEventComponent implements OnInit {
     @Input() differenceArray: number[][];
     @Input() id: number;
     @Input() original: string;
+    @Output() incrementScore: EventEmitter<number> = new EventEmitter<number>();
     timeout: boolean;
     lastDifferenceClicked: number[];
+    currentScore: number = 0;
 
     constructor() {}
 
@@ -60,6 +62,8 @@ export class ClickEventComponent implements OnInit {
             context.fillStyle = '#F00';
             context.fillRect(pos[0], pos[1], 1, 1);
         }
+        this.currentScore += 1;
+        this.incrementScore.emit(this.currentScore);
     }
 
     positionToPixel(toTransform: number) {
