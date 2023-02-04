@@ -117,22 +117,8 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     save(): void {
-        // this.card.name = this.gameTitle;
-        // this.card.image = this.baseImageURL;
-        // this.difficulty = 'Facile'; // initialisation, le temps qu'on sache quelles sont les exigences pr les difficultés.
-        // this.card.difficulty = this.difficulty;
-        // this.soloTimes = [
-        //     // initialisation. Ces propriétés vont changer une fois qu'un joueur aura joué.
-        //     { time: 0, name: '--' },
-        //     { time: 0, name: '--' },
-        //     { time: 0, name: '--' },
-        // ];
-        // this.multiTimes = [
-        //     { time: 0, name: '--' },
-        //     { time: 0, name: '--' },
-        //     { time: 0, name: '--' },
-        // ];
-        // GAMES.push(this.card);
+        // TODO ajouter verif que les images sont upload et qu'on a un nom pour le jeu
+        //
         const gameInfo = {
             name: 'this.gameTitle',
             baseImage: 'base',

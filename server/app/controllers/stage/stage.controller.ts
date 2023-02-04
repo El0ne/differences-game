@@ -16,7 +16,8 @@ export class StageController {
     }
 
     @Post('/')
-    createGame(@Body() game: GameInformation) {
+    createGame(@Body() game: GameInformation): GameCardInformation {
+        // TODO ajouter appel au service qui va générer les images de différences
         return this.gameCardService.createGameCard(game);
     }
 }
