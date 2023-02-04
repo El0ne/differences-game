@@ -1,5 +1,5 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
-import { GAMES } from '@app/mock/game-cards';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameCardInformation } from '@common/game-card';
 import { RankingBoard } from '@common/ranking-board';
 import { Observable } from 'rxjs';
@@ -10,7 +10,7 @@ import { ModalDiffPageService } from './modal-diff-page.service';
     templateUrl: './game-creation-page.component.html',
     styleUrls: ['./game-creation-page.component.scss'],
 })
-export class GameCreationPageComponent {
+export class GameCreationPageComponent implements OnInit {
     @ViewChild('canvas1') myOgCanvas: ElementRef;
     @ViewChild('canvas2') myDiffCanvas: ElementRef;
 
@@ -29,7 +29,7 @@ export class GameCreationPageComponent {
     soloTimes: RankingBoard[];
     multiTimes: RankingBoard[];
 
-    constructor(private modalDiffService: ModalDiffPageService) {}
+    constructor(private modalDiffService: ModalDiffPageService, public gameCardService: GameCardInformationService) {}
 
     ngOnInit() {
         this.display$ = this.modalDiffService.watch();
@@ -117,21 +117,30 @@ export class GameCreationPageComponent {
     }
 
     save(): void {
-        this.card.name = this.gameTitle;
-        this.card.image = this.baseImageURL;
-        this.difficulty = 'Facile'; // initialisation, le temps qu'on sache quelles sont les exigences pr les difficultés.
-        this.card.difficulty = this.difficulty;
-        this.soloTimes = [
-            // initialisation. Ces propriétés vont changer une fois qu'un joueur aura joué.
-            { time: 0, name: '--' },
-            { time: 0, name: '--' },
-            { time: 0, name: '--' },
-        ];
-        this.multiTimes = [
-            { time: 0, name: '--' },
-            { time: 0, name: '--' },
-            { time: 0, name: '--' },
-        ];
-        GAMES.push(this.card);
+        // this.card.name = this.gameTitle;
+        // this.card.image = this.baseImageURL;
+        // this.difficulty = 'Facile'; // initialisation, le temps qu'on sache quelles sont les exigences pr les difficultés.
+        // this.card.difficulty = this.difficulty;
+        // this.soloTimes = [
+        //     // initialisation. Ces propriétés vont changer une fois qu'un joueur aura joué.
+        //     { time: 0, name: '--' },
+        //     { time: 0, name: '--' },
+        //     { time: 0, name: '--' },
+        // ];
+        // this.multiTimes = [
+        //     { time: 0, name: '--' },
+        //     { time: 0, name: '--' },
+        //     { time: 0, name: '--' },
+        // ];
+        // GAMES.push(this.card);
+        const gameInfo = {
+            name: 'this.gameTitle',
+            baseImage: 'base',
+            differenceImage: 'diff',
+            radius: 3,
+        };
+        this.gameCardService.createGame(gameInfo).subscribe((data) => {
+            console.log('data', data);
+        });
     }
 }

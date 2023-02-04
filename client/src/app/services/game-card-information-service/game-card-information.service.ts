@@ -1,5 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { GameInformation } from '@app/model/game-information';
 import { STAGE } from '@app/services/server-routes';
 import { GameCardInformation } from '@common/game-card';
 import { Observable } from 'rxjs';
@@ -17,5 +18,12 @@ export class GameCardInformationService {
 
     getNumberOfGameCardInformation(): Observable<number> {
         return this.http.get<number>(`${STAGE}/info`);
+    }
+
+    createGame(gameInfo: GameInformation): Observable<GameCardInformation> {
+        const headers = { 'content-type': 'application/json' };
+        const body = JSON.stringify(gameInfo);
+        console.log(body);
+        return this.http.post<GameCardInformation>(STAGE, body, { headers });
     }
 }

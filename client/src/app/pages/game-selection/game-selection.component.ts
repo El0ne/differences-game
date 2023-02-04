@@ -21,11 +21,13 @@ export class GameSelectionComponent implements OnInit {
         this.isConfig = this.router.url === '/config';
         this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
             this.numberOfGameInformations = data;
+            console.log('number changed');
             this.selectGameCards();
         });
     }
 
     selectGameCards(): void {
+        console.log('this.numberOfGameInformations', this.numberOfGameInformations);
         const endIndex = Math.min(this.numberOfGameInformations, this.index + GAME_CARDS_TO_DISPLAY);
         this.gameCardService.getGameCardsInformations(this.index, endIndex).subscribe((data) => {
             this.gameCardInformations = data;

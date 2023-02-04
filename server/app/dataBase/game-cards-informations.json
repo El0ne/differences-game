@@ -1,9 +1,9 @@
 {
     "gameCardsInformations": [
         {
-            "name": "Library",
+            "name": "Hommage à Naps",
             "difficulty": "Difficile",
-            "image": "/assets/444-640x480.jpg",
+            "image": "/assets/VP.jpg",
             "soloTimes": [
                 { "time": 60, "name": "Inull" },
                 { "time": 90, "name": "second" },
@@ -103,6 +103,36 @@
                 { "time": 63, "name": "Flavie" },
                 { "time": 92, "name": "Vincent" },
                 { "time": 115, "name": "Mathilde" }
+            ]
+        },
+        {
+            "name": "this.gameTitle",
+            "difficulty": "Facile",
+            "image": "/assets/444-640x480.jpg",
+            "soloTimes": [
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" }
+            ],
+            "multiTimes": [
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" }
+            ]
+        },
+        {
+            "name": "this",
+            "difficulty": "Facile",
+            "image": "/assets/444-640x480.jpg",
+            "soloTimes": [
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" }
+            ],
+            "multiTimes": [
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" }
             ]
         }
     ]
