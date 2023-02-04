@@ -1,7 +1,17 @@
 <body>
     <div class="header-button-container">
-        <button id="previous" routerLink="/config">Retour</button>
-        <button id="save" routerLink="/config"><img class="save-image" src="../../../assets/save.png" /></button>
+        <div class="left-header-container">
+            <button id="previous" routerLink="/config">Retour</button>
+            <ng-container *ngIf="display$ | async as display">
+                <section [class.open]="display === 'open'" (click)="closeModalPage()">
+                    <div (click)="$event.stopPropagation()">
+                        <button id="info"><img class="info-image" src="../../../assets/info-48.png" /></button>
+                        <h1>Hello World</h1>
+                    </div>
+                </section>
+            </ng-container>
+        </div>
+        <button id="save" routerLink="/config" (click)="save()"><img class="save-image" src="../../../assets/save.png" /></button>
     </div>
     <div id="title-container">
         <div class="line title">____________</div>
@@ -9,7 +19,7 @@
         <div class="line title">____________</div>
     </div>
     <div class="central">
-        <input type="text" class="game-title game-container" placeholder="Donnez un titre à votre partie" />
+        <input type="text" class="game-title game-container" #title (keyup)="getTitle(title.value)" placeholder="Donnez un titre à votre partie" />
         <div class="upload-container">
             <div class="original container">
                 <div class="original image">

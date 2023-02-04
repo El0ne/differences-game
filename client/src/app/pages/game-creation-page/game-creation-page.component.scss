@@ -6,15 +6,30 @@ body {
     flex-direction: row;
     justify-content: space-between;
 }
+.left-header-container {
+    margin-top: 0.75%;
+    margin-left: 1%;
+    width: 15%;
+    display: flex;
+}
 #previous {
     display: inline-block;
     height: 4rem;
-    width: 8%;
+    width: 50%;
+    font-size: 24px;
+}
+#info {
+    display: inline-block;
+    width: 30%;
+    height: 4rem;
     font-size: 24px;
 }
 #save {
     height: 4rem;
     width: 8%;
+}
+.info-image {
+    width: 50%;
 }
 .save-image {
     width: 30%;
@@ -218,4 +233,42 @@ button {
     height: 3rem;
     margin: 1%;
     font-size: 20px;
+}
+
+section {
+    visibility: hidden;
+    opacity: 0;
+
+    &.open {
+        visibility: inherit;
+        opacity: 1;
+    }
+
+    display: block;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background: rgba(0, 0, 0, 0.2);
+    transition: opacity 250ms ease-in;
+
+    > div {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+
+        height: 200px;
+        width: 300px;
+
+        background: white;
+        padding: 64px;
+
+        border-radius: 8px;
+
+        box-shadow: 0 0 8px 4px rgba(0, 0, 0, 0.1);
+    }
 }
