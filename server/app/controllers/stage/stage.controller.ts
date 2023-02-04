@@ -6,7 +6,7 @@ import { Controller, Get, Query } from '@nestjs/common';
 export class StageController {
     constructor(private gameCardService: GameCardService) {}
     @Get()
-    test(@Query('index') index: number, @Query('endIndex') endIndex: number): GameCardInformation[] {
+    getStages(@Query('index') index: number, @Query('endIndex') endIndex: number): GameCardInformation[] {
         return this.gameCardService.getGameCards(index, endIndex);
     }
 
