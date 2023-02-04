@@ -1,11 +1,5 @@
-import { CourseController } from '@app/controllers/course/course.controller';
-import { DateController } from '@app/controllers/date/date.controller';
-import { ExampleController } from '@app/controllers/example/example.controller';
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { Course, courseSchema } from '@app/model/database/course';
-import { CourseService } from '@app/services/course/course.service';
-import { DateService } from '@app/services/date/date.service';
-import { ExampleService } from '@app/services/example/example.service';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -24,7 +18,7 @@ import { StageController } from './controllers/stage/stage.controller';
         }),
         MongooseModule.forFeature([{ name: Course.name, schema: courseSchema }]),
     ],
-    controllers: [CourseController, DateController, ExampleController, StageController],
-    providers: [ChatGateway, CourseService, DateService, ExampleService, Logger, GameCardService],
+    controllers: [StageController],
+    providers: [ChatGateway, Logger, GameCardService],
 })
 export class AppModule {}
