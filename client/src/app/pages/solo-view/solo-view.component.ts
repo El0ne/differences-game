@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ClickEventsService } from '@app/services/click-events/click-events.service';
-import { mockArray } from './mock-array';
+import { MOCK_ARRAY } from './mock-array';
 import { MESSAGES_LENGTH, PATHS } from './solo-view-constants';
 
 @Component({
@@ -15,10 +15,10 @@ export class SoloViewComponent {
     showTextBox: boolean = false;
     messages: string[] = [];
     messageContent: string = '';
-    differenceArray: boolean[];
+    differenceArray: number[][];
 
     constructor(private service: ClickEventsService) {
-        this.differenceArray = mockArray;
+        this.differenceArray = MOCK_ARRAY;
     }
     /*
     ngOnInit() {

@@ -1,3 +1,6 @@
-const mockArrayTrue = new Array(153600).fill(true);
-const mockArrayFalse = new Array(153600).fill(false);
-export const mockArray = mockArrayFalse.concat(mockArrayTrue);
+const difference: number[] = [];
+for (let i = 153600; i < 307201; i++) {
+    difference.push(i);
+}
+
+export const MOCK_ARRAY: number[][] = [difference];

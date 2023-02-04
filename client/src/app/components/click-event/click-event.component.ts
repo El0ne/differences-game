@@ -8,7 +8,7 @@ import { HEIGHT, WAIT_TIME, WIDTH } from './click-event-constant';
     styleUrls: ['./click-event.component.scss'],
 })
 export class ClickEventComponent implements OnInit {
-    @Input() differenceArray: boolean[];
+    @Input() differenceArray: number[][];
     @Input() id: number;
     @Input() original: string;
     timeout: boolean;
@@ -35,7 +35,7 @@ export class ClickEventComponent implements OnInit {
         return new Array(x, y);
     }
 
-    isDifferent(e: MouseEvent, differenceArray: boolean[]): boolean {
+    isDifferent(e: MouseEvent, differenceArray: number[][]): boolean {
         if (!this.isADifference(differenceArray, this.getCoordInImage(e)[0], this.getCoordInImage(e)[1])) {
             this.emitSound();
             return false;
@@ -45,9 +45,16 @@ export class ClickEventComponent implements OnInit {
         }
     }
 
-    isADifference(array: boolean[], x: number, y: number) {
-        const posToCheck = y * WIDTH + x;
-        return array[posToCheck];
+    isADifference(array: number[][], x: number, y: number) {
+        const posToCheck = y * 640 + x;
+        for (const difference of array) {
+            for (const positions of difference) {
+                if (positions === posToCheck) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     emitSound() {

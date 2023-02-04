@@ -12,7 +12,7 @@ export class ClickEventsService {
         return [x, y];
     }
 
-    isDifferent(e: MouseEvent, differenceArray: boolean[]): boolean {
+    isDifferent(e: MouseEvent, differenceArray: number[][]): boolean {
         if (!this.isADifference(differenceArray, this.getCoordInImage(e)[0], this.getCoordInImage(e)[1])) {
             this.emitSound();
             return true;
@@ -22,9 +22,12 @@ export class ClickEventsService {
         }
     }
 
-    isADifference(array: boolean[], x: number, y: number) {
+    isADifference(array: number[][], x: number, y: number) {
         const posToCheck = y * 640 + x;
-        return array[posToCheck];
+        for (const difference of array) {
+            for (const positions of difference) if ((difference[positions] = posToCheck)) return true;
+        }
+        return false;
     }
 
     emitSound() {
