@@ -41,7 +41,7 @@ export class StageController {
         return this.gameCardService.getGameCardsNumber();
     }
 
-    @Post('/')
+    @Post('/images')
     @UseInterceptors(
         FileFieldsInterceptor([{ name: 'baseImage', maxCount: 2 }], {
             storage,
