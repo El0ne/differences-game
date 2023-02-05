@@ -1,6 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameCardInformation } from '@common/game-card';
+import { ImageInformation } from '@common/image-information';
 import { RankingBoard } from '@common/ranking-board';
 import { Observable } from 'rxjs';
 import { ModalDiffPageService } from './modal-diff-page.service';
@@ -135,7 +136,7 @@ export class GameCreationPageComponent implements OnInit {
         //     differenceImage: 'diff',
         //     radius: 3,
         // };
-        this.gameCardService.uploadImage(this.selectedFile).subscribe((data) => console.log('received data fro BE', data)); // subscribe();
+        this.gameCardService.uploadImage(this.selectedFile).subscribe((data) => console.log('server image path', (data as ImageInformation).path));
         // this.gameCardService.createGame(gameInfo).subscribe();
     }
 }
