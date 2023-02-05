@@ -25,4 +25,15 @@ export class GameCardInformationService {
         const body = JSON.stringify(gameInfo);
         return this.http.post<GameCardInformation>(STAGE, body, { headers });
     }
+
+    uploadImage(image: File): Observable<object> {
+        const formData = new FormData();
+        formData.append('image', image, image.name);
+        console.log('image.name', image);
+        const body = {
+            e: 'test',
+        };
+        // this.http.post<FormData>(`${STAGE}/image`, formData);
+        return this.http.post(`${STAGE}/image`, body);
+    }
 }

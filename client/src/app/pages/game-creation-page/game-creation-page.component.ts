@@ -29,6 +29,9 @@ export class GameCreationPageComponent implements OnInit {
     soloTimes: RankingBoard[];
     multiTimes: RankingBoard[];
 
+    // elouan
+    selectedFile: File;
+
     constructor(private modalDiffService: ModalDiffPageService, public gameCardService: GameCardInformationService) {}
 
     ngOnInit() {
@@ -114,16 +117,25 @@ export class GameCreationPageComponent implements OnInit {
             this.urlDifferent = '';
             target.value = '';
         }
+        // elouan
+
+        const input = e.target as HTMLInputElement;
+
+        if (!input.files?.length) {
+            return;
+        }
+        this.selectedFile = input.files[0];
     }
 
     save(): void {
         // TODO ajouter verif que les images sont upload et qu'on a un nom pour le jeu
-        const gameInfo = {
-            name: 'this.gameTitle',
-            baseImage: 'base',
-            differenceImage: 'diff',
-            radius: 3,
-        };
-        this.gameCardService.createGame(gameInfo).subscribe();
+        // const gameInfo = {
+        //     name: 'this.gameTitle',
+        //     baseImage: 'base',
+        //     differenceImage: 'diff',
+        //     radius: 3,
+        // };
+        this.gameCardService.uploadImage(this.selectedFile).subscribe((data) => console.log(data)); // subscribe();
+        // this.gameCardService.createGame(gameInfo).subscribe();
     }
 }
