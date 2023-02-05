@@ -21,7 +21,6 @@ export class PixelRadiusService {
                 adjacentPixels.push(j * IMAGE_WIDTH + i);
             }
         }
-
         return adjacentPixels;
     }
 }
