@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { GAMES } from '@app/mock/game-cards';
 import { GameCardInformation } from '@common/game-card';
 import { RankingBoard } from '@common/ranking-board';
@@ -10,7 +10,7 @@ import { ModalDiffPageService } from './modal-diff-page.service';
     templateUrl: './game-creation-page.component.html',
     styleUrls: ['./game-creation-page.component.scss'],
 })
-export class GameCreationPageComponent {
+export class GameCreationPageComponent implements OnInit {
     @ViewChild('canvas1') myOgCanvas: ElementRef;
     @ViewChild('canvas2') myDiffCanvas: ElementRef;
 
@@ -35,10 +35,13 @@ export class GameCreationPageComponent {
         this.display$ = this.modalDiffService.watch();
     }
 
-    closeModalPage() {
-        this.modalDiffService.close();
+    open() {
+        this.modalDiffService.open();
     }
 
+    close() {
+        this.modalDiffService.close();
+    }
     getTitle(title: string) {
         this.gameTitle = title;
     }

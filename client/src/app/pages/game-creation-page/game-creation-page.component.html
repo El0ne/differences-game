@@ -2,11 +2,15 @@
     <div class="header-button-container">
         <div class="left-header-container">
             <button id="previous" routerLink="/config">Retour</button>
+            <button id="info"><img class="info-image" src="../../../assets/info-48.png" (click)="open()" /></button>
             <ng-container *ngIf="display$ | async as display">
-                <section [class.open]="display === 'open'" (click)="closeModalPage()">
+                <section [class.open]="display === 'open'" (click)="close()">
                     <div (click)="$event.stopPropagation()">
-                        <button id="info"><img class="info-image" src="../../../assets/info-48.png" /></button>
-                        <h1>Hello World</h1>
+                        <button class="close" type="button" (click)="close()">X</button>
+                        <h1>Vos différences ajoutées :</h1>
+                        <div class="diff-image">
+                            <canvas #canvasDiff width="640px" height="480px"></canvas>
+                        </div>
                     </div>
                 </section>
             </ng-container>
