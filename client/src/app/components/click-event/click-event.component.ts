@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { PATHS } from '@app/pages/solo-view/solo-view-constants';
-import { HEIGHT, WAIT_TIME, WIDTH } from './click-event-constant';
+import { WAIT_TIME, WIDTH } from './click-event-constant';
 
 @Component({
     selector: 'app-click-event',
@@ -142,12 +142,17 @@ export class ClickEventComponent implements OnInit {
                 const x = Math.floor(e.clientX - rect.left);
                 const y = Math.floor(e.clientY - rect.top);
                 const context = canvas.getContext('2d') as CanvasRenderingContext2D;
-                context.font = '30px Arial';
+                context.font = '30pt Arial';
                 context.fillStyle = 'red';
                 context.textAlign = 'center';
-                context.fillText('Error', x, y);
+                const error = 'Error';
+                context.fillText(error, x, y);
+                const metrics = context.measureText(error);
+                const height = 30;
+                const widthPosition = x - metrics.width;
+                const heightPosition = y - height;
                 setTimeout(() => {
-                    context.clearRect(0, 0, WIDTH, HEIGHT); // TODO : check if any way to not use that
+                    context.clearRect(widthPosition, heightPosition, x, y); // TODO : check if any way to not use that
                     this.timeout = true;
                 }, WAIT_TIME);
             }
