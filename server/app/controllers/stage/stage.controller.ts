@@ -1,9 +1,8 @@
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameCardInformation } from '@common/game-card';
 import { GameInformation } from '@common/game-information';
-import { ImageInformation } from '@common/image-information';
-import { Body, Controller, Get, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { Body, Controller, Get, Post, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import path = require('path');
@@ -40,8 +39,9 @@ export class StageController {
     }
 
     @Post('/image')
-    @UseInterceptors(FileInterceptor('image', storage))
-    uploadImage(@UploadedFile() file: ImageInformation): ImageInformation {
-        return file;
+    @UseInterceptors(FilesInterceptor('data'))
+    uploadImage(@UploadedFiles() files) {
+        console.log('file', files);
+        return files;
     }
 }

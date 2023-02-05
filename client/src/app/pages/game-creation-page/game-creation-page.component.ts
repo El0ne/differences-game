@@ -1,7 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameCardInformation } from '@common/game-card';
-import { ImageInformation } from '@common/image-information';
 import { RankingBoard } from '@common/ranking-board';
 import { Observable } from 'rxjs';
 import { ModalDiffPageService } from './modal-diff-page.service';
@@ -32,7 +31,6 @@ export class GameCreationPageComponent implements OnInit {
 
     // elouan
     selectedFile: File;
-    firstImagePath: string = '';
 
     constructor(private modalDiffService: ModalDiffPageService, public gameCardService: GameCardInformationService) {}
 
@@ -131,16 +129,13 @@ export class GameCreationPageComponent implements OnInit {
 
     save(): void {
         // TODO ajouter verif que les images sont upload et qu'on a un nom pour le jeu
-        this.gameCardService.uploadImage(this.selectedFile).subscribe((data) => {
-            this.firstImagePath = (data as ImageInformation).path;
-            const gameInfo = {
-                // TODO add good title, second image and radius
-                name: 'this.gameTitle',
-                baseImage: this.firstImagePath,
-                differenceImage: 'diff',
-                radius: 3,
-            };
-            this.gameCardService.createGame(gameInfo).subscribe();
-        });
+        const gameInfo = {
+            // TODO add good title, second image and radius
+            name: 'this.gameTitle',
+            baseImage: 'baseImagePath',
+            differenceImage: 'diff',
+            radius: 3,
+        };
+        this.gameCardService.uploadImage(this.selectedFile, gameInfo).subscribe((data) => console.log('data', data));
     }
 }
