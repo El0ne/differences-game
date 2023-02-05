@@ -10,18 +10,22 @@ import { v4 as uuidv4 } from 'uuid';
 export const storage = diskStorage({
     destination: './assets/images',
     filename: (req, file, cb) => {
-        const filename: string = path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
-        const extension: string = path.parse(file.originalname).ext;
-        cb(null, `${filename}${extension}`);
+        console.log('file', file);
+        if (file.mimetype === 'image/bmp') {
+            console.log('here');
+            const filename: string = path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
+            const extension: string = path.parse(file.originalname).ext;
+            cb(null, `${filename}${extension}`);
+        }
     },
 });
 
-export const fileFilter = (req, file, cb) => {
-    if (file.mimetype === 'image/bmp') {
-        return cb(null, true);
-    }
-    return cb(null, false);
-};
+// export const fileFilter = (req, file, cb) => {
+//     if (file.mimetype === 'image/bmp') {
+//         return cb(null, true);
+//     }
+//     return cb(null, false);
+// };
 @Controller('stage')
 export class StageController {
     constructor(private gameCardService: GameCardService) {}
@@ -44,13 +48,14 @@ export class StageController {
             ],
             {
                 storage,
-                fileFilter,
+                // fileFilter,
             },
         ),
     )
     createGame(@UploadedFiles() files: { baseImage?: File; gameData?: File }) {
         // TODO ajouter appel au service qui va générer les images de différences
         // this.gameCardService.createGameCard(files.gameData);
+        console.log('files', files);
         return files;
     }
 }
