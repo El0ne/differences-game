@@ -36,7 +36,7 @@ export class GameCardInformationService {
     uploadImages(image: File): Observable<ImageInformation[]> {
         const formData = new FormData();
         formData.append('baseImage', image, image.name);
-        formData.append('baseImage', image, image.name);
+        formData.append('differenceImage', image, image.name);
         console.log('formData', formData);
         return this.http.post<ImageInformation[]>(`${STAGE}/images`, formData);
     }
