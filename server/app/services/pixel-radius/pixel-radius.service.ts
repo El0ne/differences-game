@@ -1,26 +1,26 @@
-import { IMAGE_HEIGHT, IMAGE_WIDTH } from '@app/services/constants/pixel.constants';
-import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable } from '@angular/core';
+import { IMAGE_HEIGHT, IMAGE_WIDTH } from './pixel-radius-constants..constants';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class PixelRadiusService {
-    constructor(private pixelPositionService: PixelPositionService) {}
+    getAdjacentPixels(pixelLocation: number, radiusSize: number): number[] {
+        const pixelCoordinateX = pixelLocation % IMAGE_WIDTH;
+        const pixelCoordinateY = Math.floor(pixelLocation / IMAGE_WIDTH);
+        const pixelsAroundMyPixel: number[] = [];
 
-    getAdjacentPixels(pixelLocation: number, radius: number): number[] {
-        const xCoordinate = this.pixelPositionService.getXCoordinate(pixelLocation);
-        const yCoordinate = this.pixelPositionService.getYCoordinate(pixelLocation);
-        const adjacentPixels: number[] = [];
+        const leftExtremity = Math.max(pixelCoordinateX - radiusSize, 0);
+        const rightExtremity = Math.min(pixelCoordinateX + radiusSize, IMAGE_WIDTH - 1);
+        const upExtremity = Math.max(pixelCoordinateY - radiusSize, 0);
+        const downExtremity = Math.min(pixelCoordinateY + radiusSize, IMAGE_HEIGHT - 1);
 
-        const left = Math.max(xCoordinate - radius, 0);
-        const right = Math.min(xCoordinate + radius, IMAGE_WIDTH);
-        const down = Math.max(yCoordinate - radius, 0);
-        const up = Math.min(yCoordinate + radius, IMAGE_HEIGHT);
-
-        for (let i = down; i <= up; i++) {
-            for (let j = left; j <= right; j++) {
-                adjacentPixels.push(i * IMAGE_WIDTH + j);
+        for (let j = upExtremity; j <= downExtremity; j++) {
+            for (let i = leftExtremity; i <= rightExtremity; i++) {
+                pixelsAroundMyPixel.push(j * IMAGE_WIDTH + i);
             }
         }
-        return adjacentPixels;
+
+        return pixelsAroundMyPixel;
     }
 }
