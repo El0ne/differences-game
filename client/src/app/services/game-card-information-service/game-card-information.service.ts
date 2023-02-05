@@ -32,8 +32,8 @@ export class GameCardInformationService {
         const blob = new Blob([json], {
             type: 'application/json',
         });
-        formData.append('data', image, image.name);
-        formData.append('data', blob);
+        formData.append('baseImage', image, image.name);
+        formData.append('gameData', blob);
         console.log('formData', formData);
         return this.http.post(`${STAGE}/image`, formData);
     }
