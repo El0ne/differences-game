@@ -48,11 +48,11 @@ export class StageController {
             // fileFilter,
         }),
     )
-    createGame(@UploadedFiles() files: { baseImage?: File; gameData?: File }) {
+    createGame(@UploadedFiles() files) {
         // TODO ajouter appel au service qui va générer les images de différences
         // this.gameCardService.createGameCard(files.gameData);
         console.log('test');
         console.log('files', files);
-        return files;
+        return [files.baseImage[0], files.baseImage[1]];
     }
 }
