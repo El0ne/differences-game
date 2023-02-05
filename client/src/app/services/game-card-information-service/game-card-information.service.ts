@@ -26,14 +26,10 @@ export class GameCardInformationService {
         return this.http.post<GameCardInformation>(STAGE, body, { headers });
     }
 
-    uploadImage(image: File): Observable<object> {
+    uploadImage(image: File): Observable<FormData> {
         const formData = new FormData();
         formData.append('image', image, image.name);
         console.log('image.name', image);
-        const body = {
-            e: 'test',
-        };
-        // this.http.post<FormData>(`${STAGE}/image`, formData);
-        return this.http.post(`${STAGE}/image`, body);
+        return this.http.post<FormData>(`${STAGE}/image`, formData);
     }
 }

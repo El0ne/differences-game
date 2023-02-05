@@ -1,7 +1,8 @@
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameCardInformation } from '@common/game-card';
 import { GameInformation } from '@common/game-information';
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 @Controller('stage')
 export class StageController {
     constructor(private gameCardService: GameCardService) {}
@@ -22,12 +23,9 @@ export class StageController {
     }
 
     @Post('/image')
-    test(@Body() e) {
-        console.log('e', e);
-        return e;
+    @UseInterceptors(FileInterceptor('image'))
+    uploadImage(@UploadedFile() file) {
+        console.log('test', file);
+        return file;
     }
-    // @UseInterceptors(FileInterceptor('image'))
-    // uploadImage(@UploadedFile() file): void {
-    //     console.log('test', file);
-    // }
 }
