@@ -1,9 +1,12 @@
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameCardInformation } from '@common/game-card';
-import { Body, Controller, Get, Post, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { ImageInformation } from '@common/image-information';
+import { Body, Controller, Get, Param, Post, Query, StreamableFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { createReadStream } from 'fs';
 import { diskStorage } from 'multer';
 import * as path from 'path';
+import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
 // based on https://www.youtube.com/watch?v=f-URVd2OKYc
@@ -34,7 +37,7 @@ export class StageController {
         return this.gameCardService.createGameCard(game);
     }
 
-    @Post('/images')
+    @Post('/image')
     @UseInterceptors(
         FileFieldsInterceptor(
             [
@@ -44,8 +47,25 @@ export class StageController {
             { storage },
         ),
     )
-    uploadImages(@UploadedFiles() files) {
+    uploadImages(@UploadedFiles() files): ImageInformation[] {
         // TODO ajouter appel au service qui va générer les images de différences
         return [files.baseImage[0], files.differenceImage[0]];
+    }
+
+    @Get('/image/:imageName')
+    getImage(@Param() param): StreamableFile {
+        console.log(param.imageName);
+        const imagePath = join(process.cwd(), 'assets/images');
+        const file = createReadStream(join(imagePath, `/${param.imageName}`));
+        console.log('file', file.path);
+        return new StreamableFile(file);
+    }
+
+    @Get('/image')
+    getFile(): StreamableFile {
+        const file = createReadStream(join(process.cwd(), 'assets/images/test.bmp'));
+        console.log('file', file);
+
+        return new StreamableFile(file);
     }
 }

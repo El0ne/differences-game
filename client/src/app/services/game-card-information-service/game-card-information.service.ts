@@ -33,6 +33,6 @@ export class GameCardInformationService {
         formData.append('baseImage', image, image.name);
         formData.append('differenceImage', image, image.name);
         console.log('formData', formData);
-        return this.http.post<ImageInformation[]>(`${STAGE}/images`, formData);
+        return this.http.post<ImageInformation[]>(`${STAGE}/image`, formData);
     }
 }
