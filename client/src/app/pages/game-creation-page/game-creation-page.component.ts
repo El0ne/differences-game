@@ -32,6 +32,7 @@ export class GameCreationPageComponent implements OnInit {
 
     // elouan
     selectedFile: File;
+    firstImagePath: string = '';
 
     constructor(private modalDiffService: ModalDiffPageService, public gameCardService: GameCardInformationService) {}
 
@@ -130,13 +131,17 @@ export class GameCreationPageComponent implements OnInit {
 
     save(): void {
         // TODO ajouter verif que les images sont upload et qu'on a un nom pour le jeu
-        // const gameInfo = {
-        //     name: 'this.gameTitle',
-        //     baseImage: 'base',
-        //     differenceImage: 'diff',
-        //     radius: 3,
-        // };
-        this.gameCardService.uploadImage(this.selectedFile).subscribe((data) => console.log('server image path', (data as ImageInformation).path));
-        // this.gameCardService.createGame(gameInfo).subscribe();
+        this.gameCardService.uploadImage(this.selectedFile).subscribe((data) => {
+            this.firstImagePath = (data as ImageInformation).path;
+            console.log('before');
+            console.log('after');
+            const gameInfo = {
+                name: 'this.gameTitle',
+                baseImage: this.firstImagePath,
+                differenceImage: 'diff',
+                radius: 3,
+            };
+            this.gameCardService.createGame(gameInfo).subscribe();
+        });
     }
 }
