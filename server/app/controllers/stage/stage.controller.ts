@@ -42,8 +42,6 @@ export class StageController {
     @Post('/image')
     @UseInterceptors(FileInterceptor('image', storage))
     uploadImage(@UploadedFile() file: ImageInformation): ImageInformation {
-        console.log('test', file);
-        console.log(typeof file);
         return file;
     }
 }

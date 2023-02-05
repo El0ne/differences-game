@@ -133,9 +133,8 @@ export class GameCreationPageComponent implements OnInit {
         // TODO ajouter verif que les images sont upload et qu'on a un nom pour le jeu
         this.gameCardService.uploadImage(this.selectedFile).subscribe((data) => {
             this.firstImagePath = (data as ImageInformation).path;
-            console.log('before');
-            console.log('after');
             const gameInfo = {
+                // TODO add good title, second image and radius
                 name: 'this.gameTitle',
                 baseImage: this.firstImagePath,
                 differenceImage: 'diff',
