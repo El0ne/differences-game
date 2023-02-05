@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { STAGE } from '@app/services/server-routes';
 import { GameCardInformation } from '@common/game-card';
+import { GameInformation } from '@common/game-information';
 import { ImageInformation } from '@common/image-information';
 import { Observable } from 'rxjs';
 
@@ -20,17 +21,11 @@ export class GameCardInformationService {
         return this.http.get<number>(`${STAGE}/info`);
     }
 
-    createGame(image: File): Observable<ImageInformation[]> {
-        const formData = new FormData();
-        // const json = JSON.stringify(gameInfo);
-        // const blob = new Blob([json], {
-        //     type: 'application/json',
-        // });
-        formData.append('baseImage', image, image.name);
-        formData.append('baseImage', image, image.name);
-        // formData.append('gameData', blob);
-        console.log('formData', formData);
-        return this.http.post<ImageInformation[]>(`${STAGE}/`, formData);
+    createGame(gameInfo: GameInformation): Observable<GameCardInformation> {
+        const headers = { 'content-type': 'application/json' };
+        const body = JSON.stringify(gameInfo);
+        console.log(body);
+        return this.http.post<GameCardInformation>(STAGE, body, { headers });
     }
 
     uploadImages(image: File): Observable<ImageInformation[]> {

@@ -1,6 +1,6 @@
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameCardInformation } from '@common/game-card';
-import { Controller, Get, Post, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import * as path from 'path';
@@ -29,6 +29,11 @@ export class StageController {
         return this.gameCardService.getGameCardsNumber();
     }
 
+    @Post('/')
+    createGame(@Body() game) {
+        return this.gameCardService.createGameCard(game);
+    }
+
     @Post('/images')
     @UseInterceptors(
         FileFieldsInterceptor(
@@ -36,14 +41,11 @@ export class StageController {
                 { name: 'baseImage', maxCount: 1 },
                 { name: 'differenceImage', maxCount: 1 },
             ],
-            {
-                storage,
-            },
+            { storage },
         ),
     )
     uploadImages(@UploadedFiles() files) {
         // TODO ajouter appel au service qui va générer les images de différences
-        // this.gameCardService.createGameCard(files.gameData);
         return [files.baseImage[0], files.differenceImage[0]];
     }
 }
