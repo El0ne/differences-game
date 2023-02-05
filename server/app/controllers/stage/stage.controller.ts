@@ -16,16 +16,18 @@ export const storage = diskStorage({
             const filename: string = path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
             const extension: string = path.parse(file.originalname).ext;
             cb(null, `${filename}${extension}`);
+        } else {
+            console.log('else');
         }
     },
 });
 
-// export const fileFilter = (req, file, cb) => {
-//     if (file.mimetype === 'image/bmp') {
-//         return cb(null, true);
-//     }
-//     return cb(null, false);
-// };
+export const fileFilter = (req, file, cb) => {
+    if (file.mimetype === 'image/bmp') {
+        return cb(null, true);
+    }
+    return cb(null, false);
+};
 @Controller('stage')
 export class StageController {
     constructor(private gameCardService: GameCardService) {}
@@ -46,15 +48,16 @@ export class StageController {
                 { name: 'baseImage', maxCount: 1 },
                 { name: 'gameData', maxCount: 1 },
             ],
-            {
-                storage,
-                // fileFilter,
-            },
+            // {
+            storage,
+            // fileFilter,
+            // },
         ),
     )
     createGame(@UploadedFiles() files: { baseImage?: File; gameData?: File }) {
         // TODO ajouter appel au service qui va générer les images de différences
         // this.gameCardService.createGameCard(files.gameData);
+        console.log('test');
         console.log('files', files);
         return files;
     }
