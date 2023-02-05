@@ -19,14 +19,15 @@ export class GameCardInformationService {
         return this.http.get<number>(`${STAGE}/info`);
     }
 
-    createGame(image: File, gameInfo: { name: string; baseImage: string; differenceImage: string; radius: number }): Observable<object> {
+    createGame(image: File): Observable<object> {
         const formData = new FormData();
-        const json = JSON.stringify(gameInfo);
-        const blob = new Blob([json], {
-            type: 'application/json',
-        });
+        // const json = JSON.stringify(gameInfo);
+        // const blob = new Blob([json], {
+        //     type: 'application/json',
+        // });
         formData.append('baseImage', image, image.name);
-        formData.append('gameData', blob);
+        formData.append('baseImage', image, image.name);
+        // formData.append('gameData', blob);
         console.log('formData', formData);
         return this.http.post(`${STAGE}/`, formData);
     }

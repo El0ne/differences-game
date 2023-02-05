@@ -43,16 +43,10 @@ export class StageController {
 
     @Post('/')
     @UseInterceptors(
-        FileFieldsInterceptor(
-            [
-                { name: 'baseImage', maxCount: 1 },
-                { name: 'gameData', maxCount: 1 },
-            ],
-            // {
+        FileFieldsInterceptor([{ name: 'baseImage', maxCount: 2 }], {
             storage,
             // fileFilter,
-            // },
-        ),
+        }),
     )
     createGame(@UploadedFiles() files: { baseImage?: File; gameData?: File }) {
         // TODO ajouter appel au service qui va générer les images de différences

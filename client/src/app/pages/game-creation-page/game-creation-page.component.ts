@@ -129,13 +129,13 @@ export class GameCreationPageComponent implements OnInit {
 
     save(): void {
         // TODO ajouter verif que les images sont upload et qu'on a un nom pour le jeu
-        const gameInfo = {
-            // TODO add good title, second image and radius
-            name: 'this.gameTitle',
-            baseImage: 'baseImagePath',
-            differenceImage: 'diff',
-            radius: 3,
-        };
-        this.gameCardService.createGame(this.selectedFile, gameInfo).subscribe((data) => console.log('data', data));
+        // const gameInfo = {
+        //     // TODO add good title, second image and radius
+        //     name: 'this.gameTitle',
+        //     baseImage: 'baseImagePath',
+        //     differenceImage: 'diff',
+        //     radius: 3,
+        // };
+        this.gameCardService.createGame(this.selectedFile).subscribe((data) => console.log('data', data));
     }
 }
