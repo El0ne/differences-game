@@ -42,17 +42,35 @@ export class ClickEventComponent implements OnInit {
         return new Array(x, y);
     }
 
-    isDifferent(e: MouseEvent, differenceArray: number[][]): boolean {
-        if (this.isADifference(differenceArray, this.getCoordInImage(e)[0], this.getCoordInImage(e)[1], false)) {
+    isDifferent(e: MouseEvent): boolean {
+        if (this.isADifference(this.getCoordInImage(e)[0], this.getCoordInImage(e)[1], false)) {
             this.differenceEffect();
-            this.isADifference(differenceArray, this.getCoordInImage(e)[0], this.getCoordInImage(e)[1], true);
+            this.isADifference(this.getCoordInImage(e)[0], this.getCoordInImage(e)[1], true);
             return true;
         } else {
             return false;
         }
     }
 
-    deleteDifference() {}
+    constructEffect(originalContext: CanvasRenderingContext2D, differentContext: CanvasRenderingContext2D) {
+        for (const pixel of this.lastDifferenceClicked) {
+            const pos: number[] = this.positionToPixel(pixel);
+            originalContext.fillStyle = '#F00';
+            differentContext.fillStyle = '#F00';
+            originalContext.fillRect(pos[0], pos[1], 1, 1);
+            differentContext.fillRect(pos[0], pos[1], 1, 1);
+        }
+    }
+
+    destroyEffect(originalContext: CanvasRenderingContext2D, differentContext: CanvasRenderingContext2D) {
+        for (const pixel of this.lastDifferenceClicked) {
+            const pos: number[] = this.positionToPixel(pixel);
+            originalContext.fillStyle = '#F00';
+            differentContext.fillStyle = '#F00';
+            originalContext.clearRect(pos[0], pos[1], 1, 1);
+            differentContext.clearRect(pos[0], pos[1], 1, 1);
+        }
+    }
 
     // TODO : Add effect, color the same thing on the other canvas and make sure the difference is deleted from the list so you can't click it twice
     differenceEffect() {
@@ -61,13 +79,19 @@ export class ClickEventComponent implements OnInit {
         const differentCanvas = document.getElementById('different') as HTMLCanvasElement;
         const differentContext = differentCanvas.getContext('2d') as CanvasRenderingContext2D;
         this.emitSound();
-        for (const pixel of this.lastDifferenceClicked) {
-            const pos: number[] = this.positionToPixel(pixel);
-            originalContext.fillStyle = '#F00';
-            originalContext.fillRect(pos[0], pos[1], 1, 1);
-            differentContext.fillStyle = '#F00';
-            differentContext.fillRect(pos[0], pos[1], 1, 1);
-        }
+        this.constructEffect(originalContext, differentContext);
+        const flashIntro = setInterval(() => {
+            this.destroyEffect(originalContext, differentContext);
+        }, 500);
+        const flashOutro = setInterval(() => {
+            this.constructEffect(originalContext, differentContext);
+        }, 500);
+
+        setTimeout(() => {
+            clearInterval(flashIntro);
+            clearInterval(flashOutro);
+            this.destroyEffect(originalContext, differentContext);
+        }, 3500);
 
         this.currentScore += 1;
         this.incrementScore.emit(this.currentScore);
@@ -76,8 +100,8 @@ export class ClickEventComponent implements OnInit {
     positionToPixel(toTransform: number) {
         let yCounter = 0;
 
-        while (toTransform >= 640) {
-            toTransform -= 640;
+        while (toTransform >= WIDTH) {
+            toTransform -= WIDTH;
             if (toTransform >= 0) {
                 yCounter += 1;
             }
@@ -85,9 +109,9 @@ export class ClickEventComponent implements OnInit {
         return [toTransform, yCounter];
     }
 
-    isADifference(array: number[][], x: number, y: number, remove: boolean): boolean {
-        const posToCheck = y * 640 + x;
-        for (const difference of array) {
+    isADifference(x: number, y: number, remove: boolean): boolean {
+        const posToCheck = y * WIDTH + x;
+        for (const difference of this.differenceArray) {
             console.log('here');
             for (const positions of difference) {
                 if (positions === posToCheck) {
@@ -95,8 +119,8 @@ export class ClickEventComponent implements OnInit {
                         this.lastDifferenceClicked = difference;
                         return true;
                     } else if (remove) {
-                        const index = array.indexOf(difference);
-                        array.splice(index, 1);
+                        const index = this.differenceArray.indexOf(difference);
+                        this.differenceArray.splice(index, 1);
                     }
                 }
             }
@@ -111,7 +135,7 @@ export class ClickEventComponent implements OnInit {
 
     displayError(e: MouseEvent): void {
         if (this.timeout) {
-            if (!this.isDifferent(e, this.differenceArray)) {
+            if (!this.isDifferent(e)) {
                 this.timeout = false;
                 const canvas = e.target as HTMLCanvasElement;
                 const rect = canvas.getBoundingClientRect();
