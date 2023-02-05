@@ -6,6 +6,22 @@ import { diskStorage } from 'multer';
 import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
+// based on https://www.youtube.com/watch?v=f-URVd2OKYc
+export const storage = diskStorage({
+    destination: './assets/images',
+    filename: (req, file, cb) => {
+        const filename: string = path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
+        const extension: string = path.parse(file.originalname).ext;
+        cb(null, `${filename}${extension}`);
+    },
+});
+
+export const fileFilter = (req, file, cb) => {
+    if (file.mimetype === 'image/bmp') {
+        return cb(null, true);
+    }
+    return cb(null, false);
+};
 @Controller('stage')
 export class StageController {
     constructor(private gameCardService: GameCardService) {}
@@ -27,21 +43,8 @@ export class StageController {
                 { name: 'gameData', maxCount: 1 },
             ],
             {
-                // based on https://www.youtube.com/watch?v=f-URVd2OKYc
-                storage: diskStorage({
-                    destination: './assets/images',
-                    filename: (req, file, cb) => {
-                        const filename: string = path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
-                        const extension: string = path.parse(file.originalname).ext;
-                        cb(null, `${filename}${extension}`);
-                    },
-                }),
-                fileFilter: (req, file, cb) => {
-                    if (file.mimetype === 'image/bmp') {
-                        return cb(null, true);
-                    }
-                    return cb(null, false);
-                },
+                storage,
+                fileFilter,
             },
         ),
     )
