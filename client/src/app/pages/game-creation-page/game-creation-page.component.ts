@@ -136,6 +136,6 @@ export class GameCreationPageComponent implements OnInit {
             differenceImage: 'diff',
             radius: 3,
         };
-        this.gameCardService.uploadImage(this.selectedFile, gameInfo).subscribe((data) => console.log('data', data));
+        this.gameCardService.createGame(this.selectedFile, gameInfo).subscribe((data) => console.log('data', data));
     }
 }
