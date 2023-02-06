@@ -47,7 +47,7 @@ export class GameSelectionComponent implements OnInit {
     }
 
     isShowingFirstCard(): boolean {
-        return this.index === 0;
+        return this.index <= 0;
     }
 
     isShowingLastCard(): boolean {
