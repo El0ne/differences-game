@@ -32,6 +32,7 @@ export class GameCardService {
             name: game.name,
             difficulty: 'Facile',
             image: game.baseImage,
+            diffImage: game.differenceImage,
             soloTimes: [
                 { time: 0, name: '--' },
                 { time: 0, name: '--' },

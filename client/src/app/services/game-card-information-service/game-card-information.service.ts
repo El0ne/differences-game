@@ -24,7 +24,6 @@ export class GameCardInformationService {
     createGame(gameInfo: GameInformation): Observable<GameCardInformation> {
         const headers = { 'content-type': 'application/json' };
         const body = JSON.stringify(gameInfo);
-        console.log(body);
         return this.http.post<GameCardInformation>(STAGE, body, { headers });
     }
 
@@ -32,9 +31,6 @@ export class GameCardInformationService {
         const formData = new FormData();
         formData.append('baseImage', baseImage, baseImage.name);
         formData.append('differenceImage', differenceImage, differenceImage.name);
-        // console.log('baseImage', baseImage);
-        // console.log('differenceImage', differenceImage);
-        // console.log('formData', formData);
         return this.http.post<ImageInformation[]>(`${STAGE}/image`, formData);
     }
 }
