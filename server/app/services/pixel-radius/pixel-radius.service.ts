@@ -1,10 +1,10 @@
-import { IMAGE_HEIGHT, IMAGE_WIDTH } from '@app/services/constants/pixel.constants';
+import { ImageDimentionsService } from '@app/services/image-dimentions/image-dimentions.service';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class PixelRadiusService {
-    constructor(private pixelPositionService: PixelPositionService) {}
+    constructor(private pixelPositionService: PixelPositionService, private imageDimentionsService: ImageDimentionsService) {}
 
     getAdjacentPixels(pixelLocation: number, radius: number): number[] {
         const pixelCoordinateX = this.pixelPositionService.getXCoordinate(pixelLocation);
@@ -12,13 +12,13 @@ export class PixelRadiusService {
         const adjacentPixels: number[] = [];
 
         const leftExtremity = Math.max(pixelCoordinateX - radius, 0);
-        const rightExtremity = Math.min(pixelCoordinateX + radius, IMAGE_WIDTH - 1);
+        const rightExtremity = Math.min(pixelCoordinateX + radius, this.imageDimentionsService.getWidth() - 1);
         const upExtremity = Math.max(pixelCoordinateY - radius, 0);
-        const downExtremity = Math.min(pixelCoordinateY + radius, IMAGE_HEIGHT - 1);
+        const downExtremity = Math.min(pixelCoordinateY + radius, this.imageDimentionsService.getHeight() - 1);
 
         for (let i = upExtremity; i <= downExtremity; i++) {
             for (let j = leftExtremity; j <= rightExtremity; j++) {
-                adjacentPixels.push(i * IMAGE_WIDTH + j);
+                adjacentPixels.push(i * this.imageDimentionsService.getWidth() + j);
             }
         }
         return adjacentPixels;
