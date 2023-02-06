@@ -15,7 +15,7 @@ export class GameCreationPageComponent {
 
     display$: Observable<'open' | 'close'>;
 
-    gameTitle: string;
+    gameTitle: string = '';
     originalFile: File | null = null;
     differentFile: File | null = null;
     radius: number = 3;
@@ -129,10 +129,10 @@ export class GameCreationPageComponent {
     }
 
     saveVerification(): boolean {
-        if (this.gameTitle === undefined && this.originalFile === null && this.differentFile === null) {
+        if (this.gameTitle === '' && this.originalFile === null && this.differentFile === null) {
             alert('Il manque une image et un titre à votre jeu !');
             return false;
-        } else if (this.gameTitle === undefined) {
+        } else if (this.gameTitle === '') {
             alert("N'oubliez pas d'ajouter un titre à votre jeu !");
             return false;
         } else if (this.originalFile === null || this.differentFile === null) {
@@ -142,6 +142,7 @@ export class GameCreationPageComponent {
         return true;
     }
     save(): void {
+        console.log(this.gameTitle);
         if (this.saveVerification() && this.originalFile && this.differentFile) {
             this.gameCardService.uploadImages(this.originalFile, this.differentFile).subscribe((data) => {
                 const gameInfo = {
