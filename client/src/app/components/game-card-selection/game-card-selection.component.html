@@ -19,8 +19,7 @@
             </div>
         </div>
         <div class="column">
-            <div class="difficulty-container"
-                [ngClass]="gameCardInformation.difficulty === 'Difficile' ? 'difficult' : 'easy'">
+            <div class="difficulty-container" [ngClass]="gameCardInformation.difficulty ? 'difficult' : 'easy'">
                 <p id="difficulty">
                     {{ gameCardInformation.difficulty }}
                 </p>
