@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
+import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { MESSAGES_LENGTH, PATHS } from './solo-view-constants';
 
 @Component({
@@ -6,13 +8,35 @@ import { MESSAGES_LENGTH, PATHS } from './solo-view-constants';
     templateUrl: './solo-view.component.html',
     styleUrls: ['./solo-view.component.scss'],
 })
-export class SoloViewComponent {
+export class SoloViewComponent implements OnInit, OnDestroy {
     readonly paths = PATHS; // TODO : Verify with Nikolay if typing is fine for constants
 
     showErrorMessage: boolean = false;
     showTextBox: boolean = false;
     messages: string[] = [];
     messageContent: string = '';
+    currService: TimerSoloService;
+    currTime: number;
+
+    constructor(private service: TimerSoloService, private secondService: SecondToMinuteService) {
+        this.currService = service;
+    }
+
+    ngOnInit(): void {
+        this.showTime();
+    }
+
+    ngOnDestroy(): void {
+        this.service.stopTimer();
+    }
+
+    timesConvertion(time: number) {
+        return this.secondService.convert(time);
+    }
+
+    showTime() {
+        return this.service.startTimer();
+    }
 
     toggleInfoCard() {
         this.showTextBox = !this.showTextBox;
