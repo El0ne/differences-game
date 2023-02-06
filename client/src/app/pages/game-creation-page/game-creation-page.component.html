@@ -30,7 +30,7 @@
                 <div class="original image">
                     <canvas #canvas1 width="640px" height="480px"></canvas>
                 </div>
-                <button id="reset-original" (click)="clearFirstFile(this.myOgCanvas.nativeElement, 'upload-different')">X</button>
+                <button id="reset-original" (click)="clearFirstFile(this.myOgCanvas.nativeElement, 'upload-original')">X</button>
                 <label for="upload-original">
                     Choisir une image de 640*480 de format bmp
                     <input type="file" id="upload-original" class="photo-upload" (change)="fileValidation($event)" accept="image/bmp" />

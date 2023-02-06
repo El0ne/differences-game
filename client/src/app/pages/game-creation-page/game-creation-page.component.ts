@@ -29,26 +29,6 @@ export class GameCreationPageComponent {
         this.gameTitle = title;
     }
 
-    // clear(e: Event) {
-    //     const ogContext = this.myOgCanvas.nativeElement.getContext('2d');
-    //     const diffContext = this.myDiffCanvas.nativeElement.getContext('2d');
-    //     const target = e.target as HTMLInputElement;
-    //     let input: HTMLInputElement;
-
-    //     if (target.id === 'reset-original') {
-    //         input = document.getElementById('upload-original') as HTMLInputElement;
-    //         this.originalFile = null;
-    //         ogContext.clearRect(0, 0, 640, 480);
-    //     } else {
-    //         input = document.getElementById('upload-different') as HTMLInputElement;
-    //         this.differentFile = null;
-    //         diffContext.clearRect(0, 0, 640, 480);
-    //     }
-    //     input.value = '';
-    //     const bothInput = document.getElementById('upload-both ') as HTMLInputElement;
-    //     if (bothInput) bothInput.value = '';
-    // }
-
     clearSingleFile(canvas: HTMLCanvasElement, id: string) {
         const context = canvas.getContext('2d');
         const input = document.getElementById(id) as HTMLInputElement;
@@ -83,48 +63,28 @@ export class GameCreationPageComponent {
                     if (img.naturalWidth !== 640 && img.naturalHeight !== 480) {
                         alert('wrong size');
                     } else {
-                        switch (target.id) {
-                            case 'upload-original': {
-                                if (ogContext) {
-                                    ogContext.drawImage(img, 0, 0, 640, 480);
-                                }
-                                if (!target.files?.length) {
-                                    return;
-                                }
-                                this.originalFile = target.files[0];
-                                break;
-                            }
-                            case 'upload-different': {
-                                if (diffContext) {
-                                    diffContext.drawImage(img, 0, 0, 640, 480);
-                                }
-                                if (!target.files?.length) {
-                                    return;
-                                }
-                                this.differentFile = target.files[0];
-                                break;
-                            }
-                            case 'upload-both': {
-                                if (ogContext) {
-                                    ogContext.drawImage(img, 0, 0, 640, 480);
-                                }
-                                if (diffContext) {
-                                    diffContext.drawImage(img, 0, 0, 640, 480);
-                                }
-                                if (!target.files?.length) {
-                                    return;
-                                }
-                                this.originalFile = target.files[0];
-                                this.differentFile = target.files[0];
-                                break;
-                            }
+                        if (!target.files?.length) {
+                            return;
+                        }
+
+                        if (target.id === 'upload-original') {
+                            if (ogContext) ogContext.drawImage(img, 0, 0, 640, 480);
+                            this.originalFile = target.files[0];
+                        } else if (target.id === 'upload-different') {
+                            if (diffContext) diffContext.drawImage(img, 0, 0, 640, 480);
+                            this.differentFile = target.files[0];
+                        } else {
+                            if (ogContext) ogContext.drawImage(img, 0, 0, 640, 480);
+                            this.originalFile = target.files[0];
+                            if (diffContext) diffContext.drawImage(img, 0, 0, 640, 480);
+                            this.differentFile = target.files[0];
                         }
                     }
                 };
             };
         } else {
             alert('wrong size or file type please choose again');
-            target.value = '';
+            target.value = ''; // check if useful
         }
     }
 
