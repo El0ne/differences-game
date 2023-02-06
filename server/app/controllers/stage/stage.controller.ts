@@ -57,24 +57,9 @@ export class StageController {
     getFile() {
         return createReadStream(join(process.cwd(), 'package.json'));
     }
-    // getFile(): StreamableFile {
-    //     const file = createReadStream(join(process.cwd(), 'assets/images/test.bmp'));
-    //     console.log('file', file);
 
-    //     return new StreamableFile(file);
-    // }
-    // @Get('/image/:imageName')
-    // getImage(@Param() param): StreamableFile {
-    //     console.log(param.imageName);
-    //     const imagePath = join(process.cwd(), 'assets/images');
-    //     const file = createReadStream(join(imagePath, `/${param.imageName}`));
-    //     console.log('imagePath', imagePath);
-    //     console.log('file', file);
-    //     return new StreamableFile(file);
-    // }
     @Get('/image/:imageName')
     getImage(@Param() param, @Res() res: Response) {
-        // console.log(param.imageName);
         const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);
         res.sendFile(imagePath, (err) => {
             if (err) {
