@@ -1,4 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameCardInformation } from '@common/game-card';
 import { RankingBoard } from '@common/ranking-board';
@@ -31,7 +32,7 @@ export class GameCreationPageComponent implements OnInit {
     // elouan
     selectedFile: File;
 
-    constructor(public modalDiffService: ModalDiffPageService, public gameCardService: GameCardInformationService) {}
+    constructor(public modalDiffService: ModalDiffPageService, public gameCardService: GameCardInformationService, private router: Router) {}
 
     ngOnInit() {
         this.display$ = this.modalDiffService.watch();
@@ -91,7 +92,6 @@ export class GameCreationPageComponent implements OnInit {
                                 if (!target.files?.length) {
                                     return;
                                 }
-                                console.log('setup original');
                                 this.urlOriginal = target.files[0];
                                 break;
                             }
@@ -102,7 +102,6 @@ export class GameCreationPageComponent implements OnInit {
                                 if (!target.files?.length) {
                                     return;
                                 }
-                                console.log('setup different');
                                 this.urlDifferent = target.files[0];
                                 break;
                             }
@@ -130,25 +129,28 @@ export class GameCreationPageComponent implements OnInit {
         }
     }
 
-    // validateInputs(): boolean {
-    //     return this.gameTitle !== '' && this.urlOriginal !== '' && this.urlDifferent !== '';
-    // }
+    validateInputs(): boolean {
+        // return this.gameTitle !== '' && this.urlOriginal !== '' && this.urlDifferent !== '';
+        return true;
+    }
+
     save(): void {
-        // if (this.validateInputs()) {
-        console.log('this.urlOriginal', this.urlOriginal);
-        console.log('this.urlDifferent', this.urlDifferent);
-        // TODO ajouter verif que les images sont upload et qu'on a un nom pour le jeu
-        // this.gameCardService.uploadImages(this.selectedFile).subscribe((data) => {
-        //     const gameInfo = {
-        //         // TODO add good title, second image and radius
-        //         name: this.gameTitle,
-        //         baseImage: data[0].filename,
-        //         differenceImage: data[1].filename,
-        //         radius: 3,
-        //     };
-        //     //
-        //     this.gameCardService.createGame(gameInfo).subscribe((e) => console.log(e));
-        //     // this.router.navigate(['/config']);
-        // });
+        if (this.validateInputs()) {
+            // console.log('this.urlOriginal', this.urlOriginal);
+            // console.log('this.urlDifferent', this.urlDifferent);
+            // TODO ajouter verif que les images sont upload et qu'on a un nom pour le jeu
+            this.gameCardService.uploadImages(this.urlOriginal, this.urlDifferent).subscribe((data) => {
+                const gameInfo = {
+                    // TODO add good title, second image and radius
+                    name: 'title',
+                    baseImage: data[0].filename,
+                    differenceImage: data[1].filename,
+                    radius: 3,
+                };
+                //
+                this.gameCardService.createGame(gameInfo).subscribe((e) => console.log(e));
+                this.router.navigate(['/config']);
+            });
+        }
     }
 }

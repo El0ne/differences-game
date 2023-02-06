@@ -28,11 +28,13 @@ export class GameCardInformationService {
         return this.http.post<GameCardInformation>(STAGE, body, { headers });
     }
 
-    uploadImages(image: File): Observable<ImageInformation[]> {
+    uploadImages(baseImage: File, differenceImage: File): Observable<ImageInformation[]> {
         const formData = new FormData();
-        formData.append('baseImage', image, image.name);
-        formData.append('differenceImage', image, image.name);
-        console.log('formData', formData);
+        formData.append('baseImage', baseImage, baseImage.name);
+        formData.append('differenceImage', differenceImage, differenceImage.name);
+        // console.log('baseImage', baseImage);
+        // console.log('differenceImage', differenceImage);
+        // console.log('formData', formData);
         return this.http.post<ImageInformation[]>(`${STAGE}/image`, formData);
     }
 }

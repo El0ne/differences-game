@@ -50,6 +50,7 @@ export class StageController {
     )
     uploadImages(@UploadedFiles() files): ImageInformation[] {
         // TODO ajouter appel au service qui va générer les images de différences
+        console.log('files', files);
         return [files.baseImage[0], files.differenceImage[0]];
     }
 
