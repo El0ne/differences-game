@@ -1,7 +1,5 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
-import { GameCardInformation } from '@common/game-card';
-import { RankingBoard } from '@common/ranking-board';
 import { Observable } from 'rxjs';
 import { ModalDiffPageService } from './modal-diff-page.service';
 
@@ -10,71 +8,50 @@ import { ModalDiffPageService } from './modal-diff-page.service';
     templateUrl: './game-creation-page.component.html',
     styleUrls: ['./game-creation-page.component.scss'],
 })
-export class GameCreationPageComponent implements OnInit {
+export class GameCreationPageComponent {
     @ViewChild('canvas1') myOgCanvas: ElementRef;
     @ViewChild('canvas2') myDiffCanvas: ElementRef;
+    @ViewChild('og') og: ElementRef;
 
     display$: Observable<'open' | 'close'>;
 
+    gameTitle: string;
+    originalFile: File | null = null;
+    differentFile: File | null = null;
     radius: number = 3;
 
-    card = new GameCardInformation();
+    testId: string = 'upload-original';
+    otherId: string = 'upload-different';
 
-    urlOriginal: File | null = null;
-    urlDifferent: File | null = null;
-
-    nbDiff: number = 0;
-
-    gameTitle: string;
-    difficulty: string; // je
-    soloTimes: RankingBoard[];
-    multiTimes: RankingBoard[];
-
-    // elouan
-    selectedFile: File;
-
-    constructor(public modalDiffService: ModalDiffPageService, public gameCardService: GameCardInformationService) {}
-
-    ngOnInit() {
-        this.display$ = this.modalDiffService.watch();
-    }
+    constructor(public modalDiffService: ModalDiffPageService, private gameCardService: GameCardInformationService) {}
 
     getTitle(title: string) {
         this.gameTitle = title;
     }
 
     clear(e: Event) {
-        const ogCanvas: HTMLCanvasElement = this.myOgCanvas.nativeElement;
-        const diffCanvas: HTMLCanvasElement = this.myDiffCanvas.nativeElement;
-
-        const ogContext = ogCanvas.getContext('2d');
-        const diffContext = diffCanvas.getContext('2d');
-
+        const ogContext = this.myOgCanvas.nativeElement.getContext('2d');
+        const diffContext = this.myDiffCanvas.nativeElement.getContext('2d');
         const target = e.target as HTMLInputElement;
+        let input: HTMLInputElement;
+
         if (target.id === 'reset-original') {
-            const input = document.getElementById('upload-original') as HTMLInputElement;
-            const bothinput = document.getElementById('upload-both') as HTMLInputElement;
-            input.value = '';
-            bothinput.value = '';
-            this.urlOriginal = null;
-            if (ogContext) ogContext.clearRect(0, 0, 640, 480);
+            input = document.getElementById('upload-original') as HTMLInputElement;
+            this.originalFile = null;
+            ogContext.clearRect(0, 0, 640, 480);
         } else {
-            const input = document.getElementById('upload-different') as HTMLInputElement;
-            const bothinput = document.getElementById('upload-both') as HTMLInputElement;
-            bothinput.value = '';
-            input.value = '';
-            this.urlDifferent = null;
-            if (diffContext) diffContext.clearRect(0, 0, 640, 480);
+            input = document.getElementById('upload-different') as HTMLInputElement;
+            this.differentFile = null;
+            diffContext.clearRect(0, 0, 640, 480);
         }
+        input.value = '';
+        const bothInput = document.getElementById('upload-both ') as HTMLInputElement;
+        if (bothInput) bothInput.value = '';
     }
 
     fileValidation(e: Event) {
-        const ogCanvas: HTMLCanvasElement = this.myOgCanvas.nativeElement;
-        const diffCanvas: HTMLCanvasElement = this.myDiffCanvas.nativeElement;
-
-        const ogContext = ogCanvas.getContext('2d');
-        const diffContext = diffCanvas.getContext('2d');
-
+        const ogContext = this.myOgCanvas.nativeElement.getContext('2d');
+        const diffContext = this.myDiffCanvas.nativeElement.getContext('2d');
         const target = e.target as HTMLInputElement;
         const file: File = (target.files as FileList)[0];
         if (file !== undefined && file.size === 921654 && file.type === 'image/bmp') {
@@ -95,7 +72,7 @@ export class GameCreationPageComponent implements OnInit {
                                 if (!target.files?.length) {
                                     return;
                                 }
-                                this.urlOriginal = target.files[0];
+                                this.originalFile = target.files[0];
                                 break;
                             }
                             case 'upload-different': {
@@ -105,7 +82,7 @@ export class GameCreationPageComponent implements OnInit {
                                 if (!target.files?.length) {
                                     return;
                                 }
-                                this.urlDifferent = target.files[0];
+                                this.differentFile = target.files[0];
                                 break;
                             }
                             case 'upload-both': {
@@ -118,8 +95,8 @@ export class GameCreationPageComponent implements OnInit {
                                 if (!target.files?.length) {
                                     return;
                                 }
-                                this.urlOriginal = target.files[0];
-                                this.urlDifferent = target.files[0];
+                                this.originalFile = target.files[0];
+                                this.differentFile = target.files[0];
                                 break;
                             }
                         }
@@ -133,21 +110,21 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     saveVerification(): boolean {
-        if (this.gameTitle === undefined && this.urlOriginal === null && this.urlDifferent === null) {
+        if (this.gameTitle === undefined && this.originalFile === null && this.differentFile === null) {
             alert('Il manque une image et un titre à votre jeu !');
             return false;
         } else if (this.gameTitle === undefined) {
             alert("N'oubliez pas d'ajouter un titre à votre jeu !");
             return false;
-        } else if (this.urlOriginal === null || this.urlDifferent === null) {
+        } else if (this.originalFile === null || this.differentFile === null) {
             alert('Un jeu de différences sans image est pour ainsi dire... intéressant ? Ajoutez une image.');
             return false;
         }
         return true;
     }
     save(): void {
-        if (this.saveVerification() && this.urlOriginal && this.urlDifferent) {
-            this.gameCardService.uploadImages(this.urlOriginal, this.urlDifferent).subscribe((data) => {
+        if (this.saveVerification() && this.originalFile && this.differentFile) {
+            this.gameCardService.uploadImages(this.originalFile, this.differentFile).subscribe((data) => {
                 const gameInfo = {
                     name: this.gameTitle,
                     baseImage: data[0].filename,
