@@ -15,33 +15,25 @@ export class GameCreationPageComponent implements OnInit {
     @ViewChild('canvas1') myOgCanvas: ElementRef;
     @ViewChild('canvas2') myDiffCanvas: ElementRef;
 
+    radius: number = 3;
     display$: Observable<'open' | 'close'>;
 
     card = new GameCardInformation();
 
-    urlOriginal: string;
-    urlDifferent: string;
+    urlOriginal: File;
+    urlDifferent: File;
 
     nbDiff: number = 0;
 
     gameTitle: string;
-    baseImageURL: string;
     difficulty: string; // je
     soloTimes: RankingBoard[];
     multiTimes: RankingBoard[];
 
-    constructor(private modalDiffService: ModalDiffPageService, private router: Router) {}
+    constructor(public modalDiffService: ModalDiffPageService, private router: Router) {}
 
     ngOnInit() {
         this.display$ = this.modalDiffService.watch();
-    }
-
-    open() {
-        this.modalDiffService.open();
-    }
-
-    close() {
-        this.modalDiffService.close();
     }
     getTitle(title: string) {
         this.gameTitle = title;
@@ -94,23 +86,39 @@ export class GameCreationPageComponent implements OnInit {
                                 if (ogContext) {
                                     ogContext.drawImage(img, 0, 0, 640, 480);
                                 }
-                                this.urlOriginal = img.src;
+                                if (!target.files?.length) {
+                                    return;
+                                }
+                                this.urlOriginal = target.files[0];
                                 break;
                             }
                             case 'upload-different': {
                                 if (diffContext) {
                                     diffContext.drawImage(img, 0, 0, 640, 480);
                                 }
-
+                                if (!target.files?.length) {
+                                    return;
+                                }
+                                this.urlDifferent = target.files[0];
                                 break;
                             }
                             case 'upload-both': {
                                 if (ogContext) {
                                     ogContext.drawImage(img, 0, 0, 640, 480);
                                 }
+                                // this.urlOriginal = img.src;
                                 if (diffContext) {
                                     diffContext.drawImage(img, 0, 0, 640, 480);
                                 }
+                                if (!target.files?.length) {
+                                    return;
+                                }
+                                this.urlOriginal = target.files[0];
+
+                                if (!target.files?.length) {
+                                    return;
+                                }
+                                this.urlDifferent = target.files[0];
                                 break;
                             }
                         }
@@ -119,14 +127,17 @@ export class GameCreationPageComponent implements OnInit {
             };
         } else {
             alert('wrong size or file type please choose again');
-            this.urlOriginal = '';
-            this.urlDifferent = '';
+            // this.urlOriginal = '';
+            // this.urlDifferent = '';
             target.value = '';
         }
     }
 
     save(): void {
-        if (this.gameTitle === undefined && this.baseImageURL === undefined) {
+        // console.log(this.rangeValue.value);
+        console.log(this.radius);
+        console.log(this.urlDifferent);
+        if (this.gameTitle === undefined && this.urlOriginal === undefined) {
             alert('Il manque une image et un titre à votre jeu !');
         } else if (this.gameTitle === undefined) {
             alert("N'oubliez pas d'ajouter un titre à votre jeu !");
@@ -134,7 +145,7 @@ export class GameCreationPageComponent implements OnInit {
             alert('Un jeu de différences sans image est pour ainsi dire... intéressant ? Ajoutez une image.');
         } else {
             this.card.name = this.gameTitle;
-            this.card.image = this.baseImageURL;
+            // this.card.image = this.urlOriginal;
             this.difficulty = 'Facile'; // initialisation, le temps qu'on sache quelles sont les exigences pr les difficultés.
             this.card.difficulty = this.difficulty;
             this.card.soloTimes = [
