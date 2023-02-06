@@ -31,19 +31,12 @@ export class GameCreationPageComponent implements OnInit {
     // elouan
     selectedFile: File;
 
-    constructor(private modalDiffService: ModalDiffPageService, public gameCardService: GameCardInformationService) {}
+    constructor(public modalDiffService: ModalDiffPageService, public gameCardService: GameCardInformationService) {}
 
     ngOnInit() {
         this.display$ = this.modalDiffService.watch();
     }
 
-    open() {
-        this.modalDiffService.open();
-    }
-
-    close() {
-        this.modalDiffService.close();
-    }
     getTitle(title: string) {
         this.gameTitle = title;
     }

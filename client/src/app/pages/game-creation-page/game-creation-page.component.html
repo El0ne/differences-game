@@ -2,11 +2,11 @@
     <div class="header-button-container">
         <div class="left-header-container">
             <button id="previous" routerLink="/config">Retour</button>
-            <button id="info"><img class="info-image" src="../../../assets/info-48.png" (click)="open()" /></button>
+            <button id="info"><img class="info-image" src="../../../assets/info-48.png" (click)="this.modalDiffService.open()" /></button>
             <ng-container *ngIf="display$ | async as display">
-                <section [class.open]="display === 'open'" (click)="close()">
+                <section [class.open]="display === 'open'" (click)="this.modalDiffService.close()">
                     <div (click)="$event.stopPropagation()">
-                        <button class="close" type="button" (click)="close()">X</button>
+                        <button class="close" type="button" (click)="this.modalDiffService.close()">X</button>
                         <h1>Vos différences ajoutées :</h1>
                         <div class="diff-image">
                             <canvas #canvasDiff width="640px" height="480px"></canvas>
