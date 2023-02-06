@@ -29,24 +29,34 @@ export class GameCreationPageComponent {
         this.gameTitle = title;
     }
 
-    clear(e: Event) {
-        const ogContext = this.myOgCanvas.nativeElement.getContext('2d');
-        const diffContext = this.myDiffCanvas.nativeElement.getContext('2d');
-        const target = e.target as HTMLInputElement;
-        let input: HTMLInputElement;
+    // clear(e: Event) {
+    //     const ogContext = this.myOgCanvas.nativeElement.getContext('2d');
+    //     const diffContext = this.myDiffCanvas.nativeElement.getContext('2d');
+    //     const target = e.target as HTMLInputElement;
+    //     let input: HTMLInputElement;
 
-        if (target.id === 'reset-original') {
-            input = document.getElementById('upload-original') as HTMLInputElement;
-            this.originalFile = null;
-            ogContext.clearRect(0, 0, 640, 480);
-        } else {
-            input = document.getElementById('upload-different') as HTMLInputElement;
-            this.differentFile = null;
-            diffContext.clearRect(0, 0, 640, 480);
-        }
+    //     if (target.id === 'reset-original') {
+    //         input = document.getElementById('upload-original') as HTMLInputElement;
+    //         this.originalFile = null;
+    //         ogContext.clearRect(0, 0, 640, 480);
+    //     } else {
+    //         input = document.getElementById('upload-different') as HTMLInputElement;
+    //         this.differentFile = null;
+    //         diffContext.clearRect(0, 0, 640, 480);
+    //     }
+    //     input.value = '';
+    //     const bothInput = document.getElementById('upload-both ') as HTMLInputElement;
+    //     if (bothInput) bothInput.value = '';
+    // }
+
+    clearSingle(canvas: HTMLCanvasElement, id: string, fileToReset: File | null) {
+        const context = canvas.getContext('2d');
+        const input = document.getElementById(id) as HTMLInputElement;
+        const bothInput = document.getElementById('upload-both') as HTMLInputElement;
         input.value = '';
-        const bothInput = document.getElementById('upload-both ') as HTMLInputElement;
-        if (bothInput) bothInput.value = '';
+        bothInput.value = '';
+        fileToReset = null;
+        if (context) context.clearRect(0, 0, 640, 480);
     }
 
     fileValidation(e: Event) {

@@ -30,7 +30,7 @@
                 <div class="original image">
                     <canvas #canvas1 width="640px" height="480px"></canvas>
                 </div>
-                <button id="reset-original" (click)="clear($event)">X</button>
+                <button id="reset-original" (click)="clearSingle(this.myOgCanvas.nativeElement, 'upload-original', this.originalFile)">X</button>
                 <label for="upload-original">
                     Choisir une image de 640*480 de format bmp
                     <input type="file" id="upload-original" class="photo-upload" (change)="fileValidation($event)" accept="image/bmp" />
@@ -83,7 +83,7 @@
                 <div class="different image">
                     <canvas #canvas2 width="640px" height="480px"></canvas>
                 </div>
-                <button id="reset-different" (click)="clear($event)">X</button>
+                <button id="reset-different" (click)="clearSingle(this.myDiffCanvas.nativeElement, 'upload-different', this.differentFile)">X</button>
                 <label for="upload-original">
                     Choisir une image de 640*480 de format bmp
                     <input type="file" id="upload-different" class="photo-upload" (change)="fileValidation($event)" accept="image/bmp" />
