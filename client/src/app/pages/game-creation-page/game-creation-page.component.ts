@@ -93,7 +93,6 @@ export class GameCreationPageComponent implements OnInit {
                                 if (!target.files?.length) {
                                     return;
                                 }
-                                console.log('setup original');
                                 this.urlOriginal = target.files[0];
                                 break;
                             }
@@ -104,7 +103,6 @@ export class GameCreationPageComponent implements OnInit {
                                 if (!target.files?.length) {
                                     return;
                                 }
-                                console.log('setup different');
                                 this.urlDifferent = target.files[0];
                                 break;
                             }
@@ -133,12 +131,10 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     saveVerification(): boolean {
-        console.log(this.urlOriginal);
-        console.log(this.urlDifferent);
-        if (this.gameTitle === null && this.urlOriginal === null) {
+        if (this.gameTitle === undefined && this.urlOriginal === null && this.urlDifferent === null) {
             alert('Il manque une image et un titre à votre jeu !');
             return false;
-        } else if (this.gameTitle === null) {
+        } else if (this.gameTitle === undefined) {
             alert("N'oubliez pas d'ajouter un titre à votre jeu !");
             return false;
         } else if (this.urlOriginal === null || this.urlDifferent === null) {
@@ -148,9 +144,18 @@ export class GameCreationPageComponent implements OnInit {
         return true;
     }
     save(): void {
-        if (this.saveVerification()) {
-            console.log('you can save :)');
-            this.modalDiffService.open();
+        if (this.saveVerification() && this.urlOriginal && this.urlDifferent) {
+            this.gameCardService.uploadImages(this.urlOriginal, this.urlDifferent).subscribe((data) => {
+                const gameInfo = {
+                    // TODO add good title, second image and radius
+                    name: this.gameTitle,
+                    baseImage: data[0].filename,
+                    differenceImage: data[1].filename,
+                    radius: 3,
+                };
+                this.gameCardService.createGame(gameInfo).subscribe((e) => console.log(e));
+                this.modalDiffService.open();
+            });
         }
     }
 }
