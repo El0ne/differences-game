@@ -7,17 +7,17 @@ export class PixelRadiusService {
     constructor(private pixelPositionService: PixelPositionService) {}
 
     getAdjacentPixels(pixelLocation: number, radius: number): number[] {
-        const xCoordinate = this.pixelPositionService.getXCoordinate(pixelLocation);
-        const yCoordinate = this.pixelPositionService.getYCoordinate(pixelLocation);
+        const pixelCoordinateX = this.pixelPositionService.getXCoordinate(pixelLocation);
+        const pixelCoordinateY = this.pixelPositionService.getYCoordinate(pixelLocation);
         const adjacentPixels: number[] = [];
 
-        const left = Math.max(xCoordinate - radius, 0);
-        const right = Math.min(xCoordinate + radius, IMAGE_WIDTH);
-        const down = Math.max(yCoordinate - radius, 0);
-        const up = Math.min(yCoordinate + radius, IMAGE_HEIGHT);
+        const leftExtremity = Math.max(pixelCoordinateX - radius, 0);
+        const rightExtremity = Math.min(pixelCoordinateX + radius, IMAGE_WIDTH - 1);
+        const upExtremity = Math.max(pixelCoordinateY - radius, 0);
+        const downExtremity = Math.min(pixelCoordinateY + radius, IMAGE_HEIGHT - 1);
 
-        for (let i = down; i <= up; i++) {
-            for (let j = left; j <= right; j++) {
+        for (let i = upExtremity; i <= downExtremity; i++) {
+            for (let j = leftExtremity; j <= rightExtremity; j++) {
                 adjacentPixels.push(i * IMAGE_WIDTH + j);
             }
         }
