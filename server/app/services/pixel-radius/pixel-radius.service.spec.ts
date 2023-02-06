@@ -17,6 +17,8 @@ describe('PixelRadiusService', () => {
     ];
     // radius test 4
     const EXPECTED_PIXELS_WITH_RADIUS_OF_2 = [305278, 305917, 305918, 305919, 306556, 306557, 306558, 306559, 307197, 307198, 307199];
+    // square radius test
+    const EXPECTED_PIXELS_WITH_RADIUS_OF_1_AND_SQUARE = [4, 5, 6, 644, 645, 646, 1284, 1285, 1286];
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -33,28 +35,35 @@ describe('PixelRadiusService', () => {
     it('getAdjacentPixels function should return an array of pixels around a pixel', () => {
         const pixelLocation = 645;
         const radiusSize = 1;
-        const returnedPixelsAroundMyPixel = service.getAdjacentPixels(pixelLocation, radiusSize);
+        const returnedPixelsAroundMyPixel = service.getAdjacentPixels(pixelLocation, radiusSize, true);
         expect(returnedPixelsAroundMyPixel).toEqual(EXPECTED_PIXELS_WITH_RADIUS_OF_1);
     });
 
     it('getAdjacentPixels function should return a single pixel if radiusSize is 0', () => {
         const pixelLocation = 27;
         const radiusSize = 0;
-        const returnedPixelsAroundMyPixel = service.getAdjacentPixels(pixelLocation, radiusSize);
+        const returnedPixelsAroundMyPixel = service.getAdjacentPixels(pixelLocation, radiusSize, true);
         expect(returnedPixelsAroundMyPixel).toEqual(EXPECTED_PIXELS_WITH_RADIUS_OF_0);
     });
 
     it('getAdjacentPixels function should return an array of pixels around a pixel located near the top-left border of image', () => {
         const pixelLocation = 642;
         const radiusSize = 3;
-        const returnedPixelsAroundMyPixel = service.getAdjacentPixels(pixelLocation, radiusSize);
+        const returnedPixelsAroundMyPixel = service.getAdjacentPixels(pixelLocation, radiusSize, true);
         expect(returnedPixelsAroundMyPixel).toEqual(EXPECTED_PIXELS_WITH_RADIUS_OF_3);
     });
 
     it('getAdjacentPixels function should return an array of pixels around a pixel located near the bottom-right border of image', () => {
         const pixelLocation = 306558;
         const radiusSize = 2;
-        const returnedPixelsAroundMyPixel = service.getAdjacentPixels(pixelLocation, radiusSize);
+        const returnedPixelsAroundMyPixel = service.getAdjacentPixels(pixelLocation, radiusSize, true);
         expect(returnedPixelsAroundMyPixel).toEqual(EXPECTED_PIXELS_WITH_RADIUS_OF_2);
+    });
+
+    it('getAdjacentPixels function should return an square array of pixels around a pixel if isRound is false', () => {
+        const pixelLocation = 645;
+        const radiusSize = 1;
+        const returnedPixelsAroundMyPixel = service.getAdjacentPixels(pixelLocation, radiusSize, false);
+        expect(returnedPixelsAroundMyPixel).toEqual(EXPECTED_PIXELS_WITH_RADIUS_OF_1_AND_SQUARE);
     });
 });

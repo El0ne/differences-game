@@ -1,6 +1,8 @@
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { Injectable } from '@nestjs/common';
 
+const ADJACENT_PIXELS_RADIUS = 1;
+
 @Injectable()
 export class DifferencesDetectionService {
     constructor(private pixelRadiusService: PixelRadiusService) {}
@@ -17,7 +19,7 @@ export class DifferencesDetectionService {
 
                 while (queue.length !== 0) {
                     const currentPos = queue.shift();
-                    for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(currentPos, 1)) {
+                    for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(currentPos, ADJACENT_PIXELS_RADIUS, false)) {
                         if (this.isNewAndDifferentPixel(adjacentPixel, differencesArray, visitedPixels)) {
                             visitedPixels[numberOfDifferences].push(adjacentPixel);
                             queue.push(adjacentPixel);

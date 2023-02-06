@@ -61,7 +61,14 @@ describe('DifferencesDetectionService', () => {
         expect(service.isNewAndDifferentPixel(UNVISITED_DIFFERENT_PIXEL, DIFFERENT_PIXELS_LIST, VISITED_PIXELS_TEST)).toBeTruthy();
     });
 
-    it('getDifferencesList() should return an array of arrays that represent the indexes of the pixels chucks', () => {
+    it('getDifferencesList() should consider a diagonal pixel as adjacent', () => {
+        stub(imageDimensionsService, 'getWidth').returns(2);
+        stub(imageDimensionsService, 'getHeight').returns(2);
+        const DIAGONAL_ADJACENT_PIXELS = [true, false, false, true];
+        expect(service.getDifferencesList(DIAGONAL_ADJACENT_PIXELS)).toStrictEqual([[0, 3]]);
+    });
+
+    it('getDifferencesList() should return an array of arrays that represent the indexes of the pixels chunks', () => {
         stub(imageDimensionsService, 'getWidth').returns(3);
         stub(imageDimensionsService, 'getHeight').returns(3);
         const VISITED_PIXELS_END = VISITED_PIXELS_TEST;
