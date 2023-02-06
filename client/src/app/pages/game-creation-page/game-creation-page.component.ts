@@ -121,10 +121,15 @@ export class GameCreationPageComponent implements OnInit {
 
         const input = e.target as HTMLInputElement;
 
+        // Passer une valeur dans fileValidation qu<on va utiliser 
+        // dans un switch case ou autre pour assigner selecteFiles 
+        // (on va creer d<autres attributs. 3 au total un pour upload 
+        // 1 un pour upload 2 et un pour les deux uplod (on peut juste assigner les deux individuels))
         if (!input.files?.length) {
             return;
         }
         this.selectedFile = input.files[0];
+        console.log(this.selectedFile);
     }
 
     save(): void {
@@ -133,12 +138,12 @@ export class GameCreationPageComponent implements OnInit {
             const gameInfo = {
                 // TODO add good title, second image and radius
                 name: 'this.gameTitle',
-                baseImage: data[0].path,
-                differenceImage: data[1].path,
+                baseImage: data[0].filename,
+                differenceImage: data[1].filename,
                 radius: 3,
             };
-            console.log(data[0].path);
-            console.log(data[1].path);
+            console.log(data[0].filename);
+            console.log(data[1].filename);
             console.log('gameInfo', gameInfo);
             console.log('data', data);
             this.gameCardService.createGame(gameInfo).subscribe((e) => console.log(e));
