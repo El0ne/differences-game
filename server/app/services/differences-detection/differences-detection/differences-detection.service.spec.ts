@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-import { ImageDimentionsService } from '@app/services/image-dimentions/image-dimentions.service';
+import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -8,7 +8,7 @@ import { DifferencesDetectionService } from './differences-detection.service';
 
 describe('DifferencesDetectionService', () => {
     let service: DifferencesDetectionService;
-    let imageDimentionsService: ImageDimentionsService;
+    let imageDimensionsService: ImageDimensionsService;
     let DIFFERENT_PIXELS_LIST: boolean[];
     let VISITED_PIXELS_TEST: number[][];
     let DIFFERENT_PIXEL: number;
@@ -23,11 +23,11 @@ describe('DifferencesDetectionService', () => {
         UNVISITED_DIFFERENT_PIXEL = 8;
 
         const module: TestingModule = await Test.createTestingModule({
-            providers: [DifferencesDetectionService, PixelRadiusService, PixelPositionService, ImageDimentionsService],
+            providers: [DifferencesDetectionService, PixelRadiusService, PixelPositionService, ImageDimensionsService],
         }).compile();
 
         service = module.get<DifferencesDetectionService>(DifferencesDetectionService);
-        imageDimentionsService = module.get<ImageDimentionsService>(ImageDimentionsService);
+        imageDimensionsService = module.get<ImageDimensionsService>(ImageDimensionsService);
     });
 
     it('should be defined', () => {
@@ -62,8 +62,8 @@ describe('DifferencesDetectionService', () => {
     });
 
     it('getDifferencesList() should return an array of arrays that represent the indexes of the pixels chucks', () => {
-        stub(imageDimentionsService, 'getWidth').returns(3);
-        stub(imageDimentionsService, 'getHeight').returns(3);
+        stub(imageDimensionsService, 'getWidth').returns(3);
+        stub(imageDimensionsService, 'getHeight').returns(3);
         const VISITED_PIXELS_END = VISITED_PIXELS_TEST;
         VISITED_PIXELS_END[0][4] = 8;
         expect(service.getDifferencesList(DIFFERENT_PIXELS_LIST)).toStrictEqual(VISITED_PIXELS_END);

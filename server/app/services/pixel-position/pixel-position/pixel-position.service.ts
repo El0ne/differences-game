@@ -1,14 +1,14 @@
-import { ImageDimentionsService } from '@app/services/image-dimentions/image-dimentions.service';
+import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class PixelPositionService {
-    constructor(private imageDimentionsService: ImageDimentionsService) {}
+    constructor(private imageDimensionsService: ImageDimensionsService) {}
     getXCoordinate(pixelNumber: number): number {
-        return pixelNumber % this.imageDimentionsService.getWidth();
+        return pixelNumber % this.imageDimensionsService.getWidth();
     }
 
     getYCoordinate(pixelNumber: number): number {
-        return Math.floor(pixelNumber / this.imageDimentionsService.getWidth());
+        return Math.floor(pixelNumber / this.imageDimensionsService.getWidth());
     }
 }

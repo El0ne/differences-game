@@ -1,14 +1,14 @@
-import { IMAGE_DIMENTIONS } from '@common/image-dimentions';
+import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class ImageDimentionsService {
+export class ImageDimensionsService {
     getWidth(): number {
-        return IMAGE_DIMENTIONS.width;
+        return IMAGE_DIMENSIONS.width;
     }
 
     getHeight(): number {
-        return IMAGE_DIMENTIONS.height;
+        return IMAGE_DIMENSIONS.height;
     }
 
     getNumberOfPixels(): number {
