@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { PATHS } from '@app/pages/solo-view/solo-view-constants';
 import { HEIGHT, WAIT_TIME, WIDTH } from './click-event-constant';
 
@@ -12,17 +12,12 @@ export class ClickEventComponent implements OnInit {
     @Input() id: number;
     @Input() original: string;
     @Output() incrementScore: EventEmitter<number> = new EventEmitter<number>();
-    @ViewChild('#id')
     timeout: boolean;
     lastDifferenceClicked: number[];
     currentScore: number = 0;
 
     ngOnInit(): void {
         this.timeout = true;
-        this.createCanvas();
-    }
-
-    async createCanvas() {
         const tag = this.id.toString();
         const image = new Image();
         image.src = PATHS.temp;
@@ -31,6 +26,20 @@ export class ClickEventComponent implements OnInit {
             const context = canvas.getContext('2d') as CanvasRenderingContext2D;
             context.drawImage(image, 0, 0);
         };
+    }
+
+    async createCanvas() {
+        return new Promise((resolve, reject) => {
+            const tag = this.id.toString();
+            const image = new Image();
+            image.src = PATHS.temp;
+            image.onload = () => {
+                const canvas = document.getElementById(tag) as HTMLCanvasElement;
+                const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+                resolve(context.drawImage(image, 0, 0));
+            };
+            reject(image);
+        });
     }
 
     getCoordInImage(e: MouseEvent): number[] {
