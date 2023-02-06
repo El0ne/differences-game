@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { PATHS } from '@app/pages/solo-view/solo-view-constants';
-import { WAIT_TIME, WIDTH } from './click-event-constant';
+import { HEIGHT, WAIT_TIME, WIDTH } from './click-event-constant';
 
 @Component({
     selector: 'app-click-event',
@@ -55,8 +55,8 @@ export class ClickEventComponent implements OnInit {
     constructEffect(originalContext: CanvasRenderingContext2D, differentContext: CanvasRenderingContext2D) {
         for (const pixel of this.lastDifferenceClicked) {
             const pos: number[] = this.positionToPixel(pixel);
-            originalContext.fillStyle = '#F00';
-            differentContext.fillStyle = '#F00';
+            originalContext.fillStyle = '#FFD700';
+            differentContext.fillStyle = '#FFD700';
             originalContext.fillRect(pos[0], pos[1], 1, 1);
             differentContext.fillRect(pos[0], pos[1], 1, 1);
         }
@@ -65,8 +65,6 @@ export class ClickEventComponent implements OnInit {
     destroyEffect(originalContext: CanvasRenderingContext2D, differentContext: CanvasRenderingContext2D) {
         for (const pixel of this.lastDifferenceClicked) {
             const pos: number[] = this.positionToPixel(pixel);
-            originalContext.fillStyle = '#F00';
-            differentContext.fillStyle = '#F00';
             originalContext.clearRect(pos[0], pos[1], 1, 1);
             differentContext.clearRect(pos[0], pos[1], 1, 1);
         }
@@ -82,16 +80,16 @@ export class ClickEventComponent implements OnInit {
         this.constructEffect(originalContext, differentContext);
         const flashIntro = setInterval(() => {
             this.destroyEffect(originalContext, differentContext);
-        }, 500);
+        }, 100);
         const flashOutro = setInterval(() => {
             this.constructEffect(originalContext, differentContext);
-        }, 500);
+        }, 100);
 
         setTimeout(() => {
             clearInterval(flashIntro);
             clearInterval(flashOutro);
             this.destroyEffect(originalContext, differentContext);
-        }, 3500);
+        }, WAIT_TIME);
 
         this.currentScore += 1;
         this.incrementScore.emit(this.currentScore);
@@ -112,7 +110,6 @@ export class ClickEventComponent implements OnInit {
     isADifference(x: number, y: number, remove: boolean): boolean {
         const posToCheck = y * WIDTH + x;
         for (const difference of this.differenceArray) {
-            console.log('here');
             for (const positions of difference) {
                 if (positions === posToCheck) {
                     if (!remove) {
@@ -147,12 +144,8 @@ export class ClickEventComponent implements OnInit {
                 context.textAlign = 'center';
                 const error = 'Error';
                 context.fillText(error, x, y);
-                const metrics = context.measureText(error);
-                const height = 30;
-                const widthPosition = x - metrics.width;
-                const heightPosition = y - height;
                 setTimeout(() => {
-                    context.clearRect(widthPosition, heightPosition, x, y); // TODO : check if any way to not use that
+                    context.clearRect(0, 0, WIDTH, HEIGHT); // TODO : check if any way to not use that
                     this.timeout = true;
                 }, WAIT_TIME);
             }

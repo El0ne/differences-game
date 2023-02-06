@@ -83,4 +83,12 @@ describe('SoloViewComponent', () => {
         component.sendMessage();
         expect(untoggleErrorMessageSpy).toHaveBeenCalled();
     });
+
+    it('should increment counter when increment counter is called', () => {
+        component.currentScore = 0;
+        component.incrementScore();
+        const answer = 1;
+
+        expect(component.currentScore).toEqual(answer);
+    });
 });
