@@ -1,4 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { GAMES } from '@app/mock/game-cards';
 import { GameCardInformation } from '@common/game-card';
 import { RankingBoard } from '@common/ranking-board';
@@ -16,7 +17,7 @@ export class GameCreationPageComponent implements OnInit {
 
     display$: Observable<'open' | 'close'>;
 
-    card: GameCardInformation;
+    card = new GameCardInformation();
 
     urlOriginal: string;
     urlDifferent: string;
@@ -29,7 +30,7 @@ export class GameCreationPageComponent implements OnInit {
     soloTimes: RankingBoard[];
     multiTimes: RankingBoard[];
 
-    constructor(private modalDiffService: ModalDiffPageService) {}
+    constructor(private modalDiffService: ModalDiffPageService, private router: Router) {}
 
     ngOnInit() {
         this.display$ = this.modalDiffService.watch();
@@ -56,10 +57,14 @@ export class GameCreationPageComponent implements OnInit {
         const target = e.target as HTMLInputElement;
         if (target.id === 'reset-original') {
             const input = document.getElementById('upload-original') as HTMLInputElement;
+            const bothinput = document.getElementById('upload-both') as HTMLInputElement;
             input.value = '';
+            bothinput.value = '';
             if (ogContext) ogContext.clearRect(0, 0, 640, 480);
         } else {
             const input = document.getElementById('upload-different') as HTMLInputElement;
+            const bothinput = document.getElementById('upload-both') as HTMLInputElement;
+            bothinput.value = '';
             input.value = '';
             if (diffContext) diffContext.clearRect(0, 0, 640, 480);
         }
@@ -89,6 +94,7 @@ export class GameCreationPageComponent implements OnInit {
                                 if (ogContext) {
                                     ogContext.drawImage(img, 0, 0, 640, 480);
                                 }
+                                this.urlOriginal = img.src;
                                 break;
                             }
                             case 'upload-different': {
@@ -120,21 +126,30 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     save(): void {
-        this.card.name = this.gameTitle;
-        this.card.image = this.baseImageURL;
-        this.difficulty = 'Facile'; // initialisation, le temps qu'on sache quelles sont les exigences pr les difficultés.
-        this.card.difficulty = this.difficulty;
-        this.soloTimes = [
-            // initialisation. Ces propriétés vont changer une fois qu'un joueur aura joué.
-            { time: 0, name: '--' },
-            { time: 0, name: '--' },
-            { time: 0, name: '--' },
-        ];
-        this.multiTimes = [
-            { time: 0, name: '--' },
-            { time: 0, name: '--' },
-            { time: 0, name: '--' },
-        ];
-        GAMES.push(this.card);
+        if (this.gameTitle === undefined && this.baseImageURL === undefined) {
+            alert('Il manque une image et un titre à votre jeu !');
+        } else if (this.gameTitle === undefined) {
+            alert("N'oubliez pas d'ajouter un titre à votre jeu !");
+        } else if (this.urlOriginal === undefined) {
+            alert('Un jeu de différences sans image est pour ainsi dire... intéressant ? Ajoutez une image.');
+        } else {
+            this.card.name = this.gameTitle;
+            this.card.image = this.baseImageURL;
+            this.difficulty = 'Facile'; // initialisation, le temps qu'on sache quelles sont les exigences pr les difficultés.
+            this.card.difficulty = this.difficulty;
+            this.card.soloTimes = [
+                // initialisation. Ces propriétés vont changer une fois qu'un joueur aura joué.
+                { time: 0, name: '--' },
+                { time: 0, name: '--' },
+                { time: 0, name: '--' },
+            ];
+            this.card.multiTimes = [
+                { time: 0, name: '--' },
+                { time: 0, name: '--' },
+                { time: 0, name: '--' },
+            ];
+            GAMES.push(this.card);
+            this.router.navigate(['/config']);
+        }
     }
 }
