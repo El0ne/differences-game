@@ -1,8 +1,9 @@
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameCardInformation } from '@common/game-card';
 import { ImageInformation } from '@common/image-information';
-import { Body, Controller, Get, Param, Post, Query, StreamableFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
 import { createReadStream } from 'fs';
 import { diskStorage } from 'multer';
 import * as path from 'path';
@@ -52,20 +53,34 @@ export class StageController {
         return [files.baseImage[0], files.differenceImage[0]];
     }
 
-    @Get('/image/:imageName')
-    getImage(@Param() param): StreamableFile {
-        console.log(param.imageName);
-        const imagePath = join(process.cwd(), 'assets/images');
-        const file = createReadStream(join(imagePath, `/${param.imageName}`));
-        console.log('file', file.path);
-        return new StreamableFile(file);
-    }
-
     @Get('/image')
-    getFile(): StreamableFile {
-        const file = createReadStream(join(process.cwd(), 'assets/images/test.bmp'));
-        console.log('file', file);
+    getFile() {
+        return createReadStream(join(process.cwd(), 'package.json'));
+    }
+    // getFile(): StreamableFile {
+    //     const file = createReadStream(join(process.cwd(), 'assets/images/test.bmp'));
+    //     console.log('file', file);
 
-        return new StreamableFile(file);
+    //     return new StreamableFile(file);
+    // }
+    // @Get('/image/:imageName')
+    // getImage(@Param() param): StreamableFile {
+    //     console.log(param.imageName);
+    //     const imagePath = join(process.cwd(), 'assets/images');
+    //     const file = createReadStream(join(imagePath, `/${param.imageName}`));
+    //     console.log('imagePath', imagePath);
+    //     console.log('file', file);
+    //     return new StreamableFile(file);
+    // }
+    @Get('/image/:imageName')
+    getImage(@Param() param, @Res() res: Response) {
+        // console.log(param.imageName);
+        const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);
+        res.sendFile(imagePath, (err) => {
+            if (err) {
+                console.error(err);
+                res.sendStatus(500);
+            }
+        });
     }
 }
