@@ -1,5 +1,5 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
-import { GAMES } from '@app/mock/game-cards';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameCardInformation } from '@common/game-card';
 import { RankingBoard } from '@common/ranking-board';
 import { Observable } from 'rxjs';
@@ -18,13 +18,12 @@ export class GameCreationPageComponent implements OnInit {
 
     card = new GameCardInformation();
 
-    urlOriginal: string;
-    urlDifferent: string;
+    urlOriginal: File;
+    urlDifferent: File;
 
     nbDiff: number = 0;
 
     gameTitle: string;
-    baseImageURL: string;
     difficulty: string; // je
     soloTimes: RankingBoard[];
     multiTimes: RankingBoard[];
@@ -96,14 +95,22 @@ export class GameCreationPageComponent implements OnInit {
                                 if (ogContext) {
                                     ogContext.drawImage(img, 0, 0, 640, 480);
                                 }
-                                this.urlOriginal = img.src;
+                                if (!target.files?.length) {
+                                    return;
+                                }
+                                console.log('setup original');
+                                this.urlOriginal = target.files[0];
                                 break;
                             }
                             case 'upload-different': {
                                 if (diffContext) {
                                     diffContext.drawImage(img, 0, 0, 640, 480);
                                 }
-
+                                if (!target.files?.length) {
+                                    return;
+                                }
+                                console.log('setup different');
+                                this.urlDifferent = target.files[0];
                                 break;
                             }
                             case 'upload-both': {
@@ -113,6 +120,11 @@ export class GameCreationPageComponent implements OnInit {
                                 if (diffContext) {
                                     diffContext.drawImage(img, 0, 0, 640, 480);
                                 }
+                                if (!target.files?.length) {
+                                    return;
+                                }
+                                this.urlOriginal = target.files[0];
+                                this.urlDifferent = target.files[0];
                                 break;
                             }
                         }
@@ -121,65 +133,46 @@ export class GameCreationPageComponent implements OnInit {
             };
         } else {
             alert('wrong size or file type please choose again');
-            this.urlOriginal = '';
-            this.urlDifferent = '';
+            // this.urlOriginal = '';
+            // this.urlDifferent = '';
             target.value = '';
         }
         // elouan
-
-        const input = e.target as HTMLInputElement;
-
-        // Passer une valeur dans fileValidation qu<on va utiliser
-        // dans un switch case ou autre pour assigner selecteFiles
-        // (on va creer d<autres attributs. 3 au total un pour upload
-        // 1 un pour upload 2 et un pour les deux uplod (on peut juste assigner les deux individuels))
-        if (!input.files?.length) {
-            return;
-        }
-        this.selectedFile = input.files[0];
-        console.log(this.selectedFile);
     }
 
+    // testElouan(test) {
+    //     const input = e.target as HTMLInputElement;
+
+    //     // Passer une valeur dans fileValidation qu<on va utiliser
+    //     // dans un switch case ou autre pour assigner selecteFiles
+    //     // (on va creer d<autres attributs. 3 au total un pour upload
+    //     // 1 un pour upload 2 et un pour les deux uplod (on peut juste assigner les deux individuels))
+    //     if (!input.files?.length) {
+    //         return;
+    //     }
+    //     test = input.files[0];
+    //     console.log('input image', test);
+    // }
+
+    // validateInputs(): boolean {
+    //     return this.gameTitle !== '' && this.urlOriginal !== '' && this.urlDifferent !== '';
+    // }
     save(): void {
-        if (this.gameTitle === undefined && this.baseImageURL === undefined) {
-            alert('Il manque une image et un titre à votre jeu !');
-        } else if (this.gameTitle === undefined) {
-            alert("N'oubliez pas d'ajouter un titre à votre jeu !");
-        } else if (this.urlOriginal === undefined) {
-            alert('Un jeu de différences sans image est pour ainsi dire... intéressant ? Ajoutez une image.');
-        } else {
-            this.card.name = this.gameTitle;
-            this.card.image = this.baseImageURL;
-            this.difficulty = 'Facile'; // initialisation, le temps qu'on sache quelles sont les exigences pr les difficultés.
-            this.card.difficulty = this.difficulty;
-            this.card.soloTimes = [
-                // initialisation. Ces propriétés vont changer une fois qu'un joueur aura joué.
-                { time: 0, name: '--' },
-                { time: 0, name: '--' },
-                { time: 0, name: '--' },
-            ];
-            this.card.multiTimes = [
-                { time: 0, name: '--' },
-                { time: 0, name: '--' },
-                { time: 0, name: '--' },
-            ];
-            GAMES.push(this.card);
-            this.router.navigate(['/config']);
-        }
+        // if (this.validateInputs()) {
+        console.log('this.urlOriginal', this.urlOriginal);
+        console.log('this.urlDifferent', this.urlDifferent);
         // TODO ajouter verif que les images sont upload et qu'on a un nom pour le jeu
-        this.gameCardService.uploadImages(this.selectedFile).subscribe((data) => {
-            const gameInfo = {
-                // TODO add good title, second image and radius
-                name: 'this.gameTitle',
-                baseImage: data[0].filename,
-                differenceImage: data[1].filename,
-                radius: 3,
-            };
-            console.log(data[0].filename);
-            console.log(data[1].filename);
-            console.log('gameInfo', gameInfo);
-            console.log('data', data);
-            this.gameCardService.createGame(gameInfo).subscribe((e) => console.log(e));
-        });
+        // this.gameCardService.uploadImages(this.selectedFile).subscribe((data) => {
+        //     const gameInfo = {
+        //         // TODO add good title, second image and radius
+        //         name: this.gameTitle,
+        //         baseImage: data[0].filename,
+        //         differenceImage: data[1].filename,
+        //         radius: 3,
+        //     };
+        //     //
+        //     this.gameCardService.createGame(gameInfo).subscribe((e) => console.log(e));
+        //     // this.router.navigate(['/config']);
+        // });
     }
 }
