@@ -2,16 +2,21 @@
     <div class="header-button-container">
         <div class="left-header-container">
             <button id="previous" routerLink="/config">Retour</button>
+            <button id="info"><img class="info-image" src="../../../assets/info-48.png" (click)="open()" /></button>
             <ng-container *ngIf="display$ | async as display">
-                <section [class.open]="display === 'open'" (click)="closeModalPage()">
+                <section [class.open]="display === 'open'" (click)="close()">
                     <div (click)="$event.stopPropagation()">
-                        <button id="info"><img class="info-image" src="../../../assets/info-48.png" /></button>
-                        <h1>Hello World</h1>
+                        <button class="close" type="button" (click)="close()">X</button>
+                        <h1>Vos différences ajoutées :</h1>
+                        <div class="diff-image">
+                            <canvas #canvasDiff width="640px" height="480px"></canvas>
+                        </div>
                     </div>
                 </section>
             </ng-container>
         </div>
-        <button id="save" routerLink="/config" (click)="save()"><img class="save-image" src="../../../assets/save.png" /></button>
+        <button id="save" (click)="save()"><img class="save-image" src="../../../assets/save.png" /></button>
+        <!-- <button id="save" routerLink="/config" (click)="save()"><img class="save-image" src="../../../assets/save.png" /></button> -->
     </div>
     <div id="title-container">
         <div class="line title">____________</div>
@@ -63,11 +68,11 @@
                                 id="radius-range"
                                 min="0"
                                 max="15"
-                                value="0"
+                                value="3"
                                 step="3"
                                 oninput="this.nextElementSibling.value = this.value"
                             />
-                            <output>0</output>
+                            <output>3</output>
                         </div>
                         <label for="radius-range">Rayon du détecteur de différence</label>
                     </div>

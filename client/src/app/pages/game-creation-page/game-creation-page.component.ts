@@ -1,5 +1,5 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { Component, ElementRef, ViewChild } from '@angular/core';
+import { GAMES } from '@app/mock/game-cards';
 import { GameCardInformation } from '@common/game-card';
 import { RankingBoard } from '@common/ranking-board';
 import { Observable } from 'rxjs';
@@ -16,7 +16,7 @@ export class GameCreationPageComponent implements OnInit {
 
     display$: Observable<'open' | 'close'>;
 
-    card: GameCardInformation;
+    card = new GameCardInformation();
 
     urlOriginal: string;
     urlDifferent: string;
@@ -38,10 +38,13 @@ export class GameCreationPageComponent implements OnInit {
         this.display$ = this.modalDiffService.watch();
     }
 
-    closeModalPage() {
-        this.modalDiffService.close();
+    open() {
+        this.modalDiffService.open();
     }
 
+    close() {
+        this.modalDiffService.close();
+    }
     getTitle(title: string) {
         this.gameTitle = title;
     }
@@ -56,10 +59,14 @@ export class GameCreationPageComponent implements OnInit {
         const target = e.target as HTMLInputElement;
         if (target.id === 'reset-original') {
             const input = document.getElementById('upload-original') as HTMLInputElement;
+            const bothinput = document.getElementById('upload-both') as HTMLInputElement;
             input.value = '';
+            bothinput.value = '';
             if (ogContext) ogContext.clearRect(0, 0, 640, 480);
         } else {
             const input = document.getElementById('upload-different') as HTMLInputElement;
+            const bothinput = document.getElementById('upload-both') as HTMLInputElement;
+            bothinput.value = '';
             input.value = '';
             if (diffContext) diffContext.clearRect(0, 0, 640, 480);
         }
@@ -89,6 +96,7 @@ export class GameCreationPageComponent implements OnInit {
                                 if (ogContext) {
                                     ogContext.drawImage(img, 0, 0, 640, 480);
                                 }
+                                this.urlOriginal = img.src;
                                 break;
                             }
                             case 'upload-different': {
@@ -121,9 +129,9 @@ export class GameCreationPageComponent implements OnInit {
 
         const input = e.target as HTMLInputElement;
 
-        // Passer une valeur dans fileValidation qu<on va utiliser 
-        // dans un switch case ou autre pour assigner selecteFiles 
-        // (on va creer d<autres attributs. 3 au total un pour upload 
+        // Passer une valeur dans fileValidation qu<on va utiliser
+        // dans un switch case ou autre pour assigner selecteFiles
+        // (on va creer d<autres attributs. 3 au total un pour upload
         // 1 un pour upload 2 et un pour les deux uplod (on peut juste assigner les deux individuels))
         if (!input.files?.length) {
             return;
@@ -133,6 +141,31 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     save(): void {
+        if (this.gameTitle === undefined && this.baseImageURL === undefined) {
+            alert('Il manque une image et un titre à votre jeu !');
+        } else if (this.gameTitle === undefined) {
+            alert("N'oubliez pas d'ajouter un titre à votre jeu !");
+        } else if (this.urlOriginal === undefined) {
+            alert('Un jeu de différences sans image est pour ainsi dire... intéressant ? Ajoutez une image.');
+        } else {
+            this.card.name = this.gameTitle;
+            this.card.image = this.baseImageURL;
+            this.difficulty = 'Facile'; // initialisation, le temps qu'on sache quelles sont les exigences pr les difficultés.
+            this.card.difficulty = this.difficulty;
+            this.card.soloTimes = [
+                // initialisation. Ces propriétés vont changer une fois qu'un joueur aura joué.
+                { time: 0, name: '--' },
+                { time: 0, name: '--' },
+                { time: 0, name: '--' },
+            ];
+            this.card.multiTimes = [
+                { time: 0, name: '--' },
+                { time: 0, name: '--' },
+                { time: 0, name: '--' },
+            ];
+            GAMES.push(this.card);
+            this.router.navigate(['/config']);
+        }
         // TODO ajouter verif que les images sont upload et qu'on a un nom pour le jeu
         this.gameCardService.uploadImages(this.selectedFile).subscribe((data) => {
             const gameInfo = {
