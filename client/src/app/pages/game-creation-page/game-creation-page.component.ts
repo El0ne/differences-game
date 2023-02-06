@@ -126,26 +126,9 @@ export class GameCreationPageComponent implements OnInit {
             };
         } else {
             alert('wrong size or file type please choose again');
-            // this.urlOriginal = '';
-            // this.urlDifferent = '';
             target.value = '';
         }
-        // elouan
     }
-
-    // testElouan(test) {
-    //     const input = e.target as HTMLInputElement;
-
-    //     // Passer une valeur dans fileValidation qu<on va utiliser
-    //     // dans un switch case ou autre pour assigner selecteFiles
-    //     // (on va creer d<autres attributs. 3 au total un pour upload
-    //     // 1 un pour upload 2 et un pour les deux uplod (on peut juste assigner les deux individuels))
-    //     if (!input.files?.length) {
-    //         return;
-    //     }
-    //     test = input.files[0];
-    //     console.log('input image', test);
-    // }
 
     // validateInputs(): boolean {
     //     return this.gameTitle !== '' && this.urlOriginal !== '' && this.urlDifferent !== '';
