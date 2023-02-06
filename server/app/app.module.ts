@@ -4,7 +4,9 @@ import { GameCardService } from '@app/services/game-card/game-card.service';
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { GameClickController } from './controllers/game-click/game-click.controller';
 import { StageController } from './controllers/stage/stage.controller';
+import { DifferenceClickService } from './services/difference-click/difference-click.service';
 
 @Module({
     imports: [
@@ -18,7 +20,7 @@ import { StageController } from './controllers/stage/stage.controller';
         }),
         MongooseModule.forFeature([{ name: Course.name, schema: courseSchema }]),
     ],
-    controllers: [StageController],
-    providers: [ChatGateway, Logger, GameCardService],
+    controllers: [StageController, GameClickController],
+    providers: [ChatGateway, Logger, GameCardService, DifferenceClickService],
 })
 export class AppModule {}
