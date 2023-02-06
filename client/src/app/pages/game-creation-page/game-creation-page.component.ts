@@ -1,5 +1,4 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameCardInformation } from '@common/game-card';
 import { RankingBoard } from '@common/ranking-board';
@@ -19,8 +18,8 @@ export class GameCreationPageComponent implements OnInit {
 
     card = new GameCardInformation();
 
-    urlOriginal: File;
-    urlDifferent: File;
+    urlOriginal: File | null = null;
+    urlDifferent: File | null = null;
 
     nbDiff: number = 0;
 
@@ -32,7 +31,7 @@ export class GameCreationPageComponent implements OnInit {
     // elouan
     selectedFile: File;
 
-    constructor(public modalDiffService: ModalDiffPageService, public gameCardService: GameCardInformationService, private router: Router) {}
+    constructor(public modalDiffService: ModalDiffPageService, public gameCardService: GameCardInformationService) {}
 
     ngOnInit() {
         this.display$ = this.modalDiffService.watch();
@@ -55,12 +54,14 @@ export class GameCreationPageComponent implements OnInit {
             const bothinput = document.getElementById('upload-both') as HTMLInputElement;
             input.value = '';
             bothinput.value = '';
+            this.urlOriginal = null;
             if (ogContext) ogContext.clearRect(0, 0, 640, 480);
         } else {
             const input = document.getElementById('upload-different') as HTMLInputElement;
             const bothinput = document.getElementById('upload-both') as HTMLInputElement;
             bothinput.value = '';
             input.value = '';
+            this.urlDifferent = null;
             if (diffContext) diffContext.clearRect(0, 0, 640, 480);
         }
     }
@@ -129,27 +130,31 @@ export class GameCreationPageComponent implements OnInit {
         }
     }
 
-    validateInputs(): boolean {
-        // return this.gameTitle !== '' && this.urlOriginal !== '' && this.urlDifferent !== '';
+    saveVerification(): boolean {
+        if (this.gameTitle === undefined && this.urlOriginal === null && this.urlDifferent === null) {
+            alert('Il manque une image et un titre à votre jeu !');
+            return false;
+        } else if (this.gameTitle === undefined) {
+            alert("N'oubliez pas d'ajouter un titre à votre jeu !");
+            return false;
+        } else if (this.urlOriginal === null || this.urlDifferent === null) {
+            alert('Un jeu de différences sans image est pour ainsi dire... intéressant ? Ajoutez une image.');
+            return false;
+        }
         return true;
     }
-
     save(): void {
-        if (this.validateInputs()) {
-            // console.log('this.urlOriginal', this.urlOriginal);
-            // console.log('this.urlDifferent', this.urlDifferent);
-            // TODO ajouter verif que les images sont upload et qu'on a un nom pour le jeu
+        if (this.saveVerification() && this.urlOriginal && this.urlDifferent) {
             this.gameCardService.uploadImages(this.urlOriginal, this.urlDifferent).subscribe((data) => {
                 const gameInfo = {
                     // TODO add good title, second image and radius
-                    name: 'title',
+                    name: this.gameTitle,
                     baseImage: data[0].filename,
                     differenceImage: data[1].filename,
                     radius: 3,
                 };
-                //
                 this.gameCardService.createGame(gameInfo).subscribe((e) => console.log(e));
-                this.router.navigate(['/config']);
+                this.modalDiffService.open();
             });
         }
     }

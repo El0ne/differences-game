@@ -2,7 +2,6 @@
     <div class="header-button-container">
         <div class="left-header-container">
             <button id="previous" routerLink="/config">Retour</button>
-            <button id="info"><img class="info-image" src="../../../assets/info-48.png" (click)="this.modalDiffService.open()" /></button>
             <ng-container *ngIf="display$ | async as display">
                 <section [class.open]="display === 'open'" (click)="this.modalDiffService.close()">
                     <div (click)="$event.stopPropagation()">
@@ -11,6 +10,7 @@
                         <div class="diff-image">
                             <canvas #canvasDiff width="640px" height="480px"></canvas>
                         </div>
+                        <button class="continue" routerLink="/config">Continuer</button>
                     </div>
                 </section>
             </ng-container>

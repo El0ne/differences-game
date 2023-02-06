@@ -5,7 +5,6 @@ import { GameCardInformation } from '@common/game-card';
 import { GameInformation } from '@common/game-information';
 import { ImageInformation } from '@common/image-information';
 import { Observable } from 'rxjs';
-
 @Injectable({
     providedIn: 'root',
 })
