@@ -34,8 +34,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         return this.secondService.convert(time);
     }
 
-    showTime() {
-        return this.service.startTimer();
+    showTime(): void {
+        this.service.startTimer();
     }
 
     toggleInfoCard() {
