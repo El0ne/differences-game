@@ -16,9 +16,9 @@ export class PixelRadiusService {
         const upExtremity = Math.max(pixelCoordinateY - radius, 0);
         const downExtremity = Math.min(pixelCoordinateY + radius, IMAGE_HEIGHT - 1);
 
-        for (let j = upExtremity; j <= downExtremity; j++) {
-            for (let i = leftExtremity; i <= rightExtremity; i++) {
-                adjacentPixels.push(j * IMAGE_WIDTH + i);
+        for (let i = upExtremity; i <= downExtremity; i++) {
+            for (let j = leftExtremity; j <= rightExtremity; j++) {
+                adjacentPixels.push(i * IMAGE_WIDTH + j);
             }
         }
         return adjacentPixels;
