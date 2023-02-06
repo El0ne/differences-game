@@ -4,7 +4,6 @@ import { ImageInformation } from '@common/image-information';
 import { Body, Controller, Get, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
-import { createReadStream } from 'fs';
 import { diskStorage } from 'multer';
 import * as path from 'path';
 import { join } from 'path';
@@ -52,11 +51,6 @@ export class StageController {
         // TODO ajouter appel au service qui va générer les images de différences
         console.log('files', files);
         return [files.baseImage[0], files.differenceImage[0]];
-    }
-
-    @Get('/image')
-    getFile() {
-        return createReadStream(join(process.cwd(), 'package.json'));
     }
 
     @Get('/image/:imageName')

@@ -12,7 +12,7 @@ export class GameCardSelectionComponent implements OnInit {
     @Input() isConfig: boolean | null;
     image: string = '';
     ngOnInit() {
-        this.image = `${STAGE}/image/${this.gameCardInformation.image}`;
+        this.image = `${STAGE}/image/${this.gameCardInformation.originalImage}`;
     }
 
     // TODO: ajouter la logique pour que le reset des temps et le delete se fait pour le sprint 2
