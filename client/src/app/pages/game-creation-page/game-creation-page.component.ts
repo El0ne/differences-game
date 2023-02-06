@@ -49,14 +49,23 @@ export class GameCreationPageComponent {
     //     if (bothInput) bothInput.value = '';
     // }
 
-    clearSingle(canvas: HTMLCanvasElement, id: string, fileToReset: File | null) {
+    clearSingleFile(canvas: HTMLCanvasElement, id: string) {
         const context = canvas.getContext('2d');
         const input = document.getElementById(id) as HTMLInputElement;
         const bothInput = document.getElementById('upload-both') as HTMLInputElement;
         input.value = '';
         bothInput.value = '';
-        fileToReset = null;
         if (context) context.clearRect(0, 0, 640, 480);
+    }
+
+    clearFirstFile(canvas: HTMLCanvasElement, id: string) {
+        this.originalFile = null;
+        this.clearSingleFile(canvas, id);
+    }
+
+    clearSecondFile(canvas: HTMLCanvasElement, id: string) {
+        this.differentFile = null;
+        this.clearSingleFile(canvas, id);
     }
 
     fileValidation(e: Event) {
