@@ -1,4 +1,4 @@
-export class ImageDimentions {
+export class ImageDimensions {
     readonly width: number;
     readonly height: number;
     constructor(width: number, heigh: number) {
@@ -7,4 +7,4 @@ export class ImageDimentions {
     }
 }
 
-export const IMAGE_DIMENTIONS: ImageDimentions = new ImageDimentions(640, 480);
+export const IMAGE_DIMENSIONS: ImageDimensions = new ImageDimensions(640, 480);
