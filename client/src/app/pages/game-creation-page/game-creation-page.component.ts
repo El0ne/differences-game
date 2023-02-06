@@ -16,6 +16,8 @@ export class GameCreationPageComponent implements OnInit {
 
     display$: Observable<'open' | 'close'>;
 
+    radius: number = 3;
+
     card = new GameCardInformation();
 
     urlOriginal: File | null = null;
@@ -147,11 +149,10 @@ export class GameCreationPageComponent implements OnInit {
         if (this.saveVerification() && this.urlOriginal && this.urlDifferent) {
             this.gameCardService.uploadImages(this.urlOriginal, this.urlDifferent).subscribe((data) => {
                 const gameInfo = {
-                    // TODO add good title, second image and radius
                     name: this.gameTitle,
                     baseImage: data[0].filename,
                     differenceImage: data[1].filename,
-                    radius: 3,
+                    radius: this.radius,
                 };
                 this.gameCardService.createGame(gameInfo).subscribe((e) => console.log(e));
                 this.modalDiffService.open();
