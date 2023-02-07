@@ -8,3 +8,4 @@ for (let i = 0; i < 50000; i++) {
 }
 
 export const MOCK_ARRAY: number[][] = [difference1, difference2];
+export const TEST_ARRAY: number[][] = [difference1, difference2];
