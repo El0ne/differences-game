@@ -4,6 +4,9 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ExampleController } from './controllers/example/example.controller';
 import { DifferenceDetectionService } from './services/difference-detection/difference-detection.service';
+import { ImageDimensionsService } from './services/image-dimensions/image-dimensions.service';
+import { PixelPositionService } from './services/pixel-position/pixel-position/pixel-position.service';
+import { PixelRadiusService } from './services/pixel-radius/pixel-radius.service';
 
 const bootstrap = async () => {
     const app = await NestFactory.create(AppModule);
@@ -22,7 +25,8 @@ const bootstrap = async () => {
 };
 
 // TODO Comment and uncomment those lines
-const service = new DifferenceDetectionService();
+const imageService = new ImageDimensionsService();
+const service = new DifferenceDetectionService(new PixelRadiusService(new PixelPositionService(imageService), imageService));
 const controller = new ExampleController(service);
 controller.exampleInfo();
 // bootstrap();

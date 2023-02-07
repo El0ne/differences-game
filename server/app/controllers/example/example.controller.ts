@@ -15,7 +15,7 @@ export class ExampleController {
         type: Message,
     })
     async exampleInfo() {
-        return await this.exampleService.compareImages();
+        return await this.exampleService.compareImages('assets/images/image_12_diff.bmp', 'assets/images/image_empty.bmp', 5);
     }
 
     // TODO Uncomment all those lines
