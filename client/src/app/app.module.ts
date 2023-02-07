@@ -9,11 +9,10 @@ import { AppComponent } from '@app/pages/app/app.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { BestTimeComponent } from './components/best-time/best-time.component';
 import { GameCardSelectionComponent } from './components/game-card-selection/game-card-selection.component';
-import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
+import { TestComponent } from './components/test/test.component';
 import { GameSelectionComponent } from './pages/game-selection/game-selection.component';
 import { HomePageComponent } from './pages/home-page/home-page.component';
 import { SoloViewComponent } from './pages/solo-view/solo-view.component';
-import { TestComponent } from './components/test/test.component';
 
 /**
  * Main module that is used in main.ts.
@@ -30,7 +29,6 @@ import { TestComponent } from './components/test/test.component';
         BestTimeComponent,
         GameCardSelectionComponent,
         SoloViewComponent,
-        GameCreationPageComponent,
         TestComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
