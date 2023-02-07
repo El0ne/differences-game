@@ -1,17 +1,18 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
-import { Observable } from 'rxjs';
-import { ModalDiffPageService } from './modal-diff-page.service';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Component({
     selector: 'app-game-creation-page',
     templateUrl: './game-creation-page.component.html',
     styleUrls: ['./game-creation-page.component.scss'],
 })
-export class GameCreationPageComponent {
+export class GameCreationPageComponent implements OnInit {
     @ViewChild('canvas1') myOgCanvas: ElementRef;
     @ViewChild('canvas2') myDiffCanvas: ElementRef;
     @ViewChild('og') og: ElementRef;
+
+    modal: BehaviorSubject<'open' | 'close'> = new BehaviorSubject<'open' | 'close'>('close');
 
     display$: Observable<'open' | 'close'>;
 
@@ -23,7 +24,11 @@ export class GameCreationPageComponent {
     testId: string = 'upload-original';
     otherId: string = 'upload-different';
 
-    constructor(public modalDiffService: ModalDiffPageService, private gameCardService: GameCardInformationService) {}
+    constructor(private gameCardService: GameCardInformationService) {}
+
+    ngOnInit(): void {
+        this.display$ = this.modal.asObservable();
+    }
 
     getTitle(title: string) {
         this.gameTitle = title;
@@ -112,7 +117,7 @@ export class GameCreationPageComponent {
                     radius: this.radius,
                 };
                 this.gameCardService.createGame(gameInfo).subscribe((e) => console.log(e));
-                this.modalDiffService.open();
+                this.modal.next('open');
             });
         }
     }
