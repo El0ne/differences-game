@@ -109,7 +109,7 @@ export class GameCreationPageComponent implements OnInit {
     save(): void {
         console.log(this.gameTitle);
         if (this.saveVerification() && this.originalFile && this.differentFile) {
-            this.gameCardService.uploadImages(this.originalFile, this.differentFile).subscribe((data) => {
+            this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
                 const gameInfo = {
                     name: this.gameTitle,
                     baseImage: data[0].filename,
