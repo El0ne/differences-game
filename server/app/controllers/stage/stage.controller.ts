@@ -37,7 +37,7 @@ export class StageController {
         return this.gameCardService.createGameCard(game);
     }
 
-    @Post('/image')
+    @Post('/image/:radius')
     @UseInterceptors(
         FileFieldsInterceptor(
             [
@@ -47,9 +47,10 @@ export class StageController {
             { storage },
         ),
     )
-    uploadImages(@UploadedFiles() files): ImageInformation[] {
+    uploadImages(@UploadedFiles() files, @Param() param): ImageInformation[] {
         // TODO ajouter appel au service qui va générer les images de différences
         console.log('files', files);
+        console.log('param.radius', param.radius);
         return [files.baseImage[0], files.differenceImage[0]];
     }
 

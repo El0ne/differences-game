@@ -104,15 +104,15 @@ export class GameCreationPageComponent {
     save(): void {
         console.log(this.gameTitle);
         if (this.saveVerification() && this.originalFile && this.differentFile) {
-            this.gameCardService.uploadImages(this.originalFile, this.differentFile).subscribe((data) => {
+            this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
                 const gameInfo = {
                     name: this.gameTitle,
                     baseImage: data[0].filename,
                     differenceImage: data[1].filename,
                     radius: this.radius,
                 };
-                this.gameCardService.createGame(gameInfo).subscribe((e) => console.log(e));
                 this.modalDiffService.open();
+                this.gameCardService.createGame(gameInfo).subscribe((e) => console.log(e));
             });
         }
     }
