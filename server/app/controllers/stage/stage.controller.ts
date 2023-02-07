@@ -1,6 +1,4 @@
 import { GameCardService } from '@app/services/game-card/game-card.service';
-import { GameCardInformation } from '@common/game-card';
-import { ImageInformation } from '@common/image-information';
 import { Body, Controller, Get, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
@@ -13,7 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 export const storage = diskStorage({
     destination: './assets/images',
     filename: (req, file, cb) => {
-        const filename: string = path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
+        const filename: string = uuidv4();
         const extension: string = path.parse(file.originalname).ext;
         cb(null, `${filename}${extension}`);
     },
@@ -23,18 +21,38 @@ export const storage = diskStorage({
 export class StageController {
     constructor(private gameCardService: GameCardService) {}
     @Get('/')
-    getStages(@Query('index') index: number, @Query('endIndex') endIndex: number): GameCardInformation[] {
-        return this.gameCardService.getGameCards(index, endIndex);
+    getStages(@Query('index') index: number, @Query('endIndex') endIndex: number, @Res() res: Response): void {
+        try {
+            const stages = this.gameCardService.getGameCards(index, endIndex);
+            if (stages) res.status(HttpStatus.OK).send(stages);
+            else res.status(HttpStatus.NOT_FOUND).send({});
+        } catch (err) {
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
+        }
     }
 
     @Get('/info')
-    getNbOfStages(): number {
-        return this.gameCardService.getGameCardsNumber();
+    getNbOfStages(@Res() res: Response): void {
+        try {
+            const gameNumber = this.gameCardService.getGameCardsNumber();
+            // TODO send string of gameNumber cuz number was throwing an error.
+            // Replace with { numberOfGameInformations: gameNumber } when sync with game - selection
+            res.status(HttpStatus.OK).send(`${gameNumber}`);
+        } catch (err) {
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
+        }
     }
 
     @Post('/')
-    createGame(@Body() game) {
-        return this.gameCardService.createGameCard(game);
+    createGame(@Body() game, @Res() res: Response) {
+        try {
+            if (Object.keys(game).length) {
+                const newGame = this.gameCardService.createGameCard(game);
+                res.status(HttpStatus.CREATED).send(newGame);
+            } else res.sendStatus(HttpStatus.BAD_REQUEST);
+        } catch (err) {
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
+        }
     }
 
     @Post('/image/:radius')
@@ -47,14 +65,14 @@ export class StageController {
             { storage },
         ),
     )
-    uploadImages(@UploadedFiles() files, @Param() param): ImageInformation[] {
+    uploadImages(@UploadedFiles() files, @Param() param, @Res() res: Response): void {
         // TODO ajouter appel au service qui va générer les images de différences
-        console.log('param.radius', param.radius);
-        return [files.baseImage[0], files.differenceImage[0]];
+        const data = [files.baseImage[0], files.differenceImage[0]];
+        res.status(HttpStatus.CREATED).send(data);
     }
 
     @Get('/image/:imageName')
-    getImage(@Param() param, @Res() res: Response) {
+    getImage(@Param() param, @Res() res: Response): void {
         const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);
         res.sendFile(imagePath, (err) => {
             if (err) {
