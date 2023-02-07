@@ -26,7 +26,10 @@ const bootstrap = async () => {
 
 // TODO Comment and uncomment those lines
 const imageService = new ImageDimensionsService();
-const service = new DifferenceDetectionService(new PixelRadiusService(new PixelPositionService(imageService), imageService));
+const service = new DifferenceDetectionService(
+    new PixelRadiusService(new PixelPositionService(imageService), imageService),
+    new ImageDimensionsService(),
+);
 const controller = new ExampleController(service);
 controller.exampleInfo();
 // bootstrap();
