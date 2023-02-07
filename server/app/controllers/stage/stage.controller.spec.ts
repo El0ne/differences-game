@@ -40,13 +40,44 @@ describe('StageController', () => {
         expect(stages).toEqual(fakeGameCardsNumber);
         expect(gameCardService.getGameCardsNumber.calledOnce).toBeTruthy();
     });
+
+    it('createGame() should call GameCardService.createGameCard() with the body as a parameter', () => {
+        const gameInfo = getFakeInfo();
+        controller.createGame(gameInfo);
+        expect(gameCardService.createGameCard.calledWith(gameInfo));
+    });
+
+    // it('storage should generate a bmp file with a random name', () => {
+    //     const file = { originalname: 'randomFile.bmp' };
+    //     const cb = jest.fn();
+    //     storage.filename(null, file, cb);
+    //     expect(cb.mock.calls.length).toBe(1);
+    //     expect(cb.mock.calls[0][0]).toBe(null);
+    //     expect(path.parse(cb.mock.calls[0][1]).name).toMatch(new RegExp(`${uuidv4()}`));
+    //     expect(path.parse(cb.mock.calls[0][1]).ext).toBe('.bmp');
+    // });
+
+    // it('uploadImages() should call difference service and return the images', () => {
+    //     const files = getFakeFiles();
+    //     // TODO mock call to difference service when implemented
+    //     expect(controller.createGame(files)).toEqual([files.baseImage[0], files.differenceImage[0]]);
+    //     expect(gameCardService.createGameCard.calledWith(gameInfo));
+    // });
+});
+
+const getFakeInfo = () => ({
+    name: 'Fake Title',
+    baseImage: 'baseImage/path',
+    differenceImage: 'differenceImage/path',
+    radius: 3,
 });
 
 const getFakeGameCards = () => [
     {
         name: 'Library',
         difficulty: 'Difficile',
-        image: '/assets/444-640x480.jpg',
+        originalImage: '/assets/444-640x480.jpg',
+        differenceImage: '/assets/444-640x480.jpg',
         soloTimes: [
             { time: 60, name: 're' },
             { time: 90, name: 'second' },
