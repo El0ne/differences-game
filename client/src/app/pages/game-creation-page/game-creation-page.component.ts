@@ -75,6 +75,7 @@ export class GameCreationPageComponent implements OnInit {
                         if (target.id === 'upload-original') {
                             if (ogContext) ogContext.drawImage(img, 0, 0, 640, 480);
                             this.originalFile = target.files[0];
+                            console.log(this.originalFile);
                         } else if (target.id === 'upload-different') {
                             if (diffContext) diffContext.drawImage(img, 0, 0, 640, 480);
                             this.differentFile = target.files[0];
