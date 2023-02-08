@@ -66,13 +66,20 @@ describe('DifferenceDetectionService', () => {
 
     it('yo', () => {
         service.differenceArray = new Array(imageDimensionsService.getNumberOfPixels());
+        const image = new Jimp(640, 480, 'white', (err) => {
+            if (err) throw err;
+        });
         const isPixelSameColorStub = stub(service, 'isPixelSameColor').callsFake(() => false);
         const setPixelBlackStub = stub(service, 'setPixelBlack').callsFake(() => {});
         const getAdjacentPixelsStub = stub(pixelRadiusService, 'getAdjacentPixels').callsFake(() => [0, 1, 2]);
-        service.createDifferenceImage();
+        const imageWriteStub = stub(image, 'write').callsFake(() => {
+            return image;
+        });
+        service.createDifferenceImage(image);
         assert(isPixelSameColorStub.called);
         assert(setPixelBlackStub.called);
         assert(getAdjacentPixelsStub.called);
+        assert(imageWriteStub.called);
     });
 
     it('isPixelSameColor should return true if none of the 3 following rgb values differ from the 2 compared images', () => {

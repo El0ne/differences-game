@@ -30,13 +30,13 @@ export class DifferenceDetectionService {
         this.radius = radius;
         this.differenceArray = new Array(this.imageDimensionsService.getNumberOfPixels());
         this.differenceArray.fill(false);
-        this.createDifferenceImage();
-    }
-
-    createDifferenceImage(): void {
         const image = new Jimp(this.imageDimensionsService.getWidth(), this.imageDimensionsService.getHeight(), 'white', (err) => {
             if (err) throw err;
         });
+        this.createDifferenceImage(image);
+    }
+
+    createDifferenceImage(image: Jimp): void {
         image.scan(0, 0, image.bitmap.width, image.bitmap.height, (x, y, index) => {
             if (!this.isPixelSameColor(index)) {
                 for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(index / RGBA_DATA_LENGTH, this.radius)) {
