@@ -2,7 +2,7 @@ import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.serv
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class DifferencesDetectionService {
+export class DifferencesCounterService {
     constructor(private pixelRadiusService: PixelRadiusService) {}
 
     getDifferencesList(differencesArray: boolean[]): number[][] {
