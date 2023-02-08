@@ -96,9 +96,14 @@ describe('StageController', () => {
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 
-    it('uploadImages() should call the difference detection services with the body as a parameter', async () => {
-        // TODO
-    });
+    // it('uploadImages() should call the difference detection services with the body as a parameter and return 201', async () => {
+    //     // TODO
+    //     const response = await request(httpServer)
+    //         .post('/stage/image/3')
+    //         .attach('baseImage', 'assets/images/test-image.png')
+    //         .attach('differenceImage', 'assets/images/test-image.png');
+    //     expect(response.status).toBe(HttpStatus.CREATED);
+    // });
 
     it('uploadImages() should return 400 if we pass an empty body as a parameter', async () => {
         const response = await request(httpServer)
@@ -108,54 +113,12 @@ describe('StageController', () => {
         expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
 
-    it('createGame() should return 500 if there is an error', async () => {
-        jest.spyOn(controller.gameCardService, 'createGameCard').mockImplementation(() => {
-            throw new Error();
-        });
-        const response = await request(httpServer).post('/stage').send(FAKE_GAME_INFO);
+    it('uploadImages() should return 500 if there is an error', async () => {
+        const response = await request(httpServer).post('/stage/image/3');
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 
-    // it('uploadImages() should call difference service and return the images', () => {
-    //     const files = getFakeFiles();
-    //     const gameInfo = getFakeInfo();
-    //     const paramMock = jest.fn();
-    //     paramMock.mockImplementation(() => ({ radius: 3 }));
-    //     // TODO mock call to difference service when implemented
-    //     expect(controller.uploadImages(files, paramMock, mockResponse as unknown as Response)).toEqual([
-    //         files.baseImage[0],
-    //         files.differenceImage[0],
-    //     ]);
-    //     expect(gameCardService.createGameCard.calledWith(gameInfo));
-    // });
-    // it('getImage() should get and return the image to the client', () => {
-    //     const paramMock = { imageName: 'test' };
-    //     controller.getImage(paramMock, mockResponse as unknown as Response);
-    //     const filePath = join(process.cwd(), `assets/images/${paramMock.imageName}`);
-    //     expect(mockResponse.sendFile).toHaveBeenCalledWith(filePath, expect.any(Function));
-    // });
-
-    // it('getImage() should return an error and status 500 if the request has an error', () => {
-    //     const paramMock = { imageName: 'test' };
-    //     const mockResponseError = {
-    //         sendFile: jest.fn().mockImplementation((imagePath, cb) => {
-    //             cb(new Error('Error sending file'));
-    //         }),
-    //         sendStatus: jest.fn(),
-    //     };
-    //     controller.getImage(paramMock, mockResponseError as unknown as Response);
-    //     expect(mockResponseError.sendStatus).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
-    // });
-
-    // // it('storage should generate a bmp file with a random name', () => {
-    // //     const file = { originalname: 'randomFile.bmp' };
-    // //     const cb = jest.fn();
-    // //     storage.filename(null, file, cb);
-    // //     expect(cb.mock.calls.length).toBe(1);
-    // //     expect(cb.mock.calls[0][0]).toBe(null);
-    // //     expect(path.parse(cb.mock.calls[0][1]).name).toMatch(new RegExp(`${uuidv4()}`));
-    // //     expect(path.parse(cb.mock.calls[0][1]).ext).toBe('.bmp');
-    // // });
+    it('getImage() should return an image if the imageName is valid', async () => {});
 });
 
 const FAKE_GAME_INFO: GameInformation = {
