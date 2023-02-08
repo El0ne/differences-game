@@ -35,7 +35,7 @@ export class StageController {
     getNbOfStages(@Res() res: Response): void {
         try {
             const gameNumber: number = this.gameCardService.getGameCardsNumber();
-            res.status(HttpStatus.OK).send(`${gameNumber}`);
+            res.status(HttpStatus.OK).send(gameNumber.toString());
         } catch (err) {
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
         }
@@ -77,11 +77,11 @@ export class StageController {
 
     @Get('/image/:imageName')
     getImage(@Param() param, @Res() res: Response): void {
-        const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);
-        res.sendFile(imagePath, (err) => {
-            if (err) {
-                res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        });
+        try {
+            const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);
+            res.status(HttpStatus.OK).sendFile(imagePath);
+        } catch (err) {
+            res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

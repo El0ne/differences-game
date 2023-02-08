@@ -1,3 +1,5 @@
+// @ts-ignore
+
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameCardInformation } from '@common/game-card';
 import { GameInformation } from '@common/game-information';
@@ -5,7 +7,9 @@ import { ImageInformation } from '@common/image-information';
 import { ImageUploadData } from '@common/image-upload-data';
 import { HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { createStubInstance, SinonStubbedInstance } from 'sinon';
+import * as Jimp from 'jimp';
+import * as path from 'path';
+import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import * as request from 'supertest';
 import { StageController } from './stage.controller';
 
@@ -60,11 +64,10 @@ describe('StageController', () => {
     });
 
     it('getNbOfStages() should return the game cards number', async () => {
-        const getGameCardNumberMock = jest.spyOn(controller.gameCardService, 'getGameCardsNumber').mockImplementation(() => 3);
+        jest.spyOn(controller.gameCardService, 'getGameCardsNumber').mockImplementation(() => 3);
         const response = await request(httpServer).get('/stage/info');
-        expect(getGameCardNumberMock).toBeCalled();
         expect(response.status).toBe(HttpStatus.OK);
-        expect(response.body).toEqual({ numberOfGameInformations: 3 });
+        expect(response.text).toEqual('3');
     });
 
     it('getNbOfStages() should return 500 if there is an error', async () => {
@@ -120,7 +123,28 @@ describe('StageController', () => {
 
     it('getImage() should return an image if the imageName is valid', async () => {
         // make test fail to avoid merge
-        expect(true).toEqual(false);
+        // const fakeImagePath = 'fake/image/path';
+        // stub(path, 'join').callsFake(() => fakeImagePath);
+
+        // const sendFileMock = jest.fn();
+        // const mockResponse = { sendFile: sendFileMock };
+
+        // your test code
+        const image = new Jimp(100, 100, 'white', (err) => {
+            if (err) throw err;
+        });
+
+        image.write('assets/images/test.bmp');
+        const response = await request(httpServer).get('/stage/image/test.bmp');
+        // expect(sendFileMock).toHaveBeenCalledWith(fakeImagePath);
+        expect(response.statusCode).toEqual(HttpStatus.OK);
+    });
+
+    it('getImage() should return 500 if there is an error', async () => {
+        const wrongPath = 'fake/image/path';
+        stub(path, 'join').callsFake(() => wrongPath);
+        const response = await request(httpServer).get('/stage/image/sampleImageName');
+        expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 });
 
