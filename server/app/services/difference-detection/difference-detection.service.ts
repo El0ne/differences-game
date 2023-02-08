@@ -3,8 +3,9 @@ import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.serv
 import { Injectable } from '@nestjs/common';
 import * as Jimp from 'jimp';
 
-const RGBA_DATA_LENGTH = 4;
+export const RGBA_DATA_LENGTH = 4;
 const RGB_DATA_LENGTH = 3;
+export const BLACK = 0x00;
 
 @Injectable()
 export class DifferenceDetectionService {
@@ -49,7 +50,7 @@ export class DifferenceDetectionService {
 
     setPixelBlack(image: Jimp, pixelIndex: number): void {
         for (let i = 0; i < RGB_DATA_LENGTH; i++) {
-            image.bitmap.data[pixelIndex + i] = 0x00;
+            image.bitmap.data[pixelIndex + i] = BLACK;
         }
     }
 
