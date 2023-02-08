@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-empty-function */
+import { DifferencesCounterService } from '@app/services/differences-detection/differences-counter.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
@@ -13,18 +14,20 @@ describe('DifferenceDetectionService', () => {
     let service: DifferenceDetectionService;
     let imageDimensionsService: ImageDimensionsService;
     let pixelRadiusService: PixelRadiusService;
+    let differencesCounterService: DifferencesCounterService;
 
     const TEST_IMAGE_1 = 'app/services/difference-detection/test-image1.bmp';
     const TEST_IMAGE_2 = 'app/services/difference-detection/test-image2.bmp';
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [DifferenceDetectionService, PixelRadiusService, PixelPositionService, ImageDimensionsService],
+            providers: [DifferenceDetectionService, PixelRadiusService, PixelPositionService, ImageDimensionsService, DifferencesCounterService],
         }).compile();
 
         service = module.get<DifferenceDetectionService>(DifferenceDetectionService);
         imageDimensionsService = module.get<ImageDimensionsService>(ImageDimensionsService);
         pixelRadiusService = module.get<PixelRadiusService>(PixelRadiusService);
+        differencesCounterService = module.get<DifferencesCounterService>(DifferencesCounterService);
 
         stub(imageDimensionsService, 'getWidth').returns(640);
         stub(imageDimensionsService, 'getHeight').returns(480);
@@ -41,14 +44,14 @@ describe('DifferenceDetectionService', () => {
 
     it('compareImages() should set differenceArray to the same length as firstImageArray (and secondImageArray)', async () => {
         stub(service, 'createArray').callsFake(async () => Promise.resolve([1, 2, 3]));
-        stub(service, 'createDifferenceImage').callsFake(() => {});
+        stub(service, 'createDifferenceImage').callsFake(() => []);
         await service.compareImages(TEST_IMAGE_1, TEST_IMAGE_2, 1);
         expect(service.differenceArray.length).toEqual(imageDimensionsService.getNumberOfPixels());
     });
 
     it('compareImages() should call createArray twice and createDifferenceImage', async () => {
         const createArrayStub = stub(service, 'createArray').callsFake(async () => Promise.resolve([1, 2, 3]));
-        const createDifferenceImageStub = stub(service, 'createDifferenceImage').callsFake(() => {});
+        const createDifferenceImageStub = stub(service, 'createDifferenceImage').callsFake(() => []);
         await service.compareImages(TEST_IMAGE_1, TEST_IMAGE_2, 1);
         assert(createArrayStub.calledTwice);
         assert(createDifferenceImageStub.calledOnce);
@@ -64,7 +67,7 @@ describe('DifferenceDetectionService', () => {
     //     expect(setPixelWhiteSpy).toBeCalledTimes(3);
     // });
 
-    it('yo', () => {
+    it('createDifferenceImage should return ', () => {
         service.differenceArray = new Array(imageDimensionsService.getNumberOfPixels());
         const image = new Jimp(640, 480, 'white', (err) => {
             if (err) throw err;
@@ -75,11 +78,13 @@ describe('DifferenceDetectionService', () => {
         const imageWriteStub = stub(image, 'write').callsFake(() => {
             return image;
         });
+        const differencesCounterStub = stub(differencesCounterService, 'getDifferencesList').callsFake(() => []);
         service.createDifferenceImage(image);
         assert(isPixelSameColorStub.called);
         assert(setPixelBlackStub.called);
         assert(getAdjacentPixelsStub.called);
         assert(imageWriteStub.called);
+        assert(differencesCounterStub.called);
     });
 
     it('isPixelSameColor should return true if none of the 3 following rgb values differ from the 2 compared images', () => {

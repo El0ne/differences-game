@@ -2,6 +2,7 @@ import { ImageDimensionsService } from '@app/services/image-dimensions/image-dim
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { Injectable } from '@nestjs/common';
 import * as Jimp from 'jimp';
+import { DifferencesCounterService } from '../differences-detection/differences-counter.service';
 
 export const RGBA_DATA_LENGTH = 4;
 const RGB_DATA_LENGTH = 3;
@@ -15,7 +16,11 @@ export class DifferenceDetectionService {
 
     differenceArray: boolean[];
 
-    constructor(private pixelRadiusService: PixelRadiusService, private imageDimensionsService: ImageDimensionsService) {}
+    constructor(
+        private pixelRadiusService: PixelRadiusService,
+        private imageDimensionsService: ImageDimensionsService,
+        private differencesCounterService: DifferencesCounterService,
+    ) {}
 
     async createArray(image: string): Promise<number[]> {
         const numArray: number[] = [];
@@ -24,7 +29,7 @@ export class DifferenceDetectionService {
         return numArray;
     }
 
-    async compareImages(pathToImage1: string, pathToImage2: string, radius: number): Promise<void> {
+    async compareImages(pathToImage1: string, pathToImage2: string, radius: number): Promise<number[][]> {
         this.firstImageArray = await this.createArray(pathToImage1);
         this.secondImageArray = await this.createArray(pathToImage2);
         this.radius = radius;
@@ -33,10 +38,10 @@ export class DifferenceDetectionService {
         const image = new Jimp(this.imageDimensionsService.getWidth(), this.imageDimensionsService.getHeight(), 'white', (err) => {
             if (err) throw err;
         });
-        this.createDifferenceImage(image);
+        return this.createDifferenceImage(image);
     }
 
-    createDifferenceImage(image: Jimp): void {
+    createDifferenceImage(image: Jimp): number[][] {
         image.scan(0, 0, image.bitmap.width, image.bitmap.height, (x, y, index) => {
             if (!this.isPixelSameColor(index)) {
                 for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(index / RGBA_DATA_LENGTH, this.radius)) {
@@ -46,6 +51,10 @@ export class DifferenceDetectionService {
             }
         });
         image.write('assets/images/difference-image.bmp');
+
+        const yo = this.differencesCounterService.getDifferencesList(this.differenceArray);
+        console.log(yo.length);
+        return yo;
     }
 
     setPixelBlack(image: Jimp, pixelIndex: number): void {
