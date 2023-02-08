@@ -118,7 +118,10 @@ describe('StageController', () => {
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 
-    it('getImage() should return an image if the imageName is valid', async () => {});
+    it('getImage() should return an image if the imageName is valid', async () => {
+        // make test fail to avoid merge
+        expect(true).toEqual(false);
+    });
 });
 
 const FAKE_GAME_INFO: GameInformation = {
