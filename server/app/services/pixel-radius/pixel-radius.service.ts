@@ -6,7 +6,7 @@ import { Injectable } from '@nestjs/common';
 export class PixelRadiusService {
     constructor(private pixelPositionService: PixelPositionService, private imageDimensionsService: ImageDimensionsService) {}
 
-    getAdjacentPixels(pixelLocation: number, radius: number): number[] {
+    getAdjacentPixels(pixelLocation: number, radius: number, roundRadius: boolean): number[] {
         const pixelCoordinateX = this.pixelPositionService.getXCoordinate(pixelLocation);
         const pixelCoordinateY = this.pixelPositionService.getYCoordinate(pixelLocation);
         const adjacentPixels: number[] = [];
@@ -18,7 +18,11 @@ export class PixelRadiusService {
 
         for (let i = upExtremity; i <= downExtremity; i++) {
             for (let j = leftExtremity; j <= rightExtremity; j++) {
-                if (Math.pow(j - pixelCoordinateX, 2) + Math.pow(i - pixelCoordinateY, 2) <= Math.pow(radius, 2)) {
+                if (roundRadius) {
+                    if (Math.pow(j - pixelCoordinateX, 2) + Math.pow(i - pixelCoordinateY, 2) <= Math.pow(radius, 2)) {
+                        adjacentPixels.push(i * this.imageDimensionsService.getWidth() + j);
+                    }
+                } else {
                     adjacentPixels.push(i * this.imageDimensionsService.getWidth() + j);
                 }
             }
