@@ -35,9 +35,7 @@ export class StageController {
     getNbOfStages(@Res() res: Response): void {
         try {
             const gameNumber: number = this.gameCardService.getGameCardsNumber();
-            // TODO send string of gameNumber cuz number was throwing an error.
-            // Replace with { numberOfGameInformations: gameNumber } when sync with game - selection
-            res.status(HttpStatus.OK).send({ numberOfGameInformations: gameNumber });
+            res.status(HttpStatus.OK).send(`${gameNumber}`);
         } catch (err) {
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
         }
