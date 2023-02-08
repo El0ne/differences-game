@@ -1,4 +1,5 @@
 import { GameCardService } from '@app/services/game-card/game-card.service';
+import { ImageUploadData } from '@common/image-upload-data';
 import { Body, Controller, Get, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
@@ -19,13 +20,12 @@ export const storage = diskStorage({
 
 @Controller('stage')
 export class StageController {
-    constructor(private gameCardService: GameCardService) {}
+    constructor(public gameCardService: GameCardService) {}
     @Get('/')
     getStages(@Query('index') index: number, @Query('endIndex') endIndex: number, @Res() res: Response): void {
         try {
             const stages = this.gameCardService.getGameCards(index, endIndex);
-            if (stages) res.status(HttpStatus.OK).send(stages);
-            else res.status(HttpStatus.NOT_FOUND).send({});
+            res.status(HttpStatus.OK).send(stages);
         } catch (err) {
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
         }
@@ -34,10 +34,10 @@ export class StageController {
     @Get('/info')
     getNbOfStages(@Res() res: Response): void {
         try {
-            const gameNumber = this.gameCardService.getGameCardsNumber();
+            const gameNumber: number = this.gameCardService.getGameCardsNumber();
             // TODO send string of gameNumber cuz number was throwing an error.
             // Replace with { numberOfGameInformations: gameNumber } when sync with game - selection
-            res.status(HttpStatus.OK).send(`${gameNumber}`);
+            res.status(HttpStatus.OK).send({ numberOfGameInformations: gameNumber });
         } catch (err) {
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
         }
@@ -65,10 +65,16 @@ export class StageController {
             { storage },
         ),
     )
-    uploadImages(@UploadedFiles() files, @Param() param, @Res() res: Response): void {
+    uploadImages(@UploadedFiles() files: ImageUploadData, @Param() param, @Res() res: Response): void {
         // TODO ajouter appel au service qui va générer les images de différences
-        const data = [files.baseImage[0], files.differenceImage[0]];
-        res.status(HttpStatus.CREATED).send(data);
+        try {
+            if (Object.keys(files).length) {
+                const data = [files.baseImage[0], files.differenceImage[0]];
+                res.status(HttpStatus.CREATED).send(data);
+            } else res.sendStatus(HttpStatus.BAD_REQUEST);
+        } catch (err) {
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
+        }
     }
 
     @Get('/image/:imageName')
