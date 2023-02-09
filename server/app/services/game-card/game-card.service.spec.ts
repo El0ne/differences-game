@@ -22,6 +22,10 @@ describe('GameCardService', () => {
         expect(service).toBeDefined();
     });
 
+    it('make test fail to test pipelines', () => {
+        expect(true).toEqual(false);
+    });
+
     it('getGameCards should return all gameCards informations between both indexes', async () => {
         const startIndex = 2;
         const endIndex = 6;
