@@ -57,16 +57,6 @@ describe('DifferenceDetectionService', () => {
         assert(createDifferenceImageStub.calledOnce);
     });
 
-    // TODO Don't know how to test it
-    // it('createDifferenceImage should set pixels to white and or to black according to the differenceArray bool values', () => {
-    //     service.differenceArray = [true, true, true, false];
-    //     service.createDifferenceImage();
-    //     const setPixelWhiteSpy = jest.spyOn(service, 'setPixelWhite').mockImplementation();
-    //     const setPixelBlackSpy = jest.spyOn(service, 'setPixelBlack').mockImplementation();
-    //     expect(setPixelBlackSpy).toBeCalledTimes(1);
-    //     expect(setPixelWhiteSpy).toBeCalledTimes(3);
-    // });
-
     it('createDifferenceImage should return ', () => {
         service.differenceArray = new Array(imageDimensionsService.getNumberOfPixels());
         const image = new Jimp(640, 480, 'white', (err) => {

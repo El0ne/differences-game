@@ -53,7 +53,6 @@ export class DifferenceDetectionService {
         image.write('assets/images/difference-image.bmp');
 
         const yo = this.differencesCounterService.getDifferencesList(this.differenceArray);
-        console.log(yo.length);
         return yo;
     }
 

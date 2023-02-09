@@ -2,7 +2,6 @@ import { AppModule } from '@app/app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ExampleController } from './controllers/example/example.controller';
 import { DifferenceDetectionService } from './services/difference-detection/difference-detection.service';
 import { DifferencesCounterService } from './services/differences-detection/differences-counter.service';
 import { ImageDimensionsService } from './services/image-dimensions/image-dimensions.service';
@@ -29,6 +28,8 @@ const bootstrap = async () => {
 const imageService = new ImageDimensionsService();
 const pixelRadiusService = new PixelRadiusService(new PixelPositionService(imageService), imageService);
 const service = new DifferenceDetectionService(pixelRadiusService, new ImageDimensionsService(), new DifferencesCounterService(pixelRadiusService));
-const controller = new ExampleController(service);
-controller.exampleInfo();
+const i: number = performance.now();
+service.compareImages('assets/images/image_12_diff.bmp', 'assets/images/image_empty.bmp', 5);
+const j: number = performance.now();
+console.log(j - i);
 // bootstrap();
