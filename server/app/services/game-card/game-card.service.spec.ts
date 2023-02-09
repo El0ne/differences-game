@@ -1,6 +1,11 @@
 import { gameCardsInformations } from '@app/dataBase/game-cards-informations.json';
+import { GameCardInformation } from '@common/game-card';
+import { GameInformation } from '@common/game-information';
 import { Test, TestingModule } from '@nestjs/testing';
+import * as path from 'path';
+import { stub } from 'sinon';
 import { GameCardService } from './game-card.service';
+
 describe('GameCardService', () => {
     let service: GameCardService;
 
@@ -10,6 +15,7 @@ describe('GameCardService', () => {
         }).compile();
 
         service = module.get<GameCardService>(GameCardService);
+        service.jsonPath = path.join(__dirname, '/game-cards-test.json');
     });
 
     it('should be defined', () => {
@@ -27,4 +33,38 @@ describe('GameCardService', () => {
         const gameCardsNumber = service.getGameCardsNumber();
         expect(gameCardsNumber).toEqual(gameCardsInformations.length);
     });
+
+    it('createGameCard should add a game card to the list of game cards', () => {
+        stub(service, 'generateGameCard').callsFake(() => FAKE_GAME_CARD);
+        service.createGameCard(FAKE_GAME_INFO);
+        const allGameCards = service.getAllGameCards();
+        expect(allGameCards).toContainEqual(FAKE_GAME_CARD);
+    });
+
+    it('generateGameCard should create a game card from a game informations', () => {
+        expect(service.createGameCard(FAKE_GAME_INFO)).toEqual(FAKE_GAME_CARD);
+    });
 });
+
+const FAKE_GAME_INFO: GameInformation = {
+    name: 'game.name',
+    baseImage: 'game.baseImage',
+    differenceImage: 'game.differenceImage',
+    radius: 3,
+};
+const FAKE_GAME_CARD: GameCardInformation = {
+    name: 'game.name',
+    difficulty: 'Facile',
+    originalImage: 'game.baseImage',
+    differenceImage: 'game.differenceImage',
+    soloTimes: [
+        { time: 0, name: '--' },
+        { time: 0, name: '--' },
+        { time: 0, name: '--' },
+    ],
+    multiTimes: [
+        { time: 0, name: '--' },
+        { time: 0, name: '--' },
+        { time: 0, name: '--' },
+    ],
+};
