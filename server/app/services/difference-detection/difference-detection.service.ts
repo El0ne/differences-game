@@ -2,7 +2,7 @@ import { ImageDimensionsService } from '@app/services/image-dimensions/image-dim
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { Injectable } from '@nestjs/common';
 import * as Jimp from 'jimp';
-import { DifferencesCounterService } from '../differences-detection/differences-counter.service';
+import { DifferencesCounterService } from '../differences-counter/differences-counter.service';
 
 export const RGBA_DATA_LENGTH = 4;
 const RGB_DATA_LENGTH = 3;

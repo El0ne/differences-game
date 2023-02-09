@@ -3,7 +3,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { DifferenceDetectionService } from './services/difference-detection/difference-detection.service';
-import { DifferencesCounterService } from './services/differences-detection/differences-counter.service';
+import { DifferencesCounterService } from './services/differences-counter/differences-counter.service';
 import { ImageDimensionsService } from './services/image-dimensions/image-dimensions.service';
 import { PixelPositionService } from './services/pixel-position/pixel-position/pixel-position.service';
 import { PixelRadiusService } from './services/pixel-radius/pixel-radius.service';
