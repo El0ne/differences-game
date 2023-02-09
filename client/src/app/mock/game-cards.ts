@@ -2,7 +2,8 @@ const GAME1 = {
     name: 'Library',
     difficulty: 'Difficile',
     // TODO: modifie pour image qui vient du serveur
-    image: '/assets/444-640x480.jpg',
+    originalImageName: '/assets/444-640x480.jpg',
+    differenceImageName: '/assets/444-640x480.jpg',
     soloTimes: [
         { time: 60, name: 'Inull' },
         { time: 90, name: 'second' },
@@ -19,7 +20,8 @@ const GAME2 = {
     name: 'game2',
     difficulty: 'Difficile',
     // TODO: modifie pour image qui vient du serveur
-    image: '/assets/444-640x480.jpg',
+    originalImageName: '/assets/444-640x480.jpg',
+    differenceImageName: '/assets/444-640x480.jpg',
     soloTimes: [
         { time: 60, name: 'Inull' },
         { time: 90, name: 'second' },
