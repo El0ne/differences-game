@@ -10,7 +10,7 @@ const routes: Routes = [
     { path: 'stage-selection', component: GameSelectionComponent },
     { path: 'config', component: GameSelectionComponent },
     { path: 'soloView', component: SoloViewComponent },
-    // { path: '**', redirectTo: '/home' },
+    { path: '**', redirectTo: '/home' },
 ];
 
 @NgModule({
