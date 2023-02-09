@@ -18,32 +18,16 @@ describe('StageController', () => {
     let controller: StageController;
     let getGameCardStub;
     let getGameCardsNumberStub;
-    // let gameCardService: GameCardService;
-    // const mockResponse = {
-    //     sendFile: jest.fn().mockImplementation((imagePath, cb) => {
-    //         cb(null);
-    //     }),
-    //     sendStatus: jest.fn(),
-    //     send: jest.fn(),
-    //     status: jest.fn(),
-    // };
 
     beforeAll(async () => {
-        // gameCardService = createStubInstance(GameCardService);
         const module: TestingModule = await Test.createTestingModule({
             controllers: [StageController],
-            providers: [
-                // {
-                GameCardService,
-                // useValue: gameCardService,
-                // },
-            ],
+            providers: [GameCardService],
         }).compile();
         const app = module.createNestApplication();
         await app.init();
         httpServer = app.getHttpServer();
         controller = module.get<StageController>(StageController);
-        // const gameCardService = module.get<GameCardService>(GameCardService);
     });
 
     beforeEach(() => {
@@ -116,15 +100,6 @@ describe('StageController', () => {
         expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
 
-    // it('uploadImages() should call the difference detection services with the body as a parameter and return 201', async () => {
-    //     // TODO
-    //     const response = await request(httpServer)
-    //         .post('/stage/image/3')
-    //         .attach('baseImage', 'assets/images/test-image.png')
-    //         .attach('differenceImage', 'assets/images/test-image.png');
-    //     expect(response.status).toBe(HttpStatus.CREATED);
-    // });
-
     it('uploadImages() should return 400 if we pass an empty body as a parameter', async () => {
         const response = await request(httpServer)
             .post('/stage/image/3')
@@ -139,21 +114,12 @@ describe('StageController', () => {
     });
 
     it('getImage() should return an image if the imageName is valid', async () => {
-        // make test fail to avoid merge
-        // const fakeImagePath = 'fake/image/path';
-        // stub(path, 'join').callsFake(() => fakeImagePath);
-
-        // const sendFileMock = jest.fn();
-        // const mockResponse = { sendFile: sendFileMock };
-
-        // your test code
         const image = new Jimp(1, 1, 'white', (err) => {
             if (err) throw err;
         });
 
         image.write('assets/images/test.bmp');
         const response = await request(httpServer).get('/stage/image/test.bmp');
-        // expect(sendFileMock).toHaveBeenCalledWith(fakeImagePath);
         expect(response.statusCode).toEqual(HttpStatus.OK);
     });
 
