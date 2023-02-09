@@ -6,10 +6,10 @@ import { GameInformation } from '@common/game-information';
 import { HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { assert } from 'console';
+import * as fs from 'fs';
 import * as Jimp from 'jimp';
 import * as path from 'path';
 import { stub } from 'sinon';
-
 import * as request from 'supertest';
 import { StageController } from './stage.controller';
 
@@ -121,6 +121,9 @@ describe('StageController', () => {
         image.write('assets/images/test.bmp');
         const response = await request(httpServer).get('/stage/image/test.bmp');
         expect(response.statusCode).toEqual(HttpStatus.OK);
+        fs.unlink('assets/images/test.bmp', (err) => {
+            if (err) throw err;
+        });
     });
 
     it('getImage() should return 500 if there is an error', async () => {
