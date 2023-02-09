@@ -1,19 +1,20 @@
+import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { Injectable } from '@nestjs/common';
 import * as Jimp from 'jimp';
-import { DifferencesCounterService } from '../differences-counter/differences-counter.service';
 
 export const RGBA_DATA_LENGTH = 4;
 const RGB_DATA_LENGTH = 3;
 export const BLACK = 0x00;
+const WHITE = 'white';
+const DIFFERENCE_IMAGE_PATH = 'assets/images/difference-image.bmp';
 
 @Injectable()
 export class DifferenceDetectionService {
     firstImageArray: number[];
     secondImageArray: number[];
     radius: number;
-
     differenceArray: boolean[];
 
     constructor(
@@ -35,9 +36,7 @@ export class DifferenceDetectionService {
         this.radius = radius;
         this.differenceArray = new Array(this.imageDimensionsService.getNumberOfPixels());
         this.differenceArray.fill(false);
-        const image = new Jimp(this.imageDimensionsService.getWidth(), this.imageDimensionsService.getHeight(), 'white', (err) => {
-            if (err) throw err;
-        });
+        const image = new Jimp(this.imageDimensionsService.getWidth(), this.imageDimensionsService.getHeight(), WHITE);
         return this.createDifferenceImage(image);
     }
 
@@ -50,10 +49,8 @@ export class DifferenceDetectionService {
                 }
             }
         });
-        image.write('assets/images/difference-image.bmp');
-
-        const yo = this.differencesCounterService.getDifferencesList(this.differenceArray);
-        return yo;
+        image.write(DIFFERENCE_IMAGE_PATH);
+        return this.differencesCounterService.getDifferencesList(this.differenceArray);
     }
 
     setPixelBlack(image: Jimp, pixelIndex: number): void {
