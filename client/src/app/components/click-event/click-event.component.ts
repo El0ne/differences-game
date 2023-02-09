@@ -77,7 +77,7 @@ export class ClickEventComponent implements OnInit {
     // TODO : Add effect, color the same thing on the other canvas and make sure the difference is deleted from the list so you can't click it twice
     differenceEffect() {
         const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-        this.emitSound();
+        this.emitSound(false);
         this.constructEffect(originalContext);
         const flashIntro = setInterval(() => {
             this.destroyEffect(originalContext);
@@ -126,14 +126,17 @@ export class ClickEventComponent implements OnInit {
         return false;
     }
 
-    emitSound(): void {
-        const sound = new Audio('/assets/ding.mp3');
+    emitSound(error: boolean): void {
+        const sound = new Audio();
+        if (!error) sound.src = '/assets/ding.mp3';
+        else sound.src = '/assets/Error.mp3';
         sound.play();
     }
 
     displayError(e: MouseEvent): void {
         if (!this.timeout) {
             if (!this.isDifferent(e)) {
+                this.emitSound(true);
                 this.timeout = true;
                 const rect = this.modification.nativeElement.getBoundingClientRect();
                 const x = Math.floor(e.clientX - rect.left);
@@ -144,6 +147,7 @@ export class ClickEventComponent implements OnInit {
                 context.textAlign = 'center';
                 const error = 'Error';
                 context.fillText(error, x, y);
+
                 setTimeout(() => {
                     context.clearRect(0, 0, WIDTH, HEIGHT);
                     this.timeout = false;

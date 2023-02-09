@@ -66,8 +66,18 @@ describe('ClickEventComponent', () => {
 
     it('emit sound should call play', () => {
         spyOn(HTMLMediaElement.prototype, 'play');
-        component.emitSound();
+        component.emitSound(true);
         expect(HTMLMediaElement.prototype.play).toHaveBeenCalled();
+    });
+
+    it('emitSound() source should be different depending on input', () => {
+        const sound = new Audio();
+        spyOn(sound, 'play');
+        spyOn(window, 'Audio').and.returnValue(sound);
+        component.emitSound(false);
+        expect(sound.src.endsWith('/assets/ding.mp3')).toBeTrue();
+        component.emitSound(true);
+        expect(sound.src.endsWith('/assets/Error.mp3')).toBeTrue();
     });
 
     it('canvas should be rendered on init with draw image', fakeAsync(() => {
