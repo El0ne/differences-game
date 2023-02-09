@@ -1,10 +1,10 @@
-import { gameCardsInformations } from '@app/dataBase/game-cards-informations.json';
 import { GameCardInformation } from '@common/game-card';
 import { GameInformation } from '@common/game-information';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as path from 'path';
 import { stub } from 'sinon';
 import { GameCardService } from './game-card.service';
+import { gameCardsInformations } from './game-cards-test.json';
 
 describe('GameCardService', () => {
     let service: GameCardService;
@@ -23,8 +23,8 @@ describe('GameCardService', () => {
     });
 
     it('getGameCards should return all gameCards informations between both indexes', async () => {
-        const startIndex = 2;
-        const endIndex = 6;
+        const startIndex = 0;
+        const endIndex = 1;
         const gameCards = service.getGameCards(startIndex, endIndex);
         expect(gameCards).toEqual(gameCardsInformations.slice(startIndex, endIndex));
     });
