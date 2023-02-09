@@ -55,8 +55,8 @@ const FAKE_GAME_INFO: GameInformation = {
 const FAKE_GAME_CARD: GameCardInformation = {
     name: 'game.name',
     difficulty: 'Facile',
-    originalImage: 'game.baseImage',
-    differenceImage: 'game.differenceImage',
+    originalImageName: 'game.baseImage',
+    differenceImageName: 'game.differenceImage',
     soloTimes: [
         { time: 0, name: '--' },
         { time: 0, name: '--' },
