@@ -21,6 +21,8 @@ export class GameCardInformationService {
     }
 
     createGame(gameInfo: GameInformation): Observable<GameCardInformation> {
+        // content-type was causing a linting error otherwise
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         const headers = { 'content-type': 'application/json' };
         const body = JSON.stringify(gameInfo);
         return this.http.post<GameCardInformation>(STAGE, body, { headers });
