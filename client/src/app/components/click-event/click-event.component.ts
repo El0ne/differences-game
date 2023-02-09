@@ -74,7 +74,6 @@ export class ClickEventComponent implements OnInit {
         }
     }
 
-    // TODO : Add effect, color the same thing on the other canvas and make sure the difference is deleted from the list so you can't click it twice
     differenceEffect() {
         const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.emitSound(false);
@@ -118,7 +117,6 @@ export class ClickEventComponent implements OnInit {
                     } else if (remove) {
                         const index = this.differenceArray.indexOf(difference);
                         this.differenceArray.splice(index, 1);
-                        return true;
                     }
                 }
             }

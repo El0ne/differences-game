@@ -12,17 +12,29 @@ export class SoloViewComponent {
 
     showErrorMessage: boolean = false;
     showTextBox: boolean = false;
+    showWinMessage: boolean = false;
+    showNavBar: boolean = true;
     messages: string[] = [];
     messageContent: string = '';
     differenceArray: number[][];
     currentScore: number = 0;
+    numberOfErrors: number;
 
     constructor() {
         this.differenceArray = MOCK_ARRAY;
+        this.numberOfErrors = this.differenceArray.length;
+    }
+
+    finishGame() {
+        this.showWinMessage = true;
+        this.showNavBar = false;
     }
 
     incrementScore() {
         this.currentScore += 1;
+        if (this.numberOfErrors === this.currentScore) {
+            this.finishGame();
+        }
     }
 
     toggleInfoCard() {
