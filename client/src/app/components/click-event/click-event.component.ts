@@ -117,6 +117,7 @@ export class ClickEventComponent implements OnInit {
                     } else if (remove) {
                         const index = this.differenceArray.indexOf(difference);
                         this.differenceArray.splice(index, 1);
+                        return true;
                     }
                 }
             }
