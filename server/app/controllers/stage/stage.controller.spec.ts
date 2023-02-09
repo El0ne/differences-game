@@ -144,8 +144,8 @@ const FAKE_GAME_INFO: GameInformation = {
 const FAKE_GAME_CARD: GameCardInformation = {
     name: 'Library',
     difficulty: 'Difficile',
-    originalImage: '/assets/444-640x480.jpg',
-    differenceImage: '/assets/444-640x480.jpg',
+    originalImageName: '/assets/444-640x480.jpg',
+    differenceImageName: '/assets/444-640x480.jpg',
     soloTimes: [
         { time: 60, name: 're' },
         { time: 90, name: 'second' },
