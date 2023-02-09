@@ -1,6 +1,7 @@
 import { GameCardInformation } from '@common/game-card';
 import { GameInformation } from '@common/game-information';
-import { Test, TestingModule } from '@nestjs/testing';
+import { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing/test';
 import * as path from 'path';
 import { stub } from 'sinon';
 import { GameCardService } from './game-card.service';
