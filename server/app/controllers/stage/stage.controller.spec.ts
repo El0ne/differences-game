@@ -3,20 +3,22 @@
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameCardInformation } from '@common/game-card';
 import { GameInformation } from '@common/game-information';
-import { ImageInformation } from '@common/image-information';
-import { ImageUploadData } from '@common/image-upload-data';
 import { HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { assert } from 'console';
 import * as Jimp from 'jimp';
 import * as path from 'path';
-import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
+import { stub } from 'sinon';
+
 import * as request from 'supertest';
 import { StageController } from './stage.controller';
 
 describe('StageController', () => {
     let httpServer: unknown;
     let controller: StageController;
-    let gameCardService: SinonStubbedInstance<GameCardService>;
+    let getGameCardStub;
+    let getGameCardsNumberStub;
+    // let gameCardService: GameCardService;
     // const mockResponse = {
     //     sendFile: jest.fn().mockImplementation((imagePath, cb) => {
     //         cb(null);
@@ -27,20 +29,31 @@ describe('StageController', () => {
     // };
 
     beforeAll(async () => {
-        gameCardService = createStubInstance(GameCardService);
+        // gameCardService = createStubInstance(GameCardService);
         const module: TestingModule = await Test.createTestingModule({
             controllers: [StageController],
             providers: [
-                {
-                    provide: GameCardService,
-                    useValue: gameCardService,
-                },
+                // {
+                GameCardService,
+                // useValue: gameCardService,
+                // },
             ],
         }).compile();
         const app = module.createNestApplication();
         await app.init();
         httpServer = app.getHttpServer();
         controller = module.get<StageController>(StageController);
+        // const gameCardService = module.get<GameCardService>(GameCardService);
+    });
+
+    beforeEach(() => {
+        getGameCardStub = stub(controller.gameCardService, 'getGameCards');
+        getGameCardsNumberStub = stub(controller.gameCardService, 'getGameCardsNumber');
+    });
+
+    afterEach(() => {
+        getGameCardStub.restore();
+        getGameCardsNumberStub.restore();
     });
 
     it('should be defined', () => {
@@ -48,15 +61,17 @@ describe('StageController', () => {
     });
 
     it('getStages() should return game cards if there are at least one', async () => {
-        const getGameCardMock = jest.spyOn(controller.gameCardService, 'getGameCards').mockImplementation(() => FAKE_GAME_CARD_ARRAY);
+        getGameCardStub.callsFake(() => {
+            return FAKE_GAME_CARD_ARRAY;
+        });
         const response = await request(httpServer).get('/stage');
-        expect(getGameCardMock).toBeCalled();
+        assert(getGameCardStub.called);
         expect(response.status).toBe(HttpStatus.OK);
         expect(response.body).toEqual(FAKE_GAME_CARD_ARRAY);
     });
 
     it('getStages() should return 500 if there is an error', async () => {
-        jest.spyOn(controller.gameCardService, 'getGameCards').mockImplementation(() => {
+        getGameCardStub.callsFake(() => {
             throw new Error();
         });
         const response = await request(httpServer).get('/stage');
@@ -64,14 +79,14 @@ describe('StageController', () => {
     });
 
     it('getNbOfStages() should return the game cards number', async () => {
-        jest.spyOn(controller.gameCardService, 'getGameCardsNumber').mockImplementation(() => 3);
+        getGameCardsNumberStub.callsFake(() => 3);
         const response = await request(httpServer).get('/stage/info');
         expect(response.status).toBe(HttpStatus.OK);
         expect(response.text).toEqual('3');
     });
 
     it('getNbOfStages() should return 500 if there is an error', async () => {
-        jest.spyOn(controller.gameCardService, 'getGameCardsNumber').mockImplementation(() => {
+        getGameCardsNumberStub.callsFake(() => {
             throw new Error();
         });
         const response = await request(httpServer).get('/stage/info');
@@ -79,24 +94,26 @@ describe('StageController', () => {
     });
 
     it('createGame() should call GameCardService.createGameCard() with the body as a parameter', async () => {
-        const createGameCardMock = jest.spyOn(controller.gameCardService, 'createGameCard').mockImplementation(() => FAKE_GAME_CARD_ARRAY[0]);
+        const createGameCardStub = stub(controller.gameCardService, 'createGameCard').callsFake(() => FAKE_GAME_CARD_ARRAY[0]);
         const response = await request(httpServer).post('/stage').send(FAKE_GAME_INFO);
-        expect(createGameCardMock).toBeCalled();
+        assert(createGameCardStub.called);
         expect(response.status).toBe(HttpStatus.CREATED);
         expect(response.body).toEqual(FAKE_GAME_CARD);
+        createGameCardStub.restore();
+    });
+
+    it('createGame() should return 500 if there is an error', async () => {
+        const createGameCardStub = stub(controller.gameCardService, 'createGameCard').callsFake(() => {
+            throw new Error();
+        });
+        const response = await request(httpServer).post('/stage').send(FAKE_GAME_INFO);
+        expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+        createGameCardStub.restore();
     });
 
     it('createGame() should return 400 if we pass an empty body as a parameter', async () => {
         const response = await request(httpServer).post('/stage').send([]);
         expect(response.status).toBe(HttpStatus.BAD_REQUEST);
-    });
-
-    it('createGame() should return 500 if there is an error', async () => {
-        jest.spyOn(controller.gameCardService, 'createGameCard').mockImplementation(() => {
-            throw new Error();
-        });
-        const response = await request(httpServer).post('/stage').send(FAKE_GAME_INFO);
-        expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 
     // it('uploadImages() should call the difference detection services with the body as a parameter and return 201', async () => {
@@ -130,7 +147,7 @@ describe('StageController', () => {
         // const mockResponse = { sendFile: sendFileMock };
 
         // your test code
-        const image = new Jimp(100, 100, 'white', (err) => {
+        const image = new Jimp(1, 1, 'white', (err) => {
             if (err) throw err;
         });
 
@@ -173,19 +190,3 @@ const FAKE_GAME_CARD: GameCardInformation = {
 };
 
 const FAKE_GAME_CARD_ARRAY: GameCardInformation[] = [FAKE_GAME_CARD, FAKE_GAME_CARD];
-
-const FAKE_IMAGE_INFORMATION: ImageInformation = {
-    fieldname: 'baseImage',
-    originalname: 'image_12_diff.bmp',
-    encoding: '7bit',
-    mimetype: 'image/bmp',
-    destination: './assets/images',
-    filename: 'image_12_diff89dbd2eb-00eb-44d6-956e-2bd5e06fcfe3.bmp',
-    path: 'assets/images/image_12_diff89dbd2eb-00eb-44d6-956e-2bd5e06fcfe3.bmp',
-    size: 921654,
-};
-
-const FAKE_FILE: ImageUploadData = {
-    baseImage: [FAKE_IMAGE_INFORMATION],
-    differenceImage: [FAKE_IMAGE_INFORMATION],
-};
