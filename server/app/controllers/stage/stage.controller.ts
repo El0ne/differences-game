@@ -64,21 +64,27 @@ export class StageController {
     )
     async uploadImages(@UploadedFiles() files: ImageUploadData, @Param() param, @Res() res: Response): Promise<void> {
         try {
-            const differenceArray = await this.differenceService.compareImages(files.baseImage[0].path, files.differenceImage[0].path, param.radius);
-            // TODO call service to check if game is valid
-            if (this.gameDifficultyService.isGameValid(differenceArray)) {
-                const difficulty = this.gameDifficultyService.setGameDifficulty(differenceArray);
+            if (Object.keys(files).length) {
+                const differenceArray = await this.differenceService.compareImages(
+                    files.baseImage[0].path,
+                    files.differenceImage[0].path,
+                    param.radius,
+                );
+                // TODO call service to check if game is valid
+                if (this.gameDifficultyService.isGameValid(differenceArray)) {
+                    const difficulty = this.gameDifficultyService.setGameDifficulty(differenceArray);
 
-                // TODO add differenceArray to difference array json with unique id => unique id returned by service call
-                const id = 0;
-                const data: ServerGeneratedGameInfo = {
-                    gameId: id,
-                    originalImageName: files.baseImage[0].filename,
-                    differenceImageName: files.differenceImage[0].filename,
-                    gameDifficulty: difficulty,
-                    gameDifferenceNumber: differenceArray.length,
-                };
-                res.status(HttpStatus.CREATED).send(data);
+                    // TODO add differenceArray to difference array json with unique id => unique id returned by service call
+                    const id = 0;
+                    const data: ServerGeneratedGameInfo = {
+                        gameId: id,
+                        originalImageName: files.baseImage[0].filename,
+                        differenceImageName: files.differenceImage[0].filename,
+                        gameDifficulty: difficulty,
+                        gameDifferenceNumber: differenceArray.length,
+                    };
+                    res.status(HttpStatus.CREATED).send(data);
+                }
             } else res.sendStatus(HttpStatus.BAD_REQUEST);
         } catch (err) {
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
