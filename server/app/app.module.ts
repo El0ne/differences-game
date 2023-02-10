@@ -18,7 +18,7 @@ import { PixelRadiusService } from './services/pixel-radius/pixel-radius.service
                 uri: config.get<string>('DATABASE_CONNECTION_STRING'), // Loaded from .env
             }),
         }),
-        MongooseModule.forFeature([{ name: Course.name, schema: courseSchema }]),
+        MongooseModule.forFeature([]),
     ],
     controllers: [],
     providers: [
