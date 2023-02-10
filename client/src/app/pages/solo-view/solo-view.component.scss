@@ -1,0 +1,420 @@
+:host {
+    --basic-border: #00e6f6;
+    --linear-background-color-1: #92089c;
+    --linear-background-color-2: #a80d43;
+    --error-message-color: rgb(196, 97, 97);
+    --send-hover: #00b7c4;
+    --nav-button-color: #cf0edd;
+}
+
+body {
+    background: linear-gradient(var(--linear-background-color-1), var(--linear-background-color-2));
+}
+.info-card {
+    top: 15%;
+    left: 33%;
+    width: 33%;
+    height: 45%;
+    border-style: solid;
+    border-color: var(--basic-border);
+    z-index: 1;
+    position: fixed;
+    background: linear-gradient(var(--linear-background-color-1), var(--linear-background-color-2));
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.title {
+    font-family: 'Verdana';
+    font-style: normal;
+    font-weight: 200;
+    font-size: 20px;
+    line-height: 36px;
+    text-align: center;
+    color: white;
+}
+
+#info-quit {
+    bottom: 3%;
+    right: 3%;
+    position: absolute;
+}
+
+.nav-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+    height: 6%;
+}
+.home-button {
+    margin-right: 5%;
+}
+.options {
+    display: flex;
+}
+
+.middle-options {
+    border-style: solid;
+    display: inline-block;
+}
+
+.info-option {
+    margin-right: 2%;
+}
+
+.text-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: lightgray;
+    height: 40%;
+    width: 75%;
+    border-style: solid;
+    border-radius: 25px;
+}
+
+.text-area {
+    position: relative;
+    border-style: solid;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    height: 80%;
+    width: 90%;
+    margin-bottom: 5px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.answer-area {
+    margin-top: 5px;
+    width: 95%;
+    display: flex;
+    justify-content: center;
+}
+
+.input-field {
+    border-radius: 5px;
+    margin-right: 5px;
+    width: 75%;
+}
+
+.message {
+    background-color: var(--basic-border);
+    border-radius: 5px;
+    margin: 5px;
+}
+
+.error-message {
+    background-color: var(--error-message-color);
+    border-radius: 5px;
+    margin: 5px;
+}
+
+.error-message:hover {
+    cursor: pointer;
+}
+
+.send-button {
+    background-image: url(../../../assets/send-icon.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-color: var(--basic-border);
+    border-radius: 50%;
+    width: 8%;
+}
+
+.send-button:hover {
+    background-color: var(--send-hover);
+    cursor: pointer;
+}
+
+.option-buttons,
+.option-buttons:after {
+    width: 150px;
+    height: 76px;
+    line-height: 78px;
+    font-size: 20px;
+    font-family: 'Bebas Neue', sans-serif;
+    background: linear-gradient(45deg, transparent 5%, var(--nav-button-color) 5%);
+    border: 0;
+    color: #fff;
+    letter-spacing: 3px;
+    box-shadow: 6px 0px 0px var(--basic-border);
+    outline: transparent;
+    position: relative;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+}
+
+.option-buttons:after {
+    --slice-0: inset(50% 50% 50% 50%);
+    --slice-1: inset(80% -6px 0 0);
+    --slice-2: inset(50% -6px 30% 0);
+    --slice-3: inset(10% -6px 85% 0);
+    --slice-4: inset(40% -6px 43% 0);
+    --slice-5: inset(80% -6px 5% 0);
+
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 3%, var(--basic-border) 3%, var(--basic-border) 5%, #cf0edd 5%);
+    text-shadow: -3px -3px 0px #f8f005, 3px 3px 0px var(--basic-border);
+    clip-path: var(--slice-0);
+}
+
+.option-buttons:hover:after {
+    animation: 1s glitch;
+    animation-timing-function: steps(2, end);
+}
+
+.option-buttons:hover {
+    cursor: pointer;
+}
+
+@keyframes glitch {
+    0% {
+        clip-path: var(--slice-1);
+        transform: translate(-20px, -10px);
+    }
+    10% {
+        clip-path: var(--slice-3);
+        transform: translate(10px, 10px);
+    }
+    20% {
+        clip-path: var(--slice-1);
+        transform: translate(-10px, 10px);
+    }
+    30% {
+        clip-path: var(--slice-3);
+        transform: translate(0px, 5px);
+    }
+    40% {
+        clip-path: var(--slice-2);
+        transform: translate(-5px, 0px);
+    }
+    50% {
+        clip-path: var(--slice-3);
+        transform: translate(5px, 0px);
+    }
+    60% {
+        clip-path: var(--slice-4);
+        transform: translate(5px, 10px);
+    }
+    70% {
+        clip-path: var(--slice-2);
+        transform: translate(-10px, 10px);
+    }
+    80% {
+        clip-path: var(--slice-5);
+        transform: translate(20px, -10px);
+    }
+    90% {
+        clip-path: var(--slice-1);
+        transform: translate(-10px, 0px);
+    }
+    100% {
+        clip-path: var(--slice-1);
+        transform: translate(0);
+    }
+}
+
+@media (min-width: 768px) {
+    .option-buttons,
+    .option-buttons:after {
+        width: 132px;
+        height: 56.78px;
+        line-height: 58.98px;
+        margin-top: 1%;
+        margin-left: 1%;
+    }
+}
+.flex-game {
+    height: 80%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding-top: 5%;
+}
+
+#original {
+    border-style: solid;
+    border-color: var(--basic-border);
+    width: 640px;
+    height: 480px;
+}
+
+.game-options {
+    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 31rem;
+    height: 100%;
+}
+
+#score {
+    align-self: center;
+    padding: 2%;
+}
+
+#timer {
+    align-self: center;
+}
+
+.timer-box {
+    width: 360px;
+    height: 100px;
+    background: var(--basic-border);
+    border-radius: 10px;
+}
+
+.timer-box .display {
+    display: inline-block;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #1b1b1b;
+    width: 345px;
+    height: 85px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.timer-box .display #time {
+    line-height: 85px;
+    color: #fff;
+    font-size: 50px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.hint-button {
+    position: absolute;
+    bottom: -1%;
+    right: 10px;
+    justify-content: center;
+    margin: 1rem;
+}
+.hint {
+    height: 50px;
+    width: 50px;
+    border-style: hidden;
+    align-self: end;
+    background-color: rgba(255, 255, 255, 0);
+}
+
+.hint:hover {
+    transform: scale(1.2);
+    cursor: pointer;
+}
+.hint-logo {
+    height: 100%;
+    width: 100%;
+    -webkit-filter: invert(1);
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+    filter: invert(1);
+}
+
+#differences {
+    border-style: solid;
+    border-color: var(--basic-border);
+    width: 640px;
+    height: 480px;
+    float: right;
+}
+
+// référence : https://codepen.io/Vivekp1118/pen/YzLOOVG
+@import url('https://fonts.googleapis.com/css2?family=Silkscreen&display=swap');
+
+.container {
+    max-width: 6rem;
+    max-height: 4rem;
+    background: linear-gradient(var(--linear-background-color-1), var(--linear-background-color-2));
+    border-radius: 12px;
+    border: 3px solid white;
+    display: flex;
+    align-self: center;
+    justify-content: space-around;
+    align-items: center;
+    color: white;
+    padding: 68px 82px;
+    gap: 100px;
+    box-shadow: 0px 0px 3px black;
+}
+.row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.col-heading h1 {
+    font-family: 'Verdana';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 40px;
+    line-height: 36px;
+    text-align: center;
+
+    color: white;
+}
+.col-display {
+    width: 155px;
+    height: 120px;
+    background: #080001;
+    border-radius: 5px;
+    font-family: 'Silkscreen', cursive;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 90px;
+    line-height: 110px;
+    text-align: center;
+    color: #f94f6d;
+}
+
+.add {
+    width: 45px;
+    height: 45px;
+    border: 2px solid white;
+    border-radius: 5px;
+    font-family: 'Silkscreen', cursive;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 28px;
+    text-align: center;
+    color: white;
+    line-height: 35px;
+    background: transparent;
+}
+@media only screen and (max-width: 600px) {
+    body {
+        overflow-y: scroll;
+        padding: 20px 0px;
+        height: auto;
+    }
+    .container {
+        margin: auto auto;
+        padding-block: 30px;
+        flex-direction: column;
+        gap: 10px;
+        max-height: 100%;
+    }
+}
