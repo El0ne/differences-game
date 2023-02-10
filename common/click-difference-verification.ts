@@ -1,5 +1,5 @@
 export interface ClickDifferenceVerification {
     isADifference: boolean;
-    differenceArray: number[][];
+    differenceArray: number[];
     differenceNumber: number;
 }
