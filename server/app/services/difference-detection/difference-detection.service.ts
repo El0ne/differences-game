@@ -41,16 +41,7 @@ export class DifferenceDetectionService {
         return this.createDifferenceImage(image);
     }
 
-    hasWhiteNeighboor(pixelPosition: number): boolean {
-        for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(pixelPosition, 1, false)) {
-            if (!this.differenceArray[adjacentPixel]) return true;
-        }
-        return false;
-    }
-
     createDifferenceImage(image: Jimp): number[][] {
-        const h: number = performance.now();
-
         for (const i of this.differenceArray.keys()) {
             if (!this.isPixelSameColor(i * RGBA_DATA_LENGTH)) {
                 this.differenceArray[i] = true;
@@ -59,8 +50,9 @@ export class DifferenceDetectionService {
 
         const newArray = new Array(this.imageDimensionsService.getNumberOfPixels());
         newArray.fill(false);
+
         for (let i = 0; i < this.differenceArray.length; i++) {
-            if (this.differenceArray[i] && this.hasWhiteNeighboor(i)) {
+            if (this.differenceArray[i] && this.hasWhiteNeighbor(i)) {
                 for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(i, this.radius, true)) {
                     newArray[adjacentPixel] = true;
                 }
@@ -77,17 +69,16 @@ export class DifferenceDetectionService {
             if (newArray[i]) this.differenceArray[i] = true;
         }
 
-        console.log('this.differenceArray === this.test', this.differenceArray === this.test);
-        const j: number = performance.now();
-        console.log('scan', j - h);
         image.write(DIFFERENCE_IMAGE_PATH);
 
-        const k: number = performance.now();
-        const bfs = this.differencesCounterService.getDifferencesList(this.differenceArray);
-        const l: number = performance.now();
-        console.log('bfs', l - k);
-        console.log(bfs.length);
-        return bfs;
+        return this.differencesCounterService.getDifferencesList(this.differenceArray);
+    }
+
+    hasWhiteNeighbor(pixelPosition: number): boolean {
+        for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(pixelPosition, 1, false)) {
+            if (!this.differenceArray[adjacentPixel]) return true;
+        }
+        return false;
     }
 
     setPixelBlack(image: Jimp, pixelIndex: number): void {
