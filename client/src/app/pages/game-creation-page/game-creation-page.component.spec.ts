@@ -55,11 +55,12 @@ describe('GameCreationPageComponent', () => {
     it('should clear the first file', () => {
         component.originalFile = new File([], 'test.bmp', { type: 'image/bmp' });
         component.clearFirstFile(canvas, 'upload-original');
-        expect(component.originalFile).toBe(null);
+        expect(component.originalFile === null).toBe(true);
     });
     it('should clear the second file', () => {
+        component.differentFile = new File([], 'test.bmp', { type: 'image/bmp' });
         component.clearSecondFile(canvas, 'upload-different');
-        expect(component.differentFile).toBe(null);
+        expect(component.differentFile === null).toBe(true);
     });
     // it('should validate the file', () => {});
 });
