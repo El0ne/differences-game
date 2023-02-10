@@ -1,5 +1,4 @@
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
-import { Course, courseSchema } from '@app/model/database/course';
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
