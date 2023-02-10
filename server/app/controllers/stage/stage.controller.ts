@@ -73,8 +73,8 @@ export class StageController {
                 const id = 0;
                 const data: ServerGeneratedGameInfo = {
                     gameId: id,
-                    originalImageName: files.baseImage[0].path,
-                    differenceImageName: files.differenceImage[0].path,
+                    originalImageName: files.baseImage[0].filename,
+                    differenceImageName: files.differenceImage[0].filename,
                     gameDifficulty: difficulty,
                     gameDifferenceNumber: differenceArray.length,
                 };
