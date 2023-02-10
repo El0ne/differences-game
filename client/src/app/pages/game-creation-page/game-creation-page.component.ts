@@ -1,5 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { STAGE } from '@app/services/server-routes';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Component({
@@ -24,10 +25,13 @@ export class GameCreationPageComponent implements OnInit {
     testId: string = 'upload-original';
     otherId: string = 'upload-different';
 
+    image: string = '';
+
     constructor(private gameCardService: GameCardInformationService) {}
 
     ngOnInit(): void {
         this.display$ = this.modal.asObservable();
+        this.image = `${STAGE}/image/difference-image.bmp`;
     }
 
     getTitle(title: string) {

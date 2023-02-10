@@ -8,7 +8,8 @@
                         <button class="close" type="button" (click)="this.modal.next('close')">X</button>
                         <h1>Vos différences ajoutées :</h1>
                         <div class="diff-image">
-                            <canvas #canvasDiff width="640px" height="480px"></canvas>
+                            <!-- <canvas #canvasDiff width="640px" height="480px"></canvas> -->
+                            <img [src]="this.image" />
                         </div>
                         <button class="continue" routerLink="/config">Continuer</button>
                     </div>

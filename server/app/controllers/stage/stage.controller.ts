@@ -1,3 +1,4 @@
+import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameCardInformation } from '@common/game-card';
 import { ImageUploadData } from '@common/image-upload-data';
@@ -21,7 +22,7 @@ export const storage = diskStorage({
 
 @Controller('stage')
 export class StageController {
-    constructor(public gameCardService: GameCardService) {}
+    constructor(public gameCardService: GameCardService, public differenceService: DifferenceDetectionService) {}
 
     @Get('/')
     getStages(@Query('index') index: number, @Query('endIndex') endIndex: number): GameCardInformation[] {
@@ -59,6 +60,8 @@ export class StageController {
         // TODO ajouter appel au service qui va générer les images de différences
         try {
             if (Object.keys(files).length) {
+                this.differenceService.compareImages(files.baseImage[0].path, files.differenceImage[0].path, param.radius);
+                console.log(files);
                 const data = [files.baseImage[0], files.differenceImage[0]];
                 res.status(HttpStatus.CREATED).send(data);
             } else res.sendStatus(HttpStatus.BAD_REQUEST);
