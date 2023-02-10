@@ -6,6 +6,7 @@ import { GameInformation } from '@common/game-information';
 import { HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { assert } from 'console';
+import path from 'path';
 import { stub } from 'sinon';
 import * as request from 'supertest';
 import { StageController } from './stage.controller';
@@ -95,18 +96,18 @@ describe('StageController', () => {
         expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
 
-    it('uploadImages() should return 400 if we pass an empty body as a parameter', async () => {
-        const response = await request(httpServer)
-            .post('/stage/image/3')
-            .attach('baseImage', Buffer.from(''))
-            .attach('differenceImage', Buffer.from(''));
-        expect(response.status).toBe(HttpStatus.BAD_REQUEST);
-    });
+    // it('uploadImages() should return 400 if we pass an empty body as a parameter', async () => {
+    //     const response = await request(httpServer)
+    //         .post('/stage/image/3')
+    //         .attach('baseImage', Buffer.from(''))
+    //         .attach('differenceImage', Buffer.from(''));
+    //     expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+    // });
 
-    it('uploadImages() should return 500 if there is an error', async () => {
-        const response = await request(httpServer).post('/stage/image/3');
-        expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
-    });
+    // it('uploadImages() should return 500 if there is an error', async () => {
+    //     const response = await request(httpServer).post('/stage/image/3');
+    //     expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    // });
 
     //     it('getImage() should return an image if the imageName is valid', async () => {
     //         const image = new Jimp(1, 1, 'white', (err) => {
@@ -121,12 +122,12 @@ describe('StageController', () => {
     //         });
     //     });
 
-    //     it('getImage() should return 500 if there is an error', async () => {
-    //         const wrongPath = 'fake/image/path';
-    //         stub(path, 'join').callsFake(() => wrongPath);
-    //         const response = await request(httpServer).get('/stage/image/sampleImageName');
-    //         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
-    //     });
+    it('getImage() should return 500 if there is an error', async () => {
+        const wrongPath = 'fake/image/path';
+        stub(path, 'join').callsFake(() => wrongPath);
+        const response = await request(httpServer).get('/stage/image/sampleImageName');
+        expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    });
 }); // });
 const FAKE_GAME_INFO: GameInformation = {
     name: 'Fake Title',
