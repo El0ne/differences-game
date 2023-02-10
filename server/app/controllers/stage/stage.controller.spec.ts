@@ -72,28 +72,28 @@ describe('StageController', () => {
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 
-    // it('createGame() should call GameCardService.createGameCard() with the body as a parameter', async () => {
-    //     const createGameCardStub = stub(controller.gameCardService, 'createGameCard').callsFake(() => FAKE_GAME_CARD_ARRAY[0]);
-    //     const response = await request(httpServer).post('/stage').send(FAKE_GAME_INFO);
-    //     assert(createGameCardStub.called);
-    //     expect(response.status).toBe(HttpStatus.CREATED);
-    //     expect(response.body).toEqual(FAKE_GAME_CARD);
-    //     createGameCardStub.restore();
-    // });
+    it('createGame() should call GameCardService.createGameCard() with the body as a parameter', async () => {
+        const createGameCardStub = stub(controller.gameCardService, 'createGameCard').callsFake(() => FAKE_GAME_CARD_ARRAY[0]);
+        const response = await request(httpServer).post('/stage').send(FAKE_GAME_INFO);
+        assert(createGameCardStub.called);
+        expect(response.status).toBe(HttpStatus.CREATED);
+        expect(response.body).toEqual(FAKE_GAME_CARD);
+        createGameCardStub.restore();
+    });
 
-    //     it('createGame() should return 500 if there is an error', async () => {
-    //         const createGameCardStub = stub(controller.gameCardService, 'createGameCard').callsFake(() => {
-    //             throw new Error();
-    //         });
-    //         const response = await request(httpServer).post('/stage').send(FAKE_GAME_INFO);
-    //         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
-    //         createGameCardStub.restore();
-    //     });
+    it('createGame() should return 500 if there is an error', async () => {
+        const createGameCardStub = stub(controller.gameCardService, 'createGameCard').callsFake(() => {
+            throw new Error();
+        });
+        const response = await request(httpServer).post('/stage').send(FAKE_GAME_INFO);
+        expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+        createGameCardStub.restore();
+    });
 
-    //     it('createGame() should return 400 if we pass an empty body as a parameter', async () => {
-    //         const response = await request(httpServer).post('/stage').send([]);
-    //         expect(response.status).toBe(HttpStatus.BAD_REQUEST);
-    //     });
+    it('createGame() should return 400 if we pass an empty body as a parameter', async () => {
+        const response = await request(httpServer).post('/stage').send([]);
+        expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+    });
 
     //     it('uploadImages() should return 400 if we pass an empty body as a parameter', async () => {
     //         const response = await request(httpServer)
