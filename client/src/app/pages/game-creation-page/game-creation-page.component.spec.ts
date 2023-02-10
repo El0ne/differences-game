@@ -1,5 +1,6 @@
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
 
 import { GameCreationPageComponent } from './game-creation-page.component';
 
@@ -11,7 +12,7 @@ describe('GameCreationPageComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [GameCreationPageComponent],
-            imports: [HttpClientModule],
+            imports: [HttpClientModule, FormsModule],
         }).compileComponents();
 
         fixture = TestBed.createComponent(GameCreationPageComponent);
