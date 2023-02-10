@@ -21,7 +21,7 @@ export const storage = diskStorage({
 
 @Controller('stage')
 export class StageController {
-    constructor(private gameCardService: GameCardService) {}
+    constructor(public gameCardService: GameCardService) {}
 
     @Get('/')
     getStages(@Query('index') index: number, @Query('endIndex') endIndex: number): GameCardInformation[] {
