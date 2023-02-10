@@ -57,10 +57,15 @@ export class StageController {
         ),
     )
     async uploadImages(@UploadedFiles() files: ImageUploadData, @Param() param, @Res() res: Response): Promise<void> {
-        // TODO ajouter appel au service qui va générer les images de différences
         try {
             if (Object.keys(files).length) {
-                await this.differenceService.compareImages(files.baseImage[0].path, files.differenceImage[0].path, param.radius);
+                const differenceArray = await this.differenceService.compareImages(
+                    files.baseImage[0].path,
+                    files.differenceImage[0].path,
+                    param.radius,
+                );
+
+                // TODO add differenceArray to difference arry json with unique id => unique id returned by service call
                 console.log(files);
                 const data = [files.baseImage[0], files.differenceImage[0]];
                 res.status(HttpStatus.CREATED).send(data);
