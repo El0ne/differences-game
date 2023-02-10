@@ -10,6 +10,7 @@ import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PixelPositionService } from './services/pixel-position/pixel-position/pixel-position.service';
+import { GameCardService } from './game-card/game-card.service';
 
 @Module({
     imports: [
@@ -24,6 +25,6 @@ import { PixelPositionService } from './services/pixel-position/pixel-position/p
         MongooseModule.forFeature([{ name: Course.name, schema: courseSchema }]),
     ],
     controllers: [CourseController, DateController, ExampleController],
-    providers: [ChatGateway, CourseService, DateService, ExampleService, Logger, PixelPositionService],
+    providers: [ChatGateway, CourseService, DateService, ExampleService, Logger, PixelPositionService, GameCardService],
 })
 export class AppModule {}
