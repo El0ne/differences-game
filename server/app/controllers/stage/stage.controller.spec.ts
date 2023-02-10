@@ -46,7 +46,8 @@ const getFakeGameCards = () => [
     {
         name: 'Library',
         difficulty: 'Difficile',
-        image: '/assets/444-640x480.jpg',
+        originalImageName: '/assets/444-640x480.jpg',
+        differenceImageName: '/assets/444-640x480.jpg',
         soloTimes: [
             { time: 60, name: 're' },
             { time: 90, name: 'second' },
