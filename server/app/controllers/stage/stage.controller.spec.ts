@@ -49,28 +49,28 @@ describe('StageController', () => {
         expect(response.body).toEqual(FAKE_GAME_CARD_ARRAY);
     });
 
-    // it('getStages() should return 500 if there is an error', async () => {
-    //     getGameCardStub.callsFake(() => {
-    //         throw new Error();
-    //     });
-    //     const response = await request(httpServer).get('/stage');
-    //     expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
-    // });
+    it('getStages() should return 500 if there is an error', async () => {
+        getGameCardStub.callsFake(() => {
+            throw new Error();
+        });
+        const response = await request(httpServer).get('/stage');
+        expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    });
 
-    // it('getNbOfStages() should return the game cards number', async () => {
-    //     getGameCardsNumberStub.callsFake(() => 3);
-    //     const response = await request(httpServer).get('/stage/info');
-    //     expect(response.status).toBe(HttpStatus.OK);
-    //     expect(response.text).toEqual('3');
-    // });
+    it('getNbOfStages() should return the game cards number', async () => {
+        getGameCardsNumberStub.callsFake(() => 3);
+        const response = await request(httpServer).get('/stage/info');
+        expect(response.status).toBe(HttpStatus.OK);
+        expect(response.text).toEqual('3');
+    });
 
-    // it('getNbOfStages() should return 500 if there is an error', async () => {
-    //     getGameCardsNumberStub.callsFake(() => {
-    //         throw new Error();
-    //     });
-    //     const response = await request(httpServer).get('/stage/info');
-    //     expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
-    // });
+    it('getNbOfStages() should return 500 if there is an error', async () => {
+        getGameCardsNumberStub.callsFake(() => {
+            throw new Error();
+        });
+        const response = await request(httpServer).get('/stage/info');
+        expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    });
 
     // it('createGame() should call GameCardService.createGameCard() with the body as a parameter', async () => {
     //     const createGameCardStub = stub(controller.gameCardService, 'createGameCard').callsFake(() => FAKE_GAME_CARD_ARRAY[0]);
