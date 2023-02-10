@@ -16,6 +16,7 @@ export class DifferenceDetectionService {
     secondImageArray: number[];
     radius: number;
     differenceArray: boolean[];
+    test: boolean[];
 
     constructor(
         private pixelRadiusService: PixelRadiusService,
@@ -36,26 +37,74 @@ export class DifferenceDetectionService {
         this.radius = radius;
         this.differenceArray = new Array(this.imageDimensionsService.getNumberOfPixels());
         this.differenceArray.fill(false);
+        this.test = new Array(this.imageDimensionsService.getNumberOfPixels());
+        this.test.fill(false);
         const image = new Jimp(this.imageDimensionsService.getWidth(), this.imageDimensionsService.getHeight(), WHITE);
         return this.createDifferenceImage(image);
     }
 
+    hasWhiteNeighboor(pixelPosition: number, diffArray: boolean[]): boolean {
+        for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(pixelPosition, 1, false)) {
+            if (!diffArray[adjacentPixel]) return true;
+        }
+        return false;
+        // return true;
+    }
+
     createDifferenceImage(image: Jimp): number[][] {
+        const i: number = performance.now();
+
         image.scan(0, 0, image.bitmap.width, image.bitmap.height, (x, y, index) => {
             if (!this.isPixelSameColor(index)) {
-                for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(index / RGBA_DATA_LENGTH, this.radius, true)) {
-                    this.setPixelBlack(image, adjacentPixel * RGBA_DATA_LENGTH);
-                    this.differenceArray[adjacentPixel] = true;
-                }
+                // this.setPixelBlack(image, index);
+                this.differenceArray[index / RGBA_DATA_LENGTH] = true;
             }
         });
+
+        const newArray = new Array(this.imageDimensionsService.getNumberOfPixels());
+        newArray.fill(false);
+        for (let i = 0; i < this.differenceArray.length; i++) {
+            if (this.differenceArray[i] && this.hasWhiteNeighboor(i, this.differenceArray)) {
+                for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(i, this.radius, true)) {
+                    newArray[adjacentPixel] = true;
+                }
+            }
+        }
+
+        // ajouter le rayon
+        image.scan(0, 0, image.bitmap.width, image.bitmap.height, (x, y, index) => {
+            if (newArray[index / RGBA_DATA_LENGTH] || this.differenceArray[index / 4]) {
+                this.setPixelBlack(image, index);
+            }
+        });
+        // const newArray = this.differenceArray;
+        // for (let i = 0; i < this.differenceArray.length; i++) {
+        //     if (this.differenceArray[i]) {
+        //         for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(i, this.radius, true)) {
+        //             if (!this.differenceArray[adjacentPixel]) {
+        //                 this.differenceArray[adjacentPixel] = true;
+        //             }
+        //             this.setPixelBlack(image, adjacentPixel * 4);
+        //         }
+        //     }
+        // }
+
+        console.log('this.differenceArray === this.test', this.differenceArray === this.test);
+        const j: number = performance.now();
+        console.log('scan', j - i);
         image.write(DIFFERENCE_IMAGE_PATH);
-        return this.differencesCounterService.getDifferencesList(this.differenceArray);
+
+        const k: number = performance.now();
+        // const bfs = this.differencesCounterService.getDifferencesList(this.differenceArray);
+        const l: number = performance.now();
+        console.log('bfs', l - k);
+        const bfs = [[]];
+        return bfs;
     }
 
     setPixelBlack(image: Jimp, pixelIndex: number): void {
         for (let i = 0; i < RGB_DATA_LENGTH; i++) {
-            image.bitmap.data[pixelIndex + i] = BLACK;
+            if (image.bitmap.data[pixelIndex + i] !== BLACK) image.bitmap.data[pixelIndex + i] = BLACK;
         }
     }
 

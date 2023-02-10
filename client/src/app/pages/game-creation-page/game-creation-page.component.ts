@@ -113,6 +113,7 @@ export class GameCreationPageComponent implements OnInit {
     save(): void {
         console.log(this.gameTitle);
         if (this.saveVerification() && this.originalFile && this.differentFile) {
+            const i: number = performance.now();
             this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
                 const gameInfo = {
                     name: this.gameTitle,
@@ -120,11 +121,16 @@ export class GameCreationPageComponent implements OnInit {
                     differenceImage: data[1].filename,
                     radius: this.radius,
                 };
-                this.image = `${STAGE}/image/difference-image.bmp`;
-                this.gameCardService.createGame(gameInfo).subscribe((e) => {
-                    console.log(e);
-                });
-                this.modal.next('open');
+                console.log('this.radius', this.radius);
+                setTimeout(() => {
+                    this.image = `${STAGE}/image/difference-image.bmp`;
+                    const j: number = performance.now();
+                    console.log(j - i);
+                    this.gameCardService.createGame(gameInfo).subscribe((e) => {
+                        console.log(e);
+                    });
+                    this.modal.next('open');
+                }, 1000);
             });
         }
     }
