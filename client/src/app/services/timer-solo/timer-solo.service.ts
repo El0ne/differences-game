@@ -1,19 +1,19 @@
 import { Injectable } from '@angular/core';
 import { Subscription, timer } from 'rxjs';
-import { TIME } from './timer-solo.constants';
+import { ONE_SEC_IN_MS, START_TIME, ZERO } from './timer-solo.constants';
 
 @Injectable({
     providedIn: 'root',
 })
 export class TimerSoloService {
-    currTime: number = TIME.startTime;
+    currentTime: number = START_TIME;
     private subArray: Subscription[] = [];
 
     startTimer() {
-        const timer1 = timer(TIME.zero, TIME.oneSecondInMs);
+        const timer1 = timer(ZERO, ONE_SEC_IN_MS);
 
         const sub = timer1.subscribe(() => {
-            this.currTime++;
+            this.currentTime++;
         });
 
         this.subArray.push(sub);

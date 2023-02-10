@@ -1,5 +1,5 @@
 import { discardPeriodicTasks, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { TIME } from './timer-solo.constants';
+import { TEN_SECONDS, TEN_SEC_IN_MS } from './timer-solo.constants';
 import { TimerSoloService } from './timer-solo.service';
 
 describe('TimerSoloService', () => {
@@ -16,8 +16,8 @@ describe('TimerSoloService', () => {
 
     it('should increment 10 seconds after 10 seconds properly', fakeAsync(() => {
         service.startTimer();
-        tick(TIME.tenSencondsInMs);
+        tick(TEN_SEC_IN_MS);
         discardPeriodicTasks();
-        expect(service.currTime).toEqual(TIME.tenSeconds);
+        expect(service.currentTime).toEqual(TEN_SECONDS);
     }));
 });

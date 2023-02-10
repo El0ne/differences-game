@@ -12,6 +12,7 @@ import { GameCardSelectionComponent } from './components/game-card-selection/gam
 import { GameSelectionComponent } from './pages/game-selection/game-selection.component';
 import { HomePageComponent } from './pages/home-page/home-page.component';
 import { SoloViewComponent } from './pages/solo-view/solo-view.component';
+import { ClickEventComponent } from './components/click-event/click-event.component';
 
 /**
  * Main module that is used in main.ts.
@@ -28,6 +29,7 @@ import { SoloViewComponent } from './pages/solo-view/solo-view.component';
         BestTimeComponent,
         GameCardSelectionComponent,
         SoloViewComponent,
+        ClickEventComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],

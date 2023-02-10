@@ -13,8 +13,20 @@
         </button>
     </div>
 
+    <div class="info-card" *ngIf="showWinMessage">
+        <div class="info">
+            <p class="title">Vous Avez Gagné! Bravo!</p>
+        </div>
+        <button class="option-buttons home-button" id="home-win" type="button" routerLink="/home">
+            <img class="logo" src="{{ paths.home }}" />
+        </button>
+        <button class="option-buttons win-button" id="info-quit" type="button" routerLink="/stage-selection">
+            <img class="logo" src="{{ paths.quit }}" />
+        </button>
+    </div>
+
     <div class="nav-bar">
-        <div class="options">
+        <div class="options" *ngIf="showNavBar">
             <button class="option-buttons home-button" type="button" routerLink="/home">
                 <img class="logo" src="{{ paths.home }}" />
             </button>
@@ -22,21 +34,26 @@
                 <img class="logo" src="{{ paths.info }}" />
             </button>
         </div>
-        <div class="info-option">
+        <div class="info-option" *ngIf="showNavBar">
             <button class="option-buttons" type="button">
-                <!-- TODO : Add routerLink to right page-->
-                <img class="logo" src="{{ paths.quit }}" />
+                <img class="logo" src="{{ paths.quit }}" routerLink="/stage-selection" />
             </button>
         </div>
     </div>
 
     <div class="flex-game">
-        <img id="original" src="{{ paths.temp }}" />
+        <app-click-event
+            [differenceArray]="differenceArray"
+            [id]="1"
+            [original]="'original'"
+            (incrementScore)="incrementScore()"
+            (finishGame)="finishGame()"
+        ></app-click-event>
         <div class="game-options">
             <div id="timer">
                 <div class="timer-box">
                     <div class="display">
-                        <div id="time">{{ timesConvertion(currService.currTime) }}</div>
+                        <div id="time">{{ timesConvertion(currentService.currentTime) }}</div>
                     </div>
                 </div>
             </div>
@@ -48,7 +65,7 @@
                         <div class="col col-heading">
                             <h1>SCORE</h1>
                         </div>
-                        <div class="col col-display" id="scoreHome">1</div>
+                        <div class="col col-display" id="scoreHome">{{ currentScore }}</div>
                     </div>
                 </div>
             </div>
@@ -68,7 +85,13 @@
                 </div>
             </div>
         </div>
-        <img id="differences" src="{{ paths.temp }}" />
+        <app-click-event
+            [differenceArray]="differenceArray"
+            [id]="2"
+            [original]="'different'"
+            (incrementScore)="incrementScore()"
+            (finishGame)="finishGame()"
+        ></app-click-event>
         <div class="hint-button">
             <button class="hint" type="button">
                 <img class="hint-logo" src="{{ paths.hint }}" />

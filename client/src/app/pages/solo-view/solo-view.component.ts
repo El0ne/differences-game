@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
+import { MOCK_ARRAY } from './mock-array';
 import { MESSAGES_LENGTH, PATHS } from './solo-view-constants';
 
 @Component({
@@ -13,13 +14,20 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     showErrorMessage: boolean = false;
     showTextBox: boolean = false;
+    showWinMessage: boolean = false;
+    showNavBar: boolean = true;
     messages: string[] = [];
     messageContent: string = '';
-    currService: TimerSoloService;
-    currTime: number;
+    differenceArray: number[][];
+    currentScore: number = 0;
+    numberOfDifferences: number;
+    currentService: TimerSoloService;
+    currentTime: number;
 
-    constructor(private service: TimerSoloService, private secondService: SecondToMinuteService) {
-        this.currService = service;
+    constructor(private timerService: TimerSoloService, private convertService: SecondToMinuteService) {
+        this.differenceArray = MOCK_ARRAY;
+        this.numberOfDifferences = this.differenceArray.length;
+        this.currentService = timerService;
     }
 
     ngOnInit(): void {
@@ -27,15 +35,27 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.service.stopTimer();
-    }
-
-    timesConvertion(time: number) {
-        return this.secondService.convert(time);
+        this.timerService.stopTimer();
     }
 
     showTime(): void {
-        this.service.startTimer();
+        this.timerService.startTimer();
+    }
+
+    timesConvertion(time: number) {
+        return this.convertService.convert(time);
+    }
+
+    finishGame() {
+        this.showWinMessage = true;
+        this.showNavBar = false;
+    }
+
+    incrementScore() {
+        this.currentScore += 1;
+        if (this.numberOfDifferences === this.currentScore) {
+            this.finishGame();
+        }
     }
 
     toggleInfoCard() {

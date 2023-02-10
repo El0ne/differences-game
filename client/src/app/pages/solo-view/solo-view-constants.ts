@@ -7,6 +7,6 @@ export const PATHS = {
     home: 'assets/home-button.png',
     quit: 'assets/close-window.png',
     info: 'assets/info.png',
-    temp: 'assets/temporary-image.webp',
+    temp: 'assets/temporary-image.bmp',
     hint: 'assets/loupe.png',
 };
