@@ -4,6 +4,7 @@ import { GameCardService } from '@app/services/game-card/game-card.service';
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { StageController } from './controllers/stage/stage.controller';
 import { DifferenceDetectionService } from './services/difference-detection/difference-detection.service';
 import { DifferencesCounterService } from './services/differences-counter/differences-counter.service';
 import { ImageDimensionsService } from './services/image-dimensions/image-dimensions.service';
@@ -22,7 +23,7 @@ import { PixelRadiusService } from './services/pixel-radius/pixel-radius.service
         }),
         MongooseModule.forFeature([{ name: Course.name, schema: courseSchema }]),
     ],
-    controllers: [],
+    controllers: [StageController],
     providers: [
         ChatGateway,
         Logger,
