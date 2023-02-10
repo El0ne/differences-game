@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
+import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { MOCK_ARRAY } from './mock-array';
 import { MESSAGES_LENGTH, PATHS } from './solo-view-constants';
 
@@ -7,7 +9,7 @@ import { MESSAGES_LENGTH, PATHS } from './solo-view-constants';
     templateUrl: './solo-view.component.html',
     styleUrls: ['./solo-view.component.scss'],
 })
-export class SoloViewComponent {
+export class SoloViewComponent implements OnInit, OnDestroy {
     readonly paths = PATHS; // TODO : Verify with Nikolay if typing is fine for constants
 
     showErrorMessage: boolean = false;
@@ -19,10 +21,29 @@ export class SoloViewComponent {
     differenceArray: number[][];
     currentScore: number = 0;
     numberOfDifferences: number;
+    currentService: TimerSoloService;
+    currentTime: number;
 
-    constructor() {
+    constructor(private timerService: TimerSoloService, private convertService: SecondToMinuteService) {
         this.differenceArray = MOCK_ARRAY;
         this.numberOfDifferences = this.differenceArray.length;
+        this.currentService = timerService;
+    }
+
+    ngOnInit(): void {
+        this.showTime();
+    }
+
+    ngOnDestroy(): void {
+        this.timerService.stopTimer();
+    }
+
+    showTime(): void {
+        this.timerService.startTimer();
+    }
+
+    timesConvertion(time: number) {
+        return this.convertService.convert(time);
     }
 
     finishGame() {
