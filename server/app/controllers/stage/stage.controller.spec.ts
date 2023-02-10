@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // @ts-ignore
 
 import { GameCardService } from '@app/services/game-card/game-card.service';
