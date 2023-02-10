@@ -95,18 +95,18 @@ describe('StageController', () => {
         expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
 
-    //     it('uploadImages() should return 400 if we pass an empty body as a parameter', async () => {
-    //         const response = await request(httpServer)
-    //             .post('/stage/image/3')
-    //             .attach('baseImage', Buffer.from(''))
-    //             .attach('differenceImage', Buffer.from(''));
-    //         expect(response.status).toBe(HttpStatus.BAD_REQUEST);
-    //     });
+    it('uploadImages() should return 400 if we pass an empty body as a parameter', async () => {
+        const response = await request(httpServer)
+            .post('/stage/image/3')
+            .attach('baseImage', Buffer.from(''))
+            .attach('differenceImage', Buffer.from(''));
+        expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+    });
 
-    //     it('uploadImages() should return 500 if there is an error', async () => {
-    //         const response = await request(httpServer).post('/stage/image/3');
-    //         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
-    //     });
+    it('uploadImages() should return 500 if there is an error', async () => {
+        const response = await request(httpServer).post('/stage/image/3');
+        expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    });
 
     //     it('getImage() should return an image if the imageName is valid', async () => {
     //         const image = new Jimp(1, 1, 'white', (err) => {
