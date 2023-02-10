@@ -95,7 +95,7 @@ describe('SoloViewComponent', () => {
     it('finishGame should have been called if number of errors is equal to the current score in incrementScore', () => {
         const finishGameSpy = spyOn(component, 'finishGame');
         component.currentScore = 1;
-        component.numberOfErrors = 2;
+        component.numberOfDifferences = 2;
         component.incrementScore();
         expect(finishGameSpy).toHaveBeenCalled();
     });

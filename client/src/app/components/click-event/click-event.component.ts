@@ -1,6 +1,6 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { PATHS } from '@app/pages/solo-view/solo-view-constants';
-import { HEIGHT, WAIT_TIME, WIDTH } from './click-event-constant';
+import { FAST_WAIT_TIME, HEIGHT, WAIT_TIME, WIDTH } from './click-event-constant';
 
 @Component({
     selector: 'app-click-event',
@@ -38,14 +38,8 @@ export class ClickEventComponent implements OnInit {
 
     getCoordInImage(e: MouseEvent): number[] {
         const rect = this.modification.nativeElement.getBoundingClientRect();
-        let x = Math.floor(e.clientX - rect.left);
-        if (x < 0) {
-            x = 0;
-        }
-        let y = Math.floor(e.clientY - rect.top);
-        if (y < 0) {
-            y = 0;
-        }
+        const x = Math.max(Math.floor(e.clientX - rect.left), 0);
+        const y = Math.max(Math.floor(e.clientY - rect.top), 0);
         return new Array(x, y);
     }
 
@@ -80,10 +74,10 @@ export class ClickEventComponent implements OnInit {
         this.constructEffect(originalContext);
         const flashIntro = setInterval(() => {
             this.destroyEffect(originalContext);
-        }, 100);
+        }, FAST_WAIT_TIME);
         const flashOutro = setInterval(() => {
             this.constructEffect(originalContext);
-        }, 100);
+        }, FAST_WAIT_TIME);
 
         setTimeout(() => {
             clearInterval(flashIntro);
@@ -95,7 +89,7 @@ export class ClickEventComponent implements OnInit {
         this.incrementScore.emit(this.currentScore);
     }
 
-    positionToPixel(toTransform: number) {
+    positionToPixel(toTransform: number): number[] {
         let yCounter = 0;
         while (toTransform >= WIDTH) {
             toTransform -= WIDTH;
@@ -106,6 +100,7 @@ export class ClickEventComponent implements OnInit {
         return [toTransform, yCounter];
     }
 
+    // TODO : Move to server side once it's implemented
     isADifference(x: number, y: number, remove: boolean): boolean {
         const posToCheck = y * WIDTH + x;
         for (const difference of this.differenceArray) {

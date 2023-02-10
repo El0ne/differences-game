@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+
 const difference1: number[] = [];
 for (let i = 255000; i < 307201; i++) {
     difference1.push(i);

@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable @typescript-eslint/naming-convention */
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { MOCK_ARRAY, TEST_ARRAY } from '@app/pages/solo-view/mock-array';
-
 import { ClickEventComponent } from './click-event.component';
-
 describe('ClickEventComponent', () => {
     let component: ClickEventComponent;
     let fixture: ComponentFixture<ClickEventComponent>;
@@ -115,7 +116,6 @@ describe('ClickEventComponent', () => {
 
     it('isDifferent() should return true if a difference is detected', () => {
         const mockClick = new MouseEvent('click', { clientX: 0, clientY: 0 });
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
         spyOn(component, 'emitSound').and.callFake(() => {});
         const result = component.isDifferent(mockClick);
         expect(result).toBeTrue();
@@ -123,7 +123,6 @@ describe('ClickEventComponent', () => {
 
     it('isDifferent() should return false if a difference is not deteceted', () => {
         const mockClick = new MouseEvent('click', { clientX: 100, clientY: 365 });
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
         spyOn(component, 'emitSound').and.callFake(() => {});
         const result = component.isDifferent(mockClick);
         expect(result).toBeFalse();
@@ -145,7 +144,6 @@ describe('ClickEventComponent', () => {
 
     it('differenceEffect() should display effect at an alternate rate', fakeAsync(() => {
         component.lastDifferenceClicked = [0, 0, 0, 0, 0];
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
         spyOn(component, 'emitSound').and.callFake(() => {});
         const constructSpy = spyOn(component, 'constructEffect');
         const destroySpy = spyOn(component, 'destroyEffect');
@@ -180,7 +178,6 @@ describe('ClickEventComponent', () => {
         const mockClick = new MouseEvent('click', { clientX: 100, clientY: 365 });
         spyOn(CanvasRenderingContext2D.prototype, 'fillText');
         spyOn(CanvasRenderingContext2D.prototype, 'clearRect');
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
         spyOn(component, 'emitSound').and.callFake(() => {});
         component.displayError(mockClick);
         expect(CanvasRenderingContext2D.prototype.fillText).toHaveBeenCalled();

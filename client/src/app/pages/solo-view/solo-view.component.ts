@@ -18,11 +18,11 @@ export class SoloViewComponent {
     messageContent: string = '';
     differenceArray: number[][];
     currentScore: number = 0;
-    numberOfErrors: number;
+    numberOfDifferences: number;
 
     constructor() {
         this.differenceArray = MOCK_ARRAY;
-        this.numberOfErrors = this.differenceArray.length;
+        this.numberOfDifferences = this.differenceArray.length;
     }
 
     finishGame() {
@@ -32,7 +32,7 @@ export class SoloViewComponent {
 
     incrementScore() {
         this.currentScore += 1;
-        if (this.numberOfErrors === this.currentScore) {
+        if (this.numberOfDifferences === this.currentScore) {
             this.finishGame();
         }
     }
