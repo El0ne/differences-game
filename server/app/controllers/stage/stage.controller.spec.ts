@@ -35,7 +35,7 @@ describe('StageController', () => {
     it('should be defined', () => {
         expect(controller).toBeDefined();
     });
-
+});
 //     it('getStages() should return game cards if there are at least one', async () => {
 //         getGameCardStub.callsFake(() => {
 //             return FAKE_GAME_CARD_ARRAY;
