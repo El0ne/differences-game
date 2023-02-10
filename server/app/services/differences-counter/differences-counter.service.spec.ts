@@ -4,10 +4,10 @@ import { PixelPositionService } from '@app/services/pixel-position/pixel-positio
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { stub } from 'sinon';
-import { DifferencesDetectionService } from './differences-detection.service';
+import { DifferencesCounterService } from './differences-counter.service';
 
-describe('DifferencesDetectionService', () => {
-    let service: DifferencesDetectionService;
+describe('DifferencesCounterService', () => {
+    let service: DifferencesCounterService;
     let imageDimensionsService: ImageDimensionsService;
     let DIFFERENT_PIXELS_LIST: boolean[];
     let VISITED_PIXELS_TEST: number[][];
@@ -23,10 +23,10 @@ describe('DifferencesDetectionService', () => {
         UNVISITED_DIFFERENT_PIXEL = 8;
 
         const module: TestingModule = await Test.createTestingModule({
-            providers: [DifferencesDetectionService, PixelRadiusService, PixelPositionService, ImageDimensionsService],
+            providers: [DifferencesCounterService, PixelRadiusService, PixelPositionService, ImageDimensionsService],
         }).compile();
 
-        service = module.get<DifferencesDetectionService>(DifferencesDetectionService);
+        service = module.get<DifferencesCounterService>(DifferencesCounterService);
         imageDimensionsService = module.get<ImageDimensionsService>(ImageDimensionsService);
     });
 

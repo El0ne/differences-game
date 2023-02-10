@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 const ADJACENT_PIXELS_RADIUS = 1;
 
 @Injectable()
-export class DifferencesDetectionService {
+export class DifferencesCounterService {
     constructor(private pixelRadiusService: PixelRadiusService) {}
 
     getDifferencesList(differencesArray: boolean[]): number[][] {
