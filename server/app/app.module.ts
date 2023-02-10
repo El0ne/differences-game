@@ -1,9 +1,6 @@
-import { CourseController } from '@app/controllers/course/course.controller';
-import { DateController } from '@app/controllers/date/date.controller';
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { Course, courseSchema } from '@app/model/database/course';
-import { CourseService } from '@app/services/course/course.service';
-import { DateService } from '@app/services/date/date.service';
+import { GameCardService } from '@app/services/game-card/game-card.service';
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -25,17 +22,16 @@ import { PixelRadiusService } from './services/pixel-radius/pixel-radius.service
         }),
         MongooseModule.forFeature([{ name: Course.name, schema: courseSchema }]),
     ],
-    controllers: [CourseController, DateController],
+    controllers: [],
     providers: [
         ChatGateway,
-        CourseService,
-        DateService,
         Logger,
         PixelPositionService,
         ImageDimensionsService,
         DifferenceDetectionService,
         DifferencesCounterService,
         PixelRadiusService,
+        GameCardService,
     ],
 })
 export class AppModule {}

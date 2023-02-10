@@ -1,0 +1,31 @@
+.game-cards-container {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: 45% 45% 10%;
+    height: 100%;
+}
+
+.card-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.navigate-cards-container {
+    display: grid;
+    grid-template-columns: 1 1 1;
+    grid-row: 3 / 4;
+    grid-column: 1 / 3;
+}
+
+#show-previous-cards-button {
+    grid-column: 1 / 2;
+}
+
+#create-a-stage-button {
+    grid-column: 2 / 3;
+}
+
+#show-next-cards-button {
+    grid-column: 3 / 4;
+}
