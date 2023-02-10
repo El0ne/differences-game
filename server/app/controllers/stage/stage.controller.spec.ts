@@ -1,6 +1,11 @@
 // @ts-ignore
 
+import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
+import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
 import { GameCardService } from '@app/services/game-card/game-card.service';
+import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
+import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
+import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { GameCardInformation } from '@common/game-card';
 import { GameInformation } from '@common/game-information';
 import { HttpStatus } from '@nestjs/common';
@@ -21,7 +26,14 @@ describe('StageController', () => {
     beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [StageController],
-            providers: [GameCardService],
+            providers: [
+                GameCardService,
+                DifferenceDetectionService,
+                PixelRadiusService,
+                ImageDimensionsService,
+                DifferencesCounterService,
+                PixelPositionService,
+            ],
         }).compile();
         const app = module.createNestApplication();
         await app.init();
