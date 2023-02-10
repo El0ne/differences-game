@@ -3,6 +3,7 @@ import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameDifficultyService } from '@app/services/game-difficulty/game-difficulty.service';
 import { GameCardInformation } from '@common/game-card';
 import { ImageUploadData } from '@common/image-upload-data';
+import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
 import { Body, Controller, Get, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
@@ -70,7 +71,13 @@ export class StageController {
 
                 // TODO add differenceArray to difference array json with unique id => unique id returned by service call
                 const id = 0;
-                const data = [files.baseImage[0].path, files.differenceImage[0].path, difficulty, differenceArray.length, id];
+                const data: ServerGeneratedGameInfo = {
+                    gameId: id,
+                    originalImageName: files.baseImage[0].path,
+                    differenceImageName: files.differenceImage[0].path,
+                    gameDifficulty: difficulty,
+                    gameDifferenceNumber: differenceArray.length,
+                };
                 res.status(HttpStatus.CREATED).send(data);
             } else res.sendStatus(HttpStatus.BAD_REQUEST);
         } catch (err) {

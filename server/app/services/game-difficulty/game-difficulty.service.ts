@@ -11,6 +11,7 @@ export class GameDifficultyService {
     constructor(private imageDimensionsService: ImageDimensionsService) {}
 
     isGameValid(differenceArray: number[][]): boolean {
+        console.log('differenceArray.length', differenceArray.length);
         if (differenceArray.length >= MIN_DIFF_NUMBER && differenceArray.length <= MAX_DIFF_NUMBER) return true;
         return false;
     }
