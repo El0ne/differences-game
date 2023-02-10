@@ -37,8 +37,8 @@ export class StageController {
     createGame(@Body() game, @Res() res: Response) {
         try {
             if (Object.keys(game).length) {
-                // const newGame = this.gameCardService.createGameCard(game);
-                // res.status(HttpStatus.CREATED).send(newGame);
+                const newGame = this.gameCardService.createGameCard(game);
+                res.status(HttpStatus.CREATED).send(newGame);
             } else res.sendStatus(HttpStatus.BAD_REQUEST);
         } catch (err) {
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
