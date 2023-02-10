@@ -56,11 +56,11 @@ export class StageController {
             { storage },
         ),
     )
-    uploadImages(@UploadedFiles() files: ImageUploadData, @Param() param, @Res() res: Response): void {
+    async uploadImages(@UploadedFiles() files: ImageUploadData, @Param() param, @Res() res: Response): Promise<void> {
         // TODO ajouter appel au service qui va générer les images de différences
         try {
             if (Object.keys(files).length) {
-                this.differenceService.compareImages(files.baseImage[0].path, files.differenceImage[0].path, param.radius);
+                await this.differenceService.compareImages(files.baseImage[0].path, files.differenceImage[0].path, param.radius);
                 console.log(files);
                 const data = [files.baseImage[0], files.differenceImage[0]];
                 res.status(HttpStatus.CREATED).send(data);

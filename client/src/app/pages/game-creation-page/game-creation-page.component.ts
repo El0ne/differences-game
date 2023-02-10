@@ -31,7 +31,6 @@ export class GameCreationPageComponent implements OnInit {
 
     ngOnInit(): void {
         this.display$ = this.modal.asObservable();
-        this.image = `${STAGE}/image/difference-image.bmp`;
     }
 
     getTitle(title: string) {
@@ -121,7 +120,10 @@ export class GameCreationPageComponent implements OnInit {
                     differenceImage: data[1].filename,
                     radius: this.radius,
                 };
-                this.gameCardService.createGame(gameInfo).subscribe((e) => console.log(e));
+                this.image = `${STAGE}/image/difference-image.bmp`;
+                this.gameCardService.createGame(gameInfo).subscribe((e) => {
+                    console.log(e);
+                });
                 this.modal.next('open');
             });
         }
