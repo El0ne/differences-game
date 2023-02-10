@@ -6,7 +6,7 @@ import { GameInformation } from '@common/game-information';
 import { HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { assert } from 'console';
-import path from 'path';
+import * as path from 'path';
 import { stub } from 'sinon';
 import * as request from 'supertest';
 import { StageController } from './stage.controller';
