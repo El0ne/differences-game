@@ -44,8 +44,10 @@ export class DifferenceDetectionService {
         image.scan(0, 0, image.bitmap.width, image.bitmap.height, (x, y, index) => {
             if (!this.isPixelSameColor(index)) {
                 for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(index / RGBA_DATA_LENGTH, this.radius, true)) {
-                    this.setPixelBlack(image, adjacentPixel * RGBA_DATA_LENGTH);
-                    this.differenceArray[adjacentPixel] = true;
+                    if (!this.differenceArray[adjacentPixel]) {
+                        this.setPixelBlack(image, adjacentPixel * RGBA_DATA_LENGTH);
+                        this.differenceArray[adjacentPixel] = true;
+                    }
                 }
             }
         });
