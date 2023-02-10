@@ -1,3 +1,4 @@
+import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import path from 'path';
@@ -23,7 +24,7 @@ export class DifferenceClickService {
 
     getDifferenceArrayFromStageID(stageId: number): number[][] {}
 
-    validateDifferencePositions(clickPosition: number[], stageId: number): boolean {
+    validateDifferencePositions(clickPosition: number[], stageId: number): ClickDifferenceVerification {
         if (!this.differences) {
             this.differences = this.getDifferenceArrayFromStageID(stageId);
         }
@@ -35,10 +36,18 @@ export class DifferenceClickService {
                 if (positions === posToCheck) {
                     const index = this.differences.indexOf(difference);
                     this.differences.splice(index, 1);
-                    return true;
+                    return {
+                        isADifference: true,
+                        differenceArray: this.unchangedDifferences,
+                        differenceNumber: this.differences.length,
+                    };
                 }
             }
         }
-        return false;
+        return {
+            isADifference: false,
+            differenceArray: this.unchangedDifferences,
+            differenceNumber: this.differences.length,
+        };
     }
 }
