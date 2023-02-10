@@ -1,5 +1,6 @@
 import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
 import { GameCardService } from '@app/services/game-card/game-card.service';
+import { GameDifficultyService } from '@app/services/game-difficulty/game-difficulty.service';
 import { GameCardInformation } from '@common/game-card';
 import { ImageUploadData } from '@common/image-upload-data';
 import { Body, Controller, Get, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
@@ -22,7 +23,11 @@ export const storage = diskStorage({
 
 @Controller('stage')
 export class StageController {
-    constructor(public gameCardService: GameCardService, public differenceService: DifferenceDetectionService) {}
+    constructor(
+        public gameCardService: GameCardService,
+        public differenceService: DifferenceDetectionService,
+        public gameDifficultyService: GameDifficultyService,
+    ) {}
 
     @Get('/')
     getStages(@Query('index') index: number, @Query('endIndex') endIndex: number): GameCardInformation[] {
@@ -58,16 +63,14 @@ export class StageController {
     )
     async uploadImages(@UploadedFiles() files: ImageUploadData, @Param() param, @Res() res: Response): Promise<void> {
         try {
-            if (Object.keys(files).length) {
-                const differenceArray = await this.differenceService.compareImages(
-                    files.baseImage[0].path,
-                    files.differenceImage[0].path,
-                    param.radius,
-                );
+            const differenceArray = await this.differenceService.compareImages(files.baseImage[0].path, files.differenceImage[0].path, param.radius);
+            // TODO call service to check if game is valid
+            if (this.gameDifficultyService.isGameValid(differenceArray)) {
+                const difficulty = this.gameDifficultyService.setGameDifficulty(differenceArray);
 
-                // TODO add differenceArray to difference arry json with unique id => unique id returned by service call
-                console.log(files);
-                const data = [files.baseImage[0], files.differenceImage[0]];
+                // TODO add differenceArray to difference array json with unique id => unique id returned by service call
+                const id = 0;
+                const data = [files.baseImage[0].path, files.differenceImage[0].path, difficulty, differenceArray.length, id];
                 res.status(HttpStatus.CREATED).send(data);
             } else res.sendStatus(HttpStatus.BAD_REQUEST);
         } catch (err) {

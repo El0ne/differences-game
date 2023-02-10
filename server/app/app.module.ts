@@ -7,6 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { StageController } from './controllers/stage/stage.controller';
 import { DifferenceDetectionService } from './services/difference-detection/difference-detection.service';
 import { DifferencesCounterService } from './services/differences-counter/differences-counter.service';
+import { GameDifficultyService } from './services/game-difficulty/game-difficulty.service';
 import { ImageDimensionsService } from './services/image-dimensions/image-dimensions.service';
 import { PixelPositionService } from './services/pixel-position/pixel-position/pixel-position.service';
 import { PixelRadiusService } from './services/pixel-radius/pixel-radius.service';
@@ -33,6 +34,7 @@ import { PixelRadiusService } from './services/pixel-radius/pixel-radius.service
         DifferencesCounterService,
         PixelRadiusService,
         GameCardService,
+        GameDifficultyService,
     ],
 })
 export class AppModule {}
