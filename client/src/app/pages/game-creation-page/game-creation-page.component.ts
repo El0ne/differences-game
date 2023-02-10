@@ -121,16 +121,13 @@ export class GameCreationPageComponent implements OnInit {
                     differenceImage: data[1].filename,
                     radius: this.radius,
                 };
-                console.log('this.radius', this.radius);
-                setTimeout(() => {
-                    this.image = `${STAGE}/image/difference-image.bmp`;
-                    const j: number = performance.now();
-                    console.log(j - i);
-                    this.gameCardService.createGame(gameInfo).subscribe((e) => {
-                        console.log(e);
-                    });
-                    this.modal.next('open');
-                }, 1000);
+                this.image = `${STAGE}/image/difference-image.bmp`;
+                const j: number = performance.now();
+                console.log(j - i);
+                this.gameCardService.createGame(gameInfo).subscribe((e) => {
+                    console.log(e);
+                });
+                this.modal.next('open');
             });
         }
     }
