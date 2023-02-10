@@ -1,8 +1,10 @@
-const GAME1 = {
+import { GameCardInformation } from '@common/game-card';
+
+const GAME1: GameCardInformation = {
     name: 'Library',
     difficulty: 'Difficile',
-    // TODO: modifie pour image qui vient du serveur
-    image: '/assets/444-640x480.jpg',
+    originalImageName: '/assets/444-640x480.jpg',
+    differenceImageName: '/assets/444-640x480.jpg',
     soloTimes: [
         { time: 60, name: 'Inull' },
         { time: 90, name: 'second' },
@@ -15,11 +17,11 @@ const GAME1 = {
     ],
 };
 
-const GAME2 = {
+const GAME2: GameCardInformation = {
     name: 'game2',
     difficulty: 'Difficile',
-    // TODO: modifie pour image qui vient du serveur
-    image: '/assets/444-640x480.jpg',
+    originalImageName: '/assets/444-640x480.jpg',
+    differenceImageName: '/assets/444-640x480.jpg',
     soloTimes: [
         { time: 60, name: 'Inull' },
         { time: 90, name: 'second' },
@@ -32,4 +34,4 @@ const GAME2 = {
     ],
 };
 
-export const GAMES = [GAME1, GAME1, GAME2, GAME1, GAME1, GAME2];
+export const GAMES: GameCardInformation[] = [GAME1, GAME1, GAME2, GAME1, GAME1, GAME2];
