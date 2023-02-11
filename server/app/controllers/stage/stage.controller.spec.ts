@@ -23,6 +23,7 @@ describe('StageController', () => {
     let controller: StageController;
     let getGameCardStub;
     let getGameCardsNumberStub;
+    let gameCardService: GameCardService;
 
     beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -41,11 +42,12 @@ describe('StageController', () => {
         await app.init();
         httpServer = app.getHttpServer();
         controller = module.get<StageController>(StageController);
+        gameCardService = module.get<GameCardService>(GameCardService);
     });
 
     beforeEach(() => {
-        getGameCardStub = stub(controller.gameCardService, 'getGameCards');
-        getGameCardsNumberStub = stub(controller.gameCardService, 'getGameCardsNumber');
+        getGameCardStub = stub(gameCardService, 'getGameCards');
+        getGameCardsNumberStub = stub(gameCardService, 'getGameCardsNumber');
     });
 
     afterEach(() => {
@@ -90,7 +92,7 @@ describe('StageController', () => {
     });
 
     it('createGame() should call GameCardService.createGameCard() with the body as a parameter', async () => {
-        const createGameCardStub = stub(controller.gameCardService, 'createGameCard').callsFake(() => FAKE_GAME_CARD_ARRAY[0]);
+        const createGameCardStub = stub(gameCardService, 'createGameCard').callsFake(() => FAKE_GAME_CARD_ARRAY[0]);
         const response = await request(httpServer).post('/stage').send(FAKE_GAME_INFO);
         assert(createGameCardStub.called);
         expect(response.status).toBe(HttpStatus.CREATED);
@@ -99,7 +101,7 @@ describe('StageController', () => {
     });
 
     it('createGame() should return 500 if there is an error', async () => {
-        const createGameCardStub = stub(controller.gameCardService, 'createGameCard').callsFake(() => {
+        const createGameCardStub = stub(gameCardService, 'createGameCard').callsFake(() => {
             throw new Error();
         });
         const response = await request(httpServer).post('/stage').send(FAKE_GAME_INFO);
