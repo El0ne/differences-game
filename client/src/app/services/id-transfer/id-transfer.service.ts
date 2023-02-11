@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
     providedIn: 'root',
 })
 export class IdTransferService {
-    idToTransfer: string = 'hello';
+    idToTransfer: string;
 
     setIdFromGameCard(id: string): void {
         this.idToTransfer = id;

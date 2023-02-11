@@ -26,17 +26,20 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     currentTime: number;
     currentGameId: string;
 
-    constructor(private timerService: TimerSoloService, private convertService: SecondToMinuteService, convertIdService: IdTransferService) {
+    constructor(private timerService: TimerSoloService, private convertService: SecondToMinuteService, private idTransferService: IdTransferService) {
         this.differenceArray = MOCK_ARRAY;
         this.numberOfDifferences = this.differenceArray.length;
         this.currentService = timerService;
-        this.currentGameId = convertIdService.getId();
     }
 
     // TODO: Ajouter le get par ID pour recevoir les éléments du gameCard
+    getIdFromGameCard(): void {
+        this.currentGameId = this.idTransferService.getId();
+    }
 
     ngOnInit(): void {
         this.showTime();
+        this.getIdFromGameCard();
         console.log(this.currentGameId);
     }
 
