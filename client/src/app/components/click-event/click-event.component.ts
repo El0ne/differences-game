@@ -30,6 +30,7 @@ export class ClickEventComponent implements OnInit {
     async ngOnInit() {
         this.timeout = false;
         await this.loadImage();
+        this.setDifferences();
     }
     async loadImage() {
         return new Promise((resolve) => {
@@ -43,6 +44,12 @@ export class ClickEventComponent implements OnInit {
         });
     }
 
+    setDifferences() {
+        this.clickEventService.setDifferences(this.radius, this.gameCardId).subscribe((data) => {
+            this.differenceArray = data;
+        });
+    }
+
     getCoordInImage(e: MouseEvent): number[] {
         const rect = this.modification.nativeElement.getBoundingClientRect();
         const x = Math.max(Math.floor(e.clientX - rect.left), 0);
@@ -51,18 +58,15 @@ export class ClickEventComponent implements OnInit {
     }
 
     isDifferent(e: MouseEvent) {
-        this.clickEventService
-            .isADifference(this.getCoordInImage(e)[0], this.getCoordInImage(e)[1], this.gameCardId, this.radius)
-            .subscribe((data) => {
-                this.differenceData = data;
-                console.log(this.getCoordInImage(e)[0], this.getCoordInImage(e)[1]);
-                if (this.differenceData.isADifference) {
-                    this.lastDifferenceClicked = this.differenceData.differenceArray;
-                    this.differenceEffect();
-                } else {
-                    this.displayError(e);
-                }
-            });
+        this.clickEventService.isADifference(this.getCoordInImage(e)[0], this.getCoordInImage(e)[1]).subscribe((data) => {
+            this.differenceData = data;
+            if (this.differenceData.isADifference) {
+                this.lastDifferenceClicked = this.differenceData.differenceArray;
+                this.differenceEffect();
+            } else {
+                this.displayError(e);
+            }
+        });
     }
 
     constructEffect(originalContext: CanvasRenderingContext2D) {

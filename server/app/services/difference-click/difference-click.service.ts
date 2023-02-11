@@ -37,12 +37,14 @@ export class DifferenceClickService {
         }
     }
 
-    validateDifferencePositions(clickPositionX: number, clickPositionY: number, stageId: number, radius: number): ClickDifferenceVerification {
-        if (this.id !== +stageId) {
-            this.differences = this.getDifferenceArrayFromStageID(stageId, radius);
-            this.copyDifferencesToUnchanged(this.differences);
-            this.id = +stageId;
-        }
+    setDifference(stageId: number, radius: number) {
+        this.differences = this.getDifferenceArrayFromStageID(stageId, radius);
+        this.copyDifferencesToUnchanged(this.differences);
+        this.id = +stageId;
+        return this.differences;
+    }
+
+    validateDifferencePositions(clickPositionX: number, clickPositionY: number): ClickDifferenceVerification {
         const x: number = +clickPositionX;
         const y: number = +clickPositionY;
         const posToCheck = y * WIDTH + x;

@@ -1,8 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import * as fs from 'fs';
-
+/*
 @Injectable()
 export class DifferenceObjectCreationService {
+
     createDifferenceObjects(firstImagePath: string, secondImagePath: string, radius: number): void {
         // passer en parametre les images a comparer ainsi que le rayon, puis retourner l'array de arrays de pixels differents
         const differencesArray[][] = differenceDetectionService.compareImages(firstImagePath, secondImagePath, radius);
@@ -27,3 +26,4 @@ export class DifferenceObjectCreationService {
         return differenceObject;
     }
 }
+*/
