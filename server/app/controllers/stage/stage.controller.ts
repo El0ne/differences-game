@@ -27,8 +27,8 @@ export const storage = diskStorage({
 export class StageController {
     constructor(
         private gameCardService: GameCardService,
-        public differenceService: DifferenceDetectionService,
-        public gameDifficultyService: GameDifficultyService,
+        private differenceService: DifferenceDetectionService,
+        private gameDifficultyService: GameDifficultyService,
     ) {}
 
     @Get('/')
