@@ -115,19 +115,26 @@ export class GameCreationPageComponent implements OnInit {
     save(): void {
         if (this.saveVerification() && this.originalFile && this.differentFile) {
             this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
-                const gameInfo: GameInformation = {
-                    id: data.gameId,
-                    name: this.gameTitle,
-                    difficulty: data.gameDifficulty,
-                    baseImage: data.originalImageName,
-                    differenceImage: data.differenceImageName,
-                    radius: this.radius,
-                    differenceNumber: data.gameDifferenceNumber,
-                };
-                this.differenceNumber = data.gameDifferenceNumber;
-                this.image = `${STAGE}/image/difference-image.bmp`;
-                this.gameCardService.createGame(gameInfo).subscribe((e) => {});
-                this.modal.next('open');
+                console.log('data', data);
+                if (data.gameId) {
+                    const gameInfo: GameInformation = {
+                        id: data.gameId,
+                        name: this.gameTitle,
+                        difficulty: data.gameDifficulty,
+                        baseImage: data.originalImageName,
+                        differenceImage: data.differenceImageName,
+                        radius: this.radius,
+                        differenceNumber: data.gameDifferenceNumber,
+                    };
+                    this.differenceNumber = data.gameDifferenceNumber;
+                    this.image = `${STAGE}/image/difference-image.bmp`;
+                    this.gameCardService.createGame(gameInfo).subscribe((e) => {
+                        console.log('e', e);
+                    });
+                    this.modal.next('open');
+                } else {
+                    alert("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
+                }
             });
         }
     }

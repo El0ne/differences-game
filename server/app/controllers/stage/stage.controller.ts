@@ -70,7 +70,6 @@ export class StageController {
                     files.differenceImage[0].path,
                     param.radius,
                 );
-                // TODO call service to check if game is valid
                 if (this.gameDifficultyService.isGameValid(differenceArray)) {
                     const difficulty = this.gameDifficultyService.setGameDifficulty(differenceArray);
 
@@ -84,6 +83,10 @@ export class StageController {
                         gameDifferenceNumber: differenceArray.length,
                     };
                     res.status(HttpStatus.CREATED).send(data);
+                } else {
+                    // TODO delete the images
+                    // Which status code to send?
+                    res.status(HttpStatus.OK).send([]);
                 }
             } else res.sendStatus(HttpStatus.BAD_REQUEST);
         } catch (err) {
