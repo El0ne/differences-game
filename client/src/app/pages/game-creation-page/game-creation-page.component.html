@@ -2,15 +2,15 @@
     <div class="header-button-container">
         <div class="left-header-container">
             <button id="previous" routerLink="/config">Retour</button>
-            <button id="info"><img class="info-image" src="../../../assets/info-48.png" (click)="this.modalDiffService.open()" /></button>
             <ng-container *ngIf="display$ | async as display">
-                <section [class.open]="display === 'open'" (click)="this.modalDiffService.close()">
+                <section [class.open]="display === 'open'" (click)="this.modal.next('open')">
                     <div (click)="$event.stopPropagation()">
-                        <button class="close" type="button" (click)="this.modalDiffService.close()">X</button>
+                        <button class="close" type="button" (click)="this.modal.next('close')">X</button>
                         <h1>Vos différences ajoutées :</h1>
                         <div class="diff-image">
                             <canvas #canvasDiff width="640px" height="480px"></canvas>
                         </div>
+                        <button class="continue" routerLink="/config">Continuer</button>
                     </div>
                 </section>
             </ng-container>
@@ -30,7 +30,7 @@
                 <div class="original image">
                     <canvas #canvas1 width="640px" height="480px"></canvas>
                 </div>
-                <button id="reset-original" (click)="clear($event)">X</button>
+                <button id="reset-original" (click)="clearFirstFile(this.myOgCanvas.nativeElement, 'upload-original')">X</button>
                 <label for="upload-original">
                     Choisir une image de 640*480 de format bmp
                     <input type="file" id="upload-original" class="photo-upload" (change)="fileValidation($event)" accept="image/bmp" />
@@ -83,7 +83,7 @@
                 <div class="different image">
                     <canvas #canvas2 width="640px" height="480px"></canvas>
                 </div>
-                <button id="reset-different" (click)="clear($event)">X</button>
+                <button id="reset-different" (click)="clearSecondFile(this.myDiffCanvas.nativeElement, 'upload-different')">X</button>
                 <label for="upload-original">
                     Choisir une image de 640*480 de format bmp
                     <input type="file" id="upload-different" class="photo-upload" (change)="fileValidation($event)" accept="image/bmp" />
