@@ -10,6 +10,7 @@ export class TimerSoloService {
     private subArray: Subscription[] = [];
 
     startTimer() {
+        this.currentTime = -1;
         const timer1 = timer(ZERO, ONE_SEC_IN_MS);
 
         const sub = timer1.subscribe(() => {
