@@ -27,6 +27,7 @@ export class GameCreationPageComponent implements OnInit {
     otherId: string = 'upload-different';
 
     image: string = '';
+    differenceNumber: number = 0;
 
     constructor(private gameCardService: GameCardInformationService) {}
 
@@ -123,6 +124,7 @@ export class GameCreationPageComponent implements OnInit {
                     radius: this.radius,
                     differenceNumber: data.gameDifferenceNumber,
                 };
+                this.differenceNumber = data.gameDifferenceNumber;
                 this.image = `${STAGE}/image/difference-image.bmp`;
                 this.gameCardService.createGame(gameInfo).subscribe((e) => {});
                 this.modal.next('open');
