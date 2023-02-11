@@ -57,27 +57,27 @@ describe('DifferenceDetectionService', () => {
         assert(createDifferenceImageStub.calledOnce);
     });
 
-    // it('createDifferenceImage should call multiple functions ', () => {
-    //     service.differenceArray = new Array(imageDimensionsService.getNumberOfPixels());
-    //     const image = new Jimp(640, 480, 'white', (err) => {
-    //         if (err) throw err;
-    //     });
-    //     const isPixelSameColorStub = stub(service, 'isPixelSameColor').callsFake(() => false);
-    //     const setPixelBlackStub = stub(service, 'setPixelBlack').callsFake(() => {});
-    //     const hasWhiteNeighborStub = stub(service, 'hasWhiteNeighbor').callsFake(() => true);
-    //     const getAdjacentPixelsStub = stub(pixelRadiusService, 'getAdjacentPixels').callsFake(() => [0, 1, 2]);
-    //     const imageWriteStub = stub(image, 'write').callsFake(() => {
-    //         return image;
-    //     });
-    //     const differencesCounterStub = stub(differencesCounterService, 'getDifferencesList').callsFake(() => []);
-    //     service.createDifferenceImage(image);
-    //     assert(isPixelSameColorStub.called);
-    //     assert(setPixelBlackStub.called);
-    //     assert(hasWhiteNeighborStub.called);
-    //     assert(getAdjacentPixelsStub.called);
-    //     assert(imageWriteStub.called);
-    //     assert(differencesCounterStub.called);
-    // });
+    it('createDifferenceImage should call multiple functions ', () => {
+        service.differenceArray = new Array(imageDimensionsService.getNumberOfPixels());
+        const image = new Jimp(10, 10, 'white', (err) => {
+            if (err) throw err;
+        });
+        const isPixelSameColorStub = stub(service, 'isPixelSameColor').callsFake(() => false);
+        const setPixelBlackStub = stub(service, 'setPixelBlack').callsFake(() => {});
+        const hasWhiteNeighborStub = stub(service, 'hasWhiteNeighbor').callsFake(() => true);
+        const getAdjacentPixelsStub = stub(pixelRadiusService, 'getAdjacentPixels').callsFake(() => [0, 1, 2]);
+        const imageWriteStub = stub(image, 'write').callsFake(() => {
+            return image;
+        });
+        const differencesCounterStub = stub(differencesCounterService, 'getDifferencesList').callsFake(() => []);
+        service.createDifferenceImage(image);
+        assert(isPixelSameColorStub.called);
+        assert(setPixelBlackStub.called);
+        assert(hasWhiteNeighborStub.called);
+        assert(getAdjacentPixelsStub.called);
+        assert(imageWriteStub.called);
+        assert(differencesCounterStub.called);
+    });
 
     it('hasWhiteNeighbor should return true if one of the pixel neighbor is white', () => {
         service.differenceArray = [true, false, false, true];
