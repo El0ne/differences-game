@@ -2,7 +2,7 @@ import { ClickDifferenceVerification } from '@common/click-difference-verificati
 import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
-import { WIDTH } from './testing-purpose-constant';
+import { WIDTH } from './image-constants';
 
 @Injectable()
 export class DifferenceClickService {
@@ -27,18 +27,21 @@ export class DifferenceClickService {
         }
     }
 
-    getDifferenceArrayFromStageID(stageId: string): number[][] {
+    getDifferenceArrayFromStageID(stageId: number, radius: number): number[][] {
         for (const differenceObject of JSON.parse(this.content).differences) {
             if (differenceObject.id.toString() === stageId) {
-                return differenceObject.differences;
+                for (const differences of differenceObject.differences) {
+                    if (differences.radius.toString() === radius) return differences.differencePosition;
+                }
             }
         }
     }
 
-    validateDifferencePositions(clickPositionX: string, clickPositionY: string, stageId: string): ClickDifferenceVerification {
+    validateDifferencePositions(clickPositionX: number, clickPositionY: number, stageId: number, radius: number): ClickDifferenceVerification {
         if (this.id !== +stageId) {
-            this.differences = this.getDifferenceArrayFromStageID(stageId);
+            this.differences = this.getDifferenceArrayFromStageID(stageId, radius);
             this.copyDifferencesToUnchanged(this.differences);
+            this.id = +stageId;
         }
         const x: number = +clickPositionX;
         const y: number = +clickPositionY;

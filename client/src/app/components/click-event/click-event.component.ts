@@ -1,5 +1,7 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { PATHS } from '@app/pages/solo-view/solo-view-constants';
+import { ClickEventService } from '@app/services/Click-event/click-event.service';
+import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { FAST_WAIT_TIME, HEIGHT, WAIT_TIME, WIDTH } from './click-event-constant';
 
 @Component({
@@ -11,6 +13,8 @@ export class ClickEventComponent implements OnInit {
     @Input() differenceArray: number[][];
     @Input() id: number;
     @Input() original: string;
+    @Input() gameCardId: number;
+    @Input() radius: number;
     @Output() incrementScore: EventEmitter<number> = new EventEmitter<number>();
     @ViewChild('picture', { static: true })
     picture: ElementRef<HTMLCanvasElement>;
@@ -19,6 +23,9 @@ export class ClickEventComponent implements OnInit {
     timeout: boolean;
     lastDifferenceClicked: number[];
     currentScore: number = 0;
+    differenceData: ClickDifferenceVerification;
+
+    constructor(public clickEventService: ClickEventService) {}
 
     async ngOnInit() {
         this.timeout = false;
@@ -43,14 +50,19 @@ export class ClickEventComponent implements OnInit {
         return new Array(x, y);
     }
 
-    isDifferent(e: MouseEvent): boolean {
-        if (this.isADifference(this.getCoordInImage(e)[0], this.getCoordInImage(e)[1], false)) {
-            this.differenceEffect();
-            this.isADifference(this.getCoordInImage(e)[0], this.getCoordInImage(e)[1], true);
-            return true;
-        } else {
-            return false;
-        }
+    isDifferent(e: MouseEvent) {
+        this.clickEventService
+            .isADifference(this.getCoordInImage(e)[0], this.getCoordInImage(e)[1], this.gameCardId, this.radius)
+            .subscribe((data) => {
+                this.differenceData = data;
+                console.log(this.getCoordInImage(e)[0], this.getCoordInImage(e)[1]);
+                if (this.differenceData.isADifference) {
+                    this.lastDifferenceClicked = this.differenceData.differenceArray;
+                    this.differenceEffect();
+                } else {
+                    this.displayError(e);
+                }
+            });
     }
 
     constructEffect(originalContext: CanvasRenderingContext2D) {
@@ -129,7 +141,7 @@ export class ClickEventComponent implements OnInit {
 
     displayError(e: MouseEvent): void {
         if (!this.timeout) {
-            if (!this.isDifferent(e)) {
+            if (!this.differenceData.isADifference) {
                 this.emitSound(true);
                 this.timeout = true;
                 const rect = this.modification.nativeElement.getBoundingClientRect();
