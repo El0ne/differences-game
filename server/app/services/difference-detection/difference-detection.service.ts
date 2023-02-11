@@ -52,23 +52,21 @@ export class DifferenceDetectionService {
         radiusArray.fill(false);
 
         for (const i of this.differenceArray.keys()) {
-            if (this.differenceArray[i] && this.hasWhiteNeighbor(i)) {
-                for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(i, this.radius, true)) {
-                    radiusArray[adjacentPixel] = true;
-                }
-            }
-        }
-
-        for (const i of this.differenceArray.keys()) {
-            this.differenceArray[i] = this.differenceArray[i] || radiusArray[i];
             if (this.differenceArray[i]) {
+                radiusArray[i] = true;
                 this.setPixelBlack(image, i * RGBA_DATA_LENGTH);
+                if (this.hasWhiteNeighbor(i)) {
+                    for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(i, this.radius, true)) {
+                        radiusArray[adjacentPixel] = true;
+                        this.setPixelBlack(image, adjacentPixel * RGBA_DATA_LENGTH);
+                    }
+                }
             }
         }
 
         image.write(DIFFERENCE_IMAGE_PATH);
 
-        return this.differencesCounterService.getDifferencesList(this.differenceArray);
+        return this.differencesCounterService.getDifferencesList(radiusArray);
     }
 
     hasWhiteNeighbor(pixelPosition: number): boolean {
