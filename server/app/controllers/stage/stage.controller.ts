@@ -84,19 +84,14 @@ export class StageController {
                         gameDifferenceNumber: differenceArray.length,
                     };
                     res.status(HttpStatus.CREATED).send(data);
-                    // fs.unlink('assets/images/difference-image.bmp', (err) => {
-                    //     if (err) throw err;
-                    // });
                 } else {
+                    // create method to call instead of using fs directly
                     fs.unlink(files.baseImage[0].path, (err) => {
                         if (err) throw err;
                     });
                     fs.unlink(files.differenceImage[0].path, (err) => {
                         if (err) throw err;
                     });
-                    // fs.unlink('assets/images/difference-image.bmp', (err) => {
-                    //     if (err) throw err;
-                    // });
                     // Which status code to send?
                     res.status(HttpStatus.OK).send([]);
                 }
