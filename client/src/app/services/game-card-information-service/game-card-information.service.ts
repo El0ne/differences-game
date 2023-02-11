@@ -21,6 +21,10 @@ export class GameCardInformationService {
         return this.http.get<number>(`${STAGE}/info`);
     }
 
+    getGameCardInfoFromId(id: string): Observable<GameCardInformation> {
+        return this.http.get<GameCardInformation>(`${STAGE}/${id}`);
+    }
+
     createGame(gameInfo: GameInformation): Observable<GameCardInformation> {
         // content-type was causing a linting error otherwise
         // eslint-disable-next-line @typescript-eslint/naming-convention

@@ -129,6 +129,9 @@ export class GameCreationPageComponent implements OnInit {
                     this.image = `${STAGE}/image/difference-image.bmp`;
                     this.gameCardService.createGame(gameInfo).subscribe();
                     this.modal.next('open');
+                    this.gameCardService.getGameCardInfoFromId(data.gameId).subscribe((elouan) => {
+                        console.log(elouan);
+                    });
                 } else {
                     alert("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
                 }
