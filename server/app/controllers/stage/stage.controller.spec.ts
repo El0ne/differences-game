@@ -1,9 +1,13 @@
 // @ts-ignore
 
+import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
+import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameDifficultyService } from '@app/services/game-difficulty/game-difficulty.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
+import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
+import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { GameCardInformation } from '@common/game-card';
 import { GameInformation } from '@common/game-information';
 import { HttpStatus } from '@nestjs/common';
@@ -20,21 +24,32 @@ describe('StageController', () => {
     let controller: StageController;
     let getGameCardStub;
     let getGameCardsNumberStub;
+    let gameCardService: GameCardService;
 
     beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [StageController],
-            providers: [GameCardService, GameDifficultyService, ImageDimensionsService, ImageManagerService],
+            providers: [
+                GameCardService,
+                GameDifficultyService,
+                ImageDimensionsService,
+                ImageManagerService,
+                DifferenceDetectionService,
+                PixelRadiusService,
+                DifferencesCounterService,
+                PixelPositionService,
+            ],
         }).compile();
         const app = module.createNestApplication();
         await app.init();
         httpServer = app.getHttpServer();
         controller = module.get<StageController>(StageController);
+        gameCardService = module.get<GameCardService>(GameCardService);
     });
 
     beforeEach(() => {
-        getGameCardStub = stub(controller.gameCardService, 'getGameCards');
-        getGameCardsNumberStub = stub(controller.gameCardService, 'getGameCardsNumber');
+        getGameCardStub = stub(gameCardService, 'getGameCards');
+        getGameCardsNumberStub = stub(gameCardService, 'getGameCardsNumber');
     });
 
     afterEach(() => {
@@ -79,7 +94,7 @@ describe('StageController', () => {
     });
 
     it('createGame() should call GameCardService.createGameCard() with the body as a parameter', async () => {
-        const createGameCardStub = stub(controller.gameCardService, 'createGameCard').callsFake(() => FAKE_GAME_CARD_ARRAY[0]);
+        const createGameCardStub = stub(gameCardService, 'createGameCard').callsFake(() => FAKE_GAME_CARD_ARRAY[0]);
         const response = await request(httpServer).post('/stage').send(FAKE_GAME_INFO);
         assert(createGameCardStub.called);
         expect(response.status).toBe(HttpStatus.CREATED);
@@ -88,7 +103,7 @@ describe('StageController', () => {
     });
 
     it('createGame() should return 500 if there is an error', async () => {
-        const createGameCardStub = stub(controller.gameCardService, 'createGameCard').callsFake(() => {
+        const createGameCardStub = stub(gameCardService, 'createGameCard').callsFake(() => {
             throw new Error();
         });
         const response = await request(httpServer).post('/stage').send(FAKE_GAME_INFO);
@@ -126,13 +141,6 @@ describe('StageController', () => {
             if (err) throw err;
         });
     });
-
-    // it('getImage() should return 500 if there is an error', async () => {
-    //     const wrongPath = 'fake/image/path';
-    //     stub(path, 'join').callsFake(() => wrongPath);
-    //     const response = await request(httpServer).get('/stage/image/sampleImageName');
-    //     expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
-    // });
 });
 
 const FAKE_GAME_INFO: GameInformation = {

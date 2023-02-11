@@ -1,3 +1,4 @@
+import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameDifficultyService } from '@app/services/game-difficulty/game-difficulty.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
@@ -25,9 +26,10 @@ export const storage = diskStorage({
 @Controller('stage')
 export class StageController {
     constructor(
-        public gameCardService: GameCardService,
+        private gameCardService: GameCardService,
         private gameDifficultyService: GameDifficultyService,
         private imageManagerService: ImageManagerService,
+        private differenceService: DifferenceDetectionService,
     ) {}
 
     @Get('/')
@@ -67,12 +69,15 @@ export class StageController {
             { storage },
         ),
     )
-    uploadImages(@UploadedFiles() files: ImageUploadData, @Param() param, @Res() res: Response): void {
+    async uploadImages(@UploadedFiles() files: ImageUploadData, @Param() param, @Res() res: Response): Promise<void> {
         try {
             if (Object.keys(files).length) {
                 // TODO ajouter appel au service qui va générer les images de différences
-                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                const differenceArray = [[1], [2], [3], [4], [5], [6], [7], [8], [9]];
+                const differenceArray = await this.differenceService.compareImages(
+                    files.baseImage[0].path,
+                    files.differenceImage[0].path,
+                    param.radius,
+                );
                 if (this.gameDifficultyService.isGameValid(differenceArray)) {
                     const difficulty = this.gameDifficultyService.setGameDifficulty(differenceArray);
 
