@@ -77,9 +77,8 @@ export class StageController {
                     const difficulty = this.gameDifficultyService.setGameDifficulty(differenceArray);
 
                     // TODO add differenceArray to difference array json with unique id => unique id returned by service call
-                    const id = uuidv4();
                     const data: ServerGeneratedGameInfo = {
-                        gameId: id,
+                        gameId: uuidv4(),
                         originalImageName: files.baseImage[0].filename,
                         differenceImageName: files.differenceImage[0].filename,
                         gameDifficulty: difficulty,

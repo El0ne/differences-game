@@ -1,10 +1,13 @@
+import { StageController } from '@app/controllers/stage/stage.controller';
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { Course, courseSchema } from '@app/model/database/course';
 import { GameCardService } from '@app/services/game-card/game-card.service';
+import { GameDifficultyService } from '@app/services/game-difficulty/game-difficulty.service';
+import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
+import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { StageController } from './controllers/stage/stage.controller';
 
 @Module({
     imports: [
@@ -19,6 +22,6 @@ import { StageController } from './controllers/stage/stage.controller';
         MongooseModule.forFeature([{ name: Course.name, schema: courseSchema }]),
     ],
     controllers: [StageController],
-    providers: [ChatGateway, Logger, GameCardService],
+    providers: [ChatGateway, Logger, GameCardService, GameDifficultyService, ImageDimensionsService, ImageManagerService],
 })
 export class AppModule {}
