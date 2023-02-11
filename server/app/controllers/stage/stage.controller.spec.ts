@@ -139,26 +139,30 @@ describe('StageController', () => {
     });
 });
 const FAKE_GAME_INFO: GameInformation = {
-    name: 'Fake Title',
-    baseImage: 'baseImage/path',
-    differenceImage: 'differenceImage/path',
+    id: 0,
+    name: 'game.name',
+    difficulty: 'Facile',
+    baseImage: 'game.baseImage',
+    differenceImage: 'game.differenceImage',
     radius: 3,
+    differenceNumber: 6,
 };
-
 const FAKE_GAME_CARD: GameCardInformation = {
-    name: 'Library',
-    difficulty: 'Difficile',
-    originalImageName: '/assets/444-640x480.jpg',
-    differenceImageName: '/assets/444-640x480.jpg',
+    id: 0,
+    name: 'game.name',
+    difficulty: 'Facile',
+    differenceNumber: 6,
+    originalImageName: 'game.baseImage',
+    differenceImageName: 'game.differenceImage',
     soloTimes: [
-        { time: 60, name: 're' },
-        { time: 90, name: 'second' },
-        { time: 105, name: 'third' },
+        { time: 0, name: '--' },
+        { time: 0, name: '--' },
+        { time: 0, name: '--' },
     ],
     multiTimes: [
-        { time: 63, name: 'First' },
-        { time: 92, name: 'second' },
-        { time: 115, name: 'third' },
+        { time: 0, name: '--' },
+        { time: 0, name: '--' },
+        { time: 0, name: '--' },
     ],
 };
 

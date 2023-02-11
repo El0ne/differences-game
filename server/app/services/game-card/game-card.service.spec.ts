@@ -48,14 +48,19 @@ describe('GameCardService', () => {
 });
 
 const FAKE_GAME_INFO: GameInformation = {
+    id: 0,
     name: 'game.name',
+    difficulty: 'Facile',
     baseImage: 'game.baseImage',
     differenceImage: 'game.differenceImage',
     radius: 3,
+    differenceNumber: 6,
 };
 const FAKE_GAME_CARD: GameCardInformation = {
+    id: 0,
     name: 'game.name',
     difficulty: 'Facile',
+    differenceNumber: 6,
     originalImageName: 'game.baseImage',
     differenceImageName: 'game.differenceImage',
     soloTimes: [

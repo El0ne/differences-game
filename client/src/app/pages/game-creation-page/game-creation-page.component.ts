@@ -1,6 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { STAGE } from '@app/services/server-routes';
+import { GameInformation } from '@common/game-information';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Component({
@@ -115,7 +116,7 @@ export class GameCreationPageComponent implements OnInit {
         if (this.saveVerification() && this.originalFile && this.differentFile) {
             this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
                 console.log('data', data);
-                const gameInfo = {
+                const gameInfo: GameInformation = {
                     id: data.gameId,
                     name: this.gameTitle,
                     difficulty: data.gameDifficulty,
