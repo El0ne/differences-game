@@ -3,6 +3,7 @@
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameDifficultyService } from '@app/services/game-difficulty/game-difficulty.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
+import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { GameCardInformation } from '@common/game-card';
 import { GameInformation } from '@common/game-information';
 import { HttpStatus } from '@nestjs/common';
@@ -23,7 +24,7 @@ describe('StageController', () => {
     beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [StageController],
-            providers: [GameCardService, GameDifficultyService, ImageDimensionsService],
+            providers: [GameCardService, GameDifficultyService, ImageDimensionsService, ImageManagerService],
         }).compile();
         const app = module.createNestApplication();
         await app.init();
