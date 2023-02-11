@@ -1,9 +1,12 @@
 import { GameCardService } from '@app/services/game-card/game-card.service';
+import { GameDifficultyService } from '@app/services/game-difficulty/game-difficulty.service';
 import { GameCardInformation } from '@common/game-card';
 import { ImageUploadData } from '@common/image-upload-data';
+import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
 import { Body, Controller, Get, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
+import * as fs from 'fs';
 import { diskStorage } from 'multer';
 import * as path from 'path';
 import { join } from 'path';
@@ -21,7 +24,7 @@ export const storage = diskStorage({
 
 @Controller('stage')
 export class StageController {
-    constructor(public gameCardService: GameCardService) {}
+    constructor(public gameCardService: GameCardService, private gameDifficultyService: GameDifficultyService) {}
 
     @Get('/')
     getStages(@Query('index') index: number, @Query('endIndex') endIndex: number): GameCardInformation[] {
@@ -61,11 +64,35 @@ export class StageController {
         ),
     )
     uploadImages(@UploadedFiles() files: ImageUploadData, @Param() param, @Res() res: Response): void {
-        // TODO ajouter appel au service qui va générer les images de différences
         try {
             if (Object.keys(files).length) {
-                const data = [files.baseImage[0], files.differenceImage[0]];
-                res.status(HttpStatus.CREATED).send(data);
+                // TODO ajouter appel au service qui va générer les images de différences
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                const differenceArray = [[1], [2], [3], [4], [5], [6], [7], [8], [9]];
+                if (this.gameDifficultyService.isGameValid(differenceArray)) {
+                    const difficulty = this.gameDifficultyService.setGameDifficulty(differenceArray);
+
+                    // TODO add differenceArray to difference array json with unique id => unique id returned by service call
+                    const id = uuidv4();
+                    const data: ServerGeneratedGameInfo = {
+                        gameId: id,
+                        originalImageName: files.baseImage[0].filename,
+                        differenceImageName: files.differenceImage[0].filename,
+                        gameDifficulty: difficulty,
+                        gameDifferenceNumber: differenceArray.length,
+                    };
+                    res.status(HttpStatus.CREATED).send(data);
+                } else {
+                    // TODO create method to call instead of using fs directly
+                    fs.unlink(files.baseImage[0].path, (err) => {
+                        if (err) throw err;
+                    });
+                    fs.unlink(files.differenceImage[0].path, (err) => {
+                        if (err) throw err;
+                    });
+                    // Which status code to send?
+                    res.status(HttpStatus.OK).send([]);
+                }
             } else res.sendStatus(HttpStatus.BAD_REQUEST);
         } catch (err) {
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
