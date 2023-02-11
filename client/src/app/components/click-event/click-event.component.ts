@@ -34,7 +34,8 @@ export class ClickEventComponent implements OnInit {
     async loadImage() {
         return new Promise((resolve) => {
             const image = new Image();
-            image.src = './assets/444-640x480.jpg'; // TODO: replace by actual image when necessary
+            // TODO: Ajouter lorsqu'on aura acces a GameCardInformation
+            image.src = './assets/444-640x480.jpg';
             image.onload = () => {
                 const context = this.picture.nativeElement.getContext('2d') as CanvasRenderingContext2D;
                 context.drawImage(image, 0, 0);

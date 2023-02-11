@@ -1,6 +1,6 @@
 <body>
     <div class="info-card" *ngIf="showTextBox">
-        <!-- TODO : Make sure that the info card has access to the game's info-->
+        <!--TODO: Ajouter lorsqu'on aura acces a GameCardInformation-->
         <div class="info">
             <p class="title">Nom du jeu</p>
             <div class="title">difficulté : facile</div>
@@ -42,12 +42,13 @@
     </div>
 
     <div class="flex-game">
+        <!--TODO: Ajouter lorsqu'on aura acces a GameCardInformation-->
         <app-click-event
             [differenceArray]="differenceArray"
             [id]="1"
             [original]="'original'"
             [radius]="3"
-            [gameCardId]="1"
+            [gameCardId]="2"
             (incrementScore)="incrementScore()"
             (finishGame)="finishGame()"
         ></app-click-event>
@@ -87,12 +88,13 @@
                 </div>
             </div>
         </div>
+        <!--TODO: Ajouter lorsqu'on aura acces a GameCardInformation-->
         <app-click-event
             [differenceArray]="differenceArray"
             [id]="2"
             [original]="'different'"
             [radius]="3"
-            [gameCardId]="1"
+            [gameCardId]="2"
             (incrementScore)="incrementScore()"
             (finishGame)="finishGame()"
         ></app-click-event>
