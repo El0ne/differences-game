@@ -7,6 +7,7 @@ import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
 import { Body, Controller, Get, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
+import * as fs from 'fs';
 import { diskStorage } from 'multer';
 import * as path from 'path';
 import { join } from 'path';
@@ -84,7 +85,12 @@ export class StageController {
                     };
                     res.status(HttpStatus.CREATED).send(data);
                 } else {
-                    // TODO delete the images
+                    fs.unlink(files.baseImage[0].path, (err) => {
+                        if (err) throw err;
+                    });
+                    fs.unlink(files.differenceImage[0].path, (err) => {
+                        if (err) throw err;
+                    });
                     // Which status code to send?
                     res.status(HttpStatus.OK).send([]);
                 }
