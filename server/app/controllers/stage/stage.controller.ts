@@ -25,6 +25,7 @@ export const storage = diskStorage({
 
 @Controller('stage')
 export class StageController {
+    // eslint-disable-next-line max-params
     constructor(
         private gameCardService: GameCardService,
         private gameDifficultyService: GameDifficultyService,
@@ -72,7 +73,6 @@ export class StageController {
     async uploadImages(@UploadedFiles() files: ImageUploadData, @Param() param, @Res() res: Response): Promise<void> {
         try {
             if (Object.keys(files).length) {
-                // TODO ajouter appel au service qui va générer les images de différences
                 const differenceArray = await this.differenceService.compareImages(
                     files.baseImage[0].path,
                     files.differenceImage[0].path,
