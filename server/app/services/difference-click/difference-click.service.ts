@@ -10,7 +10,9 @@ export class DifferenceClickService {
     content = fs.readFileSync(this.jsonPath, 'utf8');
     private differences: number[][];
     private unchangedDifferences: number[][];
+    private id: number;
     constructor() {
+        this.id = 0;
         this.unchangedDifferences = [];
         this.differences = [];
     }
@@ -34,7 +36,7 @@ export class DifferenceClickService {
     }
 
     validateDifferencePositions(clickPositionX: string, clickPositionY: string, stageId: string): ClickDifferenceVerification {
-        if (this.unchangedDifferences.length === 0) {
+        if (this.id !== +stageId) {
             this.differences = this.getDifferenceArrayFromStageID(stageId);
             this.copyDifferencesToUnchanged(this.differences);
         }
