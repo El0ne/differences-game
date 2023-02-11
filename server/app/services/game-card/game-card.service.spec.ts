@@ -23,11 +23,20 @@ describe('GameCardService', () => {
         expect(service).toBeDefined();
     });
 
+    it('getAllGameCards should return all gameCards informations', async () => {
+        const gameCards = service.getAllGameCards();
+        expect(gameCards).toEqual(gameCardsInformations);
+    });
     it('getGameCards should return all gameCards informations between both indexes', async () => {
         const startIndex = 0;
         const endIndex = 1;
         const gameCards = service.getGameCards(startIndex, endIndex);
         expect(gameCards).toEqual(gameCardsInformations.slice(startIndex, endIndex));
+    });
+
+    it('getGameCardById should return a specific game card', async () => {
+        const gameCard = service.getGameCardById('0123');
+        expect(gameCard).toEqual(gameCardsInformations.find((gameCard) => (gameCard.id = '0123')));
     });
 
     it('getGameCardsNumber should return the number of gameCards informations we have', async () => {
