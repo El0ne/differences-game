@@ -48,25 +48,22 @@ export class DifferenceDetectionService {
             }
         }
 
-        const newArray = new Array(this.imageDimensionsService.getNumberOfPixels());
-        newArray.fill(false);
+        const radiusArray: boolean[] = new Array(this.imageDimensionsService.getNumberOfPixels());
+        radiusArray.fill(false);
 
-        for (let i = 0; i < this.differenceArray.length; i++) {
+        for (const i of this.differenceArray.keys()) {
             if (this.differenceArray[i] && this.hasWhiteNeighbor(i)) {
                 for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(i, this.radius, true)) {
-                    newArray[adjacentPixel] = true;
+                    radiusArray[adjacentPixel] = true;
                 }
             }
         }
 
         for (const i of this.differenceArray.keys()) {
-            if (newArray[i] || this.differenceArray[i]) {
+            this.differenceArray[i] = this.differenceArray[i] || radiusArray[i];
+            if (this.differenceArray[i]) {
                 this.setPixelBlack(image, i * RGBA_DATA_LENGTH);
             }
-        }
-
-        for (const i of newArray.keys()) {
-            if (newArray[i]) this.differenceArray[i] = true;
         }
 
         image.write(DIFFERENCE_IMAGE_PATH);
