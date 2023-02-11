@@ -115,26 +115,6 @@ export class ClickEventComponent implements OnInit {
         return [toTransform, yCounter];
     }
 
-    // TODO : Move to server side once it's implemented
-    isADifference(x: number, y: number, remove: boolean): boolean {
-        const posToCheck = y * WIDTH + x;
-        for (const difference of this.differenceArray) {
-            for (const positions of difference) {
-                if (positions === posToCheck) {
-                    if (!remove) {
-                        this.lastDifferenceClicked = difference;
-                        return true;
-                    } else if (remove) {
-                        const index = this.differenceArray.indexOf(difference);
-                        this.differenceArray.splice(index, 1);
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
     emitSound(error: boolean): void {
         const sound = new Audio();
         if (!error) sound.src = '/assets/ding.mp3';
