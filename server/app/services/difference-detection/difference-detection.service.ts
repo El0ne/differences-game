@@ -38,10 +38,10 @@ export class DifferenceDetectionService {
         this.differenceArray = new Array(this.imageDimensionsService.getNumberOfPixels());
         this.differenceArray.fill(false);
         const image = new Jimp(this.imageDimensionsService.getWidth(), this.imageDimensionsService.getHeight(), WHITE);
-        return this.createDifferenceImage(image);
+        return await this.createDifferenceImage(image);
     }
 
-    createDifferenceImage(image: Jimp): number[][] {
+    async createDifferenceImage(image: Jimp): Promise<number[][]> {
         for (const i of this.differenceArray.keys()) {
             if (!this.isPixelSameColor(i * RGBA_DATA_LENGTH)) {
                 this.differenceArray[i] = true;

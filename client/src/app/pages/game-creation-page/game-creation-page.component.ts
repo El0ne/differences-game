@@ -112,7 +112,7 @@ export class GameCreationPageComponent implements OnInit {
         }
         return true;
     }
-    save(): void {
+    async save(): Promise<void> {
         if (this.saveVerification() && this.originalFile && this.differentFile) {
             this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
                 if (data.gameDifferenceNumber) {
