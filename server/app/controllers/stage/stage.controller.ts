@@ -91,6 +91,9 @@ export class StageController {
                     fs.unlink(files.differenceImage[0].path, (err) => {
                         if (err) throw err;
                     });
+                    fs.unlink('assets/images/difference-image.bmp', (err) => {
+                        if (err) throw err;
+                    });
                     // Which status code to send?
                     res.status(HttpStatus.OK).send([]);
                 }

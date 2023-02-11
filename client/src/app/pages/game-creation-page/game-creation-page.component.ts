@@ -115,8 +115,7 @@ export class GameCreationPageComponent implements OnInit {
     save(): void {
         if (this.saveVerification() && this.originalFile && this.differentFile) {
             this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
-                console.log('data', data);
-                if (data.gameId) {
+                if (data.gameDifferenceNumber) {
                     const gameInfo: GameInformation = {
                         id: data.gameId,
                         name: this.gameTitle,
@@ -128,9 +127,7 @@ export class GameCreationPageComponent implements OnInit {
                     };
                     this.differenceNumber = data.gameDifferenceNumber;
                     this.image = `${STAGE}/image/difference-image.bmp`;
-                    this.gameCardService.createGame(gameInfo).subscribe((e) => {
-                        console.log('e', e);
-                    });
+                    this.gameCardService.createGame(gameInfo).subscribe();
                     this.modal.next('open');
                 } else {
                     alert("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
