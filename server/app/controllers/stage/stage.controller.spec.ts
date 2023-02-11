@@ -137,13 +137,6 @@ describe('StageController', () => {
             if (err) throw err;
         });
     });
-
-    // it('getImage() should return 500 if there is an error', async () => {
-    //     const wrongPath = 'fake/image/path';
-    //     stub(path, 'join').callsFake(() => wrongPath);
-    //     const response = await request(httpServer).get('/stage/image/sampleImageName');
-    //     expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
-    // });
 });
 const FAKE_GAME_INFO: GameInformation = {
     name: 'Fake Title',
