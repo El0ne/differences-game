@@ -36,6 +36,11 @@ export class StageController {
         return this.gameCardService.getGameCards(index, endIndex);
     }
 
+    @Get('/:gameCardId')
+    getStageById(@Param() param): GameCardInformation {
+        return this.gameCardService.getGameCardById(param.gameCardId);
+    }
+
     @Get('/info')
     getNbOfStages(): number {
         return this.gameCardService.getGameCardsNumber();
@@ -85,7 +90,7 @@ export class StageController {
                     };
                     res.status(HttpStatus.CREATED).send(data);
                 } else {
-                    // create method to call instead of using fs directly
+                    // TODO create method to call instead of using fs directly
                     fs.unlink(files.baseImage[0].path, (err) => {
                         if (err) throw err;
                     });
