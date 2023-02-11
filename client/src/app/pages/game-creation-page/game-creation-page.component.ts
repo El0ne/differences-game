@@ -114,16 +114,16 @@ export class GameCreationPageComponent implements OnInit {
 
     save(): void {
         if (this.saveVerification() && this.originalFile && this.differentFile) {
-            this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
-                const gameInfo = {
-                    name: this.gameTitle,
-                    baseImage: data[0].filename,
-                    differenceImage: data[1].filename,
-                    radius: this.radius,
-                };
-                this.gameCardService.createGame(gameInfo).subscribe((e) => console.log(e));
-                this.modal.next('open');
-            });
+            // this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
+            //     const gameInfo = {
+            //         name: this.gameTitle,
+            //         baseImage: data[0].filename,
+            //         differenceImage: data[1].filename,
+            //         radius: this.radius,
+            //     };
+            //     this.gameCardService.createGame(gameInfo).subscribe((e) => console.log(e));
+            //     this.modal.next('open');
+            // });
         }
     }
 }
