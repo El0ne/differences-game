@@ -1,0 +1,10 @@
+{
+    "gameDifferences": [
+        {
+            // inclure le nom du jeu auquel la difference correspond? (la key du jeu est son nom)
+            "gameName": "Library",
+            "differenceIndex": 1,
+            "differencePixels": []
+        }
+    ]
+}
