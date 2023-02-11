@@ -7,7 +7,7 @@ import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.serv
 import { Test, TestingModule } from '@nestjs/testing';
 import { assert } from 'console';
 import * as Jimp from 'jimp';
-import { stub } from 'sinon';
+import Sinon, { stub } from 'sinon';
 import { BLACK, DifferenceDetectionService, RGBA_DATA_LENGTH } from './difference-detection.service';
 
 describe('DifferenceDetectionService', () => {
@@ -15,6 +15,8 @@ describe('DifferenceDetectionService', () => {
     let imageDimensionsService: ImageDimensionsService;
     let pixelRadiusService: PixelRadiusService;
     let differencesCounterService: DifferencesCounterService;
+    let imageWidthStub: Sinon.SinonStub;
+    let imageHeightStub: Sinon.SinonStub;
 
     const TEST_IMAGE_1 = 'app/services/difference-detection/test-image1.bmp';
     const TEST_IMAGE_2 = 'app/services/difference-detection/test-image2.bmp';
@@ -29,8 +31,10 @@ describe('DifferenceDetectionService', () => {
         pixelRadiusService = module.get<PixelRadiusService>(PixelRadiusService);
         differencesCounterService = module.get<DifferencesCounterService>(DifferencesCounterService);
 
-        stub(imageDimensionsService, 'getWidth').returns(640);
-        stub(imageDimensionsService, 'getHeight').returns(480);
+        imageWidthStub = stub(imageDimensionsService, 'getWidth');
+        imageHeightStub = stub(imageDimensionsService, 'getHeight');
+        imageWidthStub.returns(640);
+        imageHeightStub.returns(480);
     });
 
     it('should be defined', () => {
@@ -38,6 +42,8 @@ describe('DifferenceDetectionService', () => {
     });
 
     it('createArray() should create an array of numbers that represents the rgba values of all pixels', async () => {
+        imageWidthStub.returns(10);
+        imageHeightStub.returns(10);
         const array = await service.createArray(TEST_IMAGE_1);
         expect(array.length).toEqual(imageDimensionsService.getNumberOfPixels() * RGBA_DATA_LENGTH);
     });
@@ -58,8 +64,12 @@ describe('DifferenceDetectionService', () => {
     });
 
     it('createDifferenceImage should call multiple functions ', () => {
+        imageWidthStub.returns(10);
+        imageHeightStub.returns(10);
+
         service.differenceArray = new Array(imageDimensionsService.getNumberOfPixels());
-        const image = new Jimp(640, 480, 'white', (err) => {
+        service.radius = 0;
+        const image = new Jimp(imageDimensionsService.getWidth(), imageDimensionsService.getHeight(), 'white', (err) => {
             if (err) throw err;
         });
         const isPixelSameColorStub = stub(service, 'isPixelSameColor').callsFake(() => false);
@@ -74,7 +84,7 @@ describe('DifferenceDetectionService', () => {
         assert(isPixelSameColorStub.called);
         assert(setPixelBlackStub.called);
         assert(hasWhiteNeighborStub.called);
-        assert(getAdjacentPixelsStub.called);
+        assert(getAdjacentPixelsStub.calledWith(0));
         assert(imageWriteStub.called);
         assert(differencesCounterStub.called);
     });
