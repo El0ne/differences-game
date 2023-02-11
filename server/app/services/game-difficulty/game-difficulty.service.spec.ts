@@ -45,7 +45,7 @@ describe('GameDifficultyService', () => {
 
     it('setGameDifficulty should return easy if array length is less than 7', () => {
         const diffArray = [[1, 2, 3, 4, 5, 6, 7]];
-        expect(service.setGameDifficulty(diffArray)).toBe('easy');
+        expect(service.setGameDifficulty(diffArray)).toBe('Facile');
     });
 
     it('setGameDifficulty should return easy if array length is less than 15% of surface is difference', () => {
@@ -53,11 +53,11 @@ describe('GameDifficultyService', () => {
 
         const diffArray = [[1], [2], [3], [4], [5], [6], [7], [8], [9]];
         for (let i = 0; i < MAX_PIXEL_COUNT_VALID; i++) diffArray.push([i]);
-        expect(service.setGameDifficulty(diffArray)).toBe('easy');
+        expect(service.setGameDifficulty(diffArray)).toBe('Facile');
     });
 
     it('setGameDifficulty should return difficult if array length >= 7 and 15% or less of surface is difference', () => {
         const diffArray = [[1], [2], [3], [4], [5], [6], [7], [8], [9]];
-        expect(service.setGameDifficulty(diffArray)).toBe('difficult');
+        expect(service.setGameDifficulty(diffArray)).toBe('Difficile');
     });
 });

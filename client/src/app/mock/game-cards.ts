@@ -1,8 +1,10 @@
 import { GameCardInformation } from '@common/game-card';
 
 const GAME1: GameCardInformation = {
+    id: '0',
     name: 'Library',
     difficulty: 'Difficile',
+    differenceNumber: 0,
     originalImageName: '/assets/444-640x480.jpg',
     differenceImageName: '/assets/444-640x480.jpg',
     soloTimes: [
@@ -18,8 +20,10 @@ const GAME1: GameCardInformation = {
 };
 
 const GAME2: GameCardInformation = {
+    id: '0',
     name: 'game2',
     difficulty: 'Difficile',
+    differenceNumber: 0,
     originalImageName: '/assets/444-640x480.jpg',
     differenceImageName: '/assets/444-640x480.jpg',
     soloTimes: [

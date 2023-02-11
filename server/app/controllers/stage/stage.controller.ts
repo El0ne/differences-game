@@ -75,7 +75,7 @@ export class StageController {
                     const difficulty = this.gameDifficultyService.setGameDifficulty(differenceArray);
 
                     // TODO add differenceArray to difference array json with unique id => unique id returned by service call
-                    const id = 0;
+                    const id = uuidv4();
                     const data: ServerGeneratedGameInfo = {
                         gameId: id,
                         originalImageName: files.baseImage[0].filename,
@@ -84,6 +84,9 @@ export class StageController {
                         gameDifferenceNumber: differenceArray.length,
                     };
                     res.status(HttpStatus.CREATED).send(data);
+                    // fs.unlink('assets/images/difference-image.bmp', (err) => {
+                    //     if (err) throw err;
+                    // });
                 } else {
                     fs.unlink(files.baseImage[0].path, (err) => {
                         if (err) throw err;
@@ -91,9 +94,9 @@ export class StageController {
                     fs.unlink(files.differenceImage[0].path, (err) => {
                         if (err) throw err;
                     });
-                    fs.unlink('assets/images/difference-image.bmp', (err) => {
-                        if (err) throw err;
-                    });
+                    // fs.unlink('assets/images/difference-image.bmp', (err) => {
+                    //     if (err) throw err;
+                    // });
                     // Which status code to send?
                     res.status(HttpStatus.OK).send([]);
                 }

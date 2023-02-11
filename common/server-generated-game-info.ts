@@ -1,5 +1,5 @@
 export interface ServerGeneratedGameInfo {
-    gameId: number;
+    gameId: string;
     originalImageName: string;
     differenceImageName: string;
     gameDifficulty: string;

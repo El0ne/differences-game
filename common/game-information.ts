@@ -1,5 +1,5 @@
 export class GameInformation {
-    id: number;
+    id: string;
     name: string;
     difficulty: string;
     baseImage: string;
