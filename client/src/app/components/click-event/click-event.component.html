@@ -1,0 +1,4 @@
+<div id="container">
+    <canvas #picture [attr.id]="id" class="canvas" width="640" height="480"></canvas>
+    <canvas #modification [attr.id]="original" class="canvas" width="640" height="480" (click)="displayError($event)"></canvas>
+</div>
