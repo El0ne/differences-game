@@ -1,5 +1,4 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { PATHS } from '@app/pages/solo-view/solo-view-constants';
 import { ClickEventService } from '@app/services/Click-event/click-event.service';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { FAST_WAIT_TIME, HEIGHT, WAIT_TIME, WIDTH } from './click-event-constant';
@@ -35,7 +34,7 @@ export class ClickEventComponent implements OnInit {
     async loadImage() {
         return new Promise((resolve) => {
             const image = new Image();
-            image.src = PATHS.temp;
+            image.src = './assets/444-640x480.jpg'; // TODO: replace by actual image when necessary
             image.onload = () => {
                 const context = this.picture.nativeElement.getContext('2d') as CanvasRenderingContext2D;
                 context.drawImage(image, 0, 0);

@@ -3,7 +3,7 @@ import { IdTransferService } from '@app/services/id-transfer/id-transfer.service
 import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { MOCK_ARRAY } from './mock-array';
-import { MESSAGES_LENGTH, PATHS } from './solo-view-constants';
+import { MESSAGES_LENGTH } from './solo-view-constants';
 
 @Component({
     selector: 'app-solo-view',
@@ -11,8 +11,6 @@ import { MESSAGES_LENGTH, PATHS } from './solo-view-constants';
     styleUrls: ['./solo-view.component.scss'],
 })
 export class SoloViewComponent implements OnInit, OnDestroy {
-    readonly paths = PATHS; // TODO : Verify with Nikolay if typing is fine for constants
-
     showErrorMessage: boolean = false;
     showTextBox: boolean = false;
     showWinMessage: boolean = false;
