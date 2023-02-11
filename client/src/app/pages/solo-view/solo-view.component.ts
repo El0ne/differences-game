@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { IdTransferService } from '@app/services/id-transfer/id-transfer.service';
 import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { MOCK_ARRAY } from './mock-array';
@@ -23,15 +24,20 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     numberOfDifferences: number;
     currentService: TimerSoloService;
     currentTime: number;
+    currentGameId: string;
 
-    constructor(private timerService: TimerSoloService, private convertService: SecondToMinuteService) {
+    constructor(private timerService: TimerSoloService, private convertService: SecondToMinuteService, convertIdService: IdTransferService) {
         this.differenceArray = MOCK_ARRAY;
         this.numberOfDifferences = this.differenceArray.length;
         this.currentService = timerService;
+        this.currentGameId = convertIdService.getId();
     }
+
+    // TODO: Ajouter le get par ID pour recevoir les éléments du gameCard
 
     ngOnInit(): void {
         this.showTime();
+        console.log(this.currentGameId);
     }
 
     ngOnDestroy(): void {

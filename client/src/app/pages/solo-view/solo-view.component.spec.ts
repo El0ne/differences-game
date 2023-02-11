@@ -109,4 +109,14 @@ describe('SoloViewComponent', () => {
         expect(component.showNavBar).toBeFalse();
         expect(component.showWinMessage).toBeTrue();
     });
+
+    it('ngOnInit should call showTime', () => {
+        const showTimeSpy = spyOn(component, 'showTime');
+        component.ngOnInit();
+        expect(showTimeSpy).toHaveBeenCalled();
+    });
+
+    it('ngOnDestroy should call the stopTimer form the service', () => {
+        // mettre publique et supprimer currentTime
+    });
 });

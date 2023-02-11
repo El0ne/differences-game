@@ -42,13 +42,7 @@
     </div>
 
     <div class="flex-game">
-        <app-click-event
-            [differenceArray]="differenceArray"
-            [id]="1"
-            [original]="'original'"
-            (incrementScore)="incrementScore()"
-            (finishGame)="finishGame()"
-        ></app-click-event>
+        <app-click-event [differenceArray]="differenceArray" [id]="1" [original]="'original'" (incrementScore)="incrementScore()"></app-click-event>
         <div class="game-options">
             <div id="timer">
                 <div class="timer-box">
@@ -85,13 +79,7 @@
                 </div>
             </div>
         </div>
-        <app-click-event
-            [differenceArray]="differenceArray"
-            [id]="2"
-            [original]="'different'"
-            (incrementScore)="incrementScore()"
-            (finishGame)="finishGame()"
-        ></app-click-event>
+        <app-click-event [differenceArray]="differenceArray" [id]="2" [original]="'different'" (incrementScore)="incrementScore()"></app-click-event>
         <div class="hint-button">
             <button class="hint" type="button">
                 <img class="hint-logo" src="{{ paths.hint }}" />
