@@ -40,19 +40,39 @@ export class DifferenceDetectionService {
         return this.createDifferenceImage(image);
     }
 
-    createDifferenceImage(image: Jimp): number[][] {
-        image.scan(0, 0, image.bitmap.width, image.bitmap.height, (x, y, index) => {
-            if (!this.isPixelSameColor(index)) {
-                for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(index / RGBA_DATA_LENGTH, this.radius, true)) {
-                    if (!this.differenceArray[adjacentPixel]) {
+    async createDifferenceImage(image: Jimp): Promise<number[][]> {
+        for (const i of this.differenceArray.keys()) {
+            if (!this.isPixelSameColor(i * RGBA_DATA_LENGTH)) {
+                this.differenceArray[i] = true;
+            }
+        }
+
+        const radiusArray: boolean[] = new Array(this.imageDimensionsService.getNumberOfPixels());
+        radiusArray.fill(false);
+
+        for (const i of this.differenceArray.keys()) {
+            if (this.differenceArray[i]) {
+                radiusArray[i] = true;
+                this.setPixelBlack(image, i * RGBA_DATA_LENGTH);
+                if (this.hasWhiteNeighbor(i)) {
+                    for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(i, this.radius, true)) {
+                        radiusArray[adjacentPixel] = true;
                         this.setPixelBlack(image, adjacentPixel * RGBA_DATA_LENGTH);
-                        this.differenceArray[adjacentPixel] = true;
                     }
                 }
             }
-        });
+        }
+
         image.write(DIFFERENCE_IMAGE_PATH);
-        return this.differencesCounterService.getDifferencesList(this.differenceArray);
+
+        return this.differencesCounterService.getDifferencesList(radiusArray);
+    }
+
+    hasWhiteNeighbor(pixelPosition: number): boolean {
+        for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(pixelPosition, 1, false)) {
+            if (!this.differenceArray[adjacentPixel]) return true;
+        }
+        return false;
     }
 
     setPixelBlack(image: Jimp, pixelIndex: number): void {
