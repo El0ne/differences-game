@@ -36,7 +36,7 @@ describe('GameCardService', () => {
 
     it('getGameCardById should return a specific game card', async () => {
         const gameCard = service.getGameCardById('0123');
-        expect(gameCard).toEqual(gameCardsInformations.find((gameCard) => (gameCard.id = '0123')));
+        expect(gameCard).toEqual(gameCardsInformations.find((card) => (card.id = '0123')));
     });
 
     it('getGameCardsNumber should return the number of gameCards informations we have', async () => {
