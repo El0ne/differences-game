@@ -30,22 +30,10 @@ describe('ImageManagerService', () => {
 
     it('should throw an error if it tries to delete an image with the wrong path', () => {
         const imagePath = 'wrong/path/test.bmp';
-
-        // const fsMock = sinon.mock(fs);
-        // const unlink = fsMock.expects('unlink');
-
-        // const mError = new Error('not found');
-        // fs.unlink.mockImplementationOnce((filename, callback) => {
-        //     callback(mError);
-        // });
-
         stub(fs, 'unlink').throws(new Error());
-
         const call = () => {
-            // methodThatCallsAnotherFailingMethod calls SomeObject.doSomething()
             service.deleteImage(imagePath);
         };
-
         expect(call).toThrow(Error);
     });
 });
