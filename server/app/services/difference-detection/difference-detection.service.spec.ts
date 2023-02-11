@@ -44,26 +44,27 @@ describe('DifferenceDetectionService', () => {
 
     it('compareImages() should set differenceArray to the same length as firstImageArray (and secondImageArray)', async () => {
         stub(service, 'createArray').callsFake(async () => Promise.resolve([1, 2, 3]));
-        stub(service, 'createDifferenceImage').callsFake(() => []);
+        stub(service, 'createDifferenceImage').callsFake(async () => Promise.resolve([]));
         await service.compareImages(TEST_IMAGE_1, TEST_IMAGE_2, 1);
         expect(service.differenceArray.length).toEqual(imageDimensionsService.getNumberOfPixels());
     });
 
     it('compareImages() should call createArray twice and createDifferenceImage', async () => {
         const createArrayStub = stub(service, 'createArray').callsFake(async () => Promise.resolve([1, 2, 3]));
-        const createDifferenceImageStub = stub(service, 'createDifferenceImage').callsFake(() => []);
+        const createDifferenceImageStub = stub(service, 'createDifferenceImage').callsFake(async () => Promise.resolve([]));
         await service.compareImages(TEST_IMAGE_1, TEST_IMAGE_2, 1);
         assert(createArrayStub.calledTwice);
         assert(createDifferenceImageStub.calledOnce);
     });
 
-    it('createDifferenceImage should return ', () => {
+    it('createDifferenceImage should call multiple functions ', () => {
         service.differenceArray = new Array(imageDimensionsService.getNumberOfPixels());
         const image = new Jimp(640, 480, 'white', (err) => {
             if (err) throw err;
         });
         const isPixelSameColorStub = stub(service, 'isPixelSameColor').callsFake(() => false);
         const setPixelBlackStub = stub(service, 'setPixelBlack').callsFake(() => {});
+        const hasWhiteNeighborStub = stub(service, 'hasWhiteNeighbor').callsFake(() => true);
         const getAdjacentPixelsStub = stub(pixelRadiusService, 'getAdjacentPixels').callsFake(() => [0, 1, 2]);
         const imageWriteStub = stub(image, 'write').callsFake(() => {
             return image;
@@ -72,11 +73,34 @@ describe('DifferenceDetectionService', () => {
         service.createDifferenceImage(image);
         assert(isPixelSameColorStub.called);
         assert(setPixelBlackStub.called);
+        assert(hasWhiteNeighborStub.called);
         assert(getAdjacentPixelsStub.called);
         assert(imageWriteStub.called);
         assert(differencesCounterStub.called);
     });
 
+    it('hasWhiteNeighbor should return true if one of the pixel neighbor is white', () => {
+        service.differenceArray = [true, false, false, true];
+        stub(pixelRadiusService, 'getAdjacentPixels').callsFake(() => [0, 2]);
+        expect(service.hasWhiteNeighbor(1)).toEqual(true);
+    });
+
+    it('hasWhiteNeighbor should return false if none of the pixel neighbor are white', () => {
+        service.differenceArray = [true, false, true];
+        stub(pixelRadiusService, 'getAdjacentPixels').callsFake(() => [0, 2]);
+        expect(service.hasWhiteNeighbor(1)).toEqual(false);
+    });
+
+    it('setPixelBlack should set the index value and the 2 values after that to 0x00', () => {
+        const image = new Jimp(imageDimensionsService.getWidth(), imageDimensionsService.getHeight(), 'white', (err) => {
+            if (err) throw err;
+        });
+        const index = 0;
+        service.setPixelBlack(image, index);
+        for (let i = index; i < index + 2; i++) {
+            expect(image.bitmap.data[i]).toBe(BLACK);
+        }
+    });
     it('isPixelSameColor should return true if none of the 3 following rgb values differ from the 2 compared images', () => {
         service.firstImageArray = [1, 1, 1, 1];
         service.secondImageArray = [1, 1, 1, 1];
@@ -89,16 +113,5 @@ describe('DifferenceDetectionService', () => {
         service.secondImageArray = [1, 1, 1, 1];
         const index = 1;
         expect(service.isPixelSameColor(index)).toBe(false);
-    });
-
-    it('setPixelBlack should set the index value and the 2 values after that to 0x00', () => {
-        const image = new Jimp(imageDimensionsService.getWidth(), imageDimensionsService.getHeight(), 'white', (err) => {
-            if (err) throw err;
-        });
-        const index = 0;
-        service.setPixelBlack(image, index);
-        for (let i = index; i < index + 2; i++) {
-            expect(image.bitmap.data[i]).toBe(BLACK);
-        }
     });
 });
