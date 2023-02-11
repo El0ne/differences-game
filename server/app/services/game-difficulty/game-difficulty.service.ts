@@ -16,7 +16,7 @@ export class GameDifficultyService {
     }
     setGameDifficulty(differenceArray: number[][]): string {
         const fractionOfDifference = differenceArray.flat().length / this.imageDimensionsService.getNumberOfPixels();
-        if (differenceArray.length >= MIN_DIFF_NUMBER_HARD && fractionOfDifference <= MAX_DIFF_SURFACE) return 'difficult';
-        return 'easy';
+        if (differenceArray.length >= MIN_DIFF_NUMBER_HARD && fractionOfDifference <= MAX_DIFF_SURFACE) return 'Difficile';
+        return 'Facile';
     }
 }
