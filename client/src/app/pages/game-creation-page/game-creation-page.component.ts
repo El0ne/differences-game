@@ -1,10 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
-import { GAMES } from '@app/mock/game-cards';
-import { GameCardInformation } from '@common/game-card';
-import { RankingBoard } from '@common/ranking-board';
-import { Observable } from 'rxjs';
-import { ModalDiffPageService } from './modal-diff-page.service';
+import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Component({
     selector: 'app-game-creation-page',
@@ -14,153 +10,120 @@ import { ModalDiffPageService } from './modal-diff-page.service';
 export class GameCreationPageComponent implements OnInit {
     @ViewChild('canvas1') myOgCanvas: ElementRef;
     @ViewChild('canvas2') myDiffCanvas: ElementRef;
+    @ViewChild('og') og: ElementRef;
 
-    radius: number = 3;
+    modal: BehaviorSubject<'open' | 'close'> = new BehaviorSubject<'open' | 'close'>('close');
+
     display$: Observable<'open' | 'close'>;
 
-    card = new GameCardInformation();
+    gameTitle: string = '';
+    originalFile: File | null = null;
+    differentFile: File | null = null;
+    radius: number = 3;
 
-    urlOriginal: File;
-    urlDifferent: File;
+    testId: string = 'upload-original';
+    otherId: string = 'upload-different';
 
-    nbDiff: number = 0;
+    constructor(public gameCardService: GameCardInformationService) {}
 
-    gameTitle: string;
-    difficulty: string; // je
-    soloTimes: RankingBoard[];
-    multiTimes: RankingBoard[];
-
-    constructor(public modalDiffService: ModalDiffPageService, private router: Router) {}
-
-    ngOnInit() {
-        this.display$ = this.modalDiffService.watch();
+    ngOnInit(): void {
+        this.display$ = this.modal.asObservable();
     }
+
     getTitle(title: string) {
         this.gameTitle = title;
     }
 
-    clear(e: Event) {
-        const ogCanvas: HTMLCanvasElement = this.myOgCanvas.nativeElement;
-        const diffCanvas: HTMLCanvasElement = this.myDiffCanvas.nativeElement;
+    clearSingleFile(canvas: HTMLCanvasElement, id: string) {
+        const context = canvas.getContext('2d');
+        const input = document.getElementById(id) as HTMLInputElement;
+        const bothInput = document.getElementById('upload-both') as HTMLInputElement;
+        input.value = '';
+        bothInput.value = '';
+        if (context) context.clearRect(0, 0, 640, 480);
+    }
 
-        const ogContext = ogCanvas.getContext('2d');
-        const diffContext = diffCanvas.getContext('2d');
+    clearFirstFile(canvas: HTMLCanvasElement, id: string) {
+        this.originalFile = null;
+        this.clearSingleFile(canvas, id);
+    }
 
-        const target = e.target as HTMLInputElement;
-        if (target.id === 'reset-original') {
-            const input = document.getElementById('upload-original') as HTMLInputElement;
-            const bothinput = document.getElementById('upload-both') as HTMLInputElement;
-            input.value = '';
-            bothinput.value = '';
-            if (ogContext) ogContext.clearRect(0, 0, 640, 480);
-        } else {
-            const input = document.getElementById('upload-different') as HTMLInputElement;
-            const bothinput = document.getElementById('upload-both') as HTMLInputElement;
-            bothinput.value = '';
-            input.value = '';
-            if (diffContext) diffContext.clearRect(0, 0, 640, 480);
-        }
+    clearSecondFile(canvas: HTMLCanvasElement, id: string) {
+        this.differentFile = null;
+        this.clearSingleFile(canvas, id);
     }
 
     fileValidation(e: Event) {
-        const ogCanvas: HTMLCanvasElement = this.myOgCanvas.nativeElement;
-        const diffCanvas: HTMLCanvasElement = this.myDiffCanvas.nativeElement;
-
-        const ogContext = ogCanvas.getContext('2d');
-        const diffContext = diffCanvas.getContext('2d');
-
         const target = e.target as HTMLInputElement;
         const file: File = (target.files as FileList)[0];
         if (file !== undefined && file.size === 921654 && file.type === 'image/bmp') {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => {
-                const img = new Image();
-                img.src = reader.result as string;
-                img.onload = () => {
-                    if (img.naturalWidth !== 640 && img.naturalHeight !== 480) {
-                        alert('wrong size');
-                    } else {
-                        switch (target.id) {
-                            case 'upload-original': {
-                                if (ogContext) {
-                                    ogContext.drawImage(img, 0, 0, 640, 480);
-                                }
-                                if (!target.files?.length) {
-                                    return;
-                                }
-                                this.urlOriginal = target.files[0];
-                                break;
-                            }
-                            case 'upload-different': {
-                                if (diffContext) {
-                                    diffContext.drawImage(img, 0, 0, 640, 480);
-                                }
-                                if (!target.files?.length) {
-                                    return;
-                                }
-                                this.urlDifferent = target.files[0];
-                                break;
-                            }
-                            case 'upload-both': {
-                                if (ogContext) {
-                                    ogContext.drawImage(img, 0, 0, 640, 480);
-                                }
-                                // this.urlOriginal = img.src;
-                                if (diffContext) {
-                                    diffContext.drawImage(img, 0, 0, 640, 480);
-                                }
-                                if (!target.files?.length) {
-                                    return;
-                                }
-                                this.urlOriginal = target.files[0];
-
-                                if (!target.files?.length) {
-                                    return;
-                                }
-                                this.urlDifferent = target.files[0];
-                                break;
-                            }
-                        }
-                    }
-                };
-            };
+            this.uploadImage(file, target);
         } else {
             alert('wrong size or file type please choose again');
-            // this.urlOriginal = '';
-            // this.urlDifferent = '';
-            target.value = '';
+            target.value = ''; // we ended up really needing it lol
         }
     }
 
-    save(): void {
-        // console.log(this.rangeValue.value);
-        console.log(this.radius);
-        console.log(this.urlDifferent);
-        if (this.gameTitle === undefined && this.urlOriginal === undefined) {
+    async uploadImage(file: File, target: HTMLInputElement) {
+        // return new Promise<void>((resolve) => {
+        const ogContext = this.myOgCanvas.nativeElement.getContext('2d');
+        const diffContext = this.myDiffCanvas.nativeElement.getContext('2d');
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+
+        reader.onload = () => {
+            const img = new Image();
+            img.src = reader.result as string;
+            img.onload = () => {
+                if (!target.files?.length) {
+                    return;
+                }
+                if (target.id === 'upload-original') {
+                    if (ogContext) ogContext.drawImage(img, 0, 0, 640, 480);
+                    this.originalFile = target.files[0];
+                } else if (target.id === 'upload-different') {
+                    if (diffContext) diffContext.drawImage(img, 0, 0, 640, 480);
+                    this.differentFile = target.files[0];
+                } else {
+                    if (ogContext && diffContext) {
+                        ogContext.drawImage(img, 0, 0, 640, 480);
+                        diffContext.drawImage(img, 0, 0, 640, 480);
+                        this.originalFile = target.files[0];
+                        this.differentFile = target.files[0];
+                    }
+                }
+                // resolve();
+            };
+        };
+        // });
+    }
+
+    saveVerification(): boolean {
+        if (this.gameTitle === '' && this.originalFile === null && this.differentFile === null) {
             alert('Il manque une image et un titre à votre jeu !');
-        } else if (this.gameTitle === undefined) {
+            return false;
+        } else if (this.gameTitle === '') {
             alert("N'oubliez pas d'ajouter un titre à votre jeu !");
-        } else if (this.urlOriginal === undefined) {
+            return false;
+        } else if (this.originalFile === null || this.differentFile === null) {
             alert('Un jeu de différences sans image est pour ainsi dire... intéressant ? Ajoutez une image.');
-        } else {
-            this.card.name = this.gameTitle;
-            // this.card.image = this.urlOriginal;
-            this.difficulty = 'Facile'; // initialisation, le temps qu'on sache quelles sont les exigences pr les difficultés.
-            this.card.difficulty = this.difficulty;
-            this.card.soloTimes = [
-                // initialisation. Ces propriétés vont changer une fois qu'un joueur aura joué.
-                { time: 0, name: '--' },
-                { time: 0, name: '--' },
-                { time: 0, name: '--' },
-            ];
-            this.card.multiTimes = [
-                { time: 0, name: '--' },
-                { time: 0, name: '--' },
-                { time: 0, name: '--' },
-            ];
-            GAMES.push(this.card);
-            this.router.navigate(['/config']);
+            return false;
+        }
+        return true;
+    }
+
+    save(): void {
+        if (this.saveVerification() && this.originalFile && this.differentFile) {
+            this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
+                const gameInfo = {
+                    name: this.gameTitle,
+                    baseImage: data[0].filename,
+                    differenceImage: data[1].filename,
+                    radius: this.radius,
+                };
+                this.gameCardService.createGame(gameInfo).subscribe((e) => console.log(e));
+                this.modal.next('open');
+            });
         }
     }
 }
