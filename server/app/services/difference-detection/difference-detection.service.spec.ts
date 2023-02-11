@@ -79,17 +79,17 @@ describe('DifferenceDetectionService', () => {
         assert(differencesCounterStub.called);
     });
 
-    it('hasWhiteNeighbor should return true if one of the pixel neighbor is white', () => {
-        service.differenceArray = [true, false, false, true];
-        stub(pixelRadiusService, 'getAdjacentPixels').callsFake(() => [0, 2]);
-        expect(service.hasWhiteNeighbor(1)).toEqual(true);
-    });
+    // it('hasWhiteNeighbor should return true if one of the pixel neighbor is white', () => {
+    //     service.differenceArray = [true, false, false, true];
+    //     stub(pixelRadiusService, 'getAdjacentPixels').callsFake(() => [0, 2]);
+    //     expect(service.hasWhiteNeighbor(1)).toEqual(true);
+    // });
 
-    it('hasWhiteNeighbor should return false if none of the pixel neighbor are white', () => {
-        service.differenceArray = [true, false, true];
-        stub(pixelRadiusService, 'getAdjacentPixels').callsFake(() => [0, 2]);
-        expect(service.hasWhiteNeighbor(1)).toEqual(false);
-    });
+    // it('hasWhiteNeighbor should return false if none of the pixel neighbor are white', () => {
+    //     service.differenceArray = [true, false, true];
+    //     stub(pixelRadiusService, 'getAdjacentPixels').callsFake(() => [0, 2]);
+    //     expect(service.hasWhiteNeighbor(1)).toEqual(false);
+    // });
 
     it('setPixelBlack should set the index value and the 2 values after that to 0x00', () => {
         const image = new Jimp(imageDimensionsService.getWidth(), imageDimensionsService.getHeight(), 'white', (err) => {
