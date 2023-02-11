@@ -29,8 +29,10 @@ export class GameCardService {
 
     generateGameCard(game: GameInformation): GameCardInformation {
         return {
+            id: game.id,
             name: game.name,
-            difficulty: 'Facile',
+            difficulty: game.difficulty,
+            differenceNumber: game.differenceNumber,
             originalImageName: game.baseImage,
             differenceImageName: game.differenceImage,
             soloTimes: [

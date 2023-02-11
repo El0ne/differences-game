@@ -111,14 +111,18 @@ export class GameCreationPageComponent implements OnInit {
         return true;
     }
     save(): void {
+        console.log('first');
         if (this.saveVerification() && this.originalFile && this.differentFile) {
             this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
                 console.log('data', data);
                 const gameInfo = {
+                    id: data.gameId,
                     name: this.gameTitle,
+                    difficulty: data.gameDifficulty,
                     baseImage: data.originalImageName,
-                    differenceImage: data.originalImageName,
+                    differenceImage: data.differenceImageName,
                     radius: this.radius,
+                    differenceNumber: data.gameDifferenceNumber,
                 };
                 this.image = `${STAGE}/image/difference-image.bmp`;
                 this.gameCardService.createGame(gameInfo).subscribe((e) => {});
