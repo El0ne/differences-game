@@ -14,6 +14,12 @@ export class GameCardService {
     getGameCards(startIndex: number, endIndex: number): GameCardInformation[] {
         return this.getAllGameCards().slice(startIndex, endIndex);
     }
+
+    getGameCardById(id: string): GameCardInformation {
+        const allGameCards = this.getAllGameCards();
+        return allGameCards.find((game) => game.id === id);
+    }
+
     getGameCardsNumber(): number {
         const content = fs.readFileSync(this.jsonPath, 'utf8');
         return JSON.parse(content).gameCardsInformations.length;

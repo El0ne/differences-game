@@ -33,6 +33,11 @@ export class StageController {
         return this.gameCardService.getGameCardsNumber();
     }
 
+    @Get('/:gameCardId')
+    getStageById(@Param() param): GameCardInformation {
+        return this.gameCardService.getGameCardById(param.gameCardId);
+    }
+
     @Post('/')
     createGame(@Body() game, @Res() res: Response) {
         try {
