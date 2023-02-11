@@ -1,12 +1,12 @@
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameDifficultyService } from '@app/services/game-difficulty/game-difficulty.service';
+import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { GameCardInformation } from '@common/game-card';
 import { ImageUploadData } from '@common/image-upload-data';
 import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
 import { Body, Controller, Get, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
-import * as fs from 'fs';
 import { diskStorage } from 'multer';
 import * as path from 'path';
 import { join } from 'path';
@@ -24,7 +24,11 @@ export const storage = diskStorage({
 
 @Controller('stage')
 export class StageController {
-    constructor(public gameCardService: GameCardService, private gameDifficultyService: GameDifficultyService) {}
+    constructor(
+        public gameCardService: GameCardService,
+        private gameDifficultyService: GameDifficultyService,
+        private imageManagerService: ImageManagerService,
+    ) {}
 
     @Get('/')
     getStages(@Query('index') index: number, @Query('endIndex') endIndex: number): GameCardInformation[] {
@@ -83,13 +87,8 @@ export class StageController {
                     };
                     res.status(HttpStatus.CREATED).send(data);
                 } else {
-                    // TODO create method to call instead of using fs directly
-                    fs.unlink(files.baseImage[0].path, (err) => {
-                        if (err) throw err;
-                    });
-                    fs.unlink(files.differenceImage[0].path, (err) => {
-                        if (err) throw err;
-                    });
+                    this.imageManagerService.deleteImage(files.baseImage[0].path);
+                    this.imageManagerService.deleteImage(files.differenceImage[0].path);
                     // Which status code to send?
                     res.status(HttpStatus.OK).send([]);
                 }
