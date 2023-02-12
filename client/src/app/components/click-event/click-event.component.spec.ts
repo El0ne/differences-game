@@ -45,6 +45,7 @@ describe('ClickEventComponent', () => {
         component.differenceArray = MOCK_ARRAY;
         component.id = 0;
         component.original = 'original';
+        component.gameCardId = 1;
 
         fixture.detectChanges();
     });
@@ -58,40 +59,6 @@ describe('ClickEventComponent', () => {
         const position = component.positionToPixel(postToCheck);
         expect(position).toEqual([639, 479]);
     });
-    /*
-    it('isADifference() should return true if difference detected', () => {
-        const x = 639;
-        const y = 479;
-        const remove = false;
-        const result = component.isADifference(x, y, remove);
-
-        expect(result).toBeTrue();
-    });
-
-    it('isADifference() should remove difference if in remove state is true', () => {
-        const testComponent = new ClickEventComponent();
-        testComponent.differenceArray = TEST_ARRAY;
-        testComponent.id = 0;
-        testComponent.original = 'original';
-
-        const x = 639;
-        const y = 479;
-        const remove = true;
-        const result = testComponent.isADifference(x, y, remove);
-
-        expect(testComponent.differenceArray.length).toEqual(1);
-        expect(result).toBeTrue();
-    });
-
-    it('isADifference() should return false if difference not detected', () => {
-        const x = 320;
-        const y = 240;
-        const remove = false;
-        const result = component.isADifference(x, y, remove);
-
-        expect(result).toBeFalse();
-    });
-    */
 
     it('emit sound should call play', () => {
         spyOn(HTMLMediaElement.prototype, 'play');
@@ -109,11 +76,32 @@ describe('ClickEventComponent', () => {
         expect(sound.src.endsWith('/assets/Error.mp3')).toBeTrue();
     });
 
-    it('canvas should be rendered on init with draw image', fakeAsync(() => {
+    it('canvas should be rendered on init with draw image amd sets difference on server', fakeAsync(() => {
         spyOn(component.clickEventService, 'setDifferences').and.returnValue(of(TEST_DIFFERENCES));
         const loadImageSpy = spyOn(component, 'loadImage');
         component.ngOnInit();
         expect(loadImageSpy).toHaveBeenCalled();
+    }));
+
+    it('toggleEndGame() should activate end game and prevent user inputs', fakeAsync(() => {
+        component.endGame = false;
+        component.toggleEndgame();
+        expect(component.endGame).toBeTrue();
+        component.differenceData = FAILING;
+        const mockClick = new MouseEvent('click', { clientX: 100, clientY: 365 });
+        spyOn(CanvasRenderingContext2D.prototype, 'fillText');
+        spyOn(CanvasRenderingContext2D.prototype, 'clearRect');
+        spyOn(component, 'emitSound').and.callFake(() => {});
+        component.displayError(mockClick);
+        expect(CanvasRenderingContext2D.prototype.fillText).not.toHaveBeenCalled();
+        tick(1000);
+        fixture.detectChanges();
+        expect(CanvasRenderingContext2D.prototype.clearRect).not.toHaveBeenCalled();
+        component.differenceEffect();
+        expect(CanvasRenderingContext2D.prototype.fillText).not.toHaveBeenCalled();
+        tick(1000);
+        fixture.detectChanges();
+        expect(CanvasRenderingContext2D.prototype.clearRect).not.toHaveBeenCalled();
     }));
 
     it('getCoordInImage() should reset the position in the y if click is negative', () => {
@@ -214,6 +202,7 @@ describe('ClickEventComponent', () => {
 
     it('displayError() should display error if timeout flag is inactive & should reset flag when timeout over ', fakeAsync(() => {
         component.timeout = false;
+        component.differenceData = FAILING;
         const mockClick = new MouseEvent('click', { clientX: 100, clientY: 365 });
         spyOn(CanvasRenderingContext2D.prototype, 'fillText');
         spyOn(CanvasRenderingContext2D.prototype, 'clearRect');

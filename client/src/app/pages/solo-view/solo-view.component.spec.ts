@@ -1,5 +1,8 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { ClickEventComponent } from '@app/components/click-event/click-event.component';
+import { ClickEventService } from '@app/services/Click-event/click-event.service';
 import { MESSAGES_LENGTH } from './solo-view-constants';
 
 import { SoloViewComponent } from './solo-view.component';
@@ -10,8 +13,9 @@ describe('SoloViewComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [SoloViewComponent],
-            imports: [FormsModule],
+            declarations: [SoloViewComponent, ClickEventComponent],
+            imports: [FormsModule, HttpClientTestingModule],
+            providers: [{ provide: ClickEventService }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(SoloViewComponent);

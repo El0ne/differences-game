@@ -14,7 +14,7 @@ export class GameCardSelectionComponent implements OnInit {
 
     randomId: string = Math.floor(Math.random() * 11).toString();
 
-    constructor(private idTransferService: IdTransferService) {}
+    constructor(public idTransferService: IdTransferService) {}
 
     ngOnInit(): void {
         console.log(this.randomId);
