@@ -5,7 +5,7 @@ import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testin
 import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MOCK_ARRAY } from '@app/pages/solo-view/mock-array';
-import { ClickEventService } from '@app/services/Click-event/click-event.service';
+import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { of, Subject } from 'rxjs';
 import { FAILING, PASSING, TEST_DIFFERENCES } from './click-event-constants';

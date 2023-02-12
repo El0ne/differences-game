@@ -1,8 +1,10 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
+import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { IdTransferService } from '@app/services/id-transfer/id-transfer.service';
 import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
+import { GameCardInformation } from '@common/game-card';
 import { Subject } from 'rxjs';
 import { MESSAGES_LENGTH } from './solo-view-constants';
 
@@ -25,23 +27,25 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     differenceArray: number[][];
     currentScore: number = 0;
     numberOfDifferences: number;
-    currentService: TimerSoloService;
     currentTime: number;
     currentGameId: string;
     endGame: Subject<void> = new Subject<void>();
+    gameCardInfo: GameCardInformation;
 
-    constructor(private timerService: TimerSoloService, private convertService: SecondToMinuteService, private idTransferService: IdTransferService) {
-        this.numberOfDifferences = 1; // TODO: Ajouter lorsqu'on aura acces a GameCardInformation
-        this.currentService = timerService;
-    }
-
-    getIdFromGameCard(): void {
-        this.currentGameId = this.idTransferService.getId();
-    }
+    constructor(
+        public timerService: TimerSoloService,
+        private convertService: SecondToMinuteService,
+        private idTransferService: IdTransferService,
+        private gameCardInfoService: GameCardInformationService,
+    ) {}
 
     ngOnInit(): void {
+        this.currentGameId = this.idTransferService.getId();
+        this.gameCardInfoService.getGameCardInfoFromId(this.currentGameId).subscribe((gameCardData) => {
+            this.gameCardInfo = gameCardData;
+            this.numberOfDifferences = this.gameCardInfo.differenceNumber;
+        });
         this.showTime();
-        this.getIdFromGameCard();
     }
 
     ngOnDestroy(): void {
