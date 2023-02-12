@@ -2,7 +2,7 @@
     <div class="row">
         <div class="column">
             <p class="nom">{{ gameCardInformation.name }}</p>
-            <img [src]="gameCardInformation.originalImageName" class="photo" />
+            <img [src]="this.image" class="photo" />
         </div>
         <div class="column configuration" *ngIf="isConfig">
             <div>
