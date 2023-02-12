@@ -10,6 +10,11 @@ import { Observable } from 'rxjs';
 export class GameCardInformationService {
     constructor(private http: HttpClient) {}
 
+    getGameCardInfoFromId(id: string): Observable<GameCardInformation> {
+        console.log(id);
+        return this.http.get<GameCardInformation>(`${STAGE}/${id}`);
+    }
+
     getGameCardsInformations(index: number, endIndex: number): Observable<GameCardInformation[]> {
         const options = { params: new HttpParams().set('index', index).set('endIndex', endIndex) };
         return this.http.get<GameCardInformation[]>(STAGE, options);

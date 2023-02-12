@@ -1,11 +1,10 @@
 <body>
     <div class="info-card" *ngIf="showTextBox">
-        <!--TODO: Ajouter lorsqu'on aura acces a GameCardInformation-->
         <div class="info">
-            <p class="title">Nom du jeu</p>
-            <div class="title">difficulté : facile</div>
+            <p class="title">{{ gameCardInfo.name }}</p>
+            <div class="title">difficulté : {{ gameCardInfo.difficulty }}</div>
             <div class="title">joueurs présents : 1</div>
-            <div class="title">nombre de différences : 2</div>
+            <div class="title">nombre de différences : {{ gameCardInfo.numberOfDifferences }}</div>
             <div class="title">temps perdu par indice/gagné par différence : x</div>
         </div>
         <button class="option-buttons" id="info-quit" type="button" (click)="toggleInfoCard()">
@@ -31,7 +30,7 @@
                 <mat-icon class="icon">home</mat-icon>
             </button>
             <button class="option-buttons" type="button" (click)="toggleInfoCard()">
-                <mat-icon class="icon">inf o</mat-icon>
+                <mat-icon class="icon">info</mat-icon>
             </button>
         </div>
         <div class="info-option" *ngIf="showNavBar">
@@ -44,13 +43,10 @@
     <div class="flex-game">
         <!--TODO: Ajouter lorsqu'on aura acces a GameCardInformation-->
         <app-click-event
-            #left
-            [events]="endGame.asObservable()"
             [differenceArray]="differenceArray"
             [id]="1"
             [original]="'original'"
-            [radius]="3"
-            [gameCardId]="2"
+            [gameCardId]="this.currentGameId"
             (incrementScore)="incrementScore()"
             (finishGame)="finishGame()"
         ></app-click-event>
@@ -58,7 +54,7 @@
             <div id="timer">
                 <div class="timer-box">
                     <div class="display">
-                        <div id="time">{{ timesConvertion(currentService.currentTime) }}</div>
+                        <div id="time">{{ timesConvertion(this.timerService.currentTime) }}</div>
                     </div>
                 </div>
             </div>
@@ -92,19 +88,16 @@
         </div>
         <!--TODO: Ajouter lorsqu'on aura acces a GameCardInformation-->
         <app-click-event
-            #right
-            [events]="endGame.asObservable()"
             [differenceArray]="differenceArray"
             [id]="2"
             [original]="'different'"
-            [radius]="3"
-            [gameCardId]="2"
+            [gameCardId]="this.currentGameId"
             (incrementScore)="incrementScore()"
             (finishGame)="finishGame()"
         ></app-click-event>
         <div class="hint-button">
             <button class="hint" type="button">
-                <mat-icon calss="hint-button">search</mat-icon>
+                <mat-icon class="hint-button">search</mat-icon>
             </button>
         </div>
     </div>

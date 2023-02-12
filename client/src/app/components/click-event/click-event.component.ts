@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { ClickEventService } from '@app/services/Click-event/click-event.service';
+import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { Observable } from 'rxjs';
 import { FAST_WAIT_TIME, HEIGHT, WAIT_TIME, WIDTH } from './click-event-constant';
@@ -14,8 +14,7 @@ export class ClickEventComponent implements OnInit {
     @Input() events: Observable<void>;
     @Input() id: number;
     @Input() original: string;
-    @Input() gameCardId: number;
-    @Input() radius: number;
+    @Input() gameCardId: string;
     @Output() incrementScore: EventEmitter<number> = new EventEmitter<number>();
     @ViewChild('picture', { static: true })
     picture: ElementRef<HTMLCanvasElement>;

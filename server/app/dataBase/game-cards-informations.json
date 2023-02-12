@@ -1,108 +1,39 @@
 {
     "gameCardsInformations": [
         {
-            "name": "Library",
-            "difficulty": "Difficile",
-            "image": "/assets/444-640x480.jpg",
-            "soloTimes": [
-                { "time": 60, "name": "Inull" },
-                { "time": 90, "name": "second" },
-                { "time": 105, "name": "third" }
-            ],
-            "multiTimes": [
-                { "time": 63, "name": "First" },
-                { "time": 92, "name": "second" },
-                { "time": 115, "name": "third" }
-            ]
-        },
-        {
-            "name": "Amazon Forest",
+            "id": "71fa550e-5e54-4505-8947-4291fe071655",
+            "name": "gamecard1",
             "difficulty": "Facile",
-            "image": "/assets/444-640x480.jpg",
+            "differenceNumber": 1,
+            "originalImageName": "image_2_diff.bmp",
+            "differenceImageName": "image_7_diff.bmp",
             "soloTimes": [
-                { "time": 60, "name": "Thierry" },
-                { "time": 90, "name": "Justine" },
-                { "time": 105, "name": "Claude" }
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" }
             ],
             "multiTimes": [
-                { "time": 63, "name": "Flavie" },
-                { "time": 92, "name": "Vincent" },
-                { "time": 115, "name": "Mathilde" }
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" }
             ]
         },
         {
-            "name": "Boulders",
+            "id": "test",
+            "name": "test",
             "difficulty": "Facile",
-            "image": "/assets/444-640x480.jpg",
+            "differenceNumber": 1,
+            "originalImageName": "image_7_diff.bmp",
+            "differenceImageName": "image_7_diff.bmp",
             "soloTimes": [
-                { "time": 60, "name": "Inull" },
-                { "time": 90, "name": "second" },
-                { "time": 105, "name": "third" }
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" }
             ],
             "multiTimes": [
-                { "time": 63, "name": "First" },
-                { "time": 92, "name": "second" },
-                { "time": 115, "name": "third" }
-            ]
-        },
-        {
-            "name": "Bistro Paris",
-            "difficulty": "Facile",
-            "image": "/assets/444-640x480.jpg",
-            "soloTimes": [
-                { "time": 60, "name": "Thierry" },
-                { "time": 90, "name": "Justine" },
-                { "time": 105, "name": "Claude" }
-            ],
-            "multiTimes": [
-                { "time": 63, "name": "Flavie" },
-                { "time": 92, "name": "Vincent" },
-                { "time": 115, "name": "Mathilde" }
-            ]
-        },
-        {
-            "name": "Sunglasses",
-            "difficulty": "Facile",
-            "image": "/assets/444-640x480.jpg",
-            "soloTimes": [
-                { "time": 60, "name": "Thierry" },
-                { "time": 90, "name": "Justine" },
-                { "time": 105, "name": "Claude" }
-            ],
-            "multiTimes": [
-                { "time": 63, "name": "Flavie" },
-                { "time": 92, "name": "Vincent" },
-                { "time": 115, "name": "Mathilde" }
-            ]
-        },
-        {
-            "name": "Joker",
-            "difficulty": "Facile",
-            "image": "/assets/444-640x480.jpg",
-            "soloTimes": [
-                { "time": 60, "name": "Inull" },
-                { "time": 90, "name": "second" },
-                { "time": 105, "name": "third" }
-            ],
-            "multiTimes": [
-                { "time": 63, "name": "First" },
-                { "time": 92, "name": "second" },
-                { "time": 115, "name": "third" }
-            ]
-        },
-        {
-            "name": "Volcano",
-            "difficulty": "Difficile",
-            "image": "/assets/444-640x480.jpg",
-            "soloTimes": [
-                { "time": 60, "name": "Thierry" },
-                { "time": 90, "name": "Justine" },
-                { "time": 105, "name": "Claude" }
-            ],
-            "multiTimes": [
-                { "time": 63, "name": "Flavie" },
-                { "time": 92, "name": "Vincent" },
-                { "time": 115, "name": "Mathilde" }
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" }
             ]
         }
     ]
