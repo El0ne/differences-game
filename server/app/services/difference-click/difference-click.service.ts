@@ -10,7 +10,9 @@ export class DifferenceClickService {
     content = fs.readFileSync(this.jsonPath, 'utf8');
     private differences: number[][];
     private unchangedDifferences: number[][];
+    private id: string;
     constructor() {
+        this.id = '';
         this.unchangedDifferences = [];
         this.differences = [];
     }
@@ -25,18 +27,18 @@ export class DifferenceClickService {
         }
     }
 
-    getDifferenceArrayFromStageID(stageId: number): number[][] {
+    getDifferenceArrayFromStageID(stageId: string): number[][] {
         for (const differenceObject of JSON.parse(this.content).differences) {
-            if (differenceObject.id.toString() === stageId) {
+            if (differenceObject.id === stageId) {
                 return differenceObject.differences;
             }
         }
     }
 
-    setDifference(stageId: number) {
-        console.log('here');
+    setDifference(stageId: string) {
         this.differences = this.getDifferenceArrayFromStageID(stageId);
         this.copyDifferencesToUnchanged(this.differences);
+        this.id = stageId;
         return this.differences;
     }
 
@@ -44,12 +46,13 @@ export class DifferenceClickService {
         const x: number = +clickPositionX;
         const y: number = +clickPositionY;
         const posToCheck = y * WIDTH + x;
-        for (const difference of this.differences) {
+        for (const difference of this.unchangedDifferences) {
             for (const positions of difference) {
                 if (positions === posToCheck) {
                     const index = this.unchangedDifferences.indexOf(difference);
                     const currentDifference = difference;
-                    this.differences.splice(index, 1);
+                    this.unchangedDifferences.splice(index, 1);
+                    console.log(this.unchangedDifferences.splice(index, 1)); // TODO : Faut laisser ca sinon ca bug
                     return {
                         isADifference: true,
                         differenceArray: currentDifference,

@@ -11,7 +11,6 @@ export class GameCardInformationService {
     constructor(private http: HttpClient) {}
 
     getGameCardInfoFromId(id: string): Observable<GameCardInformation> {
-        console.log(id);
         return this.http.get<GameCardInformation>(`${STAGE}/${id}`);
     }
 

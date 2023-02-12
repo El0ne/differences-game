@@ -29,11 +29,15 @@ export class ClickEventComponent implements OnInit {
     constructor(public clickEventService: ClickEventService) {}
 
     async ngOnInit() {
-        this.timeout = false;
-        this.endGame = false;
+        this.clickEventService.setDifferences(this.gameCardId).subscribe((data) => {
+            this.differenceArray = data;
+            this.timeout = false;
+            this.endGame = false;
+        });
+
         await this.loadImage();
-        this.setDifferences();
     }
+
     async loadImage() {
         return new Promise((resolve) => {
             const image = new Image();
@@ -49,12 +53,6 @@ export class ClickEventComponent implements OnInit {
 
     toggleEndgame() {
         this.endGame = true;
-    }
-
-    setDifferences() {
-        this.clickEventService.setDifferences(this.gameCardId).subscribe((data) => {
-            this.differenceArray = data;
-        });
     }
 
     getCoordInImage(e: MouseEvent): number[] {

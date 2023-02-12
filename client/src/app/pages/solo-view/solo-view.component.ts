@@ -40,7 +40,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit(): void {
-        this.currentGameId = this.idTransferService.getId();
+        this.currentGameId = this.idTransferService.getId(); // TODO : add way to keep last id in case of refresh
         this.gameCardInfoService.getGameCardInfoFromId(this.currentGameId).subscribe((gameCardData) => {
             this.gameCardInfo = gameCardData;
             this.numberOfDifferences = this.gameCardInfo.differenceNumber;

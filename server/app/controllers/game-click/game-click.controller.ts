@@ -8,11 +8,12 @@ export class GameClickController {
 
     @Get('/')
     validateDifference(@Query('x') clickPositionX: number, @Query('y') clickPositionY: number): ClickDifferenceVerification {
+        console.log('here');
         return this.differenceClickService.validateDifferencePositions(clickPositionX, clickPositionY);
     }
 
     @Get(':id')
-    getDifferencesFromId(@Param('id') stageId: number): number[][] {
+    getDifferencesFromId(@Param('id') stageId: string): number[][] {
         return this.differenceClickService.setDifference(stageId);
     }
 

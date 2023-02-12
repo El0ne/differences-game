@@ -4,26 +4,8 @@
             "id": "71fa550e-5e54-4505-8947-4291fe071655",
             "name": "gamecard1",
             "difficulty": "Facile",
-            "differenceNumber": 1,
+            "differenceNumber": 3,
             "originalImageName": "image_2_diff.bmp",
-            "differenceImageName": "image_7_diff.bmp",
-            "soloTimes": [
-                { "time": 0, "name": "--" },
-                { "time": 0, "name": "--" },
-                { "time": 0, "name": "--" }
-            ],
-            "multiTimes": [
-                { "time": 0, "name": "--" },
-                { "time": 0, "name": "--" },
-                { "time": 0, "name": "--" }
-            ]
-        },
-        {
-            "id": "test",
-            "name": "test",
-            "difficulty": "Facile",
-            "differenceNumber": 1,
-            "originalImageName": "image_7_diff.bmp",
             "differenceImageName": "image_7_diff.bmp",
             "soloTimes": [
                 { "time": 0, "name": "--" },
