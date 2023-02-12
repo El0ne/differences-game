@@ -2,6 +2,9 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { BehaviorSubject, Observable } from 'rxjs';
 
+export const IMAGE_WIDTH = 640; // in pixels
+export const IMAGE_HEIGHT = 480; // in pixels
+export const IMAGE_SIZE = 921654; // 640px * 480px * 3 bytes (24 bits). This value means that only files with these specific properties work.
 @Component({
     selector: 'app-game-creation-page',
     templateUrl: './game-creation-page.component.html',
@@ -10,7 +13,6 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export class GameCreationPageComponent implements OnInit {
     @ViewChild('canvas1') myOgCanvas: ElementRef;
     @ViewChild('canvas2') myDiffCanvas: ElementRef;
-    @ViewChild('og') og: ElementRef;
 
     modal: BehaviorSubject<'open' | 'close'> = new BehaviorSubject<'open' | 'close'>('close');
 
@@ -21,8 +23,8 @@ export class GameCreationPageComponent implements OnInit {
     differentFile: File | null = null;
     radius: number = 3;
 
-    testId: string = 'upload-original';
-    otherId: string = 'upload-different';
+    originalId: string = 'upload-original';
+    differentId: string = 'upload-different';
 
     constructor(public gameCardService: GameCardInformationService) {}
 
@@ -40,7 +42,7 @@ export class GameCreationPageComponent implements OnInit {
         const bothInput = document.getElementById('upload-both') as HTMLInputElement;
         input.value = '';
         bothInput.value = '';
-        if (context) context.clearRect(0, 0, 640, 480);
+        if (context) context.clearRect(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
     }
 
     clearFirstFile(canvas: HTMLCanvasElement, id: string) {
@@ -56,7 +58,7 @@ export class GameCreationPageComponent implements OnInit {
     fileValidation(e: Event) {
         const target = e.target as HTMLInputElement;
         const file: File = (target.files as FileList)[0];
-        if (file !== undefined && file.size === 921654 && file.type === 'image/bmp') {
+        if (file !== undefined && file.size === IMAGE_SIZE && file.type === 'image/bmp') {
             this.uploadImage(file, target);
         } else {
             alert('wrong size or file type please choose again');
@@ -65,7 +67,6 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     async uploadImage(file: File, target: HTMLInputElement) {
-        // return new Promise<void>((resolve) => {
         const ogContext = this.myOgCanvas.nativeElement.getContext('2d');
         const diffContext = this.myDiffCanvas.nativeElement.getContext('2d');
         const reader = new FileReader();
@@ -78,24 +79,22 @@ export class GameCreationPageComponent implements OnInit {
                 if (!target.files?.length) {
                     return;
                 }
-                if (target.id === 'upload-original') {
-                    if (ogContext) ogContext.drawImage(img, 0, 0, 640, 480);
+                if (target.id === this.originalId) {
+                    if (ogContext) ogContext.drawImage(img, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
                     this.originalFile = target.files[0];
-                } else if (target.id === 'upload-different') {
-                    if (diffContext) diffContext.drawImage(img, 0, 0, 640, 480);
+                } else if (target.id === this.differentId) {
+                    if (diffContext) diffContext.drawImage(img, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
                     this.differentFile = target.files[0];
                 } else {
                     if (ogContext && diffContext) {
-                        ogContext.drawImage(img, 0, 0, 640, 480);
-                        diffContext.drawImage(img, 0, 0, 640, 480);
+                        ogContext.drawImage(img, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
+                        diffContext.drawImage(img, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
                         this.originalFile = target.files[0];
                         this.differentFile = target.files[0];
                     }
                 }
-                // resolve();
             };
         };
-        // });
     }
 
     saveVerification(): boolean {

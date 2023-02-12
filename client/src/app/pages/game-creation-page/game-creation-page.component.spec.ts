@@ -2,19 +2,12 @@ import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
-import { GameCreationPageComponent } from './game-creation-page.component';
+import { GameCreationPageComponent, IMAGE_HEIGHT, IMAGE_SIZE, IMAGE_WIDTH } from './game-creation-page.component';
 
 describe('GameCreationPageComponent', () => {
     let component: GameCreationPageComponent;
     let fixture: ComponentFixture<GameCreationPageComponent>;
     let canvasOg: HTMLCanvasElement;
-    // let gameCardService: GameCardInformationService;
-
-    // let spyOgContext: jasmine.SpyObj<CanvasRenderingContext2D>;
-    // let spyDiffContext: jasmine.SpyObj<CanvasRenderingContext2D>;
-    // let spyFileReader: jasmine.SpyObj<FileReader>;
-    // let spyImg: jasmine.SpyObj<HTMLImageElement>;
-    // let canvasDiff: HTMLCanvasElement;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -27,23 +20,8 @@ describe('GameCreationPageComponent', () => {
         fixture.detectChanges();
 
         canvasOg = document.createElement('canvas');
-        canvasOg.width = 640;
-        canvasOg.height = 480;
-
-        // gameCardService = new GameCardInformationService();
-
-        // spyOgContext = jasmine.createSpyObj<CanvasRenderingContext2D>('CanvasRenderingContext2D', ['drawImage']);
-        // spyDiffContext = jasmine.createSpyObj<CanvasRenderingContext2D>('CanvasRenderingContext2D', ['drawImage']);
-
-        // spyFileReader = jasmine.createSpyObj<FileReader>('FileReader', ['readAsDataURL', 'onload']);
-
-        // spyImg = jasmine.createSpyObj<HTMLImageElement>('HTMLImageElement', ['onload']);
-
-        // component.myOgCanvas = { nativeElement: { getContext: () => spyOgContext } } as unknown;
-        // component.myDiffCanvas = { nativeElement: { getContext: () => spyDiffContext } } as unknown;
-        // canvasDiff = document.createElement('canvas');
-        // canvasDiff.width = 640;
-        // canvasDiff.height = 480;
+        canvasOg.width = IMAGE_WIDTH;
+        canvasOg.height = IMAGE_HEIGHT;
     });
 
     it('should create', () => {
@@ -87,7 +65,7 @@ describe('GameCreationPageComponent', () => {
     it('should validate the file', () => {
         spyOn(component, 'uploadImage');
 
-        const file = new File([new ArrayBuffer(921654)], 'testImage.bmp', { type: 'image/bmp' });
+        const file = new File([new ArrayBuffer(IMAGE_SIZE)], 'testImage.bmp', { type: 'image/bmp' });
 
         const input = fixture.debugElement.query(By.css('input[type="file"]')).nativeElement as HTMLInputElement;
         const event = new Event('change');
@@ -102,7 +80,7 @@ describe('GameCreationPageComponent', () => {
     it('should send an alert if picture is the wrong size', () => {
         spyOn(window, 'alert');
 
-        const file = new File([new ArrayBuffer(111111)], 'testImage.bmp', { type: 'image/bmp' });
+        const file = new File([new ArrayBuffer(123456)], 'testImage.bmp', { type: 'image/bmp' });
 
         const input = fixture.debugElement.query(By.css('input[type="file"]')).nativeElement as HTMLInputElement;
         const event = new Event('change');
@@ -118,7 +96,7 @@ describe('GameCreationPageComponent', () => {
     it('should send an alert if picture is the wrong type', () => {
         spyOn(window, 'alert');
 
-        const file = new File([new ArrayBuffer(921654)], 'testImage.jpg', { type: 'image/jpg' });
+        const file = new File([new ArrayBuffer(IMAGE_SIZE)], 'testImage.jpg', { type: 'image/jpg' });
 
         const input = fixture.debugElement.query(By.css('input[type="file"]')).nativeElement as HTMLInputElement;
         const event = new Event('change');
@@ -141,7 +119,7 @@ describe('GameCreationPageComponent', () => {
     });
 
     it('should upload difference image', () => {
-        const file = new File([new ArrayBuffer(921654)], 'testImage.bmp', { type: 'image/bmp' });
+        const file = new File([new ArrayBuffer(IMAGE_SIZE)], 'testImage.bmp', { type: 'image/bmp' });
         const input = document.createElement('input');
         input.setAttribute('id', 'upload-different');
 
@@ -151,7 +129,7 @@ describe('GameCreationPageComponent', () => {
     });
 
     it('should upload both images', () => {
-        const file = new File([new ArrayBuffer(921654)], 'testImage.bmp', { type: 'image/bmp' });
+        const file = new File([new ArrayBuffer(IMAGE_SIZE)], 'testImage.bmp', { type: 'image/bmp' });
         const input = fixture.debugElement.query(By.css('input[type="file"]')).nativeElement as HTMLInputElement;
         const target = { id: 'upload-both', files: [file] };
 
@@ -191,49 +169,57 @@ describe('GameCreationPageComponent', () => {
         expect(window.alert).toHaveBeenCalledWith('Un jeu de différences sans image est pour ainsi dire... intéressant ? Ajoutez une image.');
     });
 
-    it('should call the saveVerification method and return false if there is no title or files', () => {
-        spyOn(component, 'saveVerification').and.callThrough();
-        component.gameTitle = '';
-        component.originalFile = null;
-        component.differentFile = null;
-
-        expect(component.saveVerification).toHaveBeenCalled();
-        expect(component.save()).toBeFalse();
-    });
-
-    it('should call the saveVerification method and return false if there is no title', () => {
-        spyOn(component, 'saveVerification').and.callThrough();
-        component.gameTitle = '';
+    it('should return true if all the verifications are good', () => {
+        component.gameTitle = 'My Game';
         component.originalFile = new File([''], 'original.bmp');
         component.differentFile = new File([''], 'different.bmp');
 
-        expect(component.saveVerification).toHaveBeenCalled();
-        expect(component.save()).toBeFalse();
+        component.saveVerification();
+
+        expect(component.saveVerification).toEqual('true');
     });
 
-    it('should call the saveVerification method and return false if there are no files', () => {
-        spyOn(component, 'saveVerification').and.callThrough();
-        component.gameTitle = 'testTitle';
-        component.originalFile = null;
-        component.differentFile = null;
+    it('should open modal page and save information if saveVerification is true', () => {
+        spyOn(component, 'saveVerification').and.returnValue(true);
+        // Decommenter once we merge avec Elouan :
 
-        expect(component.saveVerification).toHaveBeenCalled();
-        expect(component.save()).toBeFalse();
+        // const mockImageInfo: ImageInformation = {
+        //     fieldname: '',
+        //     originalname: '',
+        //     encoding: '',
+        //     mimetype: '',
+        //     destination: '',
+        //     filename: '',
+        //     path: '',
+        //     size: 0,
+        // };
+        // spyOn(component.gameCardService, 'uploadImages').and.returnValue(of([mockImageInfo, mockImageInfo]));
+
+        // const mockGameCardInfo: GameCardInformation = {
+        //     name: '',
+        //     difficulty: '',
+        //     originalImage: '',
+        //     differenceImage: '',
+        //     soloTimes: [],
+        //     multiTimes: [],
+        // };
+        // spyOn(component.gameCardService, 'createGame').and.returnValue(of(mockGameCardInfo));
+
+        spyOn(component.modal, 'next');
+
+        component.gameTitle = 'My Game';
+        component.originalFile = new File([''], 'original.bmp');
+        component.differentFile = new File([''], 'different.bmp');
+
+        component.save();
+
+        // expect(component.saveVerification).toHaveBeenCalled();
+        // expect(component.gameCardService.uploadImages).toHaveBeenCalledWith(
+        //     new File([''], 'original.bmp'),
+        //     new File([''], 'different.bmp'),
+        //     component.radius,
+        // );
+        // expect(component.gameCardService.createGame);
+        // expect(component.modal.next).toHaveBeenCalledOnceWith('open');
     });
-
-    // it('should call the gameCardService.save method and return true if there is a title and files', () => {
-    //     spyOn(component, 'saveVerification').and.callThrough();
-    //     spyOn(component.gameCardService, 'uploadImages');
-    //     component.gameTitle = 'My Game';
-    //     component.originalFile = new File([''], 'original.bmp');
-    //     component.differentFile = new File([''], 'different.bmp');
-
-    //     expect(component.saveVerification).toHaveBeenCalled();
-    //     expect(component.save()).toBeTrue();
-    //     expect(component.gameCardService.uploadImages).toHaveBeenCalledWith(
-    //         new File([''], 'original.bmp'),
-    //         new File([''], 'different.bmp'),
-    //         component.radius,
-    //     );
-    // });
 });

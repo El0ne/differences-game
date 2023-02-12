@@ -16,7 +16,6 @@
             </ng-container>
         </div>
         <button id="save" (click)="save()"><img class="save-image" src="../../../assets/save.png" /></button>
-        <!-- <button id="save" routerLink="/config" (click)="save()"><img class="save-image" src="../../../assets/save.png" /></button> -->
     </div>
     <div id="title-container">
         <div class="line title">____________</div>
@@ -92,7 +91,7 @@
         </div>
         <div class="button-container">
             <label for="upload-original">
-                Choisir une image de 640*480 de format bmp
+                Choisir une image de 640px*480px de format bmp
                 <input type="file" id="upload-both" class="photo-upload" (change)="fileValidation($event)" accept="image/bmp" />
             </label>
         </div>

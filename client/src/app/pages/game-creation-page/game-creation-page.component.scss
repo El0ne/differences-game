@@ -79,7 +79,6 @@ button:active {
     align-self: center;
     font-size: 3rem;
     text-align: center;
-    //margin-bottom: 3%;
 }
 
 .game-title:hover {
@@ -100,11 +99,6 @@ button:active {
     overflow-wrap: break-word;
     text-shadow: 0 0 7px #fff, 0 0 10px #fff, 0 0 21px #fff, 0 0 42px #5271ff, 0 0 82px #5271ff, 0 0 92px #5271ff, 0 0 102px #5271ff,
         0 0 151px #5271ff;
-}
-
-.canvas-id {
-    width: 640px;
-    height: 480px;
 }
 
 .game-container {
