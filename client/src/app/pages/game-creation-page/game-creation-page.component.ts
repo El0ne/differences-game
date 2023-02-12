@@ -1,5 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { STAGE } from '@app/services/server-routes';
+import { GameInformation } from '@common/game-information';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 export const IMAGE_WIDTH = 640; // in pixels
@@ -25,6 +27,9 @@ export class GameCreationPageComponent implements OnInit {
 
     originalId: string = 'upload-original';
     differentId: string = 'upload-different';
+
+    image: string = '';
+    differenceNumber: number = 0;
 
     constructor(public gameCardService: GameCardInformationService) {}
 
@@ -111,18 +116,30 @@ export class GameCreationPageComponent implements OnInit {
         return true;
     }
 
-    save(): void {
+    async save(): Promise<void> {
         if (this.saveVerification() && this.originalFile && this.differentFile) {
-            // this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
-            //     const gameInfo = {
-            //         name: this.gameTitle,
-            //         baseImage: data[0].filename,
-            //         differenceImage: data[1].filename,
-            //         radius: this.radius,
-            //     };
-            //     this.gameCardService.createGame(gameInfo).subscribe((e) => console.log(e));
-            //     this.modal.next('open');
-            // });
+            this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
+                if (data.gameDifferenceNumber) {
+                    const gameInfo: GameInformation = {
+                        id: data.gameId,
+                        name: this.gameTitle,
+                        difficulty: data.gameDifficulty,
+                        baseImage: data.originalImageName,
+                        differenceImage: data.differenceImageName,
+                        radius: this.radius,
+                        differenceNumber: data.gameDifferenceNumber,
+                    };
+                    this.differenceNumber = data.gameDifferenceNumber;
+                    this.image = `${STAGE}/image/difference-image.bmp`;
+                    this.gameCardService.createGame(gameInfo).subscribe();
+                    this.modal.next('open');
+                    this.gameCardService.getGameCardInfoFromId(data.gameId).subscribe((elouan) => {
+                        console.log(elouan);
+                    });
+                } else {
+                    alert("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
+                }
+            });
         }
     }
 }
