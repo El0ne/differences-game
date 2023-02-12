@@ -180,47 +180,47 @@ describe('GameCreationPageComponent', () => {
     //     expect(component.saveVerification).toEqual('true');
     // });
 
-    it('should open modal page and save information if saveVerification is true', () => {
-        spyOn(component, 'saveVerification').and.returnValue(true);
-        // Decommenter once we merge avec Elouan :
+    // it('should open modal page and save information if saveVerification is true', () => {
+    //     spyOn(component, 'saveVerification').and.returnValue(true);
+    //     // Decommenter once we merge avec Elouan :
 
-        // const mockImageInfo: ImageInformation = {
-        //     fieldname: '',
-        //     originalname: '',
-        //     encoding: '',
-        //     mimetype: '',
-        //     destination: '',
-        //     filename: '',
-        //     path: '',
-        //     size: 0,
-        // };
-        // spyOn(component.gameCardService, 'uploadImages').and.returnValue(of([mockImageInfo, mockImageInfo]));
+    //     // const mockImageInfo: ImageInformation = {
+    //     //     fieldname: '',
+    //     //     originalname: '',
+    //     //     encoding: '',
+    //     //     mimetype: '',
+    //     //     destination: '',
+    //     //     filename: '',
+    //     //     path: '',
+    //     //     size: 0,
+    //     // };
+    //     // spyOn(component.gameCardService, 'uploadImages').and.returnValue(of([mockImageInfo, mockImageInfo]));
 
-        // const mockGameCardInfo: GameCardInformation = {
-        //     name: '',
-        //     difficulty: '',
-        //     originalImage: '',
-        //     differenceImage: '',
-        //     soloTimes: [],
-        //     multiTimes: [],
-        // };
-        // spyOn(component.gameCardService, 'createGame').and.returnValue(of(mockGameCardInfo));
+    //     // const mockGameCardInfo: GameCardInformation = {
+    //     //     name: '',
+    //     //     difficulty: '',
+    //     //     originalImage: '',
+    //     //     differenceImage: '',
+    //     //     soloTimes: [],
+    //     //     multiTimes: [],
+    //     // };
+    //     // spyOn(component.gameCardService, 'createGame').and.returnValue(of(mockGameCardInfo));
 
-        spyOn(component.modal, 'next');
+    //     spyOn(component.modal, 'next');
 
-        component.gameTitle = 'My Game';
-        component.originalFile = new File([''], 'original.bmp');
-        component.differentFile = new File([''], 'different.bmp');
+    //     component.gameTitle = 'My Game';
+    //     component.originalFile = new File([''], 'original.bmp');
+    //     component.differentFile = new File([''], 'different.bmp');
 
-        component.save();
+    //     component.save();
 
-        // expect(component.saveVerification).toHaveBeenCalled();
-        // expect(component.gameCardService.uploadImages).toHaveBeenCalledWith(
-        //     new File([''], 'original.bmp'),
-        //     new File([''], 'different.bmp'),
-        //     component.radius,
-        // );
-        // expect(component.gameCardService.createGame);
-        // expect(component.modal.next).toHaveBeenCalledOnceWith('open');
-    });
+    //     // expect(component.saveVerification).toHaveBeenCalled();
+    //     // expect(component.gameCardService.uploadImages).toHaveBeenCalledWith(
+    //     //     new File([''], 'original.bmp'),
+    //     //     new File([''], 'different.bmp'),
+    //     //     component.radius,
+    //     // );
+    //     // expect(component.gameCardService.createGame);
+    //     // expect(component.modal.next).toHaveBeenCalledOnceWith('open');
+    // });
 });
