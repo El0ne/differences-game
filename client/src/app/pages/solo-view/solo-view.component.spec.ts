@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
 import { MESSAGES_LENGTH } from './solo-view-constants';
 
 import { SoloViewComponent } from './solo-view.component';
@@ -10,6 +11,7 @@ describe('SoloViewComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [SoloViewComponent],
+            imports: [FormsModule],
         }).compileComponents();
 
         fixture = TestBed.createComponent(SoloViewComponent);
