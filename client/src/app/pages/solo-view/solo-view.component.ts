@@ -14,9 +14,9 @@ import { MESSAGES_LENGTH } from './solo-view-constants';
     styleUrls: ['./solo-view.component.scss'],
 })
 export class SoloViewComponent implements OnInit, OnDestroy {
-    @ViewChild('left', { static: true })
+    @ViewChild('left')
     left: ClickEventComponent;
-    @ViewChild('right', { static: true })
+    @ViewChild('right')
     right: ClickEventComponent;
     showErrorMessage: boolean = false;
     showTextBox: boolean = false;
