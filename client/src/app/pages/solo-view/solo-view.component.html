@@ -44,6 +44,7 @@
     <div class="flex-game">
         <!--TODO: Ajouter lorsqu'on aura acces a GameCardInformation-->
         <app-click-event
+            #left
             [events]="endGame.asObservable()"
             [differenceArray]="differenceArray"
             [id]="1"
@@ -91,6 +92,7 @@
         </div>
         <!--TODO: Ajouter lorsqu'on aura acces a GameCardInformation-->
         <app-click-event
+            #right
             [events]="endGame.asObservable()"
             [differenceArray]="differenceArray"
             [id]="2"

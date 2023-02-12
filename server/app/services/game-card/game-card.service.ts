@@ -51,6 +51,7 @@ export class GameCardService {
                 { time: 0, name: '--' },
                 { time: 0, name: '--' },
             ],
+            numberOfDifferences: 0,
         };
     }
 }

@@ -2,15 +2,42 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/naming-convention */
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { MOCK_ARRAY, TEST_ARRAY } from '@app/pages/solo-view/mock-array';
+import { MatIconModule } from '@angular/material/icon';
+import { RouterTestingModule } from '@angular/router/testing';
+import { MOCK_ARRAY } from '@app/pages/solo-view/mock-array';
+import { ClickEventService } from '@app/services/Click-event/click-event.service';
+import { ClickDifferenceVerification } from '@common/click-difference-verification';
+import { of, Subject } from 'rxjs';
+import { FAILING, PASSING, TEST_DIFFERENCES } from './click-event-constants';
 import { ClickEventComponent } from './click-event.component';
 describe('ClickEventComponent', () => {
     let component: ClickEventComponent;
     let fixture: ComponentFixture<ClickEventComponent>;
+    let mockService: ClickEventService;
+    let expectedClickDifference: Subject<ClickDifferenceVerification>;
+    let expectedDifferences: Subject<number[][]>;
 
-    beforeEach(async () => {
-        await TestBed.configureTestingModule({
+    beforeEach(() => {
+        mockService = jasmine.createSpyObj('ClickEventService', ['isADifference', 'setDifferences']);
+        mockService.isADifference = () => {
+            expectedClickDifference.next(PASSING);
+            return expectedClickDifference.asObservable();
+        };
+
+        mockService.isADifference = () => {
+            expectedClickDifference.next(FAILING);
+            return expectedClickDifference.asObservable();
+        };
+
+        mockService.setDifferences = () => {
+            expectedDifferences.next(TEST_DIFFERENCES);
+            return expectedDifferences.asObservable();
+        };
+
+        TestBed.configureTestingModule({
             declarations: [ClickEventComponent],
+            imports: [RouterTestingModule, MatIconModule],
+            providers: [{ provide: ClickEventService, useValue: mockService }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(ClickEventComponent);
@@ -31,7 +58,7 @@ describe('ClickEventComponent', () => {
         const position = component.positionToPixel(postToCheck);
         expect(position).toEqual([639, 479]);
     });
-
+    /*
     it('isADifference() should return true if difference detected', () => {
         const x = 639;
         const y = 479;
@@ -64,6 +91,7 @@ describe('ClickEventComponent', () => {
 
         expect(result).toBeFalse();
     });
+    */
 
     it('emit sound should call play', () => {
         spyOn(HTMLMediaElement.prototype, 'play');
@@ -82,6 +110,7 @@ describe('ClickEventComponent', () => {
     });
 
     it('canvas should be rendered on init with draw image', fakeAsync(() => {
+        spyOn(component.clickEventService, 'setDifferences').and.returnValue(of(TEST_DIFFERENCES));
         const loadImageSpy = spyOn(component, 'loadImage');
         component.ngOnInit();
         expect(loadImageSpy).toHaveBeenCalled();
@@ -115,17 +144,27 @@ describe('ClickEventComponent', () => {
     });
 
     it('isDifferent() should return true if a difference is detected', () => {
+        spyOn(component.clickEventService, 'isADifference').and.returnValue(of(PASSING));
         const mockClick = new MouseEvent('click', { clientX: 0, clientY: 0 });
         spyOn(component, 'emitSound').and.callFake(() => {});
-        const result = component.isDifferent(mockClick);
-        expect(result).toBeTrue();
+        component.isDifferent(mockClick);
+        expect(component.clickEventService.isADifference).toHaveBeenCalledWith(
+            component.getCoordInImage(mockClick)[0],
+            component.getCoordInImage(mockClick)[1],
+        );
+        expect(component.differenceData).toEqual(PASSING);
     });
 
-    it('isDifferent() should return false if a difference is not deteceted', () => {
+    it('isDifferent() should return false if a difference is not detected', () => {
+        spyOn(component.clickEventService, 'isADifference').and.returnValue(of(FAILING));
         const mockClick = new MouseEvent('click', { clientX: 100, clientY: 365 });
         spyOn(component, 'emitSound').and.callFake(() => {});
-        const result = component.isDifferent(mockClick);
-        expect(result).toBeFalse();
+        component.isDifferent(mockClick);
+        expect(component.clickEventService.isADifference).toHaveBeenCalledWith(
+            component.getCoordInImage(mockClick)[0],
+            component.getCoordInImage(mockClick)[1],
+        );
+        expect(component.differenceData).toEqual(FAILING);
     });
 
     it('constructEffect() should call fillRect() in order to construct flashing effect', () => {

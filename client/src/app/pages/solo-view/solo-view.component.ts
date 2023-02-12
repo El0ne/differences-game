@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { IdTransferService } from '@app/services/id-transfer/id-transfer.service';
 import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
@@ -11,6 +12,10 @@ import { MESSAGES_LENGTH } from './solo-view-constants';
     styleUrls: ['./solo-view.component.scss'],
 })
 export class SoloViewComponent implements OnInit, OnDestroy {
+    @ViewChild('left')
+    private left: ClickEventComponent;
+    @ViewChild('right')
+    private right: ClickEventComponent;
     showErrorMessage: boolean = false;
     showTextBox: boolean = false;
     showWinMessage: boolean = false;
@@ -28,10 +33,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     constructor(private timerService: TimerSoloService, private convertService: SecondToMinuteService, private idTransferService: IdTransferService) {
         this.numberOfDifferences = 1; // TODO: Ajouter lorsqu'on aura acces a GameCardInformation
         this.currentService = timerService;
-    }
-
-    emitEndGame() {
-        this.endGame.next();
     }
 
     getIdFromGameCard(): void {
@@ -56,7 +57,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     finishGame() {
-        this.emitEndGame();
+        this.left.toggleEndgame();
+        this.right.toggleEndgame();
         this.showWinMessage = true;
         this.showNavBar = false;
     }

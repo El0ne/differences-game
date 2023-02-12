@@ -1,7 +1,7 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { ClickEventService } from '@app/services/Click-event/click-event.service';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
-import { Observable, Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 import { FAST_WAIT_TIME, HEIGHT, WAIT_TIME, WIDTH } from './click-event-constant';
 
 @Component({
@@ -26,7 +26,6 @@ export class ClickEventComponent implements OnInit {
     currentScore: number = 0;
     differenceData: ClickDifferenceVerification;
     endGame: boolean;
-    endSubscription: Subscription;
 
     constructor(public clickEventService: ClickEventService) {}
 
@@ -35,9 +34,6 @@ export class ClickEventComponent implements OnInit {
         this.endGame = false;
         await this.loadImage();
         this.setDifferences();
-        this.endSubscription = this.events.subscribe(() => {
-            this.endGame = true;
-        });
     }
     async loadImage() {
         return new Promise((resolve) => {
@@ -50,6 +46,10 @@ export class ClickEventComponent implements OnInit {
                 resolve(image.height);
             };
         });
+    }
+
+    toggleEndgame() {
+        this.endGame = true;
     }
 
     setDifferences() {
