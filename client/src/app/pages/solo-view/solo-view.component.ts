@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { IdTransferService } from '@app/services/id-transfer/id-transfer.service';
 import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
+import { Subject } from 'rxjs';
 import { MESSAGES_LENGTH } from './solo-view-constants';
 
 @Component({
@@ -22,10 +23,15 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     currentService: TimerSoloService;
     currentTime: number;
     currentGameId: string;
+    endGame: Subject<void> = new Subject<void>();
 
     constructor(private timerService: TimerSoloService, private convertService: SecondToMinuteService, private idTransferService: IdTransferService) {
         this.numberOfDifferences = 1; // TODO: Ajouter lorsqu'on aura acces a GameCardInformation
         this.currentService = timerService;
+    }
+
+    emitEndGame() {
+        this.endGame.next();
     }
 
     getIdFromGameCard(): void {
@@ -50,6 +56,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     finishGame() {
+        this.emitEndGame();
         this.showWinMessage = true;
         this.showNavBar = false;
     }

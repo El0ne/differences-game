@@ -27,18 +27,16 @@ export class DifferenceClickService {
         }
     }
 
-    getDifferenceArrayFromStageID(stageId: number, radius: number): number[][] {
+    getDifferenceArrayFromStageID(stageId: number): number[][] {
         for (const differenceObject of JSON.parse(this.content).differences) {
             if (differenceObject.id.toString() === stageId) {
-                for (const differences of differenceObject.differences) {
-                    if (differences.radius.toString() === radius) return differences.differencePosition;
-                }
+                return differenceObject.differences;
             }
         }
     }
 
-    setDifference(stageId: number, radius: number) {
-        this.differences = this.getDifferenceArrayFromStageID(stageId, radius);
+    setDifference(stageId: number) {
+        this.differences = this.getDifferenceArrayFromStageID(stageId);
         this.copyDifferencesToUnchanged(this.differences);
         this.id = +stageId;
         return this.differences;
@@ -48,16 +46,16 @@ export class DifferenceClickService {
         const x: number = +clickPositionX;
         const y: number = +clickPositionY;
         const posToCheck = y * WIDTH + x;
-        for (const difference of this.differences) {
+        for (const difference of this.unchangedDifferences) {
             for (const positions of difference) {
                 if (positions === posToCheck) {
-                    const index = this.differences.indexOf(difference);
+                    const index = this.unchangedDifferences.indexOf(difference);
                     const currentDifference = difference;
-                    this.differences.splice(index, 1);
+                    this.unchangedDifferences.splice(index, 1);
                     return {
                         isADifference: true,
                         differenceArray: currentDifference,
-                        differenceNumber: this.differences.length,
+                        remainingDifferences: this.differences,
                     };
                 }
             }
@@ -65,7 +63,7 @@ export class DifferenceClickService {
         return {
             isADifference: false,
             differenceArray: [],
-            differenceNumber: 0,
+            remainingDifferences: this.differences,
         };
     }
 }

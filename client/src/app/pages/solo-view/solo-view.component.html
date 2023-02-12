@@ -31,7 +31,7 @@
                 <mat-icon class="icon">home</mat-icon>
             </button>
             <button class="option-buttons" type="button" (click)="toggleInfoCard()">
-                <mat-icon class="icon">info</mat-icon>
+                <mat-icon class="icon">inf o</mat-icon>
             </button>
         </div>
         <div class="info-option" *ngIf="showNavBar">
@@ -44,6 +44,7 @@
     <div class="flex-game">
         <!--TODO: Ajouter lorsqu'on aura acces a GameCardInformation-->
         <app-click-event
+            [events]="endGame.asObservable()"
             [differenceArray]="differenceArray"
             [id]="1"
             [original]="'original'"
@@ -90,6 +91,7 @@
         </div>
         <!--TODO: Ajouter lorsqu'on aura acces a GameCardInformation-->
         <app-click-event
+            [events]="endGame.asObservable()"
             [differenceArray]="differenceArray"
             [id]="2"
             [original]="'different'"

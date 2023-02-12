@@ -15,8 +15,7 @@ export class ClickEventService {
         return this.http.get<ClickDifferenceVerification>(CLICK, options);
     }
 
-    setDifferences(radius: number, stageId: number): Observable<number[][]> {
-        const options = { params: new HttpParams().set('radius', radius) };
-        return this.http.get<number[][]>(`${CLICK}/${stageId}`, options);
+    setDifferences(stageId: number): Observable<number[][]> {
+        return this.http.get<number[][]>(`${CLICK}/${stageId}`);
     }
 }

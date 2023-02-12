@@ -12,8 +12,8 @@ export class GameClickController {
     }
 
     @Get(':id')
-    getDifferencesFromId(@Query('radius') radius: number, @Param('id') stageId: number): number[][] {
-        return this.differenceClickService.setDifference(stageId, radius);
+    getDifferencesFromId(@Param('id') stageId: number): number[][] {
+        return this.differenceClickService.setDifference(stageId);
     }
 
     @Patch('/')
