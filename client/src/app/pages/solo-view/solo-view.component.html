@@ -2,10 +2,11 @@
     <div class="info-card" *ngIf="showTextBox">
         <div class="info">
             <p class="title">{{ gameCardInfo.name }}</p>
-            <div class="title">difficulté : {{ gameCardInfo.difficulty }}</div>
-            <div class="title">joueurs présents : 1</div>
-            <div class="title">nombre de différences : {{ gameCardInfo.numberOfDifferences }}</div>
-            <div class="title">temps perdu par indice/gagné par différence : x</div>
+            <div class="title">Difficulté : {{ gameCardInfo.difficulty }}</div>
+            <div class="title">Joueurs présents : 1</div>
+            <div class="title">Nombre de différences : {{ numberOfDifferences }}</div>
+            <div class="title">Temps perdu par indice/gagné par différence : x</div>
+            <!--TODO: Voir si a implementer pour game en solo-->
         </div>
         <button class="option-buttons" id="info-quit" type="button" (click)="toggleInfoCard()">
             <mat-icon class="icon">clear</mat-icon>
