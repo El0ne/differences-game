@@ -34,6 +34,7 @@ export class ClickEventComponent implements OnInit {
     constructor(public clickEventService: ClickEventService, public foundDifferenceService: FoundDifferenceService) {}
 
     async ngOnInit() {
+        console.log('here 4');
         this.clickEventService.setDifferences(this.gameCardId).subscribe((data) => {
             this.differenceArray = data;
             this.timeout = false;
@@ -81,7 +82,6 @@ export class ClickEventComponent implements OnInit {
                 this.lastDifferenceClicked = this.differenceData.differenceArray;
                 this.differenceEffect();
                 this.differences.emit(this.differenceData.differencesPosition);
-                console.log(this.foundDifferences);
             } else {
                 this.displayError(e);
             }
@@ -146,24 +146,22 @@ export class ClickEventComponent implements OnInit {
 
     displayError(e: MouseEvent): void {
         if (!this.timeout && !this.endGame) {
-            if (!this.differenceData.isADifference) {
-                this.emitSound(true);
-                this.timeout = true;
-                const rect = this.modification.nativeElement.getBoundingClientRect();
-                const x = Math.floor(e.clientX - rect.left);
-                const y = Math.floor(e.clientY - rect.top);
-                const context = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-                context.font = '30pt Arial';
-                context.fillStyle = 'red';
-                context.textAlign = 'center';
-                const error = 'Error';
-                context.fillText(error, x, y);
+            this.emitSound(true);
+            this.timeout = true;
+            const rect = this.modification.nativeElement.getBoundingClientRect();
+            const x = Math.floor(e.clientX - rect.left);
+            const y = Math.floor(e.clientY - rect.top);
+            const context = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
+            context.font = '30pt Arial';
+            context.fillStyle = 'red';
+            context.textAlign = 'center';
+            const error = 'Error';
+            context.fillText(error, x, y);
 
-                setTimeout(() => {
-                    context.clearRect(0, 0, WIDTH, HEIGHT);
-                    this.timeout = false;
-                }, WAIT_TIME);
-            }
+            setTimeout(() => {
+                context.clearRect(0, 0, WIDTH, HEIGHT);
+                this.timeout = false;
+            }, WAIT_TIME);
         }
     }
 }

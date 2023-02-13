@@ -5,9 +5,16 @@ import { Injectable } from '@angular/core';
 })
 export class FoundDifferenceService {
     foundDifferences: number[];
-    constructor() {}
+
+    constructor() {
+        this.foundDifferences = [];
+    }
 
     addDifferenceFound(index: number) {
         this.foundDifferences.push(index);
+    }
+
+    clearDifferenceFound() {
+        this.foundDifferences = [];
     }
 }
