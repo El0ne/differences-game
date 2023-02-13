@@ -70,6 +70,12 @@ button:active {
     flex-direction: column;
 }
 
+.upload-delete {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
 .game-title {
     border-radius: 10px;
     border: 0.2rem solid #fff;
@@ -89,7 +95,8 @@ button:active {
 .upload-container {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: center;
+    //justify-content: space-between;
 }
 
 .title {
@@ -130,26 +137,23 @@ button:active {
 output {
     color: white;
 }
+
+.original.container {
+    margin-right: 4%;
+}
+
+.difference.container {
+    margin-left: 4%;
+}
 .middle-container {
     display: flex;
     flex-direction: column;
     width: 8%;
+
+    margin-right: 4%;
+    margin-left: 4%;
 }
-.diff-counter {
-    border-style: solid;
-    background-color: #fff;
-    width: 100%;
-    height: 7rem;
-    border: 0.2rem solid #fff;
-    border-radius: 2rem;
-    padding: 0.4em;
-    box-shadow: 0 0 0.2rem #fff, 0 0 0.2rem #fff, 0 0 2rem #bc13fe, 0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
-    margin-bottom: 10%;
-    text-align: center;
-}
-.diff-counter-title {
-    margin-top: 10%;
-}
+
 .count {
     font-size: xx-large;
     margin-top: 10%;
@@ -201,6 +205,7 @@ output {
 label {
     color: white;
     cursor: pointer;
+    align-self: center;
 }
 
 #radius-range {
@@ -234,6 +239,12 @@ button {
     height: 3rem;
     margin: 1%;
     font-size: 20px;
+}
+
+.button-container {
+    margin-top: 15%;
+    align-self: center;
+    text-align: center;
 }
 
 section {

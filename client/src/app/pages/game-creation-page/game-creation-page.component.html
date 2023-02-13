@@ -30,20 +30,16 @@
                 <div class="original image">
                     <canvas #canvas1 width="640px" height="480px"></canvas>
                 </div>
-                <button id="reset-original" (click)="clearFirstFile(this.myOgCanvas.nativeElement, 'upload-original')">X</button>
-                <label for="upload-original">
-                    Choisir une image de 640*480 de format bmp
-                    <input type="file" id="upload-original" class="photo-upload" (change)="fileValidation($event)" accept="image/bmp" />
-                </label>
+                <div class="upload-delete">
+                    <button id="reset-original" (click)="clearFirstFile(this.myOgCanvas.nativeElement, 'upload-original')">X</button>
+                    <label for="upload-original">
+                        Choisir une image de 640*480 de format bmp
+                        <input type="file" id="upload-original" class="photo-upload" (change)="fileValidation($event)" accept="image/bmp" />
+                    </label>
+                </div>
             </div>
 
             <div class="middle-container">
-                <div class="diff-counter">
-                    <div class="diff-counter-container">
-                        <div class="diff-counter-title">Nombre de différences :</div>
-                        <div class="count">01</div>
-                    </div>
-                </div>
                 <div class="tools-container">
                     <div class="row-tools">
                         <button><img class="btn-image" src="../../../assets/undo.png" /></button>
@@ -78,23 +74,26 @@
                         <label for="radius-range">Rayon du détecteur de différence</label>
                     </div>
                 </div>
+                <div class="button-container">
+                    <label for="upload-original">
+                        <input type="file" id="upload-both" class="photo-upload" (change)="fileValidation($event)" accept="image/bmp" />
+                        Téléverser deux images
+                    </label>
+                </div>
             </div>
+
             <div class="difference container">
                 <div class="different image">
                     <canvas #canvas2 width="640px" height="480px"></canvas>
                 </div>
-                <button id="reset-different" (click)="clearSecondFile(this.myDiffCanvas.nativeElement, 'upload-different')">X</button>
-                <label for="upload-original">
-                    Choisir une image de 640*480 de format bmp
-                    <input type="file" id="upload-different" class="photo-upload" (change)="fileValidation($event)" accept="image/bmp" />
-                </label>
+                <div class="upload-delete">
+                    <button id="reset-different" (click)="clearSecondFile(this.myDiffCanvas.nativeElement, 'upload-different')">X</button>
+                    <label for="upload-original">
+                        Choisir une image de 640*480 de format bmp
+                        <input type="file" id="upload-different" class="photo-upload" (change)="fileValidation($event)" accept="image/bmp" />
+                    </label>
+                </div>
             </div>
-        </div>
-        <div class="button-container">
-            <label for="upload-original">
-                Choisir une image de 640px*480px de format bmp
-                <input type="file" id="upload-both" class="photo-upload" (change)="fileValidation($event)" accept="image/bmp" />
-            </label>
         </div>
     </div>
 </body>
