@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { IdTransferService } from '@app/services/id-transfer/id-transfer.service';
 import { STAGE } from '@app/services/server-routes';
 import { GameCardInformation } from '@common/game-card';
 
@@ -11,17 +10,10 @@ import { GameCardInformation } from '@common/game-card';
 export class GameCardSelectionComponent implements OnInit {
     @Input() gameCardInformation: GameCardInformation;
     @Input() isConfig: boolean | null;
+    image: string = '';
 
-    image: string;
-
-    constructor(public idTransferService: IdTransferService) {}
-
-    ngOnInit(): void {
+    ngOnInit() {
         this.image = `${STAGE}/image/${this.gameCardInformation.originalImageName}`;
-    }
-
-    getId() {
-        this.idTransferService.setIdFromGameCard(this.gameCardInformation.id);
     }
     // TODO: ajouter la logique pour que le reset des temps et le delete se fait pour le sprint 2
 
