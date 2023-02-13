@@ -11,7 +11,8 @@ const routes: Routes = [
     { path: 'creatingGame', component: GameCreationPageComponent },
     { path: 'stage-selection', component: GameSelectionComponent },
     { path: 'config', component: GameSelectionComponent },
-    { path: 'soloView', component: SoloViewComponent },
+    { path: 'soloview/:id', component: SoloViewComponent },
+    { path: '**', redirectTo: '/home' },
 ];
 
 @NgModule({

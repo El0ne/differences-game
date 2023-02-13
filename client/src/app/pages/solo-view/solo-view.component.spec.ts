@@ -3,8 +3,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { ClickEventService } from '@app/services/Click-event/click-event.service';
+import { GameCardInformation } from '@common/game-card';
 import { MESSAGES_LENGTH } from './solo-view-constants';
-
 import { SoloViewComponent } from './solo-view.component';
 
 describe('SoloViewComponent', () => {
@@ -20,6 +20,7 @@ describe('SoloViewComponent', () => {
 
         fixture = TestBed.createComponent(SoloViewComponent);
         component = fixture.componentInstance;
+        component.gameCardInfo = FAKE_GAME_CARD;
         fixture.detectChanges();
     });
 
@@ -124,3 +125,22 @@ describe('SoloViewComponent', () => {
         // mettre publique et supprimer currentTime
     });
 });
+
+const FAKE_GAME_CARD: GameCardInformation = {
+    id: '0',
+    name: 'game.name',
+    difficulty: 'Facile',
+    differenceNumber: 6,
+    originalImageName: 'game.baseImage',
+    differenceImageName: 'game.differenceImage',
+    soloTimes: [
+        { time: 0, name: '--' },
+        { time: 0, name: '--' },
+        { time: 0, name: '--' },
+    ],
+    multiTimes: [
+        { time: 0, name: '--' },
+        { time: 0, name: '--' },
+        { time: 0, name: '--' },
+    ],
+};

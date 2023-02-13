@@ -1,7 +1,6 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
-
 import { ClickEventService } from './click-event.service';
 
 describe('ClickEventService', () => {
@@ -29,7 +28,7 @@ describe('ClickEventService', () => {
     });
 
     it('setDifference() should return the difference array for the given gameCard id', () => {
-        service.setDifferences(4).subscribe((res) => {
+        service.setDifferences('4').subscribe((res) => {
             expect(res).toEqual([[]]);
         });
     });

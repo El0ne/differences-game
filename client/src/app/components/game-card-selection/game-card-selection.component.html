@@ -52,7 +52,7 @@
         <button class="normal-button create">Réinitialiser</button>
     </div>
     <div class="row" *ngIf="!isConfig">
-        <button class="normal-button play" routerLink="/soloview">Jouer</button>
+        <button class="normal-button play" [routerLink]="'/soloview/' + gameCardInformation.id">Jouer</button>
         <button class="normal-button create" routerLink="/waitingRoom">Joindre</button>
     </div>
 </div>

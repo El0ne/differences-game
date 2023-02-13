@@ -1,4 +1,7 @@
 <div class="game-cards-container">
+    <div class="header">
+        <button id="previous" routerLink="/home">Retour</button>
+    </div>
     <div *ngFor="let gameCardInformation of gameCardInformations" class="card-container">
         <app-game-card-selection [gameCardInformation]="gameCardInformation" [isConfig]="isConfig"></app-game-card-selection>
     </div>

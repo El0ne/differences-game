@@ -27,7 +27,7 @@ export class DifferenceClickService {
     }
 
     getDifferenceArrayFromStageID(stageId: string): number[][] {
-        for (const differenceObject of JSON.parse(this.content).differences) {
+        for (const differenceObject of JSON.parse(this.content).differenceObjects) {
             if (differenceObject.id === stageId) {
                 return differenceObject.differences;
             }
