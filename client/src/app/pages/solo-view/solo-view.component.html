@@ -51,7 +51,7 @@
             [gameCardId]="this.currentGameId"
             [imagePath]="this.gameCardInfo.originalImageName"
             (incrementScore)="incrementScore()"
-            (finishGame)="finishGame()"
+            (differences)="addDifferenceDetected($event)"
         ></app-click-event>
         <div class="game-options">
             <div id="timer">
@@ -98,7 +98,7 @@
             [gameCardId]="this.currentGameId"
             [imagePath]="this.gameCardInfo.differenceImageName"
             (incrementScore)="incrementScore()"
-            (finishGame)="finishGame()"
+            (differences)="addDifferenceDetected($event)"
         ></app-click-event>
         <div class="hint-button">
             <button class="hint" type="button">
