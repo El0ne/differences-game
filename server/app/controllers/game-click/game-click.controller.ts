@@ -1,6 +1,6 @@
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
-import { Controller, Get, Param, Patch, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 
 @Controller('game-click')
 export class GameClickController {
@@ -14,10 +14,5 @@ export class GameClickController {
     @Get(':id')
     getDifferencesFromId(@Param('id') stageId: string): number[][] {
         return this.differenceClickService.setDifference(stageId);
-    }
-
-    @Patch('/')
-    resetDifference(): void {
-        this.differenceClickService.resetDifferences();
     }
 }
