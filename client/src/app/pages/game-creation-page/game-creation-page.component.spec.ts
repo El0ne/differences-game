@@ -2,7 +2,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
-import { IMAGE } from './game-creation-constants';
+import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 
 import { GameCreationPageComponent } from './game-creation-page.component';
 
@@ -22,8 +22,8 @@ describe('GameCreationPageComponent', () => {
         fixture.detectChanges();
 
         canvasOg = document.createElement('canvas');
-        canvasOg.width = IMAGE.width;
-        canvasOg.height = IMAGE.height;
+        canvasOg.width = IMAGE_DIMENSIONS.width;
+        canvasOg.height = IMAGE_DIMENSIONS.height;
     });
 
     it('should create', () => {
@@ -66,7 +66,7 @@ describe('GameCreationPageComponent', () => {
     it('should validate the file', () => {
         spyOn(component, 'uploadImage');
 
-        const file = new File([new ArrayBuffer(IMAGE.size)], 'testImage.bmp', { type: 'image/bmp' });
+        const file = new File([new ArrayBuffer(IMAGE_DIMENSIONS.size)], 'testImage.bmp', { type: 'image/bmp' });
 
         const input = fixture.debugElement.query(By.css('input[type="file"]')).nativeElement as HTMLInputElement;
         const event = new Event('change');
@@ -97,7 +97,7 @@ describe('GameCreationPageComponent', () => {
     it('should send an alert if picture is the wrong type', () => {
         spyOn(window, 'alert');
 
-        const file = new File([new ArrayBuffer(IMAGE.size)], 'testImage.jpg', { type: 'image/jpg' });
+        const file = new File([new ArrayBuffer(IMAGE_DIMENSIONS.size)], 'testImage.jpg', { type: 'image/jpg' });
 
         const input = fixture.debugElement.query(By.css('input[type="file"]')).nativeElement as HTMLInputElement;
         const event = new Event('change');

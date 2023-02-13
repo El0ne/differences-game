@@ -2,8 +2,9 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { STAGE } from '@app/services/server-routes';
 import { GameInformation } from '@common/game-information';
+import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { GC_PATHS, IMAGE } from './game-creation-constants';
+import { GC_PATHS } from './game-creation-constants';
 
 @Component({
     selector: 'app-game-creation-page',
@@ -47,7 +48,7 @@ export class GameCreationPageComponent implements OnInit {
         const bothInput = document.getElementById('upload-both') as HTMLInputElement;
         input.value = '';
         bothInput.value = '';
-        if (context) context.clearRect(0, 0, IMAGE.width, IMAGE.height);
+        if (context) context.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
     }
 
     clearFirstFile(canvas: HTMLCanvasElement, id: string): void {
@@ -63,7 +64,7 @@ export class GameCreationPageComponent implements OnInit {
     fileValidation(e: Event): void {
         const target = e.target as HTMLInputElement;
         const file: File = (target.files as FileList)[0];
-        if (file !== undefined && file.size === IMAGE.size && file.type === 'image/bmp') {
+        if (file !== undefined && file.size === IMAGE_DIMENSIONS.size && file.type === 'image/bmp') {
             this.uploadImage(file, target);
         } else {
             alert('wrong size or file type please choose again');
@@ -85,15 +86,15 @@ export class GameCreationPageComponent implements OnInit {
                     return;
                 }
                 if (target.id === this.originalId) {
-                    if (ogContext) ogContext.drawImage(img, 0, 0, IMAGE.width, IMAGE.height);
+                    if (ogContext) ogContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
                     this.originalFile = target.files[0];
                 } else if (target.id === this.differentId) {
-                    if (diffContext) diffContext.drawImage(img, 0, 0, IMAGE.width, IMAGE.height);
+                    if (diffContext) diffContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
                     this.differentFile = target.files[0];
                 } else {
                     if (ogContext && diffContext) {
-                        ogContext.drawImage(img, 0, 0, IMAGE.width, IMAGE.height);
-                        diffContext.drawImage(img, 0, 0, IMAGE.width, IMAGE.height);
+                        ogContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+                        diffContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
                         this.originalFile = target.files[0];
                         this.differentFile = target.files[0];
                     }
