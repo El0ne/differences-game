@@ -1,1 +1,61 @@
-{"gameCardsInformations":[{"id":"d95d9b82-3c73-47d7-96fa-9ee83d289c8d","name":"ALEXIS T CRINGE","difficulty":"Difficile","differenceNumber":7,"originalImageName":"d39f1477-a856-4bd9-953f-a8c1a396ae6c.bmp","differenceImageName":"3de13514-fb08-414d-b75f-485ce3a891af.bmp","soloTimes":[{"time":0,"name":"--"},{"time":0,"name":"--"},{"time":0,"name":"--"}],"multiTimes":[{"time":0,"name":"--"},{"time":0,"name":"--"},{"time":0,"name":"--"}],"numberOfDifferences":0},{"id":"3026be9f-1a1a-44f3-afb7-cc1118a3792e","name":"bruhmoment69","difficulty":"Difficile","differenceNumber":7,"originalImageName":"30f3de06-4fb2-45c2-8fc9-5754d7381e03.bmp","differenceImageName":"ee7d9110-af11-4d3b-b463-ce10f6288c25.bmp","soloTimes":[{"time":0,"name":"--"},{"time":0,"name":"--"},{"time":0,"name":"--"}],"multiTimes":[{"time":0,"name":"--"},{"time":0,"name":"--"},{"time":0,"name":"--"}],"numberOfDifferences":0},{"id":"ea7178fd-122f-4c4b-8044-1445f176f158","name":"a","difficulty":"Difficile","differenceNumber":7,"originalImageName":"1e6cb40f-e187-4d24-b942-1d74faa45dc2.bmp","differenceImageName":"0a49be4a-2213-4cf9-abd2-1db447634898.bmp","soloTimes":[{"time":0,"name":"--"},{"time":0,"name":"--"},{"time":0,"name":"--"}],"multiTimes":[{"time":0,"name":"--"},{"time":0,"name":"--"},{"time":0,"name":"--"}],"numberOfDifferences":0},{"id":"b6b62b3f-9ae1-4b53-bdc8-0c4eb2af16b9","name":"a","difficulty":"Difficile","differenceNumber":7,"originalImageName":"9d034641-a1a0-44c9-b2d9-e4370301114d.bmp","differenceImageName":"d6396bf0-3542-4270-8783-c3b4a34bb3b1.bmp","soloTimes":[{"time":0,"name":"--"},{"time":0,"name":"--"},{"time":0,"name":"--"}],"multiTimes":[{"time":0,"name":"--"},{"time":0,"name":"--"},{"time":0,"name":"--"}],"numberOfDifferences":0}]}
+{
+    "gameCardsInformations": [
+        {
+            "id": "4f724e90-d1e9-497d-8c80-259e2cbe64cb",
+            "name": "test",
+            "difficulty": "Difficile",
+            "differenceNumber": 7,
+            "originalImageName": "8db03f76-3cc1-432c-baee-30d62b143298.bmp",
+            "differenceImageName": "867c6294-7940-44e1-bfff-dbf4de35c056.bmp",
+            "soloTimes": [
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" }
+            ],
+            "multiTimes": [
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" }
+            ],
+            "numberOfDifferences": 0
+        },
+        {
+            "id": "6f7e3e2d-9da2-49b6-a8c9-415300d0f2d1",
+            "name": "test2",
+            "difficulty": "Difficile",
+            "differenceNumber": 7,
+            "originalImageName": "87713792-a4d7-43ac-bf4d-4af365376d42.bmp",
+            "differenceImageName": "99e44cac-94ce-4aa9-bd47-97bfaa4a240e.bmp",
+            "soloTimes": [
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" }
+            ],
+            "multiTimes": [
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" }
+            ],
+            "numberOfDifferences": 0
+        },
+        {
+            "id": "66243149-aebe-4ed8-918b-979aa0002d42",
+            "name": "86964325bg67898tby9548ybby89brgv8 b8ub 82uyvubvtu83b3548vbgv3y3ig bgnu3bvg5uiho",
+            "difficulty": "Difficile",
+            "differenceNumber": 7,
+            "originalImageName": "bd5127dc-f88b-4c46-b22c-af7beb7ead4e.bmp",
+            "differenceImageName": "1e9e94ea-d99e-4c57-a6c6-cb73dc0ef5e3.bmp",
+            "soloTimes": [
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" }
+            ],
+            "multiTimes": [
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" }
+            ],
+            "numberOfDifferences": 0
+        }
+    ]
+}
