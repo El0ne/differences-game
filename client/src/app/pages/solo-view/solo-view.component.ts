@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { FoundDifferenceService } from '@app/services/Found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
@@ -38,17 +38,20 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         public timerService: TimerSoloService,
         private convertService: SecondToMinuteService,
         private gameCardInfoService: GameCardInformationService,
-        private router: Router,
         private foundDifferenceService: FoundDifferenceService,
+        private route: ActivatedRoute,
     ) {}
 
     ngOnInit(): void {
-        const id = this.router.url.replace('/soloview/', '');
-        this.currentGameId = id;
-        this.gameCardInfoService.getGameCardInfoFromId(this.currentGameId).subscribe((gameCardData) => {
-            this.gameCardInfo = gameCardData;
-            this.numberOfDifferences = this.gameCardInfo.differenceNumber;
-        });
+        const gameId = this.route.snapshot.paramMap.get('stageId');
+        if (gameId) {
+            this.currentGameId = gameId;
+            console.log('id', this.currentGameId);
+            this.gameCardInfoService.getGameCardInfoFromId(this.currentGameId).subscribe((gameCardData) => {
+                this.gameCardInfo = gameCardData;
+                this.numberOfDifferences = this.gameCardInfo.differenceNumber;
+            });
+        }
 
         this.showTime();
     }
