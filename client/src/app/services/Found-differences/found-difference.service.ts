@@ -13,4 +13,8 @@ export class FoundDifferenceService {
     addDifferenceFound(index: number) {
         this.foundDifferences.push(index);
     }
+
+    clearDifferenceFound() {
+        this.foundDifferences = [];
+    }
 }

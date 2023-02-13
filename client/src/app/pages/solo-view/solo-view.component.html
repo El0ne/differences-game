@@ -50,6 +50,7 @@
             [imagePath]="this.gameCardInfo.originalImageName"
             (incrementScore)="incrementScore()"
             (differences)="addDifferenceDetected($event)"
+            *ngIf="this.gameCardInfo"
         ></app-click-event>
         <div class="game-options">
             <div id="timer">
@@ -96,6 +97,7 @@
             [imagePath]="this.gameCardInfo.differenceImageName"
             (incrementScore)="incrementScore()"
             (differences)="addDifferenceDetected($event)"
+            *ngIf="this.gameCardInfo"
         ></app-click-event>
         <div class="hint-button">
             <button class="hint" type="button">

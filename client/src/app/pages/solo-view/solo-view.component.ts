@@ -46,7 +46,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         const gameId = this.route.snapshot.paramMap.get('stageId');
         if (gameId) {
             this.currentGameId = gameId;
-            console.log('id', this.currentGameId);
             this.gameCardInfoService.getGameCardInfoFromId(this.currentGameId).subscribe((gameCardData) => {
                 this.gameCardInfo = gameCardData;
                 this.numberOfDifferences = this.gameCardInfo.differenceNumber;
@@ -58,6 +57,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.timerService.stopTimer();
+        this.foundDifferenceService.clearDifferenceFound();
     }
 
     showTime(): void {
