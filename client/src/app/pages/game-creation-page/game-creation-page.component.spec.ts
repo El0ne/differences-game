@@ -170,39 +170,41 @@ describe('GameCreationPageComponent', () => {
         expect(window.alert).toHaveBeenCalledWith('Un jeu de différences sans image est pour ainsi dire... intéressant ? Ajoutez une image.');
     });
 
-    // it('should return true if all the verifications are good', () => {
-    //     component.gameTitle = 'My Game';
-    //     component.originalFile = new File([''], 'original.bmp');
-    //     component.differentFile = new File([''], 'different.bmp');
+    it('should return true if all the verifications are good', () => {
+        component.gameTitle = 'My Game';
+        component.originalFile = new File([''], 'original.bmp');
+        component.differentFile = new File([''], 'different.bmp');
 
-    //     component.saveVerification();
+        component.saveVerification();
 
-    //     expect(component.saveVerification).toEqual('true');
-    // });
+        expect(component.saveVerification).toBeTruthy();
+    });
 
     // it('should open modal page and save information if saveVerification is true', () => {
     //     spyOn(component, 'saveVerification').and.returnValue(true);
-    //     // const mockImageInfo: ImageInformation = {
-    //     //     fieldname: '',
-    //     //     originalname: '',
-    //     //     encoding: '',
-    //     //     mimetype: '',
-    //     //     destination: '',
-    //     //     filename: '',
-    //     //     path: '',
-    //     //     size: 0,
-    //     // };
-    //     // spyOn(component.gameCardService, 'uploadImages').and.returnValue(of([mockImageInfo, mockImageInfo]));
+    //     const mockImageInfo: ImageInformation = {
+    //         fieldname: '',
+    //         originalname: '',
+    //         encoding: '',
+    //         mimetype: '',
+    //         destination: '',
+    //         filename: '',
+    //         path: '',
+    //         size: 0,
+    //     };
+    //     spyOn(component.gameCardService, 'uploadImages').and.returnValue(of([mockImageInfo, mockImageInfo]));
 
-    //     // const mockGameCardInfo: GameCardInformation = {
-    //     //     name: '',
-    //     //     difficulty: '',
-    //     //     originalImage: '',
-    //     //     differenceImage: '',
-    //     //     soloTimes: [],
-    //     //     multiTimes: [],
-    //     // };
-    //     // spyOn(component.gameCardService, 'createGame').and.returnValue(of(mockGameCardInfo));
+    //     const mockGameCardInfo: GameCardInformation = {
+    //         id: '',
+    //         name: '',
+    //         difficulty: '',
+    //         originalImageName: '',
+    //         differenceImageName: '',
+    //         differenceNumber: 0,
+    //         soloTimes: [],
+    //         multiTimes: [],
+    //     };
+    //     spyOn(component.gameCardService, 'createGame').and.returnValue(of(mockGameCardInfo));
 
     //     spyOn(component.modal, 'next');
 
@@ -212,13 +214,13 @@ describe('GameCreationPageComponent', () => {
 
     //     component.save();
 
-    //     // expect(component.saveVerification).toHaveBeenCalled();
-    //     // expect(component.gameCardService.uploadImages).toHaveBeenCalledWith(
-    //     //     new File([''], 'original.bmp'),
-    //     //     new File([''], 'different.bmp'),
-    //     //     component.radius,
-    //     // );
-    //     // expect(component.gameCardService.createGame);
-    //     // expect(component.modal.next).toHaveBeenCalledOnceWith('open');
+    //     expect(component.saveVerification).toHaveBeenCalled();
+    //     expect(component.gameCardService.uploadImages).toHaveBeenCalledWith(
+    //         new File([''], 'original.bmp'),
+    //         new File([''], 'different.bmp'),
+    //         component.radius,
+    //     );
+    //     expect(component.gameCardService.createGame);
+    //     expect(component.modal.next).toHaveBeenCalledOnceWith('open');
     // });
 });
