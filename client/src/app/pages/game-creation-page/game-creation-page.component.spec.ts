@@ -81,6 +81,7 @@ describe('GameCreationPageComponent', () => {
     it('should send an alert if picture is the wrong size', () => {
         spyOn(window, 'alert');
 
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const file = new File([new ArrayBuffer(123456)], 'testImage.bmp', { type: 'image/bmp' });
 
         const input = fixture.debugElement.query(By.css('input[type="file"]')).nativeElement as HTMLInputElement;
