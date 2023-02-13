@@ -13,6 +13,6 @@ export class GameClickController {
 
     @Get(':id')
     getDifferencesFromId(@Param('id') stageId: string): number[][] {
-        return this.differenceClickService.setDifference(stageId);
+        return this.differenceClickService.getDifferenceArrayFromStageID(stageId);
     }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
@@ -33,12 +34,20 @@ describe('GameClickController', () => {
         expect(controller).toBeDefined();
     });
 
-    it('validateDifference() should return game cards if there are at least one', async () => {
+    it('validateDifference() should return a clickDifferenceVerification', async () => {
         const differenceClickServiceStub = stub(differenceClickService, 'validateDifferencePositions').returns(FAKE_CDV);
-        const response = await request(httpServer).get('/game-click');
-        assert(differenceClickServiceStub.called);
+        const response = await request(httpServer).get('/game-click').query({ x: 1, y: 2, id: 5 });
+        assert(differenceClickServiceStub.calledWith([1, 2, 5]));
         expect(response.status).toBe(HttpStatus.OK);
         expect(response.body).toEqual(FAKE_CDV);
+    });
+
+    it('getDifferencesFromId() should return a list of differences', async () => {
+        const differenceClickServiceStub = stub(differenceClickService, 'getDifferenceArrayFromStageID').returns([]);
+        const response = await request(httpServer).get('/game-click/5');
+        assert(differenceClickServiceStub.calledWith([5]));
+        expect(response.status).toBe(HttpStatus.OK);
+        expect(response.body).toEqual([]);
     });
 });
 

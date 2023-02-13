@@ -34,11 +34,6 @@ export class DifferenceClickService {
         }
     }
 
-    setDifference(stageId: string) {
-        const differences = this.getDifferenceArrayFromStageID(stageId);
-        return differences;
-    }
-
     validateDifferencePositions(clickPositionX: number, clickPositionY: number, stageId: string): ClickDifferenceVerification {
         const differences = this.getDifferenceArrayFromStageID(stageId);
         const x = Number(clickPositionX);
