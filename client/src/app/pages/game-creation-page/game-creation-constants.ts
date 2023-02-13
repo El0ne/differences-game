@@ -5,11 +5,6 @@ export const IMAGE = {
 };
 
 export const GC_PATHS = {
-    undo: '../../../assets/undo.png',
-    rectangle: '../../../assets/black-rectangle.png',
-    pencil: '../../../assets/pencil.png',
     erase: '../../../assets/eraser.png',
-    copy: '../../../assets/copy.png',
     invert: './../../assets/invert-tool.png',
-    save: '../../../assets/save.png',
 };
