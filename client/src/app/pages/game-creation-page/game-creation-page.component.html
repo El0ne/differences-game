@@ -8,7 +8,10 @@
                         <h1>Vos différences ajoutées :</h1>
                         <div class="diff-image">
                             <img [src]="this.image" />
-                            <h1>Il y a {{ this.differenceNumber }} différences</h1>
+                            <div class="info-diff">
+                                <h1>Il y a {{ this.differenceNumber }} différences</h1>
+                                <h1>Difficulté : {{ this.difficulty }}</h1>
+                            </div>
                         </div>
                         <button class="continue" routerLink="/config">Continuer</button>
                     </div>

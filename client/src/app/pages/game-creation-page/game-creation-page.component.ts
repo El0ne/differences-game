@@ -31,6 +31,7 @@ export class GameCreationPageComponent implements OnInit {
 
     image: string = '';
     differenceNumber: number = 0;
+    difficulty: string = '';
 
     constructor(public gameCardService: GameCardInformationService) {}
 
@@ -130,6 +131,7 @@ export class GameCreationPageComponent implements OnInit {
                         radius: this.radius,
                         differenceNumber: data.gameDifferenceNumber,
                     };
+                    this.difficulty = data.gameDifficulty;
                     this.differenceNumber = data.gameDifferenceNumber;
                     this.image = `${STAGE}/image/difference-image.bmp`;
                     this.gameCardService.createGame(gameInfo).subscribe();
