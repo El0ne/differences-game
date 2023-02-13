@@ -7,8 +7,8 @@ export class GameClickController {
     constructor(private differenceClickService: DifferenceClickService) {}
 
     @Get('/')
-    validateDifference(@Query('x') clickPositionX: number, @Query('y') clickPositionY: number): ClickDifferenceVerification {
-        return this.differenceClickService.validateDifferencePositions(clickPositionX, clickPositionY);
+    validateDifference(@Query('x') clickPositionX: number, @Query('y') clickPositionY: number, @Query('id') id: string): ClickDifferenceVerification {
+        return this.differenceClickService.validateDifferencePositions(clickPositionX, clickPositionY, id);
     }
 
     @Get(':id')
