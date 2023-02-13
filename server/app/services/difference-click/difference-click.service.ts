@@ -8,7 +8,6 @@ import * as path from 'path';
 @Injectable()
 export class DifferenceClickService {
     jsonPath = path.join(process.cwd(), 'app/dataBase/differences.json');
-    content = fs.readFileSync(this.jsonPath, 'utf8');
     constructor(private differenceCounterService: DifferencesCounterService, private imageDimensionsService: ImageDimensionsService) {}
 
     getAllDifferenceArrays(): DifferencesObject[] {
@@ -27,8 +26,10 @@ export class DifferenceClickService {
     }
 
     getDifferenceArrayFromStageID(stageId: string): number[][] {
-        console.log('this content', this.content);
-        for (const differenceObject of JSON.parse(this.content).differenceObjects) {
+        // console.log('this content', this.content);
+        const content = fs.readFileSync(this.jsonPath, 'utf8');
+
+        for (const differenceObject of JSON.parse(content).differenceObjects) {
             if (differenceObject.id === stageId) {
                 return differenceObject.differences;
             }
