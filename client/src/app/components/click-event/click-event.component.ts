@@ -1,5 +1,6 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
+import { STAGE } from '@app/services/server-routes';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { Observable } from 'rxjs';
 import { FAST_WAIT_TIME, HEIGHT, WAIT_TIME, WIDTH } from './click-event-constant';
@@ -43,7 +44,7 @@ export class ClickEventComponent implements OnInit {
         return new Promise((resolve) => {
             const image = new Image();
             // TODO: Ajouter lorsqu'on aura acces a GameCardInformation
-            image.src = this.imagePath;
+            image.src = `${STAGE}/image/${this.imagePath}`;
             image.onload = () => {
                 const context = this.picture.nativeElement.getContext('2d') as CanvasRenderingContext2D;
                 context.drawImage(image, 0, 0);

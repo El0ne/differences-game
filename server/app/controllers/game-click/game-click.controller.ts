@@ -8,7 +8,6 @@ export class GameClickController {
 
     @Get('/')
     validateDifference(@Query('x') clickPositionX: number, @Query('y') clickPositionY: number): ClickDifferenceVerification {
-        console.log('here');
         return this.differenceClickService.validateDifferencePositions(clickPositionX, clickPositionY);
     }
 
