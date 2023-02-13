@@ -15,6 +15,7 @@ export class ClickEventComponent implements OnInit {
     @Input() id: number;
     @Input() original: string;
     @Input() gameCardId: string;
+    @Input() imagePath: string;
     @Output() incrementScore: EventEmitter<number> = new EventEmitter<number>();
     @ViewChild('picture', { static: true })
     picture: ElementRef<HTMLCanvasElement>;
@@ -42,7 +43,7 @@ export class ClickEventComponent implements OnInit {
         return new Promise((resolve) => {
             const image = new Image();
             // TODO: Ajouter lorsqu'on aura acces a GameCardInformation
-            image.src = './assets/444-640x480.jpg';
+            image.src = this.imagePath;
             image.onload = () => {
                 const context = this.picture.nativeElement.getContext('2d') as CanvasRenderingContext2D;
                 context.drawImage(image, 0, 0);

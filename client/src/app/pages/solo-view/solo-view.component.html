@@ -49,6 +49,7 @@
             [id]="1"
             [original]="'original'"
             [gameCardId]="this.currentGameId"
+            [imagePath]="this.gameCardInfo.originalImageName"
             (incrementScore)="incrementScore()"
             (finishGame)="finishGame()"
         ></app-click-event>
@@ -95,6 +96,7 @@
             [id]="2"
             [original]="'different'"
             [gameCardId]="this.currentGameId"
+            [imagePath]="this.gameCardInfo.differenceImageName"
             (incrementScore)="incrementScore()"
             (finishGame)="finishGame()"
         ></app-click-event>
