@@ -9,5 +9,4 @@ export class GameCardInformation {
     differenceImageName: string;
     soloTimes: RankingBoard[];
     multiTimes: RankingBoard[];
-    numberOfDifferences: number;
 }
