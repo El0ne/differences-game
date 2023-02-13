@@ -3,10 +3,8 @@ import { GameCardInformationService } from '@app/services/game-card-information-
 import { STAGE } from '@app/services/server-routes';
 import { GameInformation } from '@common/game-information';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { GC_PATHS, IMAGE } from './game-creation-constants';
 
-export const IMAGE_WIDTH = 640; // in pixels
-export const IMAGE_HEIGHT = 480; // in pixels
-export const IMAGE_SIZE = 921654; // 640px * 480px * 3 bytes (24 bits). This value means that only files with these specific properties work.
 @Component({
     selector: 'app-game-creation-page',
     templateUrl: './game-creation-page.component.html',
@@ -19,6 +17,8 @@ export class GameCreationPageComponent implements OnInit {
     modal: BehaviorSubject<'open' | 'close'> = new BehaviorSubject<'open' | 'close'>('close');
 
     display$: Observable<'open' | 'close'>;
+
+    readonly paths = GC_PATHS;
 
     gameTitle: string = '';
     originalFile: File | null = null;
@@ -37,7 +37,7 @@ export class GameCreationPageComponent implements OnInit {
         this.display$ = this.modal.asObservable();
     }
 
-    getTitle(title: string) {
+    getTitle(title: string): void {
         this.gameTitle = title;
     }
 
@@ -47,7 +47,7 @@ export class GameCreationPageComponent implements OnInit {
         const bothInput = document.getElementById('upload-both') as HTMLInputElement;
         input.value = '';
         bothInput.value = '';
-        if (context) context.clearRect(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
+        if (context) context.clearRect(0, 0, IMAGE.width, IMAGE.height);
     }
 
     clearFirstFile(canvas: HTMLCanvasElement, id: string): void {
@@ -63,7 +63,7 @@ export class GameCreationPageComponent implements OnInit {
     fileValidation(e: Event): void {
         const target = e.target as HTMLInputElement;
         const file: File = (target.files as FileList)[0];
-        if (file !== undefined && file.size === IMAGE_SIZE && file.type === 'image/bmp') {
+        if (file !== undefined && file.size === IMAGE.size && file.type === 'image/bmp') {
             this.uploadImage(file, target);
         } else {
             alert('wrong size or file type please choose again');
@@ -71,7 +71,7 @@ export class GameCreationPageComponent implements OnInit {
         }
     }
 
-    async uploadImage(file: File, target: HTMLInputElement) {
+    async uploadImage(file: File, target: HTMLInputElement): Promise<void> {
         const ogContext = this.myOgCanvas.nativeElement.getContext('2d');
         const diffContext = this.myDiffCanvas.nativeElement.getContext('2d');
         const reader = new FileReader();
@@ -85,15 +85,15 @@ export class GameCreationPageComponent implements OnInit {
                     return;
                 }
                 if (target.id === this.originalId) {
-                    if (ogContext) ogContext.drawImage(img, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
+                    if (ogContext) ogContext.drawImage(img, 0, 0, IMAGE.width, IMAGE.height);
                     this.originalFile = target.files[0];
                 } else if (target.id === this.differentId) {
-                    if (diffContext) diffContext.drawImage(img, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
+                    if (diffContext) diffContext.drawImage(img, 0, 0, IMAGE.width, IMAGE.height);
                     this.differentFile = target.files[0];
                 } else {
                     if (ogContext && diffContext) {
-                        ogContext.drawImage(img, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
-                        diffContext.drawImage(img, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
+                        ogContext.drawImage(img, 0, 0, IMAGE.width, IMAGE.height);
+                        diffContext.drawImage(img, 0, 0, IMAGE.width, IMAGE.height);
                         this.originalFile = target.files[0];
                         this.differentFile = target.files[0];
                     }

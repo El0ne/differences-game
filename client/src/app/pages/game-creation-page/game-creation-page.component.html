@@ -16,7 +16,7 @@
                 </section>
             </ng-container>
         </div>
-        <button id="save" (click)="save()"><img class="save-image" src="../../../assets/save.png" /></button>
+        <button id="save" (click)="save()"><img class="save-image" src="{{ paths.save }}" /></button>
     </div>
     <div id="title-container">
         <div class="line title">____________</div>
@@ -42,16 +42,16 @@
             <div class="middle-container">
                 <div class="tools-container">
                     <div class="row-tools">
-                        <button><img class="btn-image" src="../../../assets/undo.png" /></button>
-                        <button><img class="btn-image" src="../../../assets/black-rectangle.png" /></button>
+                        <button><img class="btn-image" src="{{ paths.undo }}" /></button>
+                        <button><img class="btn-image" src="{{ paths.rectangle }}" /></button>
                     </div>
                     <div class="row-tools">
-                        <button><img class="btn-image" src="../../../assets/pencil.png" /></button>
-                        <button><img class="btn-image" src="../../../assets/eraser.png" /></button>
+                        <button><img class="btn-image" src="{{ paths.pencil }}" /></button>
+                        <button><img class="btn-image" src="{{ paths.erase }}" /></button>
                     </div>
                     <div class="row-tools">
-                        <button><img class="btn-image" src="../../../assets/copy.png" /></button>
-                        <button><img class="btn-image" src="../../../assets/invert-tool.png" /></button>
+                        <button><img class="btn-image" src="{{ paths.copy }}" /></button>
+                        <button><img class="btn-image" src="{{ paths.invert }}" /></button>
                     </div>
                     <div class="color-container">
                         <input type="color" id="color-picker" value="#ff124f" />

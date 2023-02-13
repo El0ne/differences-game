@@ -2,8 +2,9 @@ import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
+import { IMAGE } from './game-creation-constants';
 
-import { GameCreationPageComponent, IMAGE_HEIGHT, IMAGE_SIZE, IMAGE_WIDTH } from './game-creation-page.component';
+import { GameCreationPageComponent } from './game-creation-page.component';
 
 describe('GameCreationPageComponent', () => {
     let component: GameCreationPageComponent;
@@ -21,8 +22,8 @@ describe('GameCreationPageComponent', () => {
         fixture.detectChanges();
 
         canvasOg = document.createElement('canvas');
-        canvasOg.width = IMAGE_WIDTH;
-        canvasOg.height = IMAGE_HEIGHT;
+        canvasOg.width = IMAGE.width;
+        canvasOg.height = IMAGE.height;
     });
 
     it('should create', () => {
@@ -65,7 +66,7 @@ describe('GameCreationPageComponent', () => {
     it('should validate the file', () => {
         spyOn(component, 'uploadImage');
 
-        const file = new File([new ArrayBuffer(IMAGE_SIZE)], 'testImage.bmp', { type: 'image/bmp' });
+        const file = new File([new ArrayBuffer(IMAGE.size)], 'testImage.bmp', { type: 'image/bmp' });
 
         const input = fixture.debugElement.query(By.css('input[type="file"]')).nativeElement as HTMLInputElement;
         const event = new Event('change');
@@ -96,7 +97,7 @@ describe('GameCreationPageComponent', () => {
     it('should send an alert if picture is the wrong type', () => {
         spyOn(window, 'alert');
 
-        const file = new File([new ArrayBuffer(IMAGE_SIZE)], 'testImage.jpg', { type: 'image/jpg' });
+        const file = new File([new ArrayBuffer(IMAGE.size)], 'testImage.jpg', { type: 'image/jpg' });
 
         const input = fixture.debugElement.query(By.css('input[type="file"]')).nativeElement as HTMLInputElement;
         const event = new Event('change');
@@ -181,8 +182,6 @@ describe('GameCreationPageComponent', () => {
 
     // it('should open modal page and save information if saveVerification is true', () => {
     //     spyOn(component, 'saveVerification').and.returnValue(true);
-    //     // Decommenter once we merge avec Elouan :
-
     //     // const mockImageInfo: ImageInformation = {
     //     //     fieldname: '',
     //     //     originalname: '',
