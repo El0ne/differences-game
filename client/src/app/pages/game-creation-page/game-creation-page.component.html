@@ -1,0 +1,101 @@
+<body>
+    <div class="header-button-container">
+        <div class="left-header-container">
+            <button id="previous" routerLink="/config">Retour</button>
+            <ng-container *ngIf="display$ | async as display">
+                <section [class.open]="display === 'open'" (click)="this.modal.next('open')">
+                    <div (click)="$event.stopPropagation()">
+                        <h1>Vos différences ajoutées :</h1>
+                        <div class="diff-image">
+                            <img [src]="this.image" />
+                            <div class="info-diff">
+                                <h1>Il y a {{ this.differenceNumber }} différences</h1>
+                                <h1>Difficulté : {{ this.difficulty }}</h1>
+                            </div>
+                        </div>
+                        <button class="continue" routerLink="/config">Continuer</button>
+                    </div>
+                </section>
+            </ng-container>
+        </div>
+        <button id="save" (click)="save()"><mat-icon class="save-image">save</mat-icon></button>
+    </div>
+    <div id="title-container">
+        <div class="line title">____________</div>
+        <div class="title">Création de partie</div>
+        <div class="line title">____________</div>
+    </div>
+    <div class="central">
+        <input type="text" class="game-title game-container" #title (keyup)="getTitle(title.value)" placeholder="Donnez un titre à votre partie" />
+        <div class="upload-container">
+            <div class="original container">
+                <div class="original image">
+                    <canvas #canvas1 width="640px" height="480px"></canvas>
+                </div>
+                <div class="upload-delete">
+                    <button id="reset-original" (click)="clearFirstFile(this.myOgCanvas.nativeElement, 'upload-original')">X</button>
+                    <label for="upload-original">
+                        Choisir une image de 640*480 de format bmp
+                        <input type="file" id="upload-original" class="photo-upload" (change)="fileValidation($event)" accept="image/bmp" />
+                    </label>
+                </div>
+            </div>
+
+            <div class="middle-container">
+                <div class="tools-container">
+                    <div class="row-tools">
+                        <button><mat-icon class="btn-image">undo</mat-icon></button>
+                        <button><mat-icon class="btn-image">rectangle</mat-icon></button>
+                    </div>
+                    <div class="row-tools">
+                        <button><mat-icon class="btn-image">edit</mat-icon></button>
+                        <button><img class="btn-image-src" src="{{ paths.erase }}" /></button>
+                    </div>
+                    <div class="row-tools">
+                        <button><mat-icon class="btn-image">content_copy</mat-icon></button>
+                        <button><img class="btn-image-src" src="{{ paths.invert }}" /></button>
+                    </div>
+                    <div class="color-container">
+                        <input type="color" id="color-picker" value="#ff124f" />
+                        <label for="color-picker">Choisir une couleur</label>
+                    </div>
+                    <div class="diff-range-container">
+                        <div class="range-container">
+                            <input
+                                type="range"
+                                id="radius-range"
+                                [(ngModel)]="radius"
+                                min="0"
+                                max="15"
+                                value="3"
+                                step="3"
+                                oninput="this.nextElementSibling.value = this.value"
+                            />
+                            <output>3</output>
+                        </div>
+                        <label for="radius-range">Rayon du détecteur de différence</label>
+                    </div>
+                </div>
+                <div class="button-container">
+                    <label for="upload-original">
+                        <input type="file" id="upload-both" class="photo-upload" (change)="fileValidation($event)" accept="image/bmp" />
+                        Téléverser deux images
+                    </label>
+                </div>
+            </div>
+
+            <div class="difference container">
+                <div class="different image">
+                    <canvas #canvas2 width="640px" height="480px"></canvas>
+                </div>
+                <div class="upload-delete">
+                    <button id="reset-different" (click)="clearSecondFile(this.myDiffCanvas.nativeElement, 'upload-different')">X</button>
+                    <label for="upload-original">
+                        Choisir une image de 640*480 de format bmp
+                        <input type="file" id="upload-different" class="photo-upload" (change)="fileValidation($event)" accept="image/bmp" />
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
