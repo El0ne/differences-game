@@ -9,7 +9,7 @@ const routes: Routes = [
     { path: 'home', component: HomePageComponent },
     { path: 'stage-selection', component: GameSelectionComponent },
     { path: 'config', component: GameSelectionComponent },
-    { path: 'soloview', component: SoloViewComponent },
+    { path: 'soloview/:id', component: SoloViewComponent },
     { path: '**', redirectTo: '/home' },
 ];
 

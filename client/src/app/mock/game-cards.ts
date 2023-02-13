@@ -17,7 +17,6 @@ const GAME1: GameCardInformation = {
         { time: 92, name: 'second' },
         { time: 115, name: 'third' },
     ],
-    numberOfDifferences: 3,
 };
 
 const GAME2: GameCardInformation = {
@@ -37,7 +36,6 @@ const GAME2: GameCardInformation = {
         { time: 92, name: 'second' },
         { time: 115, name: 'third' },
     ],
-    numberOfDifferences: 3,
 };
 
 export const GAMES: GameCardInformation[] = [GAME1, GAME1, GAME2, GAME1, GAME1, GAME2];

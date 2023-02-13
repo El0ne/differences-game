@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
-import { IdTransferService } from '@app/services/id-transfer/id-transfer.service';
 import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { GameCardInformation } from '@common/game-card';
@@ -32,18 +32,18 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     endGame: Subject<void> = new Subject<void>();
     gameCardInfo: GameCardInformation;
 
+    // eslint-disable-next-line max-params
     constructor(
         public timerService: TimerSoloService,
         private convertService: SecondToMinuteService,
-        private idTransferService: IdTransferService,
+        // private idTransferService: IdTransferService,
         private gameCardInfoService: GameCardInformationService,
+        private router: Router,
     ) {}
 
     ngOnInit(): void {
-        this.currentGameId = this.idTransferService.getId(); // TODO : add way to keep last id in case of refresh
-        if (this.currentGameId === undefined) {
-            window.location.href = 'http://localhost:4200/#/stage-selection';
-        }
+        const id = this.router.url.replace('/soloview/', '');
+        this.currentGameId = id;
         this.gameCardInfoService.getGameCardInfoFromId(this.currentGameId).subscribe((gameCardData) => {
             this.gameCardInfo = gameCardData;
             this.numberOfDifferences = this.gameCardInfo.differenceNumber;
