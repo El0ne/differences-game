@@ -10,16 +10,11 @@ import { GameCardInformation } from '@common/game-card';
 export class GameCardSelectionComponent implements OnInit {
     @Input() gameCardInformation: GameCardInformation;
     @Input() isConfig: boolean | null;
+    image: string = '';
 
-    image: string;
-
-    ngOnInit(): void {
-        if (this.gameCardInformation.originalImageName === undefined) {
-            this.gameCardInformation.originalImageName = '';
-        }
+    ngOnInit() {
         this.image = `${STAGE}/image/${this.gameCardInformation.originalImageName}`;
     }
-
     // TODO: ajouter la logique pour que le reset des temps et le delete se fait pour le sprint 2
 
     // TODO: Ajouter la logique pour que les temps de configurations viennent du database pour dynamiquement les loader.

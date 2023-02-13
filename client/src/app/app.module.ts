@@ -11,6 +11,7 @@ import { MaterialPageComponent } from '@app/pages/material-page/material-page.co
 import { BestTimeComponent } from './components/best-time/best-time.component';
 import { ClickEventComponent } from './components/click-event/click-event.component';
 import { GameCardSelectionComponent } from './components/game-card-selection/game-card-selection.component';
+import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 import { GameSelectionComponent } from './pages/game-selection/game-selection.component';
 import { HomePageComponent } from './pages/home-page/home-page.component';
 import { SoloViewComponent } from './pages/solo-view/solo-view.component';
@@ -31,6 +32,7 @@ import { SoloViewComponent } from './pages/solo-view/solo-view.component';
         GameCardSelectionComponent,
         SoloViewComponent,
         ClickEventComponent,
+        GameCreationPageComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, MatIconModule],
     providers: [],

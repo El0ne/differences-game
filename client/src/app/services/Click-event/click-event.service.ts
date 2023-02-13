@@ -10,8 +10,8 @@ import { CLICK } from '../server-routes';
 export class ClickEventService {
     constructor(private http: HttpClient) {}
 
-    isADifference(clickPositionX: number, clickPositionY: number): Observable<ClickDifferenceVerification> {
-        const options = { params: new HttpParams().set('x', clickPositionX).set('y', clickPositionY) };
+    isADifference(clickPositionX: number, clickPositionY: number, id: string): Observable<ClickDifferenceVerification> {
+        const options = { params: new HttpParams().set('x', clickPositionX).set('y', clickPositionY).set('id', id) };
         return this.http.get<ClickDifferenceVerification>(CLICK, options);
     }
 

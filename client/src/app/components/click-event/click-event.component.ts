@@ -64,7 +64,7 @@ export class ClickEventComponent implements OnInit {
     }
 
     isDifferent(e: MouseEvent) {
-        this.clickEventService.isADifference(this.getCoordInImage(e)[0], this.getCoordInImage(e)[1]).subscribe((data) => {
+        this.clickEventService.isADifference(this.getCoordInImage(e)[0], this.getCoordInImage(e)[1], this.gameCardId).subscribe((data) => {
             this.differenceData = data;
             if (this.differenceData.isADifference) {
                 this.lastDifferenceClicked = this.differenceData.differenceArray;

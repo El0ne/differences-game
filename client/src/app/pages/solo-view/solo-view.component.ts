@@ -36,7 +36,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     constructor(
         public timerService: TimerSoloService,
         private convertService: SecondToMinuteService,
-        // private idTransferService: IdTransferService,
         private gameCardInfoService: GameCardInformationService,
         private router: Router,
     ) {}
@@ -48,6 +47,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.gameCardInfo = gameCardData;
             this.numberOfDifferences = this.gameCardInfo.differenceNumber;
         });
+
         this.showTime();
     }
 
