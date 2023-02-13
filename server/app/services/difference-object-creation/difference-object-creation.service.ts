@@ -1,10 +1,16 @@
 /*
+import { Injectable } from "@nestjs/common";
+import * as fs from "fs";
+import { DifferenceDetectionService } from "../difference-detection/difference-detection.service";
+
+const differenceDetectionService: DifferenceDetectionService;
+
 @Injectable()
 export class DifferenceObjectCreationService {
 
     createDifferenceObjects(firstImagePath: string, secondImagePath: string, radius: number): void {
         // passer en parametre les images a comparer ainsi que le rayon, puis retourner l'array de arrays de pixels differents
-        const differencesArray[][] = differenceDetectionService.compareImages(firstImagePath, secondImagePath, radius);
+        const differencesArray = differenceDetectionService.compareImages(firstImagePath, secondImagePath, radius);
         
         // devra possiblement faire des requetes et reponses a la place (MongoDB possibilité?)
         for (let i = 0; i < differencesArray.length; i++) {
