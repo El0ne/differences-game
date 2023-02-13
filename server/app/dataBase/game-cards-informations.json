@@ -1,1 +1,61 @@
-{"gameCardsInformations":[{"id":"4f724e90-d1e9-497d-8c80-259e2cbe64cb","name":"test","difficulty":"Difficile","differenceNumber":7,"originalImageName":"8db03f76-3cc1-432c-baee-30d62b143298.bmp","differenceImageName":"867c6294-7940-44e1-bfff-dbf4de35c056.bmp","soloTimes":[{"time":0,"name":"--"},{"time":0,"name":"--"},{"time":0,"name":"--"}],"multiTimes":[{"time":0,"name":"--"},{"time":0,"name":"--"},{"time":0,"name":"--"}],"numberOfDifferences":0},{"id":"6f7e3e2d-9da2-49b6-a8c9-415300d0f2d1","name":"test2","difficulty":"Difficile","differenceNumber":7,"originalImageName":"87713792-a4d7-43ac-bf4d-4af365376d42.bmp","differenceImageName":"99e44cac-94ce-4aa9-bd47-97bfaa4a240e.bmp","soloTimes":[{"time":0,"name":"--"},{"time":0,"name":"--"},{"time":0,"name":"--"}],"multiTimes":[{"time":0,"name":"--"},{"time":0,"name":"--"},{"time":0,"name":"--"}],"numberOfDifferences":0},{"id":"66243149-aebe-4ed8-918b-979aa0002d42","name":"86964325bg67898tby9548ybby89brgv8 b8ub 82uyvubvtu83b3548vbgv3y3ig bgnu3bvg5uiho","difficulty":"Difficile","differenceNumber":7,"originalImageName":"bd5127dc-f88b-4c46-b22c-af7beb7ead4e.bmp","differenceImageName":"1e9e94ea-d99e-4c57-a6c6-cb73dc0ef5e3.bmp","soloTimes":[{"time":0,"name":"--"},{"time":0,"name":"--"},{"time":0,"name":"--"}],"multiTimes":[{"time":0,"name":"--"},{"time":0,"name":"--"},{"time":0,"name":"--"}],"numberOfDifferences":0}]}
+{
+    "gameCardsInformations": [
+        {
+            "id": "4f724e90-d1e9-497d-8c80-259e2cbe64cb",
+            "name": "test",
+            "difficulty": "Difficile",
+            "differenceNumber": 7,
+            "originalImageName": "8db03f76-3cc1-432c-baee-30d62b143298.bmp",
+            "differenceImageName": "867c6294-7940-44e1-bfff-dbf4de35c056.bmp",
+            "soloTimes": [
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" }
+            ],
+            "multiTimes": [
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" }
+            ],
+            "numberOfDifferences": 0
+        },
+        {
+            "id": "6f7e3e2d-9da2-49b6-a8c9-415300d0f2d1",
+            "name": "test2",
+            "difficulty": "Difficile",
+            "differenceNumber": 7,
+            "originalImageName": "87713792-a4d7-43ac-bf4d-4af365376d42.bmp",
+            "differenceImageName": "99e44cac-94ce-4aa9-bd47-97bfaa4a240e.bmp",
+            "soloTimes": [
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" }
+            ],
+            "multiTimes": [
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" }
+            ],
+            "numberOfDifferences": 0
+        },
+        {
+            "id": "66243149-aebe-4ed8-918b-979aa0002d42",
+            "name": "86964325bg67898tby9548ybby89brgv8 b8ub 82uyvubvtu83b3548vbgv3y3ig bgnu3bvg5uiho",
+            "difficulty": "Difficile",
+            "differenceNumber": 7,
+            "originalImageName": "bd5127dc-f88b-4c46-b22c-af7beb7ead4e.bmp",
+            "differenceImageName": "1e9e94ea-d99e-4c57-a6c6-cb73dc0ef5e3.bmp",
+            "soloTimes": [
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" }
+            ],
+            "multiTimes": [
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" },
+                { "time": 0, "name": "--" }
+            ],
+            "numberOfDifferences": 0
+        }
+    ]
+}
