@@ -113,4 +113,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         }
         this.messageContent = '';
     }
+
+    paintPixel(array: number[]) {
+        const rgbaValues = this.left.sendPixels(array);
+        this.right.receivePixels(rgbaValues, array);
+    }
 }

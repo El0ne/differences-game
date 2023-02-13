@@ -20,6 +20,7 @@ export class ClickEventComponent implements OnInit {
     @Input() imagePath: string;
     @Output() incrementScore: EventEmitter<number> = new EventEmitter<number>();
     @Output() differences: EventEmitter<number> = new EventEmitter<number>();
+    @Output() transmitter: EventEmitter<number[]> = new EventEmitter<number[]>();
     @ViewChild('picture', { static: true })
     picture: ElementRef<HTMLCanvasElement>;
     @ViewChild('modification', { static: true })
@@ -34,7 +35,6 @@ export class ClickEventComponent implements OnInit {
     constructor(public clickEventService: ClickEventService, public foundDifferenceService: FoundDifferenceService) {}
 
     async ngOnInit() {
-        console.log('here 4');
         this.clickEventService.setDifferences(this.gameCardId).subscribe((data) => {
             this.differenceArray = data;
             this.timeout = false;
@@ -48,6 +48,7 @@ export class ClickEventComponent implements OnInit {
     async loadImage() {
         return new Promise((resolve) => {
             const image = new Image();
+            image.crossOrigin = 'Anonymous';
             image.src = `${STAGE}/image/${this.imagePath}`;
             image.onload = () => {
                 const context = this.picture.nativeElement.getContext('2d') as CanvasRenderingContext2D;
@@ -82,6 +83,7 @@ export class ClickEventComponent implements OnInit {
                 this.lastDifferenceClicked = this.differenceData.differenceArray;
                 this.differenceEffect();
                 this.differences.emit(this.differenceData.differencesPosition);
+                this.transmitter.emit(this.lastDifferenceClicked);
             } else {
                 this.displayError(e);
             }
@@ -162,6 +164,29 @@ export class ClickEventComponent implements OnInit {
                 context.clearRect(0, 0, WIDTH, HEIGHT);
                 this.timeout = false;
             }, WAIT_TIME);
+        }
+    }
+
+    sendPixels(differenceArray: number[]): ImageData[] {
+        const context = this.picture.nativeElement.getContext('2d') as CanvasRenderingContext2D;
+        const colorArray = [];
+
+        for (const position of differenceArray) {
+            const pos = this.positionToPixel(position);
+            const pixel = context.getImageData(pos[0], pos[1], 1, 1);
+            colorArray.push(pixel);
+        }
+        return colorArray;
+    }
+
+    receivePixels(colorArray: ImageData[], positionArray: number[]) {
+        const context = this.picture.nativeElement.getContext('2d') as CanvasRenderingContext2D;
+
+        for (let i = 0; i < positionArray.length; i++) {
+            const diffPixel = `rgba(${colorArray[i].data[0]},${colorArray[i].data[1]},${colorArray[i].data[2]},${colorArray[i].data[3]})`;
+            context.fillStyle = diffPixel;
+            const posInPixels = this.positionToPixel(positionArray[i]);
+            context.fillRect(posInPixels[0], posInPixels[1], 1, 1);
         }
     }
 }
