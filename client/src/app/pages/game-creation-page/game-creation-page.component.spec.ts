@@ -52,11 +52,10 @@ describe('GameCreationPageComponent', () => {
     it('should clear the first file', () => {
         component.originalFile = new File([], 'test.bmp', { type: 'image/bmp' });
         component.clearFirstFile(canvasOg, 'upload-original');
-        expect(component.originalFile).toBeNull(); // not working, looking how to correct it
+        expect(component.originalFile).toBeNull();
     });
 
     it('should clear the second file', () => {
-        // this test passes but not good
         component.differentFile = new File([], 'test.bmp', { type: 'image/bmp' });
         component.clearSecondFile(canvasOg, 'upload-different');
         expect(component.differentFile).toBeNull();
@@ -137,8 +136,6 @@ describe('GameCreationPageComponent', () => {
         Object.defineProperty(event, 'target', { value: target });
         input.dispatchEvent(event);
         fixture.detectChanges();
-
-        console.log(component.originalFile);
 
         component.uploadImage(file, input);
 
