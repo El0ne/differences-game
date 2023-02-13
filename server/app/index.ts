@@ -10,14 +10,12 @@ const bootstrap = async () => {
     app.enableCors();
     const config = new DocumentBuilder()
         .setTitle('Cadriciel Serveur')
-        .setDescription('Serveur du projet de base pour le cours de LOG2990')
+        .setDescription('Serveur du projet 2990 avec systeme de detection de difference')
         .setVersion('1.0.0')
         .build();
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api/docs', app, document);
     SwaggerModule.setup('', app, document);
-
     await app.listen(process.env.PORT);
 };
-
 bootstrap();

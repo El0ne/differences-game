@@ -1,10 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
+import { BestTimeComponent } from '@app/components/best-time/best-time.component';
+import { GameCardSelectionComponent } from '@app/components/game-card-selection/game-card-selection.component';
 import { GAMES } from '@app/mock/game-cards';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameCardInformation } from '@common/game-card';
-import { Subject } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
 import { GameSelectionComponent } from './game-selection.component';
 
@@ -30,7 +32,7 @@ describe('GameSelectionComponent', () => {
         };
 
         TestBed.configureTestingModule({
-            declarations: [GameSelectionComponent],
+            declarations: [GameSelectionComponent, GameCardSelectionComponent, BestTimeComponent],
             imports: [RouterTestingModule, MatIconModule],
             providers: [{ provide: GameCardInformationService, useValue: mockService }],
         }).compileComponents();
@@ -56,13 +58,17 @@ describe('GameSelectionComponent', () => {
         expect(component.isConfig).toBeFalsy();
     });
 
-    it('selectGameCards() should put the endIndex at 4 more than index until there is less than 4 other gameCards to show', () => {
-        component.endIndex = 4;
+    it('selectGameCards() should put the end Index at 4 more than index unless there is less than 4 other gameCards to show', () => {
+        spyOn(component.gameCardService, 'getGameCardsInformations').and.returnValue(of(GAMES));
+        component.index = 0;
         component.numberOfGameInformations = 5;
         component.selectGameCards();
-        expect(component.endIndex).toBe(component.index + GAME_CARDS_TO_DISPLAY);
-        component.nextCards();
-        expect(component.endIndex).toBe(component.index + 1);
+        expect(component.gameCardService.getGameCardsInformations).toHaveBeenCalledWith(component.index, component.index + GAME_CARDS_TO_DISPLAY);
+
+        component.index = 4;
+        component.numberOfGameInformations = 5;
+        component.selectGameCards();
+        expect(component.gameCardService.getGameCardsInformations).toHaveBeenCalledWith(component.index, component.numberOfGameInformations);
     });
 
     it('previousCards() should not call selectGameCards() if index is 0', () => {
@@ -73,23 +79,22 @@ describe('GameSelectionComponent', () => {
 
     it('previousCards() should call selectGameCards() if index is different than 0', () => {
         component.index = 4;
-        component.endIndex = 5;
         component.selectGameCards = jasmine.createSpy();
         component.previousCards();
         expect(component.selectGameCards).toHaveBeenCalled();
     });
 
-    it('nextCards() should not call selectGameCards() if EndIndex is equal to numberOfGameInformations', () => {
-        component.endIndex = 4;
-        component.numberOfGameInformations = component.endIndex;
+    it('nextCards() should not call selectGameCards() if current index plus 4 is greater than or equal to numberOfGameInformations', () => {
+        component.index = 4;
+        component.numberOfGameInformations = component.index + 1;
         component.selectGameCards = jasmine.createSpy();
         component.nextCards();
         expect(component.selectGameCards).not.toHaveBeenCalled();
     });
 
-    it('nextCards() should call selectGameCards() if endIndex is different than numberOfGameInformations', () => {
-        component.endIndex = 4;
-        component.numberOfGameInformations = 5;
+    it('nextCards() should call selectGameCards() if current index plus 4 is less than than numberOfGameInformations', () => {
+        component.index = 4;
+        component.numberOfGameInformations = component.index + GAME_CARDS_TO_DISPLAY + 1;
         component.selectGameCards = jasmine.createSpy();
         component.nextCards();
         expect(component.selectGameCards).toHaveBeenCalled();
@@ -102,11 +107,11 @@ describe('GameSelectionComponent', () => {
         expect(component.isShowingFirstCard()).toBeTruthy();
     });
 
-    it('isShowingLastCard() should return false unless endIndex is the same as numberOfGameInformations', () => {
-        component.numberOfGameInformations = 5;
-        component.endIndex = 4;
+    it('isShowingLastCard() should return false unless index plus 4 is greater or equal than numberOfGameInformations', () => {
+        component.numberOfGameInformations = 10;
+        component.index = 4;
         expect(component.isShowingLastCard()).toBeFalsy();
-        component.endIndex = component.numberOfGameInformations;
+        component.index = component.numberOfGameInformations;
         expect(component.isShowingLastCard()).toBeTruthy();
     });
 });
