@@ -27,6 +27,7 @@ export class DifferenceClickService {
     }
 
     getDifferenceArrayFromStageID(stageId: string): number[][] {
+        console.log('this content', this.content);
         for (const differenceObject of JSON.parse(this.content).differenceObjects) {
             if (differenceObject.id === stageId) {
                 return differenceObject.differences;
@@ -36,6 +37,7 @@ export class DifferenceClickService {
 
     validateDifferencePositions(clickPositionX: number, clickPositionY: number, stageId: string): ClickDifferenceVerification {
         const differences = this.getDifferenceArrayFromStageID(stageId);
+
         const x = Number(clickPositionX);
         const y = Number(clickPositionY);
         const posToCheck = y * WIDTH + x;
