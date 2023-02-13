@@ -41,8 +41,8 @@ export class DifferenceClickService {
 
     validateDifferencePositions(clickPositionX: number, clickPositionY: number, stageId: string): ClickDifferenceVerification {
         const differences = this.getDifferenceArrayFromStageID(stageId);
-        const x: number = +clickPositionX;
-        const y: number = +clickPositionY;
+        const x = Number(clickPositionX);
+        const y = Number(clickPositionY);
         const posToCheck = y * WIDTH + x;
         const differenceIndex = this.differenceCounterService.findPixelDifferenceIndex(posToCheck, differences);
         if (differenceIndex === differences.length) {

@@ -1,5 +1,6 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { ClickEventService } from '@app/services/Click-event/click-event.service';
+import { ClickEventService } from '@app/services/click-event/click-event.service';
+import { FoundDifferenceService } from '@app/services/Found-differences/found-difference.service';
 import { STAGE } from '@app/services/server-routes';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { Observable } from 'rxjs';
@@ -18,6 +19,7 @@ export class ClickEventComponent implements OnInit {
     @Input() gameCardId: string;
     @Input() imagePath: string;
     @Output() incrementScore: EventEmitter<number> = new EventEmitter<number>();
+    @Output() differences: EventEmitter<number> = new EventEmitter<number>();
     @ViewChild('picture', { static: true })
     picture: ElementRef<HTMLCanvasElement>;
     @ViewChild('modification', { static: true })
@@ -27,14 +29,16 @@ export class ClickEventComponent implements OnInit {
     currentScore: number = 0;
     differenceData: ClickDifferenceVerification;
     endGame: boolean;
+    foundDifferences: number[];
 
-    constructor(public clickEventService: ClickEventService) {}
+    constructor(public clickEventService: ClickEventService, public foundDifferenceService: FoundDifferenceService) {}
 
     async ngOnInit() {
         this.clickEventService.setDifferences(this.gameCardId).subscribe((data) => {
             this.differenceArray = data;
             this.timeout = false;
             this.endGame = false;
+            this.foundDifferences = [];
         });
 
         await this.loadImage();
@@ -52,6 +56,10 @@ export class ClickEventComponent implements OnInit {
         });
     }
 
+    setFoundDifferences(foundDifferences: number[]) {
+        this.foundDifferences = foundDifferences;
+    }
+
     toggleEndgame() {
         this.endGame = true;
     }
@@ -66,9 +74,14 @@ export class ClickEventComponent implements OnInit {
     isDifferent(e: MouseEvent) {
         this.clickEventService.isADifference(this.getCoordInImage(e)[0], this.getCoordInImage(e)[1], this.gameCardId).subscribe((data) => {
             this.differenceData = data;
-            if (this.differenceData.isADifference) {
+            if (
+                this.differenceData.isADifference &&
+                !this.foundDifferenceService.foundDifferences.includes(this.differenceData.differencesPosition)
+            ) {
                 this.lastDifferenceClicked = this.differenceData.differenceArray;
                 this.differenceEffect();
+                this.differences.emit(this.differenceData.differencesPosition);
+                console.log(this.foundDifferences);
             } else {
                 this.displayError(e);
             }

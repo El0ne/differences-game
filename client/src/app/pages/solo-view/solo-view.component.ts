@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
+import { FoundDifferenceService } from '@app/services/Found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
@@ -38,6 +39,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private convertService: SecondToMinuteService,
         private gameCardInfoService: GameCardInformationService,
         private router: Router,
+        private foundDifferenceService: FoundDifferenceService,
     ) {}
 
     ngOnInit(): void {
@@ -75,6 +77,10 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         if (this.numberOfDifferences === this.currentScore) {
             this.finishGame();
         }
+    }
+
+    addDifferenceDetected(differenceIndex: number) {
+        this.foundDifferenceService.addDifferenceFound(differenceIndex);
     }
 
     toggleInfoCard() {
