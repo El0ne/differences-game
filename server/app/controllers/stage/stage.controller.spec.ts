@@ -1,5 +1,6 @@
 // @ts-ignore
 
+import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
 import { GameCardService } from '@app/services/game-card/game-card.service';
@@ -38,6 +39,7 @@ describe('StageController', () => {
                 PixelRadiusService,
                 DifferencesCounterService,
                 PixelPositionService,
+                DifferenceClickService,
             ],
         }).compile();
         const app = module.createNestApplication();
