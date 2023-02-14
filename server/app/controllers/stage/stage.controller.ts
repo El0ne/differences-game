@@ -6,7 +6,7 @@ import { ImageManagerService } from '@app/services/image-manager/image-manager.s
 import { GameCardInformation } from '@common/game-card';
 import { ImageUploadData } from '@common/image-upload-data';
 import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
-import { Body, Controller, Get, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { diskStorage } from 'multer';
@@ -36,8 +36,13 @@ export class StageController {
     ) {}
 
     @Get('/')
-    getStages(@Query('index') index: number, @Query('endIndex') endIndex: number): GameCardInformation[] {
-        return this.gameCardService.getGameCards(index, endIndex);
+    getStages(@Query('index') index: number, @Query('endIndex') endIndex: number, @Res() res: Response): void {
+        try {
+            // return this.gameCardService.getGameCards(index, endIndex);
+            res.status(HttpStatus.OK).send(this.gameCardService.getGameCards(index, endIndex));
+        } catch (error) {
+            throw new HttpException('Forbidden', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Get('/info')
