@@ -59,10 +59,7 @@ export class GameCreationPageComponent implements OnInit {
             },
         });
 
-        dialogRef.afterClosed().subscribe((result) => {
-            console.log(result.image);
-            console.log(result.difference);
-            console.log(result.difficulty);
+        dialogRef.afterClosed().subscribe(() => {
             this.router.navigate(['/config']);
         });
     }

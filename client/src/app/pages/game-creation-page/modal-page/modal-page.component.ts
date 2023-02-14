@@ -1,4 +1,4 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
@@ -6,7 +6,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
     templateUrl: './modal-page.component.html',
     styleUrls: ['./modal-page.component.scss'],
 })
-export class ModalPageComponent implements OnInit, OnDestroy {
+export class ModalPageComponent implements OnDestroy {
     constructor(
         @Inject(MAT_DIALOG_DATA)
         public data: {
@@ -16,8 +16,6 @@ export class ModalPageComponent implements OnInit, OnDestroy {
         },
         private matDialogRef: MatDialogRef<ModalPageComponent>,
     ) {}
-
-    ngOnInit(): void {}
 
     ngOnDestroy() {
         this.matDialogRef.close(this.data);

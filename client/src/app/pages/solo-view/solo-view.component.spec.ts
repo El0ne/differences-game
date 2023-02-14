@@ -1,6 +1,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
 import { By } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
@@ -16,7 +17,7 @@ describe('SoloViewComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [SoloViewComponent, ClickEventComponent],
-            imports: [FormsModule, HttpClientTestingModule, RouterTestingModule],
+            imports: [FormsModule, HttpClientTestingModule, RouterTestingModule, MatIconModule],
             providers: [{ provide: ClickEventService }],
         }).compileComponents();
 

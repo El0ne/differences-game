@@ -1,6 +1,6 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
-import { FoundDifferenceService } from '@app/services/Found-differences/found-difference.service';
+import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { STAGE } from '@app/services/server-routes';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { Observable } from 'rxjs';
