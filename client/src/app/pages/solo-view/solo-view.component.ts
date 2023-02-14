@@ -69,8 +69,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     finishGame() {
-        this.left.toggleEndgame();
-        this.right.toggleEndgame();
+        this.left.endGame = true;
+        this.right.endGame = true;
         this.showWinMessage = true;
         this.showNavBar = false;
     }

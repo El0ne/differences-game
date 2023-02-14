@@ -58,14 +58,6 @@ export class ClickEventComponent implements OnInit {
         });
     }
 
-    setFoundDifferences(foundDifferences: number[]) {
-        this.foundDifferences = foundDifferences;
-    }
-
-    toggleEndgame() {
-        this.endGame = true;
-    }
-
     getCoordInImage(e: MouseEvent): number[] {
         const rect = this.modification.nativeElement.getBoundingClientRect();
         const x = Math.max(Math.floor(e.clientX - rect.left), 0);
