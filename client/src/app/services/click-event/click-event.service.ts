@@ -1,10 +1,8 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { CLICK } from '@app/services/server-routes';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { Observable } from 'rxjs';
-// TODO: Check if any way to unlint import
-// eslint-disable-next-line no-restricted-imports
-import { CLICK } from '../server-routes';
 
 @Injectable({
     providedIn: 'root',
