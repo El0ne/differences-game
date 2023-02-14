@@ -2,7 +2,7 @@
     <div class="header-button-container">
         <div class="left-header-container">
             <button id="previous" routerLink="/config">Retour</button>
-            <ng-container *ngIf="display$ | async as display">
+            <!-- <ng-container *ngIf="display$ | async as display">
                 <section [class.open]="display === 'open'" (click)="this.modal.next('open')">
                     <div (click)="$event.stopPropagation()">
                         <h1>Vos différences ajoutées :</h1>
@@ -16,9 +16,9 @@
                         <button class="continue" routerLink="/config">Continuer</button>
                     </div>
                 </section>
-            </ng-container>
+            </ng-container> -->
         </div>
-        <button id="save" (click)="save()"><mat-icon class="save-image">save</mat-icon></button>
+        <button id="save" [disabled]="isDisabled" (click)="save()"><mat-icon class="save-image">save</mat-icon></button>
     </div>
     <div id="title-container">
         <div class="line title">____________</div>
