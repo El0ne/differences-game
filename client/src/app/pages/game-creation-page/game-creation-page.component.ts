@@ -34,11 +34,8 @@ export class GameCreationPageComponent implements OnInit {
 
     isDisabled = false;
     image: string = '';
-    // image: string = './../../assets/image_12_diff.bmp';
     differenceNumber: number = 0;
     difficulty: string = '';
-    // differenceNumber: number = 7;
-    // difficulty: string = 'Difficile';
 
     constructor(public gameCardService: GameCardInformationService, private matDialog: MatDialog, private router: Router) {}
 
