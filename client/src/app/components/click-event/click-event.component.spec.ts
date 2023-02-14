@@ -161,14 +161,14 @@ describe('ClickEventComponent', () => {
     it('sendPixels should call getContext', () => {
         const getContextSpy = spyOn(component.picture.nativeElement, 'getContext');
 
-        component.sendPixels([]);
+        component.sendDifferencePixels([]);
         expect(getContextSpy).toHaveBeenCalled();
     });
 
     it('receivePixel should call getContext', () => {
         const getContextSpy = spyOn(component.picture.nativeElement, 'getContext');
 
-        component.receivePixels([], []);
+        component.receiveDifferencePixels([], []);
         expect(getContextSpy).toHaveBeenCalled();
     });
 });

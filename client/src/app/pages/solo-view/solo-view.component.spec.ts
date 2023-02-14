@@ -165,8 +165,8 @@ describe('SoloViewComponent', () => {
     });
 
     it('paintPixel should call sendPixels and receivePixels properly', () => {
-        const leftCanvasSpy = spyOn(component.left, 'sendPixels');
-        const rightCanvasSpy = spyOn(component.right, 'receivePixels');
+        const leftCanvasSpy = spyOn(component.left, 'sendDifferencePixels');
+        const rightCanvasSpy = spyOn(component.right, 'receiveDifferencePixels');
 
         component.paintPixel([1]);
 

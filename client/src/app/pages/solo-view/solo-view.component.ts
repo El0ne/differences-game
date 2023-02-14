@@ -125,7 +125,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     paintPixel(array: number[]) {
-        const rgbaValues = this.left.sendPixels(array);
-        this.right.receivePixels(rgbaValues, array);
+        const rgbaValues = this.left.sendDifferencePixels(array);
+        this.right.receiveDifferencePixels(rgbaValues, array);
     }
 }
