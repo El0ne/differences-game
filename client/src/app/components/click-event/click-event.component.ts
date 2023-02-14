@@ -82,7 +82,7 @@ export class ClickEventComponent implements OnInit {
         });
     }
 
-    constructEffect(originalContext: CanvasRenderingContext2D) {
+    turnDifferenceYellow(originalContext: CanvasRenderingContext2D) {
         for (const pixel of this.lastDifferenceClicked) {
             const pos: number[] = this.positionToPixel(pixel);
             originalContext.fillStyle = '#FFD700';
@@ -90,29 +90,29 @@ export class ClickEventComponent implements OnInit {
         }
     }
 
-    destroyEffect(originalContext: CanvasRenderingContext2D) {
+    turnOffYellow(originalContext: CanvasRenderingContext2D) {
         for (const pixel of this.lastDifferenceClicked) {
             const pos: number[] = this.positionToPixel(pixel);
             originalContext.clearRect(pos[0], pos[1], 1, 1);
         }
     }
 
-    differenceEffect() {
+    differenceEffect(): void {
         if (!this.endGame) {
             const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
             this.emitSound(false);
-            this.constructEffect(originalContext);
+            this.turnDifferenceYellow(originalContext);
             const flashIntro = setInterval(() => {
-                this.destroyEffect(originalContext);
+                this.turnOffYellow(originalContext);
             }, FAST_WAIT_TIME_MS);
             const flashOutro = setInterval(() => {
-                this.constructEffect(originalContext);
+                this.turnDifferenceYellow(originalContext);
             }, FAST_WAIT_TIME_MS);
 
             setTimeout(() => {
                 clearInterval(flashIntro);
                 clearInterval(flashOutro);
-                this.destroyEffect(originalContext);
+                this.turnOffYellow(originalContext);
             }, WAIT_TIME_MS);
 
             this.currentScore += 1;
@@ -131,9 +131,9 @@ export class ClickEventComponent implements OnInit {
         return [toTransform, yCounter];
     }
 
-    emitSound(error: boolean): void {
+    emitSound(isErrorSound: boolean): void {
         const sound = new Audio();
-        if (!error) sound.src = '/assets/ding.mp3';
+        if (!isErrorSound) sound.src = '/assets/ding.mp3';
         else sound.src = '/assets/Error.mp3';
         sound.play();
     }

@@ -130,17 +130,17 @@ describe('ClickEventComponent', () => {
         expect(component.differenceData).toEqual(DIFFERENCE_NOT_FOUND);
     });
 
-    it('constructEffect() should call fillRect() in order to construct flashing effect', () => {
+    it('turnDifferenceYellow() should call fillRect() in order to construct flashing effect', () => {
         component.lastDifferenceClicked = [0, 0, 0];
         spyOn(CanvasRenderingContext2D.prototype, 'fillRect');
-        component.constructEffect(component.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D);
+        component.turnDifferenceYellow(component.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D);
         expect(CanvasRenderingContext2D.prototype.fillRect).toHaveBeenCalledTimes(3);
     });
 
-    it('destroyEffect() should call clearRect() in order to construct flashing effect', () => {
+    it('turnOffYellow() should call clearRect() in order to construct flashing effect', () => {
         component.lastDifferenceClicked = [0, 0, 0, 0, 0];
         spyOn(CanvasRenderingContext2D.prototype, 'clearRect');
-        component.destroyEffect(component.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D);
+        component.turnOffYellow(component.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D);
         expect(CanvasRenderingContext2D.prototype.clearRect).toHaveBeenCalledTimes(5);
     });
 
