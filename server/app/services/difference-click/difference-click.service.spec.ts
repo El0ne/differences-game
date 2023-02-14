@@ -67,6 +67,6 @@ describe('DifferenceClickService', () => {
         const result = service.validateDifferencePositions(100, 100, '1');
         expect(result.isADifference).toBe(false);
         expect(result.differencesPosition).toEqual(2);
-        expect(result.differenceArray).toBe([]);
+        expect(result.differenceArray).toEqual([]);
     });
 });
