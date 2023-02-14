@@ -40,7 +40,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         public timerService: TimerSoloService,
         private convertService: SecondToMinuteService,
         private gameCardInfoService: GameCardInformationService,
-        private foundDifferenceService: FoundDifferenceService,
+        public foundDifferenceService: FoundDifferenceService,
         private route: ActivatedRoute,
     ) {}
 
