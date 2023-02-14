@@ -26,6 +26,7 @@ describe('StageController', () => {
     let controller: StageController;
     let getGameCardStub;
     let getGameCardsNumberStub;
+    let getGameCardByIdStub;
     let gameCardService: GameCardService;
 
     beforeAll(async () => {
@@ -53,16 +54,19 @@ describe('StageController', () => {
     beforeEach(() => {
         getGameCardStub = stub(gameCardService, 'getGameCards');
         getGameCardsNumberStub = stub(gameCardService, 'getGameCardsNumber');
+        getGameCardByIdStub = stub(gameCardService, 'getGameCardById');
     });
 
     afterEach(() => {
         getGameCardStub.restore();
         getGameCardsNumberStub.restore();
+        getGameCardByIdStub.restore();
     });
 
     it('should be defined', () => {
         expect(controller).toBeDefined();
     });
+
     it('getStages() should return game cards if there are at least one', async () => {
         getGameCardStub.callsFake(() => {
             return FAKE_GAME_CARD_ARRAY;
@@ -93,6 +97,24 @@ describe('StageController', () => {
             throw new Error();
         });
         const response = await request(httpServer).get('/stage/info');
+        expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    });
+
+    it('getStageById() should return a game card if the id is valid', async () => {
+        getGameCardByIdStub.callsFake(() => {
+            return FAKE_GAME_CARD_ARRAY[0];
+        });
+        const response = await request(httpServer).get('/stage/:gameCardId');
+        assert(getGameCardByIdStub.called);
+        expect(response.status).toBe(HttpStatus.OK);
+        expect(response.body).toEqual(FAKE_GAME_CARD_ARRAY[0]);
+    });
+
+    it('getStageById() should return 500 if there is an error', async () => {
+        getGameCardByIdStub.callsFake(() => {
+            throw new Error();
+        });
+        const response = await request(httpServer).get('/stage/:gameCardId');
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 
@@ -144,6 +166,7 @@ describe('StageController', () => {
             if (err) throw err;
         });
     });
+
     it('getImage() should return an  500 error if path is not functional', async () => {
         jest.spyOn(join, 'join').mockImplementationOnce(() => {
             throw new Error();
@@ -160,14 +183,8 @@ describe('StageController', () => {
             if (err) throw err;
         });
     });
-    it('getGameCardById() should return gameCardInformation given the id', async () => {
-        const gameCardServiceStub = stub(gameCardService, 'getGameCardById').returns(undefined);
-        const response = await request(httpServer).get('/stage/3');
-        assert(gameCardServiceStub.calledWith('3'));
-        expect(response.status).toBe(HttpStatus.OK);
-        expect(response.body).toEqual({});
-    });
-    it('uploadImages should return a 200 status if the upload ');
+
+    // it('uploadImages should return a 200 status if the upload ');
 });
 
 const FAKE_GAME_INFO: GameInformation = {
