@@ -1,8 +1,9 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
-import { ClickEventService } from '@app/services/Click-event/click-event.service';
+import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { GameCardInformation } from '@common/game-card';
 import { MESSAGES_LENGTH } from './solo-view-constants';
 import { SoloViewComponent } from './solo-view.component';
@@ -14,7 +15,7 @@ describe('SoloViewComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [SoloViewComponent, ClickEventComponent],
-            imports: [FormsModule, HttpClientTestingModule],
+            imports: [FormsModule, HttpClientTestingModule, RouterTestingModule],
             providers: [{ provide: ClickEventService }],
         }).compileComponents();
 
@@ -119,10 +120,6 @@ describe('SoloViewComponent', () => {
         const showTimeSpy = spyOn(component, 'showTime');
         component.ngOnInit();
         expect(showTimeSpy).toHaveBeenCalled();
-    });
-
-    it('ngOnDestroy should call the stopTimer form the service', () => {
-        // mettre publique et supprimer currentTime
     });
 });
 
