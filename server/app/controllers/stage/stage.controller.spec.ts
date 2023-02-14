@@ -17,7 +17,7 @@ import { assert } from 'console';
 import * as fs from 'fs';
 import * as Jimp from 'jimp';
 import * as join from 'path';
-import Sinon, { stub } from 'sinon';
+import Sinon, { SinonStub, stub } from 'sinon';
 import * as request from 'supertest';
 import { StageController } from './stage.controller';
 
@@ -25,8 +25,8 @@ describe('StageController', () => {
     let httpServer: unknown;
     let controller: StageController;
     let getGameCardStub: Sinon.SinonStub;
-    let getGameCardsNumberStub;
-    let getGameCardByIdStub;
+    let getGameCardsNumberStub: SinonStub;
+    let getGameCardByIdStub: SinonStub;
     let gameCardService: GameCardService;
 
     beforeAll(async () => {
@@ -113,17 +113,15 @@ describe('StageController', () => {
         getGameCardByIdStub.callsFake(() => {
             return FAKE_GAME_CARD_ARRAY[0];
         });
-        const response = await request(httpServer).get('/stage/:gameCardId');
-        assert(getGameCardByIdStub.called);
+        const response = await request(httpServer).get('/stage/5');
+        expect(getGameCardByIdStub.calledWith('5'));
         expect(response.status).toBe(HttpStatus.OK);
         expect(response.body).toEqual(FAKE_GAME_CARD_ARRAY[0]);
     });
 
     it('getStageById() should return 500 if there is an error', async () => {
-        getGameCardByIdStub.callsFake(() => {
-            throw new Error();
-        });
-        const response = await request(httpServer).get('/stage/:gameCardId');
+        getGameCardByIdStub.throws(new Error());
+        const response = await request(httpServer).get('/stage/error');
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 
