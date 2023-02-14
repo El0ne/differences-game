@@ -64,45 +64,45 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.timerService.startTimer();
     }
 
-    timesConvertion(time: number) {
+    timesConvertion(time: number): string {
         return this.convertService.convert(time);
     }
 
-    finishGame() {
+    finishGame(): void {
         this.left.endGame = true;
         this.right.endGame = true;
         this.showWinMessage = true;
         this.showNavBar = false;
     }
 
-    incrementScore() {
+    incrementScore(): void {
         this.currentScore += 1;
         if (this.numberOfDifferences === this.currentScore) {
             this.finishGame();
         }
     }
 
-    addDifferenceDetected(differenceIndex: number) {
+    addDifferenceDetected(differenceIndex: number): void {
         this.foundDifferenceService.addDifferenceFound(differenceIndex);
     }
 
-    toggleInfoCard() {
+    toggleInfoCard(): void {
         this.showTextBox = !this.showTextBox;
     }
 
-    toggleErrorMessage() {
+    toggleErrorMessage(): void {
         if (!this.showErrorMessage) {
             this.showErrorMessage = !this.showErrorMessage;
         }
     }
 
-    untoggleErrorMessage() {
+    untoggleErrorMessage(): void {
         if (this.showErrorMessage) {
             this.showErrorMessage = !this.showErrorMessage;
         }
     }
 
-    sendMessage() {
+    sendMessage(): void {
         if (this.messageContent.length === MESSAGES_LENGTH.minLength || this.messageContent.length > MESSAGES_LENGTH.maxLength) {
             this.toggleErrorMessage();
         } else {
@@ -114,7 +114,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.messageContent = '';
     }
 
-    validateName() {
+    validateName(): void {
         const inputValue = (document.getElementById('name') as HTMLInputElement).value;
         if (inputValue.replace(/\s/g, '') !== '') {
             this.showEnterName = false;
@@ -124,7 +124,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         }
     }
 
-    paintPixel(array: number[]) {
+    paintPixel(array: number[]): void {
         const rgbaValues = this.left.sendDifferencePixels(array);
         this.right.receiveDifferencePixels(rgbaValues, array);
     }
