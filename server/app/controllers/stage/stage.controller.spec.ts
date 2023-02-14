@@ -25,6 +25,7 @@ describe('StageController', () => {
     let controller: StageController;
     let getGameCardStub;
     let getGameCardsNumberStub;
+    let getGameCardByIdStub;
     let gameCardService: GameCardService;
 
     beforeAll(async () => {
@@ -52,16 +53,19 @@ describe('StageController', () => {
     beforeEach(() => {
         getGameCardStub = stub(gameCardService, 'getGameCards');
         getGameCardsNumberStub = stub(gameCardService, 'getGameCardsNumber');
+        getGameCardByIdStub = stub(gameCardService, 'getGameCardById');
     });
 
     afterEach(() => {
         getGameCardStub.restore();
         getGameCardsNumberStub.restore();
+        getGameCardByIdStub.restore();
     });
 
     it('should be defined', () => {
         expect(controller).toBeDefined();
     });
+
     it('getStages() should return game cards if there are at least one', async () => {
         getGameCardStub.callsFake(() => {
             return FAKE_GAME_CARD_ARRAY;
@@ -92,6 +96,24 @@ describe('StageController', () => {
             throw new Error();
         });
         const response = await request(httpServer).get('/stage/info');
+        expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    });
+
+    it('getStageById() should return a game card if the id is valid', async () => {
+        getGameCardByIdStub.callsFake(() => {
+            return FAKE_GAME_CARD_ARRAY[0];
+        });
+        const response = await request(httpServer).get('/stage/:gameCardId');
+        assert(getGameCardByIdStub.called);
+        expect(response.status).toBe(HttpStatus.OK);
+        expect(response.body).toEqual(FAKE_GAME_CARD_ARRAY[0]);
+    });
+
+    it('getStageById() should return 500 if there is an error', async () => {
+        getGameCardByIdStub.callsFake(() => {
+            throw new Error();
+        });
+        const response = await request(httpServer).get('/stage/:gameCardId');
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 
