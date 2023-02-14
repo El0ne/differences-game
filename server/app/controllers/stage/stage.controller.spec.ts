@@ -16,6 +16,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { assert } from 'console';
 import * as fs from 'fs';
 import * as Jimp from 'jimp';
+import * as join from 'path';
 import { stub } from 'sinon';
 import * as request from 'supertest';
 import { StageController } from './stage.controller';
@@ -143,6 +144,30 @@ describe('StageController', () => {
             if (err) throw err;
         });
     });
+    it('getImage() should return an  500 error if path is not functional', async () => {
+        jest.spyOn(join, 'join').mockImplementationOnce(() => {
+            throw new Error();
+        });
+
+        const image = new Jimp(1, 1, 'white', (err) => {
+            if (err) throw err;
+        });
+
+        image.write('assets/images/test.bmp');
+        const response = await request(httpServer).get('/stage/image/test.bmp');
+        expect(response.statusCode).toEqual(HttpStatus.INTERNAL_SERVER_ERROR);
+        fs.unlink('assets/images/test.bmp', (err) => {
+            if (err) throw err;
+        });
+    });
+    it('getGameCardById() should return gameCardInformation given the id', async () => {
+        const gameCardServiceStub = stub(gameCardService, 'getGameCardById').returns(undefined);
+        const response = await request(httpServer).get('/stage/3');
+        assert(gameCardServiceStub.calledWith('3'));
+        expect(response.status).toBe(HttpStatus.OK);
+        expect(response.body).toEqual({});
+    });
+    it('uploadImages should return a 200 status if the upload ');
 });
 
 const FAKE_GAME_INFO: GameInformation = {
