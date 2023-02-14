@@ -10,11 +10,11 @@ export class FoundDifferenceService {
         this.foundDifferences = [];
     }
 
-    addDifferenceFound(index: number) {
+    addDifferenceFound(index: number): void {
         this.foundDifferences.push(index);
     }
 
-    clearDifferenceFound() {
+    clearDifferenceFound(): void {
         this.foundDifferences = [];
     }
 }

@@ -7,9 +7,9 @@ import { ONE_SEC_IN_MS, START_TIME, ZERO } from './timer-solo.constants';
 })
 export class TimerSoloService {
     currentTime: number = START_TIME;
-    private subArray: Subscription[] = [];
+    subArray: Subscription[] = [];
 
-    startTimer() {
+    startTimer(): void {
         this.currentTime = -1;
         const timer1 = timer(ZERO, ONE_SEC_IN_MS);
 
@@ -20,11 +20,7 @@ export class TimerSoloService {
         this.subArray.push(sub);
     }
 
-    setArray(subscriptions: Subscription[]) {
-        this.subArray = subscriptions;
-    }
-
-    stopTimer() {
+    stopTimer(): void {
         this.subArray.forEach((sub) => sub.unsubscribe());
     }
 }

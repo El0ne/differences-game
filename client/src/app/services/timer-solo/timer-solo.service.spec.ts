@@ -24,7 +24,7 @@ describe('TimerSoloService', () => {
 
     it('stopTimer should unsubscribe from all subscriptions', fakeAsync(() => {
         const mockSubscriptions = [of('1').subscribe(), of('2').subscribe(), of('3').subscribe()];
-        service.setArray(mockSubscriptions);
+        service.subArray = mockSubscriptions;
 
         service.stopTimer();
 
