@@ -30,7 +30,12 @@ body {
     background: linear-gradient(var(--linear-background-color-1), var(--linear-background-color-2));
     text-align: center;
 }
-
+.name-input {
+    top: 10%;
+    left: 5%;
+    width: 90%;
+    height: 70%;
+}
 .info {
     display: flex;
     flex-direction: column;
@@ -41,7 +46,7 @@ body {
     font-family: 'Verdana';
     font-style: normal;
     font-weight: 200;
-    font-size: 20px;
+    font-size: 40px;
     line-height: 36px;
     text-align: center;
     color: white;
