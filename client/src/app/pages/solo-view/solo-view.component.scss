@@ -11,6 +11,10 @@
     color: #000000;
 }
 
+.name-field {
+    align-self: center;
+}
+
 body {
     background: linear-gradient(var(--linear-background-color-1), var(--linear-background-color-2));
 }
@@ -24,6 +28,7 @@ body {
     z-index: 1;
     position: fixed;
     background: linear-gradient(var(--linear-background-color-1), var(--linear-background-color-2));
+    text-align: center;
 }
 
 .info {
