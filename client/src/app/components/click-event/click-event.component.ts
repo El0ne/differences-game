@@ -179,9 +179,8 @@ export class ClickEventComponent implements OnInit {
         return colorArray;
     }
 
-    receivePixels(colorArray: ImageData[], positionArray: number[]) {
+    receivePixels(colorArray: ImageData[], positionArray: number[]): void {
         const context = this.picture.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-
         for (let i = 0; i < positionArray.length; i++) {
             const diffPixel = `rgba(${colorArray[i].data[0]},${colorArray[i].data[1]},${colorArray[i].data[2]},${colorArray[i].data[3]})`;
             context.fillStyle = diffPixel;
