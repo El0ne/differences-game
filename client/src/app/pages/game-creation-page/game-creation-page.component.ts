@@ -1,10 +1,13 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { STAGE } from '@app/services/server-routes';
 import { GameInformation } from '@common/game-information';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GC_PATHS } from './game-creation-constants';
+import { ModalPageComponent } from './modal-page/modal-page.component';
 
 @Component({
     selector: 'app-game-creation-page',
@@ -29,11 +32,15 @@ export class GameCreationPageComponent implements OnInit {
     originalId: string = 'upload-original';
     differentId: string = 'upload-different';
 
+    isDisabled = false;
     image: string = '';
+    // image: string = './../../assets/image_12_diff.bmp';
     differenceNumber: number = 0;
     difficulty: string = '';
+    // differenceNumber: number = 7;
+    // difficulty: string = 'Difficile';
 
-    constructor(public gameCardService: GameCardInformationService) {}
+    constructor(public gameCardService: GameCardInformationService, private matDialog: MatDialog, private router: Router) {}
 
     ngOnInit(): void {
         this.display$ = this.modal.asObservable();
@@ -43,6 +50,22 @@ export class GameCreationPageComponent implements OnInit {
         this.gameTitle = title;
     }
 
+    openModal() {
+        const dialogRef = this.matDialog.open(ModalPageComponent, {
+            data: {
+                image: this.image,
+                difference: this.differenceNumber,
+                difficulty: this.difficulty,
+            },
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            console.log(result.image);
+            console.log(result.difference);
+            console.log(result.difficulty);
+            this.router.navigate(['/config']);
+        });
+    }
     clearSingleFile(canvas: HTMLCanvasElement, id: string): void {
         const context = canvas.getContext('2d');
         const input = document.getElementById(id) as HTMLInputElement;
@@ -119,6 +142,8 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     async save(): Promise<void> {
+        this.isDisabled = true;
+
         if (this.saveVerification() && this.originalFile && this.differentFile) {
             this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
                 if (data.gameDifferenceNumber) {
@@ -135,8 +160,8 @@ export class GameCreationPageComponent implements OnInit {
                     this.differenceNumber = data.gameDifferenceNumber;
                     this.image = `${STAGE}/image/difference-image.bmp`;
                     this.gameCardService.createGame(gameInfo).subscribe();
-                    this.modal.next('open');
                     this.gameCardService.getGameCardInfoFromId(data.gameId);
+                    this.openModal();
                 } else {
                     alert("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
                 }
