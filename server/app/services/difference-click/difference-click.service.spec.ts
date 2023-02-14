@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
