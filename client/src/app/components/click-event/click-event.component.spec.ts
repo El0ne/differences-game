@@ -76,35 +76,6 @@ describe('ClickEventComponent', () => {
         component.emitSound(true);
         expect(sound.src.endsWith('/assets/Error.mp3')).toBeTrue();
     });
-    /*
-    it('canvas should be rendered on init with draw image amd sets difference on server', fakeAsync(() => {
-        // spyOn(component.clickEventService, 'setDifferences');
-        const loadImageSpy = spyOn(component, 'loadImage');
-        component.ngOnInit();
-        expect(loadImageSpy).toHaveBeenCalled();
-    }));
-
-    it('toggleEndGame() should activate end game and prevent user inputs', fakeAsync(() => {
-        component.endGame = false;
-        component.toggleEndgame();
-        expect(component.endGame).toBeTrue();
-        component.differenceData = FAILING;
-        const mockClick = new MouseEvent('click', { clientX: 100, clientY: 365 });
-        spyOn(CanvasRenderingContext2D.prototype, 'fillText');
-        spyOn(CanvasRenderingContext2D.prototype, 'clearRect');
-        spyOn(component, 'emitSound').and.callFake(() => {});
-        component.displayError(mockClick);
-        expect(CanvasRenderingContext2D.prototype.fillText).not.toHaveBeenCalled();
-        tick(1000);
-        fixture.detectChanges();
-        expect(CanvasRenderingContext2D.prototype.clearRect).not.toHaveBeenCalled();
-        component.differenceEffect();
-        expect(CanvasRenderingContext2D.prototype.fillText).not.toHaveBeenCalled();
-        tick(1000);
-        fixture.detectChanges();
-        expect(CanvasRenderingContext2D.prototype.clearRect).not.toHaveBeenCalled();
-    }));
-    */
 
     it('getCoordInImage() should reset the position in the y if click is negative', () => {
         const mockClick = new MouseEvent('click', { clientX: 0, clientY: -200 });
@@ -134,7 +105,7 @@ describe('ClickEventComponent', () => {
     });
 
     it('isDifferent() should return true if a difference is detected', () => {
-        spyOn(component.clickEventService, 'isADifference').and.returnValue(of(PASSING));
+        spyOn(component.clickEventService, 'isADifference').and.returnValue(of(DIFFERENCE_FOUND));
         const mockClick = new MouseEvent('click', { clientX: 0, clientY: 0 });
         spyOn(component, 'emitSound').and.callFake(() => {});
         component.isDifferent(mockClick);
@@ -143,11 +114,11 @@ describe('ClickEventComponent', () => {
             component.getCoordInImage(mockClick)[1],
             '1',
         );
-        expect(component.differenceData).toEqual(PASSING);
+        expect(component.differenceData).toEqual(DIFFERENCE_FOUND);
     });
 
     it('isDifferent() should return false if a difference is not detected', () => {
-        spyOn(component.clickEventService, 'isADifference').and.returnValue(of(FAILING));
+        spyOn(component.clickEventService, 'isADifference').and.returnValue(of(DIFFERENCE_NOT_FOUND));
         const mockClick = new MouseEvent('click', { clientX: 100, clientY: 365 });
         spyOn(component, 'emitSound').and.callFake(() => {});
         component.isDifferent(mockClick);
@@ -156,7 +127,7 @@ describe('ClickEventComponent', () => {
             component.getCoordInImage(mockClick)[1],
             '1',
         );
-        expect(component.differenceData).toEqual(FAILING);
+        expect(component.differenceData).toEqual(DIFFERENCE_NOT_FOUND);
     });
 
     it('constructEffect() should call fillRect() in order to construct flashing effect', () => {
@@ -186,52 +157,18 @@ describe('ClickEventComponent', () => {
         expect(component.endGame).toBeFalsy();
         expect(component.foundDifferences).toEqual([]);
     });
-    /*
-    it('differenceEffect() should display effect at an alternate rate', fakeAsync(() => {
-        component.lastDifferenceClicked = [0, 0, 0, 0, 0];
-        spyOn(component, 'emitSound').and.callFake(() => {});
-        const constructSpy = spyOn(component, 'constructEffect');
-        const destroySpy = spyOn(component, 'destroyEffect');
-        component.differenceEffect();
-        tick(100);
-        fixture.detectChanges();
-        expect(constructSpy).toHaveBeenCalled();
-        tick(100);
-        fixture.detectChanges();
-        expect(destroySpy).toHaveBeenCalled();
-        tick(100);
-        fixture.detectChanges();
-        expect(constructSpy).toHaveBeenCalledTimes(4);
-        expect(destroySpy).toHaveBeenCalledTimes(3);
-        tick(2000);
-        fixture.detectChanges();
-        expect(destroySpy).toHaveBeenCalledTimes(10);
-        expect(constructSpy).toHaveBeenCalledTimes(10);
-    }));
-    
-    it('displayError() should ignore input if timeout flag is active', () => {
-        component.timeout = true;
-        const mockClick = new MouseEvent('click', { clientX: 100, clientY: 365 });
-        spyOn(CanvasRenderingContext2D.prototype, 'fillRect');
-        component.displayError(mockClick);
-        expect(CanvasRenderingContext2D.prototype.fillRect).not.toHaveBeenCalled();
-        expect(component.timeout).toBeTrue();
+
+    it('sendPixels should call getContext', () => {
+        const getContextSpy = spyOn(component.picture.nativeElement, 'getContext');
+
+        component.sendPixels([]);
+        expect(getContextSpy).toHaveBeenCalled();
     });
 
-    it('displayError() should display error if timeout flag is inactive & should reset flag when timeout over ', fakeAsync(() => {
-        component.timeout = false;
-        component.differenceData = FAILING;
-        const mockClick = new MouseEvent('click', { clientX: 100, clientY: 365 });
-        spyOn(CanvasRenderingContext2D.prototype, 'fillText');
-        spyOn(CanvasRenderingContext2D.prototype, 'clearRect');
-        spyOn(component, 'emitSound').and.callFake(() => {});
-        component.displayError(mockClick);
-        expect(CanvasRenderingContext2D.prototype.fillText).toHaveBeenCalled();
-        expect(component.timeout).toBeTrue();
-        tick(1000);
-        fixture.detectChanges();
-        expect(CanvasRenderingContext2D.prototype.clearRect).toHaveBeenCalled();
-        expect(component.timeout).toBeFalse();
-    }));
-    */
+    it('receivePixel should call getContext', () => {
+        const getContextSpy = spyOn(component.picture.nativeElement, 'getContext');
+
+        component.receivePixels([], []);
+        expect(getContextSpy).toHaveBeenCalled();
+    });
 });
