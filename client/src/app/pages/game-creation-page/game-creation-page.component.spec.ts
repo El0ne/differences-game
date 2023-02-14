@@ -1,20 +1,21 @@
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
+import { RouterTestingModule } from '@angular/router/testing';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
-
 import { GameCreationPageComponent } from './game-creation-page.component';
 
 describe('GameCreationPageComponent', () => {
     let component: GameCreationPageComponent;
     let fixture: ComponentFixture<GameCreationPageComponent>;
     let canvasOg: HTMLCanvasElement;
-
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [GameCreationPageComponent],
-            imports: [HttpClientModule, FormsModule],
+            imports: [HttpClientModule, FormsModule, MatDialogModule, RouterTestingModule],
+            providers: [{ provide: MAT_DIALOG_DATA, useValue: {} }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(GameCreationPageComponent);
@@ -206,9 +207,6 @@ describe('GameCreationPageComponent', () => {
     //         multiTimes: [],
     //     };
     //     spyOn(component.gameCardService, 'createGame').and.returnValue(of(mockGameCardInfo));
-
-    //     spyOn(component.modal, 'next');
-
     //     component.gameTitle = 'My Game';
     //     component.originalFile = new File([''], 'original.bmp');
     //     component.differentFile = new File([''], 'different.bmp');
