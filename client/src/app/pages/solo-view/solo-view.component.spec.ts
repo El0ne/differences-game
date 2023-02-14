@@ -1,8 +1,10 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { By } from '@angular/platform-browser';
+import { RouterTestingModule } from '@angular/router/testing';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
-import { ClickEventService } from '@app/services/Click-event/click-event.service';
+import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { GameCardInformation } from '@common/game-card';
 import { MESSAGES_LENGTH } from './solo-view-constants';
 import { SoloViewComponent } from './solo-view.component';
@@ -14,7 +16,7 @@ describe('SoloViewComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [SoloViewComponent, ClickEventComponent],
-            imports: [FormsModule, HttpClientTestingModule],
+            imports: [FormsModule, HttpClientTestingModule, RouterTestingModule],
             providers: [{ provide: ClickEventService }],
         }).compileComponents();
 
@@ -115,14 +117,60 @@ describe('SoloViewComponent', () => {
         expect(component.showWinMessage).toBeTrue();
     });
 
-    it('ngOnInit should call showTime', () => {
+    it('validateName should call showTime if message is good', () => {
+        const textBox = fixture.debugElement.query(By.css('#name'));
+        textBox.nativeElement.value = 'good name';
+        textBox.nativeElement.dispatchEvent(new Event('input'));
+
         const showTimeSpy = spyOn(component, 'showTime');
-        component.ngOnInit();
+        component.validateName();
         expect(showTimeSpy).toHaveBeenCalled();
     });
 
-    it('ngOnDestroy should call the stopTimer form the service', () => {
-        // mettre publique et supprimer currentTime
+    it('validateName should turn nameErrorMessage to true if message is empty', () => {
+        const textBox = fixture.debugElement.query(By.css('#name'));
+        textBox.nativeElement.value = '';
+        textBox.nativeElement.dispatchEvent(new Event('input'));
+
+        component.validateName();
+
+        expect(component.showNameErrorMessage).toBeTrue();
+    });
+
+    it('validateName should turn nameErrorMessage to false if message is fine', () => {
+        const textBox = fixture.debugElement.query(By.css('#name'));
+        textBox.nativeElement.value = '';
+        textBox.nativeElement.dispatchEvent(new Event('input'));
+
+        component.validateName();
+
+        expect(component.showNameErrorMessage).toBeTrue();
+    });
+
+    it('showTime should call startTimer of service', () => {
+        const startTimerSpy = spyOn(component.timerService, 'startTimer');
+
+        component.showTime();
+
+        expect(startTimerSpy).toHaveBeenCalled();
+    });
+
+    it('addDifferenceDetected should call addDifferenceFound of service', () => {
+        const addDiffSpy = spyOn(component.foundDifferenceService, 'addDifferenceFound');
+
+        component.addDifferenceDetected(1);
+
+        expect(addDiffSpy).toHaveBeenCalled();
+    });
+
+    it('paintPixel should call sendPixels and receivePixels properly', () => {
+        const leftCanvasSpy = spyOn(component.left, 'sendPixels');
+        const rightCanvasSpy = spyOn(component.right, 'receivePixels');
+
+        component.paintPixel([1]);
+
+        expect(leftCanvasSpy).toHaveBeenCalled();
+        expect(rightCanvasSpy).toHaveBeenCalled();
     });
 });
 

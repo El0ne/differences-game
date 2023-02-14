@@ -1,19 +1,16 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 
-export const PASSING: ClickDifferenceVerification = {
+export const DIFFERENCE_FOUND: ClickDifferenceVerification = {
     isADifference: true,
     differenceArray: [0, 1, 2, 3, 4],
-    remainingDifferences: [
-        [5, 6, 7, 8],
-        [19, 20, 21],
-    ],
+    differencesPosition: 5,
 };
 
-export const FAILING: ClickDifferenceVerification = {
+export const DIFFERENCE_NOT_FOUND: ClickDifferenceVerification = {
     isADifference: false,
     differenceArray: [],
-    remainingDifferences: [],
+    differencesPosition: 0,
 };
 
 export const TEST_DIFFERENCES: number[][] = [

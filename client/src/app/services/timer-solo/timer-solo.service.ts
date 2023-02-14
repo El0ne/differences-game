@@ -20,6 +20,10 @@ export class TimerSoloService {
         this.subArray.push(sub);
     }
 
+    setArray(subscriptions: Subscription[]) {
+        this.subArray = subscriptions;
+    }
+
     stopTimer() {
         this.subArray.forEach((sub) => sub.unsubscribe());
     }

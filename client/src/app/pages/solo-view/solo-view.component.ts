@@ -19,7 +19,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     left: ClickEventComponent;
     @ViewChild('right')
     right: ClickEventComponent;
+    showEnterName: boolean = true;
     showErrorMessage: boolean = false;
+    showNameErrorMessage: boolean = false;
     showTextBox: boolean = false;
     showWinMessage: boolean = false;
     showNavBar: boolean = true;
@@ -38,7 +40,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         public timerService: TimerSoloService,
         private convertService: SecondToMinuteService,
         private gameCardInfoService: GameCardInformationService,
-        private foundDifferenceService: FoundDifferenceService,
+        public foundDifferenceService: FoundDifferenceService,
         private route: ActivatedRoute,
     ) {}
 
@@ -51,8 +53,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.numberOfDifferences = this.gameCardInfo.differenceNumber;
             });
         }
-
-        this.showTime();
     }
 
     ngOnDestroy(): void {
@@ -112,6 +112,16 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.messages.push(this.messageContent);
         }
         this.messageContent = '';
+    }
+
+    validateName() {
+        const inputValue = (document.getElementById('name') as HTMLInputElement).value;
+        if (inputValue.replace(/\s/g, '') !== '') {
+            this.showEnterName = false;
+            this.showTime();
+        } else {
+            this.showNameErrorMessage = true;
+        }
     }
 
     paintPixel(array: number[]) {

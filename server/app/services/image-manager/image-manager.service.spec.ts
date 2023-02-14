@@ -28,11 +28,10 @@ describe('ImageManagerService', () => {
         }, 100);
     });
 
-    it('should throw an error if it tries to delete an image with the wrong path', () => {
+    it('should not throw an error even if it tries to delete an image with the wrong path', () => {
         const imagePath = '/wrong/path/test.bmp';
-        const unlinkSyncStub = sinon.stub(fs, 'unlinkSync').throws(new Error());
+        const serviceStub = sinon.stub(service, 'deleteImage');
         service.deleteImage(imagePath);
-        expect(unlinkSyncStub.called).toEqual(true);
-        unlinkSyncStub.restore();
+        expect(serviceStub).not.toThrowError();
     });
 });

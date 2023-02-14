@@ -16,15 +16,17 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { assert } from 'console';
 import * as fs from 'fs';
 import * as Jimp from 'jimp';
-import { stub } from 'sinon';
+import * as join from 'path';
+import Sinon, { SinonStub, stub } from 'sinon';
 import * as request from 'supertest';
 import { StageController } from './stage.controller';
 
 describe('StageController', () => {
     let httpServer: unknown;
     let controller: StageController;
-    let getGameCardStub;
-    let getGameCardsNumberStub;
+    let getGameCardStub: Sinon.SinonStub;
+    let getGameCardsNumberStub: SinonStub;
+    let getGameCardByIdStub: SinonStub;
     let gameCardService: GameCardService;
 
     beforeAll(async () => {
@@ -52,16 +54,30 @@ describe('StageController', () => {
     beforeEach(() => {
         getGameCardStub = stub(gameCardService, 'getGameCards');
         getGameCardsNumberStub = stub(gameCardService, 'getGameCardsNumber');
+        getGameCardByIdStub = stub(gameCardService, 'getGameCardById');
     });
 
     afterEach(() => {
         getGameCardStub.restore();
         getGameCardsNumberStub.restore();
+        getGameCardByIdStub.restore();
     });
 
     it('should be defined', () => {
         expect(controller).toBeDefined();
     });
+    /*
+    it('should generate a unique filename with the correct extension', () => {
+        const req = {};
+        const file = { name: 'test.jpg' };
+        const cb = jest.fn();
+
+        storage.filename(req, file, cb);
+
+        expect(cb).toHaveBeenCalled();
+        expect(cb).toHaveBeenCalledWith(null, expect.stringMatching(???));
+    });
+    */
     it('getStages() should return game cards if there are at least one', async () => {
         getGameCardStub.callsFake(() => {
             return FAKE_GAME_CARD_ARRAY;
@@ -73,9 +89,7 @@ describe('StageController', () => {
     });
 
     it('getStages() should return 500 if there is an error', async () => {
-        getGameCardStub.callsFake(() => {
-            throw new Error();
-        });
+        getGameCardStub.throws(new Error('test'));
         const response = await request(httpServer).get('/stage');
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
@@ -92,6 +106,22 @@ describe('StageController', () => {
             throw new Error();
         });
         const response = await request(httpServer).get('/stage/info');
+        expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    });
+
+    it('getStageById() should return a game card if the id is valid', async () => {
+        getGameCardByIdStub.callsFake(() => {
+            return FAKE_GAME_CARD_ARRAY[0];
+        });
+        const response = await request(httpServer).get('/stage/5');
+        expect(getGameCardByIdStub.calledWith('5'));
+        expect(response.status).toBe(HttpStatus.OK);
+        expect(response.body).toEqual(FAKE_GAME_CARD_ARRAY[0]);
+    });
+
+    it('getStageById() should return 500 if there is an error', async () => {
+        getGameCardByIdStub.throws(new Error());
+        const response = await request(httpServer).get('/stage/error');
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 
@@ -143,6 +173,36 @@ describe('StageController', () => {
             if (err) throw err;
         });
     });
+
+    it('getImage() should return an  500 error if path is not functional', async () => {
+        jest.spyOn(join, 'join').mockImplementationOnce(() => {
+            throw new Error();
+        });
+
+        const image = new Jimp(1, 1, 'white', (err) => {
+            if (err) throw err;
+        });
+
+        image.write('assets/images/test.bmp');
+        const response = await request(httpServer).get('/stage/image/test.bmp');
+        expect(response.statusCode).toEqual(HttpStatus.INTERNAL_SERVER_ERROR);
+        fs.unlink('assets/images/test.bmp', (err) => {
+            if (err) throw err;
+        });
+    });
+    /*
+    it('uploadImages() should return 201 if the images are uploaded', async () => {
+        const image = new Jimp(100, 100, 'white', (err) => {
+            if (err) throw err;
+        });
+
+        const response = await request(httpServer)
+            .post('/server/app/stage/image/3')
+            .attach('originalImage', await image.getBufferAsync('TestImage01.bmp'))
+            .attach('differenceImage', await image.getBufferAsync('TestImage02.bmp'));
+        expect(response.status).toBe(HttpStatus.CREATED);
+    });
+    */
 });
 
 const FAKE_GAME_INFO: GameInformation = {

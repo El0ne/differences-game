@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { GAMES } from '@app/mock/game-cards';
 import { GAME_CARDS_TO_DISPLAY } from '@app/pages/game-selection/game-selection-constants';
 import { STAGE } from '@app/services/server-routes';
+import { GameInformation } from '@common/game-information';
 
 import { GameCardInformationService } from './game-card-information.service';
 
@@ -36,5 +37,38 @@ describe('GameCardInformationService', () => {
 
         const req = httpController.expectOne(`${STAGE}?index=0&endIndex=4`);
         req.flush(GAMES.slice(0, GAME_CARDS_TO_DISPLAY));
+    });
+
+    it('uploadImages should make a GET request', () => {
+        const mockString = 'Hello, this is a mock string';
+        const mockBlob = new Blob([mockString], { type: 'text/plain' });
+        const mockFile = new File([mockBlob], 'mock-file.txt');
+
+        service.uploadImages(mockFile, mockFile, 3).subscribe((res) => {
+            expect(res).toBeTruthy();
+        });
+    });
+
+    it('getGameCardInfo should call get on httpManager', () => {
+        const getSpy = spyOn(service.http, 'get');
+
+        service.getGameCardInfoFromId('');
+        expect(getSpy).toHaveBeenCalled();
+    });
+
+    it('getGameCardInfo should call post on httpManager', () => {
+        const postSpy = spyOn(service.http, 'post');
+        const mock: GameInformation = {
+            id: '1',
+            name: 'name',
+            difficulty: 'difficult',
+            baseImage: 'string',
+            differenceImage: 'string',
+            radius: 3,
+            differenceNumber: 3,
+        };
+
+        service.createGame(mock);
+        expect(postSpy).toHaveBeenCalled();
     });
 });
