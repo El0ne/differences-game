@@ -26,3 +26,30 @@ h1 {
     color: white;
     font-style: bold;
 }
+
+.continue {
+    display: inline-block;
+    height: 4rem;
+    width: 130px;
+    margin: 1%;
+    font-size: 24px;
+
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    background-color: #ff124f;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px #999;
+}
+.continue:hover {
+    background-color: #ff124dc5;
+}
+
+.continue:active {
+    background-color: #ff124dc5;
+    box-shadow: 0 5px #666;
+    transform: translateY(4px);
+}
