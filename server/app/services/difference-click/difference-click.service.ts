@@ -26,7 +26,6 @@ export class DifferenceClickService {
     }
 
     getDifferenceArrayFromStageID(stageId: string): number[][] {
-        // console.log('this content', this.content);
         const content = fs.readFileSync(this.jsonPath, 'utf8');
 
         for (const differenceObject of JSON.parse(content).differenceObjects) {
