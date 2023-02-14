@@ -5,7 +5,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MOCK_ARRAY } from '@app/pages/solo-view/mock-array';
-import { ClickEventService } from '@app/services/Click-event/click-event.service';
+import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { of, Subject } from 'rxjs';
 import { FAILING, PASSING, TEST_DIFFERENCES } from './click-event-constants';
@@ -141,6 +141,7 @@ describe('ClickEventComponent', () => {
         expect(component.clickEventService.isADifference).toHaveBeenCalledWith(
             component.getCoordInImage(mockClick)[0],
             component.getCoordInImage(mockClick)[1],
+            '1',
         );
         expect(component.differenceData).toEqual(PASSING);
     });
@@ -153,6 +154,7 @@ describe('ClickEventComponent', () => {
         expect(component.clickEventService.isADifference).toHaveBeenCalledWith(
             component.getCoordInImage(mockClick)[0],
             component.getCoordInImage(mockClick)[1],
+            '1',
         );
         expect(component.differenceData).toEqual(FAILING);
     });
@@ -169,6 +171,20 @@ describe('ClickEventComponent', () => {
         spyOn(CanvasRenderingContext2D.prototype, 'clearRect');
         component.destroyEffect(component.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D);
         expect(CanvasRenderingContext2D.prototype.clearRect).toHaveBeenCalledTimes(5);
+    });
+
+    it('ngOnInit should initialize the elements of the component correctly', () => {
+        const data = [[0], [2]];
+
+        spyOn(mockService, 'setDifferences').and.returnValue(of(data));
+
+        component.ngOnInit();
+
+        expect(mockService.setDifferences).toHaveBeenCalledWith(component.gameCardId);
+        expect(component.differenceArray).toEqual(data);
+        expect(component.timeout).toBeFalsy();
+        expect(component.endGame).toBeFalsy();
+        expect(component.foundDifferences).toEqual([]);
     });
     /*
     it('differenceEffect() should display effect at an alternate rate', fakeAsync(() => {
@@ -192,7 +208,7 @@ describe('ClickEventComponent', () => {
         expect(destroySpy).toHaveBeenCalledTimes(10);
         expect(constructSpy).toHaveBeenCalledTimes(10);
     }));
-
+    
     it('displayError() should ignore input if timeout flag is active', () => {
         component.timeout = true;
         const mockClick = new MouseEvent('click', { clientX: 100, clientY: 365 });

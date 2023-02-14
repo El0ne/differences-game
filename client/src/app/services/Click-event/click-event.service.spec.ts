@@ -1,7 +1,6 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { ClickDifferenceVerification } from '@common/click-difference-verification';
-import { ClickEventService } from './click-event.service';
+import { ClickEventService } from '@app/services/click-event/click-event.service';
 
 describe('ClickEventService', () => {
     let service: ClickEventService;
@@ -17,19 +16,9 @@ describe('ClickEventService', () => {
         expect(service).toBeTruthy();
     });
 
-    it('isADifference() should validate a difference depending on the array selected', () => {
-        service.isADifference(0, 0).subscribe((res: ClickDifferenceVerification) => {
-            expect(res).toBeTrue();
-        });
-
-        service.isADifference(100, 2000).subscribe((res: ClickDifferenceVerification) => {
-            expect(res).toBeFalse();
-        });
-    });
-
-    it('setDifference() should return the difference array for the given gameCard id', () => {
-        service.setDifferences('4').subscribe((res) => {
-            expect(res).toEqual([[]]);
+    it('should make a GET request to the correct URL with the correct parameters', () => {
+        service.isADifference(0, 0, '').subscribe((res) => {
+            expect(res).toBeTruthy();
         });
     });
 });

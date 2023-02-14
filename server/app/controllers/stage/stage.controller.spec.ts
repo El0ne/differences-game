@@ -17,14 +17,14 @@ import { assert } from 'console';
 import * as fs from 'fs';
 import * as Jimp from 'jimp';
 import * as join from 'path';
-import { stub } from 'sinon';
+import Sinon, { stub } from 'sinon';
 import * as request from 'supertest';
 import { StageController } from './stage.controller';
 
 describe('StageController', () => {
     let httpServer: unknown;
     let controller: StageController;
-    let getGameCardStub;
+    let getGameCardStub: Sinon.SinonStub;
     let getGameCardsNumberStub;
     let getGameCardByIdStub;
     let gameCardService: GameCardService;
@@ -89,9 +89,7 @@ describe('StageController', () => {
     });
 
     it('getStages() should return 500 if there is an error', async () => {
-        getGameCardStub.callsFake(() => {
-            throw new Error();
-        });
+        getGameCardStub.throws(new Error('test'));
         const response = await request(httpServer).get('/stage');
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
