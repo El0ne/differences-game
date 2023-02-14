@@ -12,9 +12,9 @@ import { BestTimeComponent } from './components/best-time/best-time.component';
 import { ClickEventComponent } from './components/click-event/click-event.component';
 import { GameCardSelectionComponent } from './components/game-card-selection/game-card-selection.component';
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
-import { ModalPageComponent } from './pages/game-creation-page/modal-page/modal-page.component';
 import { GameSelectionComponent } from './pages/game-selection/game-selection.component';
 import { HomePageComponent } from './pages/home-page/home-page.component';
+import { ModalPageComponent } from './pages/modal-page/modal-page.component';
 import { SoloViewComponent } from './pages/solo-view/solo-view.component';
 
 /**

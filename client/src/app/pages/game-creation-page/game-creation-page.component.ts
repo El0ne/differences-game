@@ -6,8 +6,8 @@ import { STAGE } from '@app/services/server-routes';
 import { GameInformation } from '@common/game-information';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { ModalPageComponent } from '../modal-page/modal-page.component';
 import { GC_PATHS } from './game-creation-constants';
-import { ModalPageComponent } from './modal-page/modal-page.component';
 
 @Component({
     selector: 'app-game-creation-page',
@@ -138,10 +138,10 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     async save(): Promise<void> {
+        this.isDisabled = true;
         if (this.saveVerification() && this.originalFile && this.differentFile) {
             this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
                 if (data.gameDifferenceNumber) {
-                    this.isDisabled = true;
                     const gameInfo: GameInformation = {
                         id: data.gameId,
                         name: this.gameTitle,
@@ -158,6 +158,7 @@ export class GameCreationPageComponent implements OnInit {
                     this.gameCardService.getGameCardInfoFromId(data.gameId);
                     this.openModal();
                 } else {
+                    this.isDisabled = false;
                     alert("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
                 }
             });
