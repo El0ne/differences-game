@@ -13,7 +13,8 @@ export class GameCardInformationService {
     constructor(public http: HttpClient) {}
 
     getGameCardInfoFromId(id: string): Observable<GameCardInformation> {
-        return this.http.get<GameCardInformation>(`${STAGE}/${id}`);
+        const options = { params: new HttpParams().set('stageId', id) };
+        return this.http.get<GameCardInformation>(STAGE, options);
     }
 
     getGameCardsInformations(index: number, endIndex: number): Observable<GameCardInformation[]> {

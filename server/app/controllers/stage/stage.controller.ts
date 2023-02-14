@@ -41,18 +41,22 @@ export class StageController {
             // return this.gameCardService.getGameCards(index, endIndex);
             res.status(HttpStatus.OK).send(this.gameCardService.getGameCards(index, endIndex));
         } catch (error) {
-            throw new HttpException('Forbidden', HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @Get('/info')
     getNbOfStages(): number {
-        return this.gameCardService.getGameCardsNumber();
+        try {
+            return this.gameCardService.getGameCardsNumber();
+        } catch (error) {
+            throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    @Get('/:gameCardId')
-    getStageById(@Param() param): GameCardInformation {
-        return this.gameCardService.getGameCardById(param.gameCardId);
+    @Get('/:stageId')
+    getStageById(@Param() stageId: string): GameCardInformation {
+        return this.gameCardService.getGameCardById(stageId);
     }
 
     @Post('/')
