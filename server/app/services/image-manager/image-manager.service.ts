@@ -3,7 +3,7 @@ import * as fs from 'fs';
 
 @Injectable()
 export class ImageManagerService {
-    deleteImage(imagePath: string) {
+    deleteImage(imagePath: string): void {
         fs.unlinkSync(imagePath);
     }
 }

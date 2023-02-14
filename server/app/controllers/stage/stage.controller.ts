@@ -38,7 +38,6 @@ export class StageController {
     @Get('/')
     getStages(@Query('index') index: number, @Query('endIndex') endIndex: number, @Res() res: Response): void {
         try {
-            // return this.gameCardService.getGameCards(index, endIndex);
             res.status(HttpStatus.OK).send(this.gameCardService.getGameCards(index, endIndex));
         } catch (error) {
             throw new HttpException('Forbidden', HttpStatus.INTERNAL_SERVER_ERROR);
@@ -103,7 +102,6 @@ export class StageController {
                 } else {
                     this.imageManagerService.deleteImage(files.baseImage[0].path);
                     this.imageManagerService.deleteImage(files.differenceImage[0].path);
-                    // Which status code to send?
                     res.status(HttpStatus.OK).send([]);
                 }
             } else res.sendStatus(HttpStatus.BAD_REQUEST);

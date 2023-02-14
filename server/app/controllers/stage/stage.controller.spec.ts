@@ -66,18 +66,7 @@ describe('StageController', () => {
     it('should be defined', () => {
         expect(controller).toBeDefined();
     });
-    /*
-    it('should generate a unique filename with the correct extension', () => {
-        const req = {};
-        const file = { name: 'test.jpg' };
-        const cb = jest.fn();
 
-        storage.filename(req, file, cb);
-
-        expect(cb).toHaveBeenCalled();
-        expect(cb).toHaveBeenCalledWith(null, expect.stringMatching(???));
-    });
-    */
     it('getStages() should return game cards if there are at least one', async () => {
         getGameCardStub.callsFake(() => {
             return FAKE_GAME_CARD_ARRAY;
@@ -192,19 +181,6 @@ describe('StageController', () => {
             if (err) throw err;
         });
     });
-    /*
-    it('uploadImages() should return 201 if the images are uploaded', async () => {
-        const image = new Jimp(100, 100, 'white', (err) => {
-            if (err) throw err;
-        });
-
-        const response = await request(httpServer)
-            .post('/server/app/stage/image/3')
-            .attach('originalImage', await image.getBufferAsync('TestImage01.bmp'))
-            .attach('differenceImage', await image.getBufferAsync('TestImage02.bmp'));
-        expect(response.status).toBe(HttpStatus.CREATED);
-    });
-    */
 });
 
 const FAKE_GAME_INFO: GameInformation = {
