@@ -4,7 +4,7 @@ import { FoundDifferenceService } from '@app/services/Found-differences/found-di
 import { STAGE } from '@app/services/server-routes';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { Observable } from 'rxjs';
-import { FAST_WAIT_TIME, HEIGHT, WAIT_TIME, WIDTH } from './click-event-constant';
+import { FAST_WAIT_TIME_MS, HEIGHT, WAIT_TIME_MS, WIDTH } from './click-event-constant';
 
 @Component({
     selector: 'app-click-event',
@@ -112,16 +112,16 @@ export class ClickEventComponent implements OnInit {
             this.constructEffect(originalContext);
             const flashIntro = setInterval(() => {
                 this.destroyEffect(originalContext);
-            }, FAST_WAIT_TIME);
+            }, FAST_WAIT_TIME_MS);
             const flashOutro = setInterval(() => {
                 this.constructEffect(originalContext);
-            }, FAST_WAIT_TIME);
+            }, FAST_WAIT_TIME_MS);
 
             setTimeout(() => {
                 clearInterval(flashIntro);
                 clearInterval(flashOutro);
                 this.destroyEffect(originalContext);
-            }, WAIT_TIME);
+            }, WAIT_TIME_MS);
 
             this.currentScore += 1;
             this.incrementScore.emit(this.currentScore);
@@ -163,7 +163,7 @@ export class ClickEventComponent implements OnInit {
             setTimeout(() => {
                 context.clearRect(0, 0, WIDTH, HEIGHT);
                 this.timeout = false;
-            }, WAIT_TIME);
+            }, WAIT_TIME_MS);
         }
     }
 

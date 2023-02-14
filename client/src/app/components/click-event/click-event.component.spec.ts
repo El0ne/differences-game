@@ -8,7 +8,7 @@ import { MOCK_ARRAY } from '@app/pages/solo-view/mock-array';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { of, Subject } from 'rxjs';
-import { FAILING, PASSING, TEST_DIFFERENCES } from './click-event-constants';
+import { DIFFERENCE_FOUND, DIFFERENCE_NOT_FOUND, TEST_DIFFERENCES } from './click-event-constants';
 import { ClickEventComponent } from './click-event.component';
 describe('ClickEventComponent', () => {
     let component: ClickEventComponent;
@@ -20,12 +20,12 @@ describe('ClickEventComponent', () => {
     beforeEach(() => {
         mockService = jasmine.createSpyObj('ClickEventService', ['isADifference', 'setDifferences']);
         mockService.isADifference = () => {
-            expectedClickDifference.next(PASSING);
+            expectedClickDifference.next(DIFFERENCE_FOUND);
             return expectedClickDifference.asObservable();
         };
 
         mockService.isADifference = () => {
-            expectedClickDifference.next(FAILING);
+            expectedClickDifference.next(DIFFERENCE_NOT_FOUND);
             return expectedClickDifference.asObservable();
         };
 
