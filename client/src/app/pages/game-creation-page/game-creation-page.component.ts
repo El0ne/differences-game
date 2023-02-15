@@ -1,13 +1,13 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { ModalPageComponent } from '@app/pages/modal-page/modal-page.component';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { STAGE } from '@app/services/server-routes';
 import { GameInformation } from '@common/game-information';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GC_PATHS } from './game-creation-constants';
-import { ModalPageComponent } from './modal-page/modal-page.component';
 
 @Component({
     selector: 'app-game-creation-page',
@@ -37,7 +37,7 @@ export class GameCreationPageComponent implements OnInit {
     differenceNumber: number = 0;
     difficulty: string = '';
 
-    constructor(public gameCardService: GameCardInformationService, private matDialog: MatDialog, private router: Router) {}
+    constructor(public gameCardService: GameCardInformationService, private matDialog: MatDialog, public router: Router) {}
 
     ngOnInit(): void {
         this.display$ = this.modal.asObservable();
@@ -56,7 +56,8 @@ export class GameCreationPageComponent implements OnInit {
             },
         });
 
-        dialogRef.afterClosed().subscribe(() => {
+        dialogRef.afterClosed().subscribe((result) => {
+            result.image = '';
             this.router.navigate(['/config']);
         });
     }
@@ -156,6 +157,7 @@ export class GameCreationPageComponent implements OnInit {
                     this.gameCardService.getGameCardInfoFromId(data.gameId);
                     this.openModal();
                 } else {
+                    this.isDisabled = false;
                     alert("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
                 }
             });

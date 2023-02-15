@@ -1,5 +1,6 @@
 import { Component, Inject, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-modal-page',
@@ -14,10 +15,18 @@ export class ModalPageComponent implements OnDestroy {
             difference: number;
             difficulty: string;
         },
-        private matDialogRef: MatDialogRef<ModalPageComponent>,
+        public matDialogRef: MatDialogRef<ModalPageComponent>,
+        public router: Router,
     ) {}
 
     ngOnDestroy() {
         this.matDialogRef.close(this.data);
+    }
+    close() {
+        this.matDialogRef.close(this.data);
+        this.matDialogRef.afterClosed().subscribe((result) => {
+            result.image = '';
+            this.router.navigate(['/config']);
+        });
     }
 }

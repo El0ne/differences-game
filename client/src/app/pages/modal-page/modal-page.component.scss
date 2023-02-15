@@ -1,0 +1,55 @@
+.modal {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    width: 900px;
+    height: 800px;
+    background: linear-gradient(0.25turn, #ff5f6d, #ffc371);
+}
+.diff-image {
+    display: flex;
+    justify-content: center;
+}
+img {
+    width: 640px;
+    height: 480px;
+    top: 50%;
+    left: 50%;
+}
+.info-diff {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+h1 {
+    color: white;
+    font-style: bold;
+}
+
+.continue {
+    display: inline-block;
+    height: 4rem;
+    width: 130px;
+    margin: 1%;
+    font-size: 24px;
+
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    background-color: #ff124f;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px #999;
+}
+.continue:hover {
+    background-color: #ff124dc5;
+}
+
+.continue:active {
+    background-color: #ff124dc5;
+    box-shadow: 0 5px #666;
+    transform: translateY(4px);
+}
