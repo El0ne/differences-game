@@ -8,7 +8,7 @@ import { MOCK_ARRAY } from '@app/pages/solo-view/mock-array';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { of, Subject } from 'rxjs';
-import { DIFFERENCE_FOUND, DIFFERENCE_NOT_FOUND, TEST_DIFFERENCES } from './click-event-constants';
+import { DIFFERENCE_FOUND, DIFFERENCE_NOT_FOUND, TEST_DIFFERENCES } from './click-event-constants-testing';
 import { ClickEventComponent } from './click-event.component';
 describe('ClickEventComponent', () => {
     let component: ClickEventComponent;
