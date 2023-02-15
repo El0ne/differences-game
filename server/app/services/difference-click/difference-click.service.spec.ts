@@ -39,6 +39,11 @@ describe('DifferenceClickService', () => {
         expect(differences).toEqual(differenceObjects.find((difference) => (difference.id = '1')).differences);
     });
 
+    it('getDifferenceArrayFromStageId should return an empty array if id is not found', async () => {
+        const differences = service.getDifferenceArrayFromStageID('1000');
+        expect(differences).toEqual([]);
+    });
+
     it('createDifferenceArray should create a difference array given an id and the array', async () => {
         const differences = service.getAllDifferenceArrays();
         service.createDifferenceArray('2', [
