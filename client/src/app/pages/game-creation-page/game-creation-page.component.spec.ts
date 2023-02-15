@@ -198,8 +198,8 @@ describe('GameCreationPageComponent', () => {
             soloTimes: [],
             multiTimes: [],
         };
-        spyOn(component.gameCardService, 'createGame').and.returnValue(of(mockGameCardInfo));
-        spyOn(component.gameCardService, 'getGameCardInfoFromId').and.returnValue(of(mockGameCardInfo));
+        // spyOn(component.gameCardService, 'createGame').and.returnValue(of(mockGameCardInfo));
+        // spyOn(component.gameCardService, 'getGameCardInfoFromId').and.returnValue(of(mockGameCardInfo));
 
         component.save();
 
