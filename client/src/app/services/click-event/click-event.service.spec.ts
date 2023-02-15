@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
-import { CLICK } from '../server-routes';
+import { CLICK } from '@app/services/server-routes';
 
 describe('ClickEventService', () => {
     let service: ClickEventService;
