@@ -15,7 +15,7 @@ export class ClickEventService {
         return this.http.get<ClickDifferenceVerification>(CLICK, options);
     }
 
-    setDifferences(stageId: string): Observable<number[][]> {
+    getDifferences(stageId: string): Observable<number[][]> {
         return this.http.get<number[][]>(`${CLICK}/${stageId}`);
     }
 }

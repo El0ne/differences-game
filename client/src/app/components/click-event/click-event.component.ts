@@ -35,7 +35,7 @@ export class ClickEventComponent implements OnInit {
     constructor(public clickEventService: ClickEventService, public foundDifferenceService: FoundDifferenceService) {}
 
     async ngOnInit() {
-        this.clickEventService.setDifferences(this.gameCardId).subscribe((data) => {
+        this.clickEventService.getDifferences(this.gameCardId).subscribe((data) => {
             this.differenceArray = data;
             this.timeout = false;
             this.endGame = false;
