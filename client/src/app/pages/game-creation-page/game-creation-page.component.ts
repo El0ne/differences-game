@@ -37,7 +37,7 @@ export class GameCreationPageComponent implements OnInit {
     differenceNumber: number = 0;
     difficulty: string = '';
 
-    constructor(public gameCardService: GameCardInformationService, private matDialog: MatDialog, private router: Router) {}
+    constructor(public gameCardService: GameCardInformationService, private matDialog: MatDialog, public router: Router) {}
 
     ngOnInit(): void {
         this.display$ = this.modal.asObservable();
@@ -58,7 +58,6 @@ export class GameCreationPageComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe((result) => {
             result.image = '';
-            console.log(result.image);
             this.router.navigate(['/config']);
         });
     }
@@ -138,8 +137,8 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     async save(): Promise<void> {
-        this.isDisabled = true;
         if (this.saveVerification() && this.originalFile && this.differentFile) {
+            this.isDisabled = true;
             this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
                 if (data.gameDifferenceNumber) {
                     const gameInfo: GameInformation = {
