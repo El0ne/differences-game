@@ -38,17 +38,17 @@ describe('GameCardInformationService', () => {
         const req = httpController.expectOne(`${STAGE}?index=0&endIndex=4`);
         req.flush(GAMES.slice(0, GAME_CARDS_TO_DISPLAY));
     });
-    /*
-    it('uploadImages should make a GET request', () => {
+
+    it('uploadImages should make a post request', () => {
         const mockString = 'Hello, this is a mock string';
         const mockBlob = new Blob([mockString], { type: 'text/plain' });
         const mockFile = new File([mockBlob], 'mock-file.txt');
+        const postSpy = spyOn(service.http, 'post');
 
-        service.uploadImages(mockFile, mockFile, 3).subscribe((res) => {
-            expect(res).toBeTruthy();
-        });
+        service.uploadImages(mockFile, mockFile, 3);
+        expect(postSpy).toHaveBeenCalled();
     });
-*/
+
     it('getGameCardInfo should call get on httpManager', () => {
         const getSpy = spyOn(service.http, 'get');
 
