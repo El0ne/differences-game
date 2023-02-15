@@ -27,12 +27,12 @@ export class DifferenceClickService {
 
     getDifferenceArrayFromStageID(stageId: string): number[][] {
         const content = fs.readFileSync(this.jsonPath, 'utf8');
-
         for (const differenceObject of JSON.parse(content).differenceObjects) {
             if (differenceObject.id === stageId) {
                 return differenceObject.differences;
             }
         }
+        return [];
     }
 
     validateDifferencePositions(clickPositionX: number, clickPositionY: number, stageId: string): ClickDifferenceVerification {
