@@ -29,7 +29,7 @@ describe('ClickEventComponent', () => {
             return expectedClickDifference.asObservable();
         };
 
-        mockService.setDifferences = () => {
+        mockService.getDifferences = () => {
             expectedDifferences.next(TEST_DIFFERENCES);
             return expectedDifferences.asObservable();
         };
@@ -147,11 +147,11 @@ describe('ClickEventComponent', () => {
     it('ngOnInit should initialize the elements of the component correctly', () => {
         const data = [[0], [2]];
 
-        spyOn(mockService, 'setDifferences').and.returnValue(of(data));
+        spyOn(mockService, 'getDifferences').and.returnValue(of(data));
 
         component.ngOnInit();
 
-        expect(mockService.setDifferences).toHaveBeenCalledWith(component.gameCardId);
+        expect(mockService.getDifferences).toHaveBeenCalledWith(component.gameCardId);
         expect(component.differenceArray).toEqual(data);
         expect(component.timeout).toBeFalsy();
         expect(component.endGame).toBeFalsy();
