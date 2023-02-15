@@ -1,13 +1,15 @@
 import { HttpClientModule } from '@angular/common/http';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
+import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameCardInformation } from '@common/game-card';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
 import { of } from 'rxjs';
+import { ModalPageComponent } from '../modal-page/modal-page.component';
 import { GameCreationPageComponent } from './game-creation-page.component';
 
 describe('GameCreationPageComponent', () => {
@@ -15,8 +17,12 @@ describe('GameCreationPageComponent', () => {
     let fixture: ComponentFixture<GameCreationPageComponent>;
     let canvasOg: HTMLCanvasElement;
     let matDialog: MatDialog;
+    let router: jasmine.SpyObj<Router>;
 
     beforeEach(async () => {
+        matDialog = jasmine.createSpyObj('MatDialog', ['open']);
+        router = jasmine.createSpyObj('Router', ['navigate']);
+
         await TestBed.configureTestingModule({
             declarations: [GameCreationPageComponent],
             imports: [HttpClientModule, FormsModule, MatDialogModule, RouterTestingModule],
@@ -31,6 +37,8 @@ describe('GameCreationPageComponent', () => {
                         }),
                     },
                 },
+                { provide: MatDialog, useValue: matDialog },
+                { provide: Router, useValue: router },
                 { provide: MAT_DIALOG_DATA, useValue: {} },
                 { provide: MatDialogRef, useValue: {} },
             ],
@@ -55,13 +63,24 @@ describe('GameCreationPageComponent', () => {
     });
 
     it('should open the modal page', () => {
-        spyOn(matDialog, 'open');
-        spyOn(component.router, 'navigate');
+        const afterClosedSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+        afterClosedSpy.afterClosed.and.returnValue(of({ image: '', difference: 0, difficulty: '' }));
+
+        matDialog.open.and.returnValue({ afterClosed: () => afterClosedSpy } as unknown);
 
         component.openModal();
 
-        expect(matDialog.open).toHaveBeenCalled();
-        expect(component.router.navigate).toHaveBeenCalledWith(['/config']);
+        expect(matDialog.open).toHaveBeenCalledWith(ModalPageComponent, {
+            data: {
+                image: component.image,
+                difference: component.differenceNumber,
+                difficulty: component.difficulty,
+            },
+        });
+
+        afterClosedSpy.afterClosed();
+
+        expect(router.navigate).toHaveBeenCalledWith(['/config']);
     });
 
     it('should clear the single file', () => {
@@ -172,12 +191,13 @@ describe('GameCreationPageComponent', () => {
         expect(component.saveVerification).toBeTruthy();
     });
 
-    it('should open modal page and save information if saveVerification is true', () => {
+    it('should open modal page and save information if saveVerification is true', fakeAsync(() => {
         component.gameTitle = 'My Game';
         component.originalFile = new File([''], 'original.bmp');
         component.differentFile = new File([''], 'different.bmp');
 
         spyOn(component, 'saveVerification').and.returnValue(true);
+        spyOn(component, 'openModal');
 
         const mockServerInfo: ServerGeneratedGameInfo = {
             gameId: '',
@@ -198,20 +218,42 @@ describe('GameCreationPageComponent', () => {
             soloTimes: [],
             multiTimes: [],
         };
-        // spyOn(component.gameCardService, 'createGame').and.returnValue(of(mockGameCardInfo));
-        // spyOn(component.gameCardService, 'getGameCardInfoFromId').and.returnValue(of(mockGameCardInfo));
+        spyOn(component.gameCardService, 'createGame').and.returnValue(of(mockGameCardInfo));
+        spyOn(component.gameCardService, 'getGameCardInfoFromId').and.returnValue(of(mockGameCardInfo));
 
         component.save();
 
-        // expect(component.saveVerification).toHaveBeenCalled();
-        // expect(component.isDisabled).toBe(true);
-        // expect(component.gameCardService.uploadImages).toHaveBeenCalledWith(
-        //     new File([''], 'original.bmp'),
-        //     new File([''], 'different.bmp'),
-        //     component.radius,
-        // );
-        // expect(component.gameCardService.createGame).toHaveBeenCalled();
-        // expect(component.gameCardService.getGameCardInfoFromId).toHaveBeenCalled();
-        // expect(component.openModal).toHaveBeenCalled();
-    });
+        expect(component.saveVerification).toHaveBeenCalled();
+        expect(component.isDisabled).toBe(true);
+        expect(component.gameCardService.uploadImages).toHaveBeenCalledWith(
+            new File([''], 'original.bmp'),
+            new File([''], 'different.bmp'),
+            component.radius,
+        );
+        expect(component.gameCardService.createGame).toHaveBeenCalled();
+        expect(component.gameCardService.getGameCardInfoFromId).toHaveBeenCalled();
+        expect(component.openModal).toHaveBeenCalled();
+    }));
+
+    it('should send alert if not good number of differences', fakeAsync(() => {
+        spyOn(window, 'alert');
+
+        component.gameTitle = 'My Game';
+        component.originalFile = new File([''], 'original.bmp');
+        component.differentFile = new File([''], 'different.bmp');
+
+        spyOn(component, 'saveVerification').and.returnValue(true);
+        spyOn(component, 'openModal');
+
+        const mockServerInfo: ServerGeneratedGameInfo = {
+            gameId: '',
+            originalImageName: '',
+            differenceImageName: '',
+            gameDifficulty: '',
+            gameDifferenceNumber: 0,
+        };
+        spyOn(component.gameCardService, 'uploadImages').and.returnValue(of(mockServerInfo));
+        component.save();
+        expect(window.alert).toHaveBeenCalledWith("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
+    }));
 });
