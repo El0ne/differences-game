@@ -1,9 +1,12 @@
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { By } from '@angular/platform-browser';
+import { RouterTestingModule } from '@angular/router/testing';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
-
+import { of } from 'rxjs';
 import { GameCreationPageComponent } from './game-creation-page.component';
 
 describe('GameCreationPageComponent', () => {
@@ -14,13 +17,26 @@ describe('GameCreationPageComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [GameCreationPageComponent],
-            imports: [HttpClientModule, FormsModule],
+            imports: [HttpClientModule, FormsModule, MatDialogModule, RouterTestingModule, MatIconModule],
+            providers: [
+                {
+                    provide: MatDialog,
+                    useValue: {
+                        open: () => ({
+                            afterClosed: () => of({}),
+                            // eslint-disable-next-line @typescript-eslint/no-empty-function
+                            close: () => {},
+                        }),
+                    },
+                },
+                { provide: MAT_DIALOG_DATA, useValue: {} },
+                { provide: MatDialogRef, useValue: {} },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(GameCreationPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
-
         canvasOg = document.createElement('canvas');
         canvasOg.width = IMAGE_DIMENSIONS.width;
         canvasOg.height = IMAGE_DIMENSIONS.height;
@@ -35,7 +51,6 @@ describe('GameCreationPageComponent', () => {
         component.getTitle(input);
         expect(component.gameTitle).toBe(input);
     });
-
     it('should clear the single file', () => {
         component.clearSingleFile(canvasOg, 'upload-original');
 
@@ -111,43 +126,6 @@ describe('GameCreationPageComponent', () => {
         expect(input.value).toBe('');
     });
 
-    // it('should upload original image', () => {
-    //     const file = new File(['test-image'], 'test.bmp', { type: 'image/bmp' });
-    //     const target = { id: 'upload-original', files: [file] } as unknown as HTMLInputElement;
-
-    //     component.uploadImage(file, target);
-
-    //     expect(component.originalFile).toEqual(file);
-    // });
-
-    // it('should upload difference image', () => {
-    //     const file = new File([new ArrayBuffer(IMAGE_SIZE)], 'testImage.bmp', { type: 'image/bmp' });
-    //     const input = document.createElement('input');
-    //     input.setAttribute('id', 'upload-different');
-
-    //     component.uploadImage(file, input);
-
-    //     expect(component.differentFile).toEqual(file);
-    // });
-
-    // it('should upload both images', () => {
-    //     const file = new File([new ArrayBuffer(IMAGE_SIZE)], 'testImage.bmp', { type: 'image/bmp' });
-    //     const input = fixture.debugElement.query(By.css('input[type="file"]')).nativeElement as HTMLInputElement;
-    //     const target = { id: 'upload-both', files: [file] };
-
-    //     const event = new Event('change');
-    //     Object.defineProperty(event, 'target', { value: target });
-    //     input.dispatchEvent(event);
-    //     fixture.detectChanges();
-
-    //     console.log(component.originalFile);
-
-    //     component.uploadImage(file, input);
-
-    //     expect(component.originalFile).toEqual(file);
-    //     expect(component.differentFile).toEqual(file);
-    // });
-
     it('should send an alert if both title and canvas are empty', () => {
         spyOn(window, 'alert');
         component.saveVerification();
@@ -180,48 +158,4 @@ describe('GameCreationPageComponent', () => {
 
         expect(component.saveVerification).toBeTruthy();
     });
-
-    // it('should open modal page and save information if saveVerification is true', () => {
-    //     spyOn(component, 'saveVerification').and.returnValue(true);
-    //     const mockImageInfo: ImageInformation = {
-    //         fieldname: '',
-    //         originalname: '',
-    //         encoding: '',
-    //         mimetype: '',
-    //         destination: '',
-    //         filename: '',
-    //         path: '',
-    //         size: 0,
-    //     };
-    //     spyOn(component.gameCardService, 'uploadImages').and.returnValue(of([mockImageInfo, mockImageInfo]));
-
-    //     const mockGameCardInfo: GameCardInformation = {
-    //         id: '',
-    //         name: '',
-    //         difficulty: '',
-    //         originalImageName: '',
-    //         differenceImageName: '',
-    //         differenceNumber: 0,
-    //         soloTimes: [],
-    //         multiTimes: [],
-    //     };
-    //     spyOn(component.gameCardService, 'createGame').and.returnValue(of(mockGameCardInfo));
-
-    //     spyOn(component.modal, 'next');
-
-    //     component.gameTitle = 'My Game';
-    //     component.originalFile = new File([''], 'original.bmp');
-    //     component.differentFile = new File([''], 'different.bmp');
-
-    //     component.save();
-
-    //     expect(component.saveVerification).toHaveBeenCalled();
-    //     expect(component.gameCardService.uploadImages).toHaveBeenCalledWith(
-    //         new File([''], 'original.bmp'),
-    //         new File([''], 'different.bmp'),
-    //         component.radius,
-    //     );
-    //     expect(component.gameCardService.createGame);
-    //     expect(component.modal.next).toHaveBeenCalledOnceWith('open');
-    // });
 });

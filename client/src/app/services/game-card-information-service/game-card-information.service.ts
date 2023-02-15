@@ -10,7 +10,11 @@ import { Observable } from 'rxjs';
     providedIn: 'root',
 })
 export class GameCardInformationService {
-    constructor(private http: HttpClient) {}
+    constructor(public http: HttpClient) {}
+
+    getGameCardInfoFromId(id: string): Observable<GameCardInformation> {
+        return this.http.get<GameCardInformation>(`${STAGE}/${id}`);
+    }
 
     getGameCardsInformations(index: number, endIndex: number): Observable<GameCardInformation[]> {
         const options = { params: new HttpParams().set('index', index).set('endIndex', endIndex) };
@@ -19,10 +23,6 @@ export class GameCardInformationService {
 
     getNumberOfGameCardInformation(): Observable<number> {
         return this.http.get<number>(`${STAGE}/info`);
-    }
-
-    getGameCardInfoFromId(id: string): Observable<GameCardInformation> {
-        return this.http.get<GameCardInformation>(`${STAGE}/${id}`);
     }
 
     createGame(gameInfo: GameInformation): Observable<GameCardInformation> {

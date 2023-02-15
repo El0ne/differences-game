@@ -1,36 +1,108 @@
-import { Component } from '@angular/core';
-import { MESSAGES_LENGTH, PATHS } from './solo-view-constants';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { ClickEventComponent } from '@app/components/click-event/click-event.component';
+import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
+import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
+import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
+import { GameCardInformation } from '@common/game-card';
+import { Subject } from 'rxjs';
+import { MESSAGES_LENGTH } from './solo-view-constants';
 
 @Component({
     selector: 'app-solo-view',
     templateUrl: './solo-view.component.html',
     styleUrls: ['./solo-view.component.scss'],
 })
-export class SoloViewComponent {
-    readonly paths = PATHS; // TODO : Verify with Nikolay if typing is fine for constants
-
+export class SoloViewComponent implements OnInit, OnDestroy {
+    @ViewChild('left')
+    left: ClickEventComponent;
+    @ViewChild('right')
+    right: ClickEventComponent;
+    showEnterName: boolean = true;
     showErrorMessage: boolean = false;
+    showNameErrorMessage: boolean = false;
     showTextBox: boolean = false;
+    showWinMessage: boolean = false;
+    showNavBar: boolean = true;
     messages: string[] = [];
     messageContent: string = '';
+    differenceArray: number[][];
+    currentScore: number = 0;
+    numberOfDifferences: number;
+    currentTime: number;
+    currentGameId: string;
+    endGame: Subject<void> = new Subject<void>();
+    gameCardInfo: GameCardInformation;
 
-    toggleInfoCard() {
+    // eslint-disable-next-line max-params
+    constructor(
+        public timerService: TimerSoloService,
+        private convertService: SecondToMinuteService,
+        private gameCardInfoService: GameCardInformationService,
+        public foundDifferenceService: FoundDifferenceService,
+        private route: ActivatedRoute,
+    ) {}
+
+    ngOnInit(): void {
+        const gameId = this.route.snapshot.paramMap.get('stageId');
+        if (gameId) {
+            this.currentGameId = gameId;
+            this.gameCardInfoService.getGameCardInfoFromId(this.currentGameId).subscribe((gameCardData) => {
+                this.gameCardInfo = gameCardData;
+                this.numberOfDifferences = this.gameCardInfo.differenceNumber;
+            });
+        }
+    }
+
+    ngOnDestroy(): void {
+        this.timerService.stopTimer();
+        this.foundDifferenceService.clearDifferenceFound();
+    }
+
+    showTime(): void {
+        this.timerService.startTimer();
+    }
+
+    timesConvertion(time: number): string {
+        return this.convertService.convert(time);
+    }
+
+    finishGame(): void {
+        this.left.endGame = true;
+        this.right.endGame = true;
+        this.showWinMessage = true;
+        this.showNavBar = false;
+    }
+
+    incrementScore(): void {
+        this.currentScore += 1;
+        if (this.numberOfDifferences === this.currentScore) {
+            this.finishGame();
+        }
+    }
+
+    addDifferenceDetected(differenceIndex: number): void {
+        this.foundDifferenceService.addDifferenceFound(differenceIndex);
+    }
+
+    toggleInfoCard(): void {
         this.showTextBox = !this.showTextBox;
     }
 
-    toggleErrorMessage() {
+    toggleErrorMessage(): void {
         if (!this.showErrorMessage) {
             this.showErrorMessage = !this.showErrorMessage;
         }
     }
 
-    untoggleErrorMessage() {
+    untoggleErrorMessage(): void {
         if (this.showErrorMessage) {
             this.showErrorMessage = !this.showErrorMessage;
         }
     }
 
-    sendMessage() {
+    sendMessage(): void {
         if (this.messageContent.length === MESSAGES_LENGTH.minLength || this.messageContent.length > MESSAGES_LENGTH.maxLength) {
             this.toggleErrorMessage();
         } else {
@@ -40,5 +112,20 @@ export class SoloViewComponent {
             this.messages.push(this.messageContent);
         }
         this.messageContent = '';
+    }
+
+    validateName(): void {
+        const inputValue = (document.getElementById('name') as HTMLInputElement).value;
+        if (inputValue.replace(/\s/g, '') !== '') {
+            this.showEnterName = false;
+            this.showTime();
+        } else {
+            this.showNameErrorMessage = true;
+        }
+    }
+
+    paintPixel(array: number[]): void {
+        const rgbaValues = this.left.sendDifferencePixels(array);
+        this.right.receiveDifferencePixels(rgbaValues, array);
     }
 }

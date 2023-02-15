@@ -1,5 +1,6 @@
 // @ts-ignore
 
+import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
 import { GameCardService } from '@app/services/game-card/game-card.service';
@@ -15,15 +16,17 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { assert } from 'console';
 import * as fs from 'fs';
 import * as Jimp from 'jimp';
-import { stub } from 'sinon';
+import * as join from 'path';
+import Sinon, { stub } from 'sinon';
 import * as request from 'supertest';
 import { StageController } from './stage.controller';
 
 describe('StageController', () => {
     let httpServer: unknown;
     let controller: StageController;
-    let getGameCardStub;
+    let getGameCardStub: Sinon.SinonStub;
     let getGameCardsNumberStub;
+    let getGameCardByIdStub;
     let gameCardService: GameCardService;
 
     beforeAll(async () => {
@@ -38,6 +41,7 @@ describe('StageController', () => {
                 PixelRadiusService,
                 DifferencesCounterService,
                 PixelPositionService,
+                DifferenceClickService,
             ],
         }).compile();
         const app = module.createNestApplication();
@@ -50,16 +54,19 @@ describe('StageController', () => {
     beforeEach(() => {
         getGameCardStub = stub(gameCardService, 'getGameCards');
         getGameCardsNumberStub = stub(gameCardService, 'getGameCardsNumber');
+        getGameCardByIdStub = stub(gameCardService, 'getGameCardById');
     });
 
     afterEach(() => {
         getGameCardStub.restore();
         getGameCardsNumberStub.restore();
+        getGameCardByIdStub.restore();
     });
 
     it('should be defined', () => {
         expect(controller).toBeDefined();
     });
+
     it('getStages() should return game cards if there are at least one', async () => {
         getGameCardStub.callsFake(() => {
             return FAKE_GAME_CARD_ARRAY;
@@ -71,9 +78,7 @@ describe('StageController', () => {
     });
 
     it('getStages() should return 500 if there is an error', async () => {
-        getGameCardStub.callsFake(() => {
-            throw new Error();
-        });
+        getGameCardStub.throws(new Error('test'));
         const response = await request(httpServer).get('/stage');
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
@@ -90,6 +95,24 @@ describe('StageController', () => {
             throw new Error();
         });
         const response = await request(httpServer).get('/stage/info');
+        expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    });
+
+    it('getStageById() should return a game card if the id is valid', async () => {
+        getGameCardByIdStub.callsFake(() => {
+            return FAKE_GAME_CARD_ARRAY[0];
+        });
+        const response = await request(httpServer).get('/stage/:gameCardId');
+        assert(getGameCardByIdStub.called);
+        expect(response.status).toBe(HttpStatus.OK);
+        expect(response.body).toEqual(FAKE_GAME_CARD_ARRAY[0]);
+    });
+
+    it('getStageById() should return 500 if there is an error', async () => {
+        getGameCardByIdStub.callsFake(() => {
+            throw new Error();
+        });
+        const response = await request(httpServer).get('/stage/:gameCardId');
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 
@@ -137,6 +160,23 @@ describe('StageController', () => {
         image.write('assets/images/test.bmp');
         const response = await request(httpServer).get('/stage/image/test.bmp');
         expect(response.statusCode).toEqual(HttpStatus.OK);
+        fs.unlink('assets/images/test.bmp', (err) => {
+            if (err) throw err;
+        });
+    });
+
+    it('getImage() should return an  500 error if path is not functional', async () => {
+        jest.spyOn(join, 'join').mockImplementationOnce(() => {
+            throw new Error();
+        });
+
+        const image = new Jimp(1, 1, 'white', (err) => {
+            if (err) throw err;
+        });
+
+        image.write('assets/images/test.bmp');
+        const response = await request(httpServer).get('/stage/image/test.bmp');
+        expect(response.statusCode).toEqual(HttpStatus.INTERNAL_SERVER_ERROR);
         fs.unlink('assets/images/test.bmp', (err) => {
             if (err) throw err;
         });

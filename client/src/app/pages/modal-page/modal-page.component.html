@@ -1,0 +1,13 @@
+<div class="modal">
+    <div class="header">
+        <h1>Vos différences ajoutées :</h1>
+    </div>
+    <div class="diff-image">
+        <img src="{{ data.image }}" />
+    </div>
+    <div class="info-diff">
+        <h1>Il y a {{ data.difference }} différences</h1>
+        <h1>Difficulté : {{ data.difficulty }}</h1>
+    </div>
+    <button class="continue" (click)="close()">Continuer</button>
+</div>

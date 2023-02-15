@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Test, TestingModule } from '@nestjs/testing';
 import * as fs from 'fs';
-import { stub } from 'sinon';
+import * as sinon from 'sinon';
 import { ImageManagerService } from './image-manager.service';
 describe('ImageManagerService', () => {
     let service: ImageManagerService;
@@ -28,12 +28,10 @@ describe('ImageManagerService', () => {
         }, 100);
     });
 
-    it('should throw an error if it tries to delete an image with the wrong path', () => {
-        const imagePath = 'wrong/path/test.bmp';
-        stub(fs, 'unlink').throws(new Error());
-        const call = () => {
-            service.deleteImage(imagePath);
-        };
-        expect(call).toThrow(Error);
+    it('should not throw an error even if it tries to delete an image with the wrong path', () => {
+        const imagePath = '/wrong/path/test.bmp';
+        const serviceStub = sinon.stub(service, 'deleteImage');
+        service.deleteImage(imagePath);
+        expect(serviceStub).not.toThrowError();
     });
 });

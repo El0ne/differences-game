@@ -7,6 +7,14 @@
     --nav-button-color: #cf0edd;
 }
 
+.icon {
+    color: #000000;
+}
+
+.name-field {
+    align-self: center;
+}
+
 body {
     background: linear-gradient(var(--linear-background-color-1), var(--linear-background-color-2));
 }
@@ -20,8 +28,14 @@ body {
     z-index: 1;
     position: fixed;
     background: linear-gradient(var(--linear-background-color-1), var(--linear-background-color-2));
+    text-align: center;
 }
-
+.name-input {
+    top: 10%;
+    left: 5%;
+    width: 90%;
+    height: 70%;
+}
 .info {
     display: flex;
     flex-direction: column;
@@ -32,7 +46,7 @@ body {
     font-family: 'Verdana';
     font-style: normal;
     font-weight: 200;
-    font-size: 20px;
+    font-size: 40px;
     line-height: 36px;
     text-align: center;
     color: white;
@@ -41,6 +55,12 @@ body {
 #info-quit {
     bottom: 3%;
     right: 3%;
+    position: absolute;
+}
+
+#home-win {
+    bottom: 3%;
+    left: 3%;
     position: absolute;
 }
 
@@ -252,11 +272,12 @@ body {
     padding-top: 5%;
 }
 
-#original {
+app-click-event {
     border-style: solid;
     border-color: var(--basic-border);
     width: 640px;
     height: 480px;
+    float: right;
 }
 
 .game-options {
@@ -313,15 +334,14 @@ body {
     margin: 1rem;
 }
 .hint {
-    height: 50px;
-    width: 50px;
+    transform: scale(1.5);
     border-style: hidden;
     align-self: end;
     background-color: rgba(255, 255, 255, 0);
 }
 
 .hint:hover {
-    transform: scale(1.2);
+    transform: scale(1.7);
     cursor: pointer;
 }
 .hint-logo {

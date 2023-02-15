@@ -36,11 +36,17 @@
 }
 .nom {
     flex-basis: 15%;
-    font-size: xx-large;
+    font-size: 25px;
     position: relative;
     font-weight: bold;
-    margin-top: 10%;
-    margin-left: 5%;
+    margin-top: 15px;
+    margin-left: 7.5px;
+    margin-bottom: 10px;
+    width: 189px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .row {
