@@ -40,18 +40,26 @@ export class StageController {
         try {
             res.status(HttpStatus.OK).send(this.gameCardService.getGameCards(index, endIndex));
         } catch (error) {
-            throw new HttpException('Forbidden', HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @Get('/info')
     getNbOfStages(): number {
-        return this.gameCardService.getGameCardsNumber();
+        try {
+            return this.gameCardService.getGameCardsNumber();
+        } catch {
+            throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Get('/:gameCardId')
     getStageById(@Param() param): GameCardInformation {
-        return this.gameCardService.getGameCardById(param.gameCardId);
+        try {
+            return this.gameCardService.getGameCardById(param.gameCardId);
+        } catch {
+            throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Post('/')
@@ -62,7 +70,7 @@ export class StageController {
                 res.status(HttpStatus.CREATED).send(newGame);
             } else res.sendStatus(HttpStatus.BAD_REQUEST);
         } catch (err) {
-            res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
+            throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
