@@ -91,9 +91,7 @@ describe('StageController', () => {
     });
 
     it('getNbOfStages() should return 500 if there is an error', async () => {
-        getGameCardsNumberStub.callsFake(() => {
-            throw new Error();
-        });
+        getGameCardsNumberStub.throws(new Error('test'));
         const response = await request(httpServer).get('/stage/info');
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
@@ -109,9 +107,7 @@ describe('StageController', () => {
     });
 
     it('getStageById() should return 500 if there is an error', async () => {
-        getGameCardByIdStub.callsFake(() => {
-            throw new Error();
-        });
+        getGameCardByIdStub.throws(new Error('test'));
         const response = await request(httpServer).get('/stage/:gameCardId');
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
@@ -126,9 +122,7 @@ describe('StageController', () => {
     });
 
     it('createGame() should return 500 if there is an error', async () => {
-        const createGameCardStub = stub(gameCardService, 'createGameCard').callsFake(() => {
-            throw new Error();
-        });
+        const createGameCardStub = stub(gameCardService, 'createGameCard').throws(new Error('test'));
         const response = await request(httpServer).post('/stage').send(FAKE_GAME_INFO);
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
         createGameCardStub.restore();
