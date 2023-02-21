@@ -58,7 +58,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         }
 
         const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true });
-        dialogRef.afterClosed().subscribe((result) => {
+        dialogRef.afterClosed().subscribe((result: string) => {
             this.playerName = result;
             this.showTime();
         });

@@ -1,8 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { of } from 'rxjs';
 
 import { ChosePlayerNameDialogComponent } from './chose-player-name-dialog.component';
 
@@ -19,19 +18,7 @@ describe('ChosePlayerNameDialogComponent', () => {
         await TestBed.configureTestingModule({
             declarations: [ChosePlayerNameDialogComponent],
             imports: [MatDialogModule, MatIconModule, FormsModule],
-            providers: [
-                {
-                    provide: MatDialog,
-                    useValue: {
-                        open: () => ({
-                            afterClosed: () => of({}),
-                            // eslint-disable-next-line @typescript-eslint/no-empty-function
-                            close: () => {},
-                        }),
-                    },
-                },
-                { provide: MatDialogRef, useValue: matDialogSpy },
-            ],
+            providers: [{ provide: MatDialogRef, useValue: matDialogSpy }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(ChosePlayerNameDialogComponent);
