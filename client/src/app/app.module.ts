@@ -11,10 +11,11 @@ import { MaterialPageComponent } from '@app/pages/material-page/material-page.co
 import { BestTimeComponent } from './components/best-time/best-time.component';
 import { ClickEventComponent } from './components/click-event/click-event.component';
 import { GameCardSelectionComponent } from './components/game-card-selection/game-card-selection.component';
+import { ChosePlayerNameDialogComponent } from './modals/chose-player-name-dialog/chose-player-name-dialog.component';
+import { ModalPageComponent } from './modals/modal-page/modal-page.component';
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 import { GameSelectionComponent } from './pages/game-selection/game-selection.component';
 import { HomePageComponent } from './pages/home-page/home-page.component';
-import { ModalPageComponent } from './pages/modal-page/modal-page.component';
 import { SoloViewComponent } from './pages/solo-view/solo-view.component';
 
 /**
@@ -34,6 +35,7 @@ import { SoloViewComponent } from './pages/solo-view/solo-view.component';
         SoloViewComponent,
         ClickEventComponent,
         GameCreationPageComponent,
+        ChosePlayerNameDialogComponent,
     ],
     entryComponents: [ModalPageComponent],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, MatIconModule],

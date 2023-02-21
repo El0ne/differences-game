@@ -37,29 +37,11 @@
         </div>
     </div>
 
-    <div class="info-card name-input" *ngIf="showEnterName">
-        <div class="info">
-            <p class="title">Entrez votre nom</p>
-        </div>
-        <input type="“text”" id="name" class="name-field" placeholder="Entrez votre nom" />
-        <p class="title" *ngIf="showNameErrorMessage">Nom invalide</p>
-        <button class="option-buttons win-button" id="info-quit" type="button" (click)="validateName()">
-            <mat-icon class="icon">check</mat-icon>
-        </button>
-    </div>
-
     <div class="flex-game">
-        <app-click-event
-            #left
-            [id]="1"
-            [original]="'original'"
-            [gameCardId]="this.currentGameId"
-            [imagePath]="this.gameCardInfo.originalImageName"
-            (incrementScore)="incrementScore()"
-            (differences)="addDifferenceDetected($event)"
-            (transmitter)="paintPixel($event)"
-            *ngIf="this.gameCardInfo"
-        ></app-click-event>
+        <app-click-event #left [id]="1" [original]="'original'" [gameCardId]="this.currentGameId"
+            [imagePath]="this.gameCardInfo.originalImageName" (incrementScore)="incrementScore()"
+            (differences)="addDifferenceDetected($event)" (transmitter)="paintPixel($event)"
+            *ngIf="this.gameCardInfo"></app-click-event>
         <div class="game-options">
             <div id="timer">
                 <div class="timer-box">
@@ -91,22 +73,16 @@
                     </div>
                 </div>
                 <div class="answer-area">
-                    <input type="text" class="input-field" placeholder="Entrez votre message" [(ngModel)]="messageContent" />
+                    <input type="text" class="input-field" placeholder="Entrez votre message"
+                        [(ngModel)]="messageContent" />
                     <button class="send-button" (click)="sendMessage()"></button>
                 </div>
             </div>
         </div>
-        <app-click-event
-            #right
-            [id]="2"
-            [original]="'different'"
-            [gameCardId]="this.currentGameId"
-            [imagePath]="this.gameCardInfo.differenceImageName"
-            (incrementScore)="incrementScore()"
-            (differences)="addDifferenceDetected($event)"
-            (transmitter)="paintPixel($event)"
-            *ngIf="this.gameCardInfo"
-        ></app-click-event>
+        <app-click-event #right [id]="2" [original]="'different'" [gameCardId]="this.currentGameId"
+            [imagePath]="this.gameCardInfo.differenceImageName" (incrementScore)="incrementScore()"
+            (differences)="addDifferenceDetected($event)" (transmitter)="paintPixel($event)"
+            *ngIf="this.gameCardInfo"></app-click-event>
         <div class="hint-button">
             <button class="hint" type="button">
                 <mat-icon class="hint-button">search</mat-icon>

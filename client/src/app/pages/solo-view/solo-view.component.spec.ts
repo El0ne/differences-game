@@ -1,24 +1,33 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { By } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
+import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { GameCardInformation } from '@common/game-card';
+import { of } from 'rxjs/internal/observable/of';
 import { MESSAGES_LENGTH } from './solo-view-constants';
 import { SoloViewComponent } from './solo-view.component';
 
 describe('SoloViewComponent', () => {
     let component: SoloViewComponent;
     let fixture: ComponentFixture<SoloViewComponent>;
+    let modalSpy: MatDialog;
+    let afterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
 
     beforeEach(async () => {
+        modalSpy = jasmine.createSpyObj('MatDialog', ['open']);
+        afterClosedSpy = jasmine.createSpyObj('MatDialogRef<ChosePlayerNameDialogComponent>', ['afterClosed']);
+        afterClosedSpy.afterClosed = () => of('test');
+        modalSpy.open = () => afterClosedSpy;
+
         await TestBed.configureTestingModule({
-            declarations: [SoloViewComponent, ClickEventComponent],
-            imports: [FormsModule, HttpClientTestingModule, RouterTestingModule, MatIconModule],
-            providers: [{ provide: ClickEventService }],
+            declarations: [SoloViewComponent, ClickEventComponent, ChosePlayerNameDialogComponent],
+            imports: [FormsModule, HttpClientTestingModule, RouterTestingModule, MatIconModule, MatDialogModule],
+            providers: [{ provide: ClickEventService }, { provide: MatDialog, useValue: modalSpy }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(SoloViewComponent);
@@ -118,34 +127,8 @@ describe('SoloViewComponent', () => {
         expect(component.showWinMessage).toBeTrue();
     });
 
-    it('validateName should call showTime if message is good', () => {
-        const textBox = fixture.debugElement.query(By.css('#name'));
-        textBox.nativeElement.value = 'good name';
-        textBox.nativeElement.dispatchEvent(new Event('input'));
-
-        const showTimeSpy = spyOn(component, 'showTime');
-        component.validateName();
-        expect(showTimeSpy).toHaveBeenCalled();
-    });
-
-    it('validateName should turn nameErrorMessage to true if message is empty', () => {
-        const textBox = fixture.debugElement.query(By.css('#name'));
-        textBox.nativeElement.value = '';
-        textBox.nativeElement.dispatchEvent(new Event('input'));
-
-        component.validateName();
-
-        expect(component.showNameErrorMessage).toBeTrue();
-    });
-
-    it('validateName should turn nameErrorMessage to false if message is fine', () => {
-        const textBox = fixture.debugElement.query(By.css('#name'));
-        textBox.nativeElement.value = '';
-        textBox.nativeElement.dispatchEvent(new Event('input'));
-
-        component.validateName();
-
-        expect(component.showNameErrorMessage).toBeTrue();
+    it('the playerName should be initialized after the modal is closed', () => {
+        expect(component.playerName).toBe('test');
     });
 
     it('showTime should call startTimer of service', () => {
