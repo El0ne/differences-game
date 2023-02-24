@@ -1,3 +1,1 @@
-{
-    "gameCardsInformations": []
-}
+{"gameCardsInformations":[{"id":"0787ef82-e8cf-420a-9872-89f5aac15f5f","name":"testComponent","difficulty":"Facile","differenceNumber":3,"originalImageName":"5a269dd0-a566-4e5f-b5e2-a57a5ec0aa2e.bmp","differenceImageName":"c825e11e-074f-423e-a79f-b8aad4689460.bmp","soloTimes":[{"time":0,"name":"--"},{"time":0,"name":"--"},{"time":0,"name":"--"}],"multiTimes":[{"time":0,"name":"--"},{"time":0,"name":"--"},{"time":0,"name":"--"}]}]}
