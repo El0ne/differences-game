@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/naming-convention */
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MOCK_ARRAY } from '@app/pages/solo-view/mock-array';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
+import { STAGE } from '@app/services/server-routes';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { of, Subject } from 'rxjs';
 import { DIFFERENCE_FOUND, DIFFERENCE_NOT_FOUND, TEST_DIFFERENCES } from './click-event-constants-testing';
@@ -15,7 +16,6 @@ describe('ClickEventComponent', () => {
     let fixture: ComponentFixture<ClickEventComponent>;
     let mockService: ClickEventService;
     let expectedClickDifference: Subject<ClickDifferenceVerification>;
-    let expectedDifferences: Subject<number[][]>;
 
     beforeEach(() => {
         mockService = jasmine.createSpyObj('ClickEventService', ['isADifference', 'setDifferences']);
@@ -30,8 +30,7 @@ describe('ClickEventComponent', () => {
         };
 
         mockService.getDifferences = () => {
-            expectedDifferences.next(TEST_DIFFERENCES);
-            return expectedDifferences.asObservable();
+            return of(TEST_DIFFERENCES);
         };
 
         TestBed.configureTestingModule({
@@ -133,14 +132,17 @@ describe('ClickEventComponent', () => {
     it('turnDifferenceYellow() should call fillRect() in order to construct flashing effect', () => {
         component.lastDifferenceClicked = [0, 0, 0];
         spyOn(CanvasRenderingContext2D.prototype, 'fillRect');
-        component.turnDifferenceYellow(component.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D);
+        component.turnDifferenceYellow(
+            component.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D,
+            component.lastDifferenceClicked,
+        );
         expect(CanvasRenderingContext2D.prototype.fillRect).toHaveBeenCalledTimes(3);
     });
 
     it('turnOffYellow() should call clearRect() in order to construct flashing effect', () => {
         component.lastDifferenceClicked = [0, 0, 0, 0, 0];
         spyOn(CanvasRenderingContext2D.prototype, 'clearRect');
-        component.turnOffYellow(component.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D);
+        component.turnOffYellow(component.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D, component.lastDifferenceClicked);
         expect(CanvasRenderingContext2D.prototype.clearRect).toHaveBeenCalledTimes(5);
     });
 
@@ -165,10 +167,77 @@ describe('ClickEventComponent', () => {
         expect(getContextSpy).toHaveBeenCalled();
     });
 
+    it('sendPixels should get all pixels inside the difference array', () => {
+        const getImageDataSpy = spyOn(CanvasRenderingContext2D.prototype, 'getImageData');
+        component.sendDifferencePixels([0, 1, 2, 3]);
+        expect(getImageDataSpy).toHaveBeenCalledTimes(4);
+    });
+
     it('receivePixel should call getContext', () => {
         const getContextSpy = spyOn(component.picture.nativeElement, 'getContext');
 
         component.receiveDifferencePixels([], []);
         expect(getContextSpy).toHaveBeenCalled();
     });
+
+    it('receivePixel should paint all pixels from given position array', () => {
+        const fillRectSpy = spyOn(CanvasRenderingContext2D.prototype, 'fillRect');
+        const mockImageData = [
+            new ImageData(new Uint8ClampedArray([255, 0, 0, 255]), 1, 1),
+            new ImageData(new Uint8ClampedArray([0, 255, 0, 255]), 1, 1),
+            new ImageData(new Uint8ClampedArray([0, 0, 255, 255]), 1, 1),
+        ];
+
+        component.receiveDifferencePixels(mockImageData, [0, 1, 2]);
+        expect(fillRectSpy).toHaveBeenCalledTimes(3);
+        expect(fillRectSpy).toHaveBeenCalledWith(0, 0, 1, 1);
+        expect(fillRectSpy).toHaveBeenCalledWith(1, 0, 1, 1);
+        expect(fillRectSpy).toHaveBeenCalledWith(2, 0, 1, 1);
+    });
+
+    it('delay should delay for a given amount of time in ms', fakeAsync(() => {
+        const start = Date.now();
+        component.delay(100).then(() => {
+            const end = Date.now();
+            expect(end - start).toBeCloseTo(100, -1);
+        });
+        tick(100);
+    }));
+
+    it('differenceEffect() should flash yellow 2 times', async () => {
+        const turnYellowSpy = spyOn(component, 'turnDifferenceYellow');
+        const turnOffYellowSpy = spyOn(component, 'turnOffYellow');
+        await component.differenceEffect([0]);
+
+        expect(turnYellowSpy).toHaveBeenCalledTimes(2);
+        expect(turnOffYellowSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it('component should draw image on canvas on init', waitForAsync(async () => {
+        const imageSpyObj = jasmine.createSpyObj('Image', ['onload']);
+        spyOn(window, 'Image').and.returnValue(imageSpyObj);
+        spyOn(CanvasRenderingContext2D.prototype, 'drawImage').and.returnValue();
+
+        component.imagePath = 'test.png';
+        component.ngOnInit();
+
+        expect(window.Image).toHaveBeenCalledWith();
+        expect(imageSpyObj.src).toBe(`${STAGE}/image/test.png`);
+        expect(imageSpyObj.crossOrigin).toBe('Anonymous');
+        imageSpyObj.onload();
+        expect(CanvasRenderingContext2D.prototype.drawImage).toHaveBeenCalled();
+    }));
+
+    it('displayError should only display an error for 1 second', fakeAsync(() => {
+        component.timeout = false;
+        component.endGame = false;
+        const mockClick = new MouseEvent('click', { clientX: 100, clientY: 365 });
+        spyOn(component, 'emitSound').and.callFake(() => {});
+        const clearRectSpy = spyOn(CanvasRenderingContext2D.prototype, 'clearRect');
+        const fillTextSpy = spyOn(CanvasRenderingContext2D.prototype, 'fillText');
+        component.displayError(mockClick);
+        expect(fillTextSpy).toHaveBeenCalled();
+        tick(1000);
+        expect(clearRectSpy).toHaveBeenCalled();
+    }));
 });

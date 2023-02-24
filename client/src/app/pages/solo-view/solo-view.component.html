@@ -58,6 +58,7 @@
             (incrementScore)="incrementScore()"
             (differences)="addDifferenceDetected($event)"
             (transmitter)="paintPixel($event)"
+            (flash)="handleFlash($event)"
             *ngIf="this.gameCardInfo"
         ></app-click-event>
         <div class="game-options">
@@ -105,6 +106,7 @@
             (incrementScore)="incrementScore()"
             (differences)="addDifferenceDetected($event)"
             (transmitter)="paintPixel($event)"
+            (flash)="handleFlash($event)"
             *ngIf="this.gameCardInfo"
         ></app-click-event>
         <div class="hint-button">

@@ -128,4 +128,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         const rgbaValues = this.left.sendDifferencePixels(array);
         this.right.receiveDifferencePixels(rgbaValues, array);
     }
+
+    handleFlash(currentDifferences: number[]): void {
+        this.left.differenceEffect(currentDifferences);
+        this.right.differenceEffect(currentDifferences);
+    }
 }

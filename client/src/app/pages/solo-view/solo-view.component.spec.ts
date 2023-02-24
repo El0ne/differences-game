@@ -1,29 +1,40 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { By } from '@angular/platform-browser';
+import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
+import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameCardInformation } from '@common/game-card';
+import { of } from 'rxjs';
 import { MESSAGES_LENGTH } from './solo-view-constants';
 import { SoloViewComponent } from './solo-view.component';
 
 describe('SoloViewComponent', () => {
     let component: SoloViewComponent;
     let fixture: ComponentFixture<SoloViewComponent>;
+    let mockGameCardInfo: GameCardInformationService;
 
     beforeEach(async () => {
+        mockGameCardInfo = jasmine.createSpyObj('gameCardInformationService', ['getGameCardInfoFromId']);
+        mockGameCardInfo.getGameCardInfoFromId = () => {
+            return of(FAKE_GAME_CARD);
+        };
         await TestBed.configureTestingModule({
             declarations: [SoloViewComponent, ClickEventComponent],
             imports: [FormsModule, HttpClientTestingModule, RouterTestingModule, MatIconModule],
-            providers: [{ provide: ClickEventService }],
+            providers: [
+                { provide: ClickEventService },
+                { provide: ActivatedRoute, useValue: { snapshot: { paramMap: convertToParamMap({ stageId: '1' }) } } },
+                { provide: GameCardInformationService, useValue: mockGameCardInfo },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(SoloViewComponent);
         component = fixture.componentInstance;
-        component.gameCardInfo = FAKE_GAME_CARD;
         fixture.detectChanges();
     });
 
@@ -173,6 +184,21 @@ describe('SoloViewComponent', () => {
         expect(leftCanvasSpy).toHaveBeenCalled();
         expect(rightCanvasSpy).toHaveBeenCalled();
     });
+
+    it('handleFlash() should canvas functions to emit difference effect', () => {
+        const leftCanvasSpy = spyOn(component.left, 'differenceEffect');
+        const rightCanvasSpy = spyOn(component.right, 'differenceEffect');
+
+        component.handleFlash([0]);
+
+        expect(leftCanvasSpy).toHaveBeenCalled();
+        expect(rightCanvasSpy).toHaveBeenCalled();
+    });
+    it('ngOnInit() should set gameCard information if found in database', fakeAsync(() => {
+        component.ngOnInit();
+        expect(component.gameCardInfo).toEqual(FAKE_GAME_CARD);
+        expect(component.numberOfDifferences).toEqual(FAKE_GAME_CARD.differenceNumber);
+    }));
 });
 
 const FAKE_GAME_CARD: GameCardInformation = {
