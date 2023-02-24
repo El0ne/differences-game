@@ -1,6 +1,8 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
+import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
@@ -19,12 +21,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     left: ClickEventComponent;
     @ViewChild('right')
     right: ClickEventComponent;
-    showEnterName: boolean = true;
     showErrorMessage: boolean = false;
     showNameErrorMessage: boolean = false;
     showTextBox: boolean = false;
     showWinMessage: boolean = false;
     showNavBar: boolean = true;
+    playerName: string;
     messages: string[] = [];
     messageContent: string = '';
     differenceArray: number[][];
@@ -42,6 +44,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private gameCardInfoService: GameCardInformationService,
         public foundDifferenceService: FoundDifferenceService,
         private route: ActivatedRoute,
+        public dialog: MatDialog,
     ) {}
 
     ngOnInit(): void {
@@ -53,6 +56,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.numberOfDifferences = this.gameCardInfo.differenceNumber;
             });
         }
+
+        const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true });
+        dialogRef.afterClosed().subscribe((result: string) => {
+            this.playerName = result;
+            this.showTime();
+        });
     }
 
     ngOnDestroy(): void {
@@ -112,16 +121,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.messages.push(this.messageContent);
         }
         this.messageContent = '';
-    }
-
-    validateName(): void {
-        const inputValue = (document.getElementById('name') as HTMLInputElement).value;
-        if (inputValue.replace(/\s/g, '') !== '') {
-            this.showEnterName = false;
-            this.showTime();
-        } else {
-            this.showNameErrorMessage = true;
-        }
     }
 
     paintPixel(array: number[]): void {
