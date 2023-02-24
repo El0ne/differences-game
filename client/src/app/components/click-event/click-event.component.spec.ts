@@ -207,6 +207,7 @@ describe('ClickEventComponent', () => {
     it('differenceEffect() should flash yellow 2 times', async () => {
         const turnYellowSpy = spyOn(component, 'turnDifferenceYellow');
         const turnOffYellowSpy = spyOn(component, 'turnOffYellow');
+        spyOn(component, 'delay').and.callThrough();
         await component.differenceEffect([0]);
 
         expect(turnYellowSpy).toHaveBeenCalledTimes(2);
