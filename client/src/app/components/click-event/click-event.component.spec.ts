@@ -208,6 +208,7 @@ describe('ClickEventComponent', () => {
         const turnYellowSpy = spyOn(component, 'turnDifferenceYellow');
         const turnOffYellowSpy = spyOn(component, 'turnOffYellow');
         spyOn(component, 'delay').and.callThrough();
+        spyOn(component, 'emitSound').and.callFake(() => {});
         await component.differenceEffect([0]);
 
         expect(turnYellowSpy).toHaveBeenCalledTimes(2);
