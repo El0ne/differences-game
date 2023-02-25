@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
@@ -21,16 +21,20 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     left: ClickEventComponent;
     @ViewChild('right')
     right: ClickEventComponent;
+    is1v1: boolean | null;
     showErrorMessage: boolean = false;
     showNameErrorMessage: boolean = false;
     showTextBox: boolean = false;
     showWinMessage: boolean = false;
     showNavBar: boolean = true;
-    playerName: string;
+    playerName: string = 'Player';
+    playerName1: string = 'Player 1';
+    playerName2: string = 'Player 2';
     messages: string[] = [];
     messageContent: string = '';
     differenceArray: number[][];
-    currentScore: number = 0;
+    currentScorePlayer1: number = 0;
+    currentScorePlayer2: number = 0;
     numberOfDifferences: number;
     currentTime: number;
     currentGameId: string;
@@ -45,10 +49,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         public foundDifferenceService: FoundDifferenceService,
         private route: ActivatedRoute,
         public dialog: MatDialog,
+        public router: Router,
     ) {}
 
     ngOnInit(): void {
         const gameId = this.route.snapshot.paramMap.get('stageId');
+        this.is1v1 = this.router.url.includes('1v1');
         if (gameId) {
             this.currentGameId = gameId;
             this.gameCardInfoService.getGameCardInfoFromId(this.currentGameId).subscribe((gameCardData) => {
@@ -84,9 +90,10 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.showNavBar = false;
     }
 
+    // logic needed to be modified according to who adds a point
     incrementScore(): void {
-        this.currentScore += 1;
-        if (this.numberOfDifferences === this.currentScore) {
+        this.currentScorePlayer1 += 1;
+        if (this.numberOfDifferences === this.currentScorePlayer1) {
             this.finishGame();
         }
     }

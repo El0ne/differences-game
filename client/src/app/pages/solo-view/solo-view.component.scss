@@ -92,7 +92,7 @@ body {
     align-items: center;
     justify-content: center;
     background-color: lightgray;
-    height: 40%;
+    height: 43%;
     width: 75%;
     border-style: solid;
     border-radius: 25px;
@@ -287,15 +287,23 @@ app-click-event {
     align-items: center;
     width: 31rem;
     height: 100%;
+    padding-bottom: 10.75%;
 }
-
+#double-score {
+    display: flex;
+    flex-direction: row;
+    gap: 5%;
+}
 #score {
     align-self: center;
-    padding: 2%;
+    padding-top: 2%;
+    padding-bottom: 2%;
 }
 
 #timer {
     align-self: center;
+    padding-top: 3%;
+    padding-bottom: 3%;
 }
 
 .timer-box {
@@ -379,22 +387,19 @@ app-click-event {
     gap: 100px;
     box-shadow: 0px 0px 3px black;
 }
+
 .row {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
 }
-.col-heading h1 {
-    font-family: 'Verdana';
-    font-style: normal;
-    font-weight: 700;
-    font-size: 40px;
-    line-height: 36px;
-    text-align: center;
 
-    color: white;
+.col-heading {
+    margin-top: 10%;
+    margin-bottom: 5%;
 }
+
 .col-display {
     width: 155px;
     height: 120px;
@@ -407,6 +412,7 @@ app-click-event {
     line-height: 110px;
     text-align: center;
     color: #f94f6d;
+    margin-bottom: 15%;
 }
 
 .add {
@@ -437,4 +443,15 @@ app-click-event {
         gap: 10px;
         max-height: 100%;
     }
+}
+
+.playerName {
+    font-family: 'Verdana';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 40px;
+    line-height: 36px;
+    text-align: center;
+    padding-bottom: 5%;
+    color: white;
 }
