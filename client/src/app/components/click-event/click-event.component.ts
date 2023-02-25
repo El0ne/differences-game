@@ -3,6 +3,7 @@ import { ClickEventService } from '@app/services/click-event/click-event.service
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { STAGE } from '@app/services/server-routes';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
+import { differenceInformation } from '@common/difference-information';
 import { Observable } from 'rxjs';
 import { FAST_WAIT_TIME_MS, HEIGHT, WAIT_TIME_MS, WIDTH } from './click-event-constant';
 
@@ -18,17 +19,13 @@ export class ClickEventComponent implements OnInit {
     @Input() original: string;
     @Input() gameCardId: string;
     @Input() imagePath: string;
-    @Output() incrementScore: EventEmitter<number> = new EventEmitter<number>();
-    @Output() differences: EventEmitter<number> = new EventEmitter<number>();
-    @Output() transmitter: EventEmitter<number[]> = new EventEmitter<number[]>();
-    @Output() flash: EventEmitter<number[]> = new EventEmitter<number[]>();
+    @Output() handler: EventEmitter<differenceInformation> = new EventEmitter<differenceInformation>();
     @ViewChild('picture', { static: true })
     picture: ElementRef<HTMLCanvasElement>;
     @ViewChild('modification', { static: true })
     modification: ElementRef<HTMLCanvasElement>;
     timeout: boolean;
     lastDifferenceClicked: number[];
-    currentScore: number = 0;
     differenceData: ClickDifferenceVerification;
     endGame: boolean;
     foundDifferences: number[];
@@ -36,12 +33,9 @@ export class ClickEventComponent implements OnInit {
     constructor(public clickEventService: ClickEventService, public foundDifferenceService: FoundDifferenceService) {}
 
     async ngOnInit() {
-        this.clickEventService.getDifferences(this.gameCardId).subscribe((data) => {
-            this.differenceArray = data;
-            this.timeout = false;
-            this.endGame = false;
-            this.foundDifferences = [];
-        });
+        this.timeout = false;
+        this.endGame = false;
+        this.foundDifferences = [];
 
         const image = new Image();
         image.crossOrigin = 'Anonymous';
@@ -66,11 +60,10 @@ export class ClickEventComponent implements OnInit {
                 this.differenceData.isADifference &&
                 !this.foundDifferenceService.foundDifferences.includes(this.differenceData.differencesPosition)
             ) {
-                // this.lastDifferenceClicked = this.differenceData.differenceArray;
-                this.flash.emit(this.differenceData.differenceArray);
-                this.differences.emit(this.differenceData.differencesPosition);
-                this.transmitter.emit(this.differenceData.differenceArray);
-                this.incrementScore.emit(this.currentScore);
+                this.handler.emit({
+                    differencesPosition: this.differenceData.differencesPosition,
+                    lastDifferences: this.differenceData.differenceArray,
+                });
             } else {
                 this.displayError(e);
             }
@@ -108,7 +101,6 @@ export class ClickEventComponent implements OnInit {
             await this.delay(FAST_WAIT_TIME_MS);
             this.turnOffYellow(originalContext, currentDifferences);
             await this.delay(FAST_WAIT_TIME_MS);
-            this.currentScore += 1;
         }
     }
 

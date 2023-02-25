@@ -9,6 +9,7 @@ import { ClickEventComponent } from '@app/components/click-event/click-event.com
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { differenceInformation } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
 import { of } from 'rxjs';
 import { MESSAGES_LENGTH } from './solo-view-constants';
@@ -185,7 +186,24 @@ describe('SoloViewComponent', () => {
         expect(component.numberOfDifferences).toEqual(FAKE_GAME_CARD.differenceNumber);
         discardPeriodicTasks();
     }));
+
+    it('emit handler should call all the correct handlers', () => {
+        const handleFlashSpy = spyOn(component, 'handleFlash');
+        const paintPixelSpy = spyOn(component, 'paintPixel');
+        const incrementSpy = spyOn(component, 'incrementScore');
+        const addDiffSpy = spyOn(component, 'addDifferenceDetected');
+        component.emitHandler(MOCK_INFORMATION);
+        expect(handleFlashSpy).toHaveBeenCalled();
+        expect(paintPixelSpy).toHaveBeenCalled();
+        expect(incrementSpy).toHaveBeenCalled();
+        expect(addDiffSpy).toHaveBeenCalled();
+    });
 });
+
+const MOCK_INFORMATION: differenceInformation = {
+    lastDifferences: [0, 1, 2, 3],
+    differencesPosition: 2,
+};
 
 const FAKE_GAME_CARD: GameCardInformation = {
     id: '0',
