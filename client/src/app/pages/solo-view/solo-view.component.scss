@@ -16,7 +16,7 @@
 }
 
 body {
-    background: linear-gradient(var(--linear-background-color-1), var(--linear-background-color-2));
+    background: linear-gradient(black, #7a04eb, #bd04eb);
 }
 .info-card {
     top: 15%;
@@ -87,15 +87,21 @@ body {
 }
 
 .text-box {
+    margin-top: 1rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: lightgray;
+    background-color: black;
+
     height: 40%;
     width: 75%;
+
     border-style: solid;
     border-radius: 25px;
+
+    border: 0.2rem solid #eee;
+    box-shadow: 0 0 0.2rem #eee, 0 0 0.2rem #aaa, 0 0 2rem #bc13fe, 0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
 }
 
 .text-area {
@@ -149,6 +155,10 @@ body {
     background-size: contain;
     background-color: var(--basic-border);
     border-radius: 50%;
+
+    //background-color: var(--basic-border);
+    box-shadow: 0 0 7px var(--basic-border), 0 0 20px var(--basic-border), 0 0 10px var(--basic-border);
+    border: solid 2px var(--basic-border);
     width: 8%;
 }
 
@@ -157,111 +167,12 @@ body {
     cursor: pointer;
 }
 
-.option-buttons,
-.option-buttons:after {
-    width: 150px;
-    height: 76px;
-    line-height: 78px;
-    font-size: 20px;
-    font-family: 'Bebas Neue', sans-serif;
-    background: linear-gradient(45deg, transparent 5%, var(--nav-button-color) 5%);
-    border: 0;
-    color: #fff;
-    letter-spacing: 3px;
-    box-shadow: 6px 0px 0px var(--basic-border);
-    outline: transparent;
-    position: relative;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: manipulation;
+.option-buttons {
+    width: 13rem;
+    height: 4rem;
+    margin-top: 1rem;
 }
 
-.option-buttons:after {
-    --slice-0: inset(50% 50% 50% 50%);
-    --slice-1: inset(80% -6px 0 0);
-    --slice-2: inset(50% -6px 30% 0);
-    --slice-3: inset(10% -6px 85% 0);
-    --slice-4: inset(40% -6px 43% 0);
-    --slice-5: inset(80% -6px 5% 0);
-
-    content: '';
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(45deg, transparent 3%, var(--basic-border) 3%, var(--basic-border) 5%, #cf0edd 5%);
-    text-shadow: -3px -3px 0px #f8f005, 3px 3px 0px var(--basic-border);
-    clip-path: var(--slice-0);
-}
-
-.option-buttons:hover:after {
-    animation: 1s glitch;
-    animation-timing-function: steps(2, end);
-}
-
-.option-buttons:hover {
-    cursor: pointer;
-}
-
-@keyframes glitch {
-    0% {
-        clip-path: var(--slice-1);
-        transform: translate(-20px, -10px);
-    }
-    10% {
-        clip-path: var(--slice-3);
-        transform: translate(10px, 10px);
-    }
-    20% {
-        clip-path: var(--slice-1);
-        transform: translate(-10px, 10px);
-    }
-    30% {
-        clip-path: var(--slice-3);
-        transform: translate(0px, 5px);
-    }
-    40% {
-        clip-path: var(--slice-2);
-        transform: translate(-5px, 0px);
-    }
-    50% {
-        clip-path: var(--slice-3);
-        transform: translate(5px, 0px);
-    }
-    60% {
-        clip-path: var(--slice-4);
-        transform: translate(5px, 10px);
-    }
-    70% {
-        clip-path: var(--slice-2);
-        transform: translate(-10px, 10px);
-    }
-    80% {
-        clip-path: var(--slice-5);
-        transform: translate(20px, -10px);
-    }
-    90% {
-        clip-path: var(--slice-1);
-        transform: translate(-10px, 0px);
-    }
-    100% {
-        clip-path: var(--slice-1);
-        transform: translate(0);
-    }
-}
-
-@media (min-width: 768px) {
-    .option-buttons,
-    .option-buttons:after {
-        width: 132px;
-        height: 56.78px;
-        line-height: 58.98px;
-        margin-top: 1%;
-        margin-left: 1%;
-    }
-}
 .flex-game {
     height: 80%;
     width: 100%;
@@ -272,9 +183,29 @@ body {
     padding-top: 5%;
 }
 
+.image-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 680px;
+    height: 516px;
+
+    border-style: solid;
+    border: 0.2rem solid #eee;
+    border-radius: 2rem;
+    padding: 0.4em;
+    box-shadow: 0 0 0.2rem #eee, 0 0 0.2rem #aaa, 0 0 2rem #bc13fe, 0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
+}
+
+.image-container:hover {
+    border: 0.3rem solid #fff;
+}
+
 app-click-event {
     border-style: solid;
-    border-color: var(--basic-border);
+    border-color: rgba(255, 255, 255, 0);
+
     width: 640px;
     height: 480px;
     float: right;
@@ -285,11 +216,12 @@ app-click-event {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 31rem;
+    width: 29rem;
     height: 100%;
 }
 
 #score {
+    margin-top: 1.5rem;
     align-self: center;
     padding: 2%;
 }
@@ -301,7 +233,9 @@ app-click-event {
 .timer-box {
     width: 360px;
     height: 100px;
-    background: var(--basic-border);
+    border: 0.2rem solid #eee;
+    box-shadow: 0 0 1px #eee, 0 0 1px #aaa, 0 0 2rem var(--basic-border), 0 0 0.8rem var(--basic-border), 0 0 2.8rem var(--basic-border),
+        inset 0 0 1.3rem var(--basic-border);
     border-radius: 10px;
 }
 
@@ -367,7 +301,7 @@ app-click-event {
 .container {
     max-width: 6rem;
     max-height: 4rem;
-    background: linear-gradient(var(--linear-background-color-1), var(--linear-background-color-2));
+    background: black;
     border-radius: 12px;
     border: 3px solid white;
     display: flex;
@@ -375,9 +309,10 @@ app-click-event {
     justify-content: space-around;
     align-items: center;
     color: white;
+
     padding: 68px 82px;
     gap: 100px;
-    box-shadow: 0px 0px 3px black;
+    box-shadow: 0 0 1px #eee, 0 0 1px #aaa, 0 0 2rem #bc13fe, 0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
 }
 .row {
     display: flex;
@@ -393,12 +328,16 @@ app-click-event {
     line-height: 36px;
     text-align: center;
 
-    color: white;
+    letter-spacing: 0.05em;
 }
 .col-display {
     width: 155px;
     height: 120px;
-    background: #080001;
+    //background: black;
+    background-color: #bd04eb;
+    box-shadow: 0 0 7px #bd04eb, 0 0 20px #bd04eb, 0 0 10px #bd04eb;
+    border: solid 3px white;
+
     border-radius: 5px;
     font-family: 'Silkscreen', cursive;
     font-style: normal;
@@ -406,7 +345,8 @@ app-click-event {
     font-size: 90px;
     line-height: 110px;
     text-align: center;
-    color: #f94f6d;
+    color: white;
+    //text-shadow: 0 0 5px #b62943, 0 0 10px #b62943, 0 0 20px #b62943, 0 0 40px #ff5e52, 0 0 80px #5271ff, 0 0 90px #5271ff, 0 0 100px #5271ff,
 }
 
 .add {
