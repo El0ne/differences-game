@@ -2,6 +2,7 @@ import { AppModule } from '@app/app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { DataBaseService } from './services/data-base/data-base.service';
 
 const bootstrap = async () => {
     const app = await NestFactory.create(AppModule);
@@ -17,5 +18,12 @@ const bootstrap = async () => {
     SwaggerModule.setup('api/docs', app, document);
     SwaggerModule.setup('', app, document);
     await app.listen(process.env.PORT);
+    const dataBaseService: DataBaseService = new DataBaseService();
+    try {
+        await dataBaseService.start();
+        console.log('Connection was successful');
+    } catch {
+        console.log('Connection was unsuccessful');
+    }
 };
 bootstrap();

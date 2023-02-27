@@ -2,13 +2,27 @@ import { Injectable } from '@angular/core';
 import { MongoClient } from 'mongodb';
 import gameCardsInformations from '../../../../../server/app/dataBase/game-cards-informations.json';
 
-const url = 'mongodb://localhost:27017';
-const client = new MongoClient(url);
+// const url = 'mongodb://localhost:27017/';
+// const client = new MongoClient(url);
 
 @Injectable({
     providedIn: 'root',
 })
 export class DataBaseService {
+    async start(url: string = process.env.DB_URL!): Promise<void> {
+        try {
+            this.client = new MongoClient(url);
+            await this.client.connect();
+            this.db = this.client.db(process.env.DATABASE_NAME);
+        } catch {
+            throw new Error('Database connection error');
+        }
+
+        if ((await this.db.collection(process.env.DATABASE_COLLECTION!).countDocuments()) === 0) {
+            await this.populateDB();
+        }
+    }
+
     async connectToMongoDB() {
         try {
             await client.connect();
