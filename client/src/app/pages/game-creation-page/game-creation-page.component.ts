@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { ModalPageComponent } from '@app/pages/modal-page/modal-page.component';
+import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { STAGE } from '@app/services/server-routes';
 import { GameInformation } from '@common/game-information';
@@ -61,6 +61,7 @@ export class GameCreationPageComponent implements OnInit {
             this.router.navigate(['/config']);
         });
     }
+
     clearSingleFile(canvas: HTMLCanvasElement, id: string): void {
         const context = canvas.getContext('2d');
         const input = document.getElementById(id) as HTMLInputElement;
