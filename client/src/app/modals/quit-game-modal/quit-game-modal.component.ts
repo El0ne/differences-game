@@ -1,15 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-quit-game-modal',
-  templateUrl: './quit-game-modal.component.html',
-  styleUrls: ['./quit-game-modal.component.scss']
+    selector: 'app-quit-game-modal',
+    templateUrl: './quit-game-modal.component.html',
+    styleUrls: ['./quit-game-modal.component.scss'],
 })
-export class QuitGameModalComponent implements OnInit {
+export class QuitGameModalComponent {
+    constructor(public matDialogRef: MatDialogRef<QuitGameModalComponent>, public router: Router) {}
 
-  constructor() { }
+    confirm() {
+        this.matDialogRef.close();
+        this.router.navigate(['/stage-selection']);
+    }
 
-  ngOnInit(): void {
-  }
-
+    cancel() {
+        this.matDialogRef.close();
+    }
 }

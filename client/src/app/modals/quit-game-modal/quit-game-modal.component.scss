@@ -1,0 +1,27 @@
+.quit {
+    display: flex;
+    flex-direction: column;
+    width: 600px;
+    height: 600px;
+    background-color: black;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.option-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-evenly;
+}
+
+img {
+    width: 40%;
+    height: 40%;
+}
+
+button {
+    width: 9rem;
+    height: 4rem;
+    font-size: larger;
+}

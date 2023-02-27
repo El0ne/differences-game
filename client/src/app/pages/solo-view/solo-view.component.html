@@ -26,12 +26,12 @@
             <button class="normal-button home-button option-buttons" type="button" routerLink="/home">
                 <mat-icon class="icon">home</mat-icon>
             </button>
-            <button class="normal-button option-buttons" type="button" (click)="openModal()">
+            <button class="normal-button option-buttons" type="button" (click)="openInfoModal()">
                 <mat-icon class="icon">info</mat-icon>
             </button>
         </div>
         <div class="info-option" *ngIf="showNavBar">
-            <button class="normal-button option-buttons" type="button" routerLink="/stage-selection">
+            <button class="normal-button option-buttons" type="button" (click)="quitGame()">
                 <mat-icon class="icon">logout</mat-icon>
             </button>
         </div>
