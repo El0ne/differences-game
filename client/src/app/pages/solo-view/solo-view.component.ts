@@ -39,7 +39,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     endGame: Subject<void> = new Subject<void>();
     gameCardInfo: GameCardInformation;
 
-    // eslint-disable-next-line max-params
+    // eslint-disable-next-line max-params // chahine : idk what this is, so I'll keep this comment up
     constructor(
         public timerService: TimerSoloService,
         private convertService: SecondToMinuteService,
