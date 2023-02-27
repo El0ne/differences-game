@@ -3,10 +3,9 @@ import { DifferenceDetectionService } from '@app/services/difference-detection/d
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameDifficultyService } from '@app/services/game-difficulty/game-difficulty.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
-import { GameCardInformation } from '@common/game-card';
 import { ImageUploadData } from '@common/image-upload-data';
 import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { diskStorage } from 'multer';
@@ -36,9 +35,10 @@ export class StageController {
     ) {}
 
     @Get('/')
-    getStages(@Query('index') index: number, @Query('endIndex') endIndex: number, @Res() res: Response): void {
+    async getStages(@Query('index') index: number, @Query('endIndex') endIndex: number, @Res() res: Response): Promise<void> {
         try {
-            res.status(HttpStatus.OK).send(this.gameCardService.getGameCards(index, endIndex));
+            const gameCards = await this.gameCardService.getGameCards(index, endIndex);
+            res.status(HttpStatus.OK).send(gameCards);
         } catch (error) {
             throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -54,7 +54,7 @@ export class StageController {
     }
 
     @Get('/:gameCardId')
-    getStageById(@Param() param): GameCardInformation {
+    async getStageById(@Param() param) {
         try {
             return this.gameCardService.getGameCardById(param.gameCardId);
         } catch {
@@ -62,17 +62,17 @@ export class StageController {
         }
     }
 
-    @Post('/')
-    createGame(@Body() game, @Res() res: Response) {
-        try {
-            if (Object.keys(game).length) {
-                const newGame = this.gameCardService.createGameCard(game);
-                res.status(HttpStatus.CREATED).send(newGame);
-            } else res.sendStatus(HttpStatus.BAD_REQUEST);
-        } catch (err) {
-            throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+    // @Post('/')
+    // createGame(@Body() game, @Res() res: Response) {
+    //     try {
+    //         if (Object.keys(game).length) {
+    //             const newGame = this.gameCardService.createGameCard(game);
+    //             res.status(HttpStatus.CREATED).send(newGame);
+    //         } else res.sendStatus(HttpStatus.BAD_REQUEST);
+    //     } catch (err) {
+    //         throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    // }
 
     @Post('/image/:radius')
     @UseInterceptors(

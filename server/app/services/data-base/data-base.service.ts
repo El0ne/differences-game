@@ -4,8 +4,8 @@ import { Db, MongoClient } from 'mongodb';
 
 @Injectable()
 export class DataBaseService {
+    db: Db;
     private client: MongoClient;
-    private db: Db;
     async start(url: string = process.env.DB_URL): Promise<void> {
         try {
             this.client = new MongoClient(url);
