@@ -19,12 +19,16 @@ body {
     background: linear-gradient(black, #7a04eb, #bd04eb);
 }
 .info-card {
-    top: 15%;
-    left: 33%;
-    width: 33%;
-    height: 45%;
-    border-style: solid;
-    border-color: var(--basic-border);
+    top: 13%;
+    left: 19%;
+    width: 62%;
+    height: 72%;
+    // border-style: solid;
+    // border-color: var(--basic-border);
+    border-radius: 2rem;
+
+    border: 0.2rem solid #eee;
+    box-shadow: 0 0 0.2rem #eee, 0 0 0.2rem #aaa, 0 0 2rem #bc13fe, 0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
     z-index: 1;
     position: fixed;
     background: linear-gradient(var(--linear-background-color-1), var(--linear-background-color-2));

@@ -1,0 +1,31 @@
+.info {
+    display: flex;
+    flex-direction: column;
+    width: 900px;
+    height: 800px;
+    background-color: black;
+}
+
+.info-container {
+    display: flex;
+    flex-direction: column;
+    justify-self: unset;
+}
+
+.title {
+    align-self: center;
+    margin: 3rem;
+    font-size: 4rem;
+}
+
+h1 {
+    font-size: 2rem;
+    margin-left: 1rem;
+}
+
+h2 {
+    font-size: medium;
+    text-shadow: none;
+    font-size: 1.75rem;
+    margin-left: 1rem;
+}

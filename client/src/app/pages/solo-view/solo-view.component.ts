@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
-import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
+import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
@@ -57,11 +57,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             });
         }
 
-        const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true });
-        dialogRef.afterClosed().subscribe((result: string) => {
-            this.playerName = result;
-            this.showTime();
-        });
+        // const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true });
+        // dialogRef.afterClosed().subscribe((result: string) => {
+        //     this.playerName = result;
+        //     this.showTime();
+        // });
     }
 
     ngOnDestroy(): void {
@@ -97,6 +97,15 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     toggleInfoCard(): void {
         this.showTextBox = !this.showTextBox;
+    }
+
+    openModal() {
+        this.dialog.open(GameInfoModalComponent, {
+            data: {
+                gameCardInfo: this.gameCardInfo,
+                numberOfDifferences: this.numberOfDifferences,
+            },
+        });
     }
 
     toggleErrorMessage(): void {

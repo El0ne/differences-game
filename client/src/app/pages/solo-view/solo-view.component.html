@@ -1,5 +1,5 @@
 <body>
-    <div class="info-card" *ngIf="showTextBox">
+    <!-- <div class="info-card" *ngIf="showTextBox">
         <div class="info">
             <p class="title">{{ gameCardInfo.name }}</p>
             <div class="title">Difficulté : {{ gameCardInfo.difficulty }}</div>
@@ -10,7 +10,7 @@
         <button class="normal-button" id="info-quit" type="button" (click)="toggleInfoCard()">
             <mat-icon class="icon">clear</mat-icon>
         </button>
-    </div>
+    </div> -->
 
     <div class="info-card" *ngIf="showWinMessage">
         <div class="info">
@@ -26,19 +26,18 @@
             <button class="normal-button home-button option-buttons" type="button" routerLink="/home">
                 <mat-icon class="icon">home</mat-icon>
             </button>
-            <button class="normal-button option-buttons" type="button" (click)="toggleInfoCard()">
+            <button class="normal-button option-buttons" type="button" (click)="openModal()">
                 <mat-icon class="icon">info</mat-icon>
             </button>
         </div>
         <div class="info-option" *ngIf="showNavBar">
             <button class="normal-button option-buttons" type="button" routerLink="/stage-selection">
-                <mat-icon class="icon">menu</mat-icon>
+                <mat-icon class="icon">logout</mat-icon>
             </button>
         </div>
     </div>
 
     <div class="flex-game">
-        <<<<<<< HEAD
         <div class="image-container">
             <app-click-event
                 #left
@@ -52,19 +51,6 @@
                 *ngIf="this.gameCardInfo"
             ></app-click-event>
         </div>
-        =======
-        <app-click-event
-            #left
-            [id]="1"
-            [original]="'original'"
-            [gameCardId]="this.currentGameId"
-            [imagePath]="this.gameCardInfo.originalImageName"
-            (incrementScore)="incrementScore()"
-            (differences)="addDifferenceDetected($event)"
-            (transmitter)="paintPixel($event)"
-            *ngIf="this.gameCardInfo"
-        ></app-click-event>
-        >>>>>>> dev
         <div class="game-options">
             <div id="timer">
                 <div class="timer-box">
@@ -101,17 +87,19 @@
                 </div>
             </div>
         </div>
-        <app-click-event
-            #right
-            [id]="2"
-            [original]="'different'"
-            [gameCardId]="this.currentGameId"
-            [imagePath]="this.gameCardInfo.differenceImageName"
-            (incrementScore)="incrementScore()"
-            (differences)="addDifferenceDetected($event)"
-            (transmitter)="paintPixel($event)"
-            *ngIf="this.gameCardInfo"
-        ></app-click-event>
+        <div class="image-container">
+            <app-click-event
+                #right
+                [id]="2"
+                [original]="'different'"
+                [gameCardId]="this.currentGameId"
+                [imagePath]="this.gameCardInfo.differenceImageName"
+                (incrementScore)="incrementScore()"
+                (differences)="addDifferenceDetected($event)"
+                (transmitter)="paintPixel($event)"
+                *ngIf="this.gameCardInfo"
+            ></app-click-event>
+        </div>
         <div class="hint-button">
             <button class="hint" type="button">
                 <mat-icon class="hint-button">search</mat-icon>
