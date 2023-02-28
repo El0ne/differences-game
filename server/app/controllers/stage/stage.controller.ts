@@ -120,7 +120,7 @@ export class StageController {
     }
 
     @Get('/image/:imageName')
-    getImage(@Param() param, @Res() res: Response): void {
+    async getImage(@Param() param, @Res() res: Response): Promise<void> {
         try {
             const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);
             res.status(HttpStatus.OK).sendFile(imagePath);
