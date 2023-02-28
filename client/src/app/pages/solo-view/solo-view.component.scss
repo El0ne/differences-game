@@ -152,17 +152,11 @@ body {
 }
 
 .send-button {
-    background-image: url(../../../assets/send-icon.png);
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: contain;
     background-color: var(--basic-border);
     border-radius: 50%;
-
-    //background-color: var(--basic-border);
     box-shadow: 0 0 7px var(--basic-border), 0 0 20px var(--basic-border), 0 0 10px var(--basic-border);
     border: solid 2px var(--basic-border);
-    width: 8%;
+    display: flex;
 }
 
 .send-button:hover {

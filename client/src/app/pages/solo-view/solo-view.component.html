@@ -39,17 +39,10 @@
 
     <div class="flex-game">
         <div class="image-container">
-            <app-click-event
-                #left
-                [id]="1"
-                [original]="'original'"
-                [gameCardId]="this.currentGameId"
-                [imagePath]="this.gameCardInfo.originalImageName"
-                (incrementScore)="incrementScore()"
-                (differences)="addDifferenceDetected($event)"
-                (transmitter)="paintPixel($event)"
-                *ngIf="this.gameCardInfo"
-            ></app-click-event>
+            <app-click-event #left [id]="1" [original]="'original'" [gameCardId]="this.currentGameId"
+                [imagePath]="this.gameCardInfo.originalImageName" (incrementScore)="incrementScore()"
+                (differences)="addDifferenceDetected($event)" (transmitter)="paintPixel($event)"
+                *ngIf="this.gameCardInfo"></app-click-event>
         </div>
         <div class="game-options">
             <div id="timer">
@@ -82,23 +75,19 @@
                     </div>
                 </div>
                 <div class="answer-area">
-                    <input type="text" class="input-field" placeholder="Entrez votre message" [(ngModel)]="messageContent" />
-                    <button class="send-button" (click)="sendMessage()"></button>
+                    <input type="text" class="input-field" placeholder="Entrez votre message"
+                        [(ngModel)]="messageContent" />
+                    <button class="send-button" (click)="sendMessage()">
+                        <mat-icon>send</mat-icon>
+                    </button>
                 </div>
             </div>
         </div>
         <div class="image-container">
-            <app-click-event
-                #right
-                [id]="2"
-                [original]="'different'"
-                [gameCardId]="this.currentGameId"
-                [imagePath]="this.gameCardInfo.differenceImageName"
-                (incrementScore)="incrementScore()"
-                (differences)="addDifferenceDetected($event)"
-                (transmitter)="paintPixel($event)"
-                *ngIf="this.gameCardInfo"
-            ></app-click-event>
+            <app-click-event #right [id]="2" [original]="'different'" [gameCardId]="this.currentGameId"
+                [imagePath]="this.gameCardInfo.differenceImageName" (incrementScore)="incrementScore()"
+                (differences)="addDifferenceDetected($event)" (transmitter)="paintPixel($event)"
+                *ngIf="this.gameCardInfo"></app-click-event>
         </div>
         <div class="hint-button">
             <button class="hint" type="button">
