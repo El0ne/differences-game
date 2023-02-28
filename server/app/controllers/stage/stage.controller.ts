@@ -3,14 +3,9 @@ import { DifferenceDetectionService } from '@app/services/difference-detection/d
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameDifficultyService } from '@app/services/game-difficulty/game-difficulty.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
-import { ImageUploadData } from '@common/image-upload-data';
-import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
-import { Controller, Get, HttpException, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { Response } from 'express';
+import { Controller } from '@nestjs/common';
 import { diskStorage } from 'multer';
 import * as path from 'path';
-import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
 // based on https://www.youtube.com/watch?v=f-URVd2OKYc
@@ -34,33 +29,33 @@ export class StageController {
         private differenceClickService: DifferenceClickService,
     ) {}
 
-    @Get('/')
-    async getStages(@Query('index') index: number, @Query('endIndex') endIndex: number, @Res() res: Response): Promise<void> {
-        try {
-            const gameCards = await this.gameCardService.getGameCards(index, endIndex);
-            res.status(HttpStatus.OK).send(gameCards);
-        } catch (error) {
-            throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+    // @Get('/')
+    // async getStages(@Query('index') index: number, @Query('endIndex') endIndex: number, @Res() res: Response): Promise<void> {
+    //     try {
+    //         const gameCards = await this.gameCardService.getGameCards(index, endIndex);
+    //         res.status(HttpStatus.OK).send(gameCards);
+    //     } catch (error) {
+    //         throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    // }
 
-    @Get('/info')
-    getNbOfStages(): number {
-        try {
-            return this.gameCardService.getGameCardsNumber();
-        } catch {
-            throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+    // @Get('/info')
+    // getNbOfStages(): number {
+    //     try {
+    //         return this.gameCardService.getGameCardsNumber();
+    //     } catch {
+    //         throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    // }
 
-    @Get('/:gameCardId')
-    async getStageById(@Param() param) {
-        try {
-            return this.gameCardService.getGameCardById(param.gameCardId);
-        } catch {
-            throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+    // @Get('/:gameCardId')
+    // async getStageById(@Param() param) {
+    //     try {
+    //         return this.gameCardService.getGameCardById(param.gameCardId);
+    //     } catch {
+    //         throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    // }
 
     // @Post('/')
     // createGame(@Body() game, @Res() res: Response) {
@@ -74,57 +69,57 @@ export class StageController {
     //     }
     // }
 
-    @Post('/image/:radius')
-    @UseInterceptors(
-        FileFieldsInterceptor(
-            [
-                { name: 'baseImage', maxCount: 1 },
-                { name: 'differenceImage', maxCount: 1 },
-            ],
-            { storage },
-        ),
-    )
-    async uploadImages(@UploadedFiles() files: ImageUploadData, @Param() param, @Res() res: Response): Promise<void> {
-        try {
-            if (Object.keys(files).length) {
-                const differencesArray = await this.differenceService.compareImages(
-                    files.baseImage[0].path,
-                    files.differenceImage[0].path,
-                    param.radius,
-                );
+    // @Post('/image/:radius')
+    // @UseInterceptors(
+    //     FileFieldsInterceptor(
+    //         [
+    //             { name: 'baseImage', maxCount: 1 },
+    //             { name: 'differenceImage', maxCount: 1 },
+    //         ],
+    //         { storage },
+    //     ),
+    // )
+    // async uploadImages(@UploadedFiles() files: ImageUploadData, @Param() param, @Res() res: Response): Promise<void> {
+    //     try {
+    //         if (Object.keys(files).length) {
+    //             const differencesArray = await this.differenceService.compareImages(
+    //                 files.baseImage[0].path,
+    //                 files.differenceImage[0].path,
+    //                 param.radius,
+    //             );
 
-                const id = uuidv4();
-                this.differenceClickService.createDifferenceArray(id, differencesArray);
+    //             const id = uuidv4();
+    //             this.differenceClickService.createDifferenceArray(id, differencesArray);
 
-                if (this.gameDifficultyService.isGameValid(differencesArray)) {
-                    const difficulty = this.gameDifficultyService.setGameDifficulty(differencesArray);
+    //             if (this.gameDifficultyService.isGameValid(differencesArray)) {
+    //                 const difficulty = this.gameDifficultyService.setGameDifficulty(differencesArray);
 
-                    const data: ServerGeneratedGameInfo = {
-                        gameId: id,
-                        originalImageName: files.baseImage[0].filename,
-                        differenceImageName: files.differenceImage[0].filename,
-                        gameDifficulty: difficulty,
-                        gameDifferenceNumber: differencesArray.length,
-                    };
-                    res.status(HttpStatus.CREATED).send(data);
-                } else {
-                    this.imageManagerService.deleteImage(files.baseImage[0].path);
-                    this.imageManagerService.deleteImage(files.differenceImage[0].path);
-                    res.status(HttpStatus.OK).send([]);
-                }
-            } else res.sendStatus(HttpStatus.BAD_REQUEST);
-        } catch (err) {
-            res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
-        }
-    }
+    //                 const data: ServerGeneratedGameInfo = {
+    //                     gameId: id,
+    //                     originalImageName: files.baseImage[0].filename,
+    //                     differenceImageName: files.differenceImage[0].filename,
+    //                     gameDifficulty: difficulty,
+    //                     gameDifferenceNumber: differencesArray.length,
+    //                 };
+    //                 res.status(HttpStatus.CREATED).send(data);
+    //             } else {
+    //                 this.imageManagerService.deleteImage(files.baseImage[0].path);
+    //                 this.imageManagerService.deleteImage(files.differenceImage[0].path);
+    //                 res.status(HttpStatus.OK).send([]);
+    //             }
+    //         } else res.sendStatus(HttpStatus.BAD_REQUEST);
+    //     } catch (err) {
+    //         res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
+    //     }
+    // }
 
-    @Get('/image/:imageName')
-    getImage(@Param() param, @Res() res: Response): void {
-        try {
-            const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);
-            res.status(HttpStatus.OK).sendFile(imagePath);
-        } catch (err) {
-            res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+    // @Get('/image/:imageName')
+    // getImage(@Param() param, @Res() res: Response): void {
+    //     try {
+    //         const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);
+    //         res.status(HttpStatus.OK).sendFile(imagePath);
+    //     } catch (err) {
+    //         res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    // }
 }

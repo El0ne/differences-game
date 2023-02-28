@@ -1,8 +1,5 @@
 import { DataBaseService } from '@app/services/data-base/data-base.service';
-import { GameCardInformation } from '@common/game-card';
-import { GameInformation } from '@common/game-information';
 import { Injectable } from '@nestjs/common';
-import * as fs from 'fs';
 import * as path from 'path';
 
 @Injectable()
@@ -18,55 +15,57 @@ export class GameCardService {
         return await this.collection.find({}).toArray();
     }
 
-    /*
-    getAllGameCards(): GameCardInformation[] {
-        const content = fs.readFileSync(this.jsonPath, 'utf8');
-        return JSON.parse(content).gameCardsInformations;
-    }
-    */
+    // async getGameCards(startIndex: number, endIndex: number): Promise<unknown> {
+    //     const allGameCards = await this.getAllGameCards();
+    //     const selectedGameCards: GameCardInformation[] = [];
+    //     for (let i = startIndex; i <= endIndex; i++) {
+    //         selectedGameCards.push(allGameCards[i]);
+    //     }
+    //     return selectedGameCards;
+    // }
 
-    async getGameCards(startIndex: number, endIndex: number) {
-        // return this.getAllGameCards().slice(startIndex, endIndex);
-        const allGameCards = await this.getAllGameCards();
-        return allGameCards;
-    }
+    // async getGameCardById(id: string): Promise<Document> {
+    //     const allGameCards = await this.getAllGameCards();
+    //     return allGameCards.find((game) => game.id === id);
+    // }
 
-    async getGameCardById(id: string) {
-        const allGameCards = await this.getAllGameCards();
-        return allGameCards.find((game) => game.id === id);
-    }
+    // async getGameCardsNumber(): Promise<number> {
+    //     const allGameCards = await this.getAllGameCards();
+    //     return allGameCards.length;
+    // }
 
-    getGameCardsNumber(): number {
-        const content = fs.readFileSync(this.jsonPath, 'utf8');
-        return JSON.parse(content).gameCardsInformations.length;
-    }
-
-    // createGameCard(game): GameCardInformation {
-    //     const allGameCards = this.getAllGameCards();
+    // async createGameCard(game): Promise<GameCardInformation> {
     //     const newGame = this.generateGameCard(game);
-    //     allGameCards.push(newGame);
-    //     fs.writeFileSync(this.jsonPath, JSON.stringify({ gameCardsInformations: allGameCards }));
+    //     await this.collection.insertOne(newGame);
     //     return newGame;
     // }
 
-    generateGameCard(game: GameInformation): GameCardInformation {
-        return {
-            id: game.id,
-            name: game.name,
-            difficulty: game.difficulty,
-            differenceNumber: game.differenceNumber,
-            originalImageName: game.baseImage,
-            differenceImageName: game.differenceImage,
-            soloTimes: [
-                { time: 0, name: '--' },
-                { time: 0, name: '--' },
-                { time: 0, name: '--' },
-            ],
-            multiTimes: [
-                { time: 0, name: '--' },
-                { time: 0, name: '--' },
-                { time: 0, name: '--' },
-            ],
-        };
-    }
+    // generateGameCard(game: GameInformation): GameCardInformation {
+    //     return {
+    //         id: game.id,
+    //         name: game.name,
+    //         difficulty: game.difficulty,
+    //         differenceNumber: game.differenceNumber,
+    //         originalImageName: game.baseImage,
+    //         differenceImageName: game.differenceImage,
+    //         soloTimes: [
+    //             { time: 0, name: '--' },
+    //             { time: 0, name: '--' },
+    //             { time: 0, name: '--' },
+    //         ],
+    //         multiTimes: [
+    //             { time: 0, name: '--' },
+    //             { time: 0, name: '--' },
+    //             { time: 0, name: '--' },
+    //         ],
+    //     };
+    // }
+
+    // async deleteGameCard(id: string): Promise<Document> {
+    //     const deletedGameCard = await this.collection.findOneAndDelete({ id });
+    //     if (!deletedGameCard.value) {
+    //         throw new Error('Game card not found');
+    //     }
+    //     return deletedGameCard;
+    // }
 }
