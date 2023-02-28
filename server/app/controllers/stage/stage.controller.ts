@@ -54,16 +54,17 @@ export class StageController {
     }
 
     @Get('/:gameCardId')
-    async getStageById(@Param() param) {
+    async getStageById(@Param() param, @Res() res: Response): Promise<void> {
         try {
-            return this.gameCardService.getGameCardById(param.gameCardId);
+            const gameCard = await this.gameCardService.getGameCardById(param.gameCardId);
+            res.status(HttpStatus.OK).send(gameCard);
         } catch {
             throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @Post('/')
-    async createGame(@Body() game, @Res() res: Response) {
+    async createGame(@Body() game, @Res() res: Response): Promise<void> {
         try {
             if (Object.keys(game).length) {
                 const newGame = await this.gameCardService.createGameCard(game);
@@ -72,8 +73,6 @@ export class StageController {
         } catch (err) {
             throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        // console.log('post');
-        // return this.gameCardService.createGameCard(game);
     }
 
     @Post('/image/:radius')
