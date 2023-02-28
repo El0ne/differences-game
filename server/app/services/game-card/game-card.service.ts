@@ -19,25 +19,20 @@ export class GameCardService {
         return await this.gameCardModel
             .find({})
             .skip(startIndex)
-            .limit(endIndex - startIndex + 1);
+            .limit(endIndex - startIndex);
     }
 
     async getGameCardById(id: string) {
-        const allGameCards = await this.getAllGameCards();
-        return this.gameCardModel.findOne({ id });
-        // return allGameCards.find((game) => game.id === id);
+        return await this.gameCardModel.findOne({ id });
     }
 
     async getGameCardsNumber(): Promise<number> {
-        // const content = fs.readFileSync(this.jsonPath, 'utf8');
-        // return JSON.parse(content).gameCardsInformations.length;
         return await this.gameCardModel.count();
     }
 
     async createGameCard(gameCard: GameInformation): Promise<GameCard> {
         const generatedGameCard = this.generateGameCard(gameCard);
         const newGameCard = new this.gameCardModel(generatedGameCard);
-        console.log('createGameCard');
         return newGameCard.save();
     }
 
