@@ -1,7 +1,6 @@
 import { GameInformation } from '@common/game-information';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import * as fs from 'fs';
 import { GameCard, GameCardDocument } from 'game-card/schemas/game-cards.schemas';
 import { Model } from 'mongoose';
 import * as path from 'path';
@@ -11,9 +10,9 @@ export class GameCardService {
     jsonPath = path.join(process.cwd(), '/app/dataBase/game-cards-informations.json');
     constructor(@InjectModel(GameCard.name) private gameCardModel: Model<GameCardDocument>) {}
 
+    // TODO remove later if useless (i think it is)
     async getAllGameCards(): Promise<GameCard[]> {
         return await this.gameCardModel.find({});
-        // return await this.collection.find({}).toArray();
     }
 
     async getGameCards(startIndex: number, endIndex: number) {
@@ -28,9 +27,10 @@ export class GameCardService {
         // return allGameCards.find((game) => game.id === id);
     }
 
-    getGameCardsNumber(): number {
-        const content = fs.readFileSync(this.jsonPath, 'utf8');
-        return JSON.parse(content).gameCardsInformations.length;
+    async getGameCardsNumber(): Promise<number> {
+        // const content = fs.readFileSync(this.jsonPath, 'utf8');
+        // return JSON.parse(content).gameCardsInformations.length;
+        return await this.gameCardModel.count();
     }
 
     async createGameCard(gameCard: GameInformation): Promise<GameCard> {

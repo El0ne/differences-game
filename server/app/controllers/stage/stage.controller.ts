@@ -45,9 +45,9 @@ export class StageController {
     }
 
     @Get('/info')
-    getNbOfStages(): number {
+    async getNbOfStages(): Promise<number> {
         try {
-            return this.gameCardService.getGameCardsNumber();
+            return await this.gameCardService.getGameCardsNumber();
         } catch {
             throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
         }
