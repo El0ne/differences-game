@@ -62,17 +62,28 @@ export class StageController {
         }
     }
 
-    // @Post('/')
-    // createGame(@Body() game, @Res() res: Response) {
-    //     try {
-    //         if (Object.keys(game).length) {
-    //             const newGame = this.gameCardService.createGameCard(game);
-    //             res.status(HttpStatus.CREATED).send(newGame);
-    //         } else res.sendStatus(HttpStatus.BAD_REQUEST);
-    //     } catch (err) {
-    //         throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
-    //     }
-    // }
+    @Post('/')
+    async createGame() {
+        // try {
+        //     if (Object.keys(game).length) {
+        //         const newGame = this.gameCardService.createGameCard(game);
+        //         res.status(HttpStatus.CREATED).send(newGame);
+        //     } else res.sendStatus(HttpStatus.BAD_REQUEST);
+        // } catch (err) {
+        //     throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        // }
+        const game = {
+            id: 'string',
+            name: 'string',
+            difficulty: 'string',
+            baseImage: 'string',
+            differenceImage: '',
+            radius: 78,
+            differenceNumber: 5,
+        };
+        console.log('post');
+        return this.gameCardService.createGameCard(game);
+    }
 
     @Post('/image/:radius')
     @UseInterceptors(
