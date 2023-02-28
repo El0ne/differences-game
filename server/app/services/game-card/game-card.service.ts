@@ -1,21 +1,26 @@
-import { DataBaseService } from '@app/services/data-base/data-base.service';
 import { GameCardInformation } from '@common/game-card';
 import { GameInformation } from '@common/game-information';
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 import * as fs from 'fs';
+import { GameCard, GameCardDocument } from 'game-card/schemas/game-cards.schemas';
+import { Model } from 'mongoose';
 import * as path from 'path';
 
 @Injectable()
 export class GameCardService {
     jsonPath = path.join(process.cwd(), '/app/dataBase/game-cards-informations.json');
-    constructor(private dataBaseService: DataBaseService) {}
+    constructor(@InjectModel(GameCard.name) private gameCardModel: Model<GameCardDocument>) {}
 
-    get collection() {
-        return this.dataBaseService.db.collection('gameCards');
-    }
+    // get collection() {
+    //     // this.db.collection(process.env.DB_GAMECARDS_COLLECTION)
+    //     return this.dataBaseService.db.collection(process.env.DB_GAMECARDS_COLLECTION);
+    //     // return this.dataBaseService.db.collection('gameCards');
+    // }
 
-    async getAllGameCards() {
-        return await this.collection.find({}).toArray();
+    async getAllGameCards(): Promise<GameCard[]> {
+        return await this.gameCardModel.find({});
+        // return await this.collection.find({}).toArray();
     }
 
     /*
@@ -27,13 +32,14 @@ export class GameCardService {
 
     async getGameCards(startIndex: number, endIndex: number) {
         // return this.getAllGameCards().slice(startIndex, endIndex);
-        const allGameCards = await this.getAllGameCards();
-        return allGameCards;
+        // const allGameCards = await this.getAllGameCards();
+        // console.log('allGameCards', allGameCards);
+        // return allGameCards;
     }
 
     async getGameCardById(id: string) {
         const allGameCards = await this.getAllGameCards();
-        return allGameCards.find((game) => game.id === id);
+        // return allGameCards.find((game) => game.id === id);
     }
 
     getGameCardsNumber(): number {

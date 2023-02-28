@@ -37,7 +37,7 @@ export class StageController {
     @Get('/')
     async getStages(@Query('index') index: number, @Query('endIndex') endIndex: number, @Res() res: Response): Promise<void> {
         try {
-            const gameCards = await this.gameCardService.getGameCards(index, endIndex);
+            const gameCards = await this.gameCardService.getAllGameCards();
             res.status(HttpStatus.OK).send(gameCards);
         } catch (error) {
             throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
