@@ -1,6 +1,7 @@
 :host {
     --basic-border: #00e6f6;
     --message: #0019f6;
+    --player2: #6b6b6b;
     --linear-background-color-1: #92089c;
     --linear-background-color-2: #a80d43;
     --error-message-color: rgb(177, 32, 32);
@@ -138,8 +139,12 @@ body {
     background-color: var(--error-message-color);
 }
 
-.normal {
+.player1 {
     background-color: var(--message);
+}
+
+.player2 {
+    background-color: var(--player2);
 }
 
 .error-message:hover {

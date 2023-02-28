@@ -1,15 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from '@nestjs/websockets';
+import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID, WORD_MIN_LENGTH } from './chat.gateway.constants';
-import { ChatEvents } from './chat.gateway.events';
+import { DELAY_BEFORE_EMITTING_TIME, MESSAGE_MAX_LENGTH } from './chat.gateway.constants';
+import { ChatEvents, RoomManagement } from './chat.gateway.events';
 
 @WebSocketGateway({ cors: true })
 @Injectable()
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() private server: Server;
-
-    private readonly room = PRIVATE_ROOM_ID;
 
     constructor(private readonly logger: Logger) {}
 
@@ -19,8 +17,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(ChatEvents.Validate)
-    validate(socket: Socket, word: string) {
-        socket.emit(ChatEvents.WordValidated, word.length > WORD_MIN_LENGTH);
+    validate(socket: Socket, message: string) {
+        socket.emit(ChatEvents.WordValidated, { validated: message.length < MESSAGE_MAX_LENGTH, originalMessage: message });
     }
 
     @SubscribeMessage(ChatEvents.BroadcastAll)
@@ -29,15 +27,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(ChatEvents.JoinRoom)
-    joinRoom(socket: Socket) {
-        socket.join(this.room);
+    joinRoom(socket: Socket, room: string) {
+        socket.join(room);
     }
 
     @SubscribeMessage(ChatEvents.RoomMessage)
-    roomMessage(socket: Socket, message: string) {
+    roomMessage(socket: Socket, message: RoomManagement) {
         // Seulement un membre de la salle peut envoyer un message aux autres
-        if (socket.rooms.has(this.room)) {
-            this.server.to(this.room).emit(ChatEvents.RoomMessage, `${socket.id} : ${message}`);
+        if (socket.rooms.has(message.room)) {
+            this.server.to(message.room).emit(ChatEvents.RoomMessage, { socketId: socket.id, message: message.message });
         }
     }
 

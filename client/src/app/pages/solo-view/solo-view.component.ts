@@ -3,13 +3,14 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
+import { ChatSocketService } from '@app/services/chat-socket/chat-socket.service';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
+import { RoomMessage, Validation } from '@common/chat-gateway-constants';
 import { GameCardInformation } from '@common/game-card';
 import { Subject } from 'rxjs';
-import { MESSAGES_LENGTH } from './solo-view-constants';
 
 @Component({
     selector: 'app-solo-view',
@@ -30,7 +31,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     playerName: string = 'Player';
     playerName1: string = 'Player 1';
     playerName2: string = 'Player 2';
-    messages: string[] = [];
+    messages: RoomMessage[] = [];
     messageContent: string = '';
     differenceArray: number[][];
     currentScorePlayer1: number = 0;
@@ -50,7 +51,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         public dialog: MatDialog,
         public router: Router,
+        private chat: ChatSocketService,
     ) {}
+
+    get socketId() {
+        return this.chat.sio.id ? this.chat.sio.id : '';
+    }
 
     ngOnInit(): void {
         const gameId = this.route.snapshot.paramMap.get('stageId');
@@ -67,12 +73,42 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         dialogRef.afterClosed().subscribe((result: string) => {
             this.playerName = result;
             this.showTime();
+            this.connect();
+        });
+    }
+
+    connect() {
+        if (!this.chat.liveSocket()) {
+            this.chat.connect();
+            this.configureSocketReactions();
+            this.joinRoom();
+        }
+    }
+
+    joinRoom() {
+        this.chat.send('joinRoom', this.currentGameId);
+    }
+
+    configureSocketReactions() {
+        this.chat.listen('hello', (data: string) => {
+            console.log(data);
+        });
+        this.chat.listen('wordValidated', (validation: Validation) => {
+            if (validation.validated) {
+                this.chat.send('roomMessage', { room: this.currentGameId, message: validation.originalMessage });
+            } else {
+                this.showErrorMessage = true;
+            }
+        });
+        this.chat.listen('roomMessage', (data: RoomMessage) => {
+            this.messages.push(data);
         });
     }
 
     ngOnDestroy(): void {
         this.timerService.stopTimer();
         this.foundDifferenceService.clearDifferenceFound();
+        this.chat.disconnect();
     }
 
     showTime(): void {
@@ -119,14 +155,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     sendMessage(): void {
-        if (this.messageContent.length === MESSAGES_LENGTH.minLength || this.messageContent.length > MESSAGES_LENGTH.maxLength) {
-            this.toggleErrorMessage();
-        } else {
-            if (this.showErrorMessage) {
-                this.untoggleErrorMessage();
-            }
-            this.messages.push(this.messageContent);
-        }
+        this.chat.send('validate', this.messageContent);
         this.messageContent = '';
     }
 

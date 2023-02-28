@@ -97,8 +97,8 @@
             </div>
             <div class="text-box">
                 <div class="text-area">
-                    <div class="text-container" *ngFor="let message of messages">
-                        <div class="normal message">{{ message }}</div>
+                    <div class="text-container" *ngFor="let data of messages">
+                        <div [ngClass]="data.socketId === socketId ? 'player1 message' : 'player2 message'">{{ data.message }}</div>
                     </div>
                     <div class="error message" *ngIf="showErrorMessage" (click)="untoggleErrorMessage()">
                         Votre message ne respecte pas le bon format. Cliquez ici pour enlever ce message.
