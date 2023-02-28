@@ -9,68 +9,7 @@ import * as path from 'path';
 @Injectable()
 export class GameCardService {
     jsonPath = path.join(process.cwd(), '/app/dataBase/game-cards-informations.json');
-    constructor(@InjectModel(GameCard.name) private gameCardModel: Model<GameCardDocument>) {
-        this.start();
-    }
-
-    async start() {
-        if ((await this.gameCardModel.countDocuments()) === 0) {
-            await this.populateDB();
-        }
-    }
-
-    async populateDB(): Promise<void> {
-        const gameCards = [
-            {
-                id: 'dfghdfghdfgh',
-                name: 'string',
-                difficulty: 'string',
-                baseImage: 'string',
-                differenceImage: '',
-                radius: 78,
-                differenceNumber: 5,
-            },
-            {
-                id: 'dfghdfgh',
-                name: 'string',
-                difficulty: 'string',
-                baseImage: 'string',
-                differenceImage: '',
-                radius: 78,
-                differenceNumber: 5,
-            },
-            {
-                id: 'string',
-                name: 'string',
-                difficulty: 'string',
-                baseImage: 'string',
-                differenceImage: '',
-                radius: 78,
-                differenceNumber: 5,
-            },
-            {
-                id: 'fgjh',
-                name: 'string',
-                difficulty: 'string',
-                baseImage: 'string',
-                differenceImage: '',
-                radius: 78,
-                differenceNumber: 5,
-            },
-            {
-                id: 'r5yeyjdfgn',
-                name: 'string',
-                difficulty: 'string',
-                baseImage: 'string',
-                differenceImage: '',
-                radius: 78,
-                differenceNumber: 5,
-            },
-        ];
-
-        await this.gameCardModel.insertMany(gameCards);
-        console.log('oidgheopf;hgertg');
-    }
+    constructor(@InjectModel(GameCard.name) private gameCardModel: Model<GameCardDocument>) {}
 
     // get collection() {
     //     // this.db.collection(process.env.DB_GAMECARDS_COLLECTION)
@@ -95,6 +34,10 @@ export class GameCardService {
         // const allGameCards = await this.getAllGameCards();
         // console.log('allGameCards', allGameCards);
         // return allGameCards;
+        return await this.gameCardModel
+            .find({})
+            .skip(startIndex)
+            .limit(endIndex - startIndex);
     }
 
     async getGameCardById(id: string) {

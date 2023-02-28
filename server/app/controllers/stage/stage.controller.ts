@@ -5,7 +5,7 @@ import { GameDifficultyService } from '@app/services/game-difficulty/game-diffic
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { ImageUploadData } from '@common/image-upload-data';
 import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
-import { Controller, Get, HttpException, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { diskStorage } from 'multer';
@@ -37,7 +37,7 @@ export class StageController {
     @Get('/')
     async getStages(@Query('index') index: number, @Query('endIndex') endIndex: number, @Res() res: Response): Promise<void> {
         try {
-            const gameCards = await this.gameCardService.getAllGameCards();
+            const gameCards = await this.gameCardService.getGameCards(index, endIndex);
             res.status(HttpStatus.OK).send(gameCards);
         } catch (error) {
             throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
@@ -63,26 +63,17 @@ export class StageController {
     }
 
     @Post('/')
-    async createGame() {
-        // try {
-        //     if (Object.keys(game).length) {
-        //         const newGame = this.gameCardService.createGameCard(game);
-        //         res.status(HttpStatus.CREATED).send(newGame);
-        //     } else res.sendStatus(HttpStatus.BAD_REQUEST);
-        // } catch (err) {
-        //     throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
-        // }
-        const game = {
-            id: 'string',
-            name: 'string',
-            difficulty: 'string',
-            baseImage: 'string',
-            differenceImage: '',
-            radius: 78,
-            differenceNumber: 5,
-        };
-        console.log('post');
-        return this.gameCardService.createGameCard(game);
+    async createGame(@Body() game, @Res() res: Response) {
+        try {
+            if (Object.keys(game).length) {
+                const newGame = await this.gameCardService.createGameCard(game);
+                res.status(HttpStatus.CREATED).send(newGame);
+            } else res.sendStatus(HttpStatus.BAD_REQUEST);
+        } catch (err) {
+            throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        // console.log('post');
+        // return this.gameCardService.createGameCard(game);
     }
 
     @Post('/image/:radius')
