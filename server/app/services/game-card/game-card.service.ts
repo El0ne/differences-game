@@ -24,6 +24,7 @@ export class GameCardService {
 
     async getGameCardById(id: string) {
         const allGameCards = await this.getAllGameCards();
+        return this.gameCardModel.findOne({ id });
         // return allGameCards.find((game) => game.id === id);
     }
 
