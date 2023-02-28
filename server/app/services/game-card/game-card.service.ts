@@ -11,29 +11,12 @@ export class GameCardService {
     jsonPath = path.join(process.cwd(), '/app/dataBase/game-cards-informations.json');
     constructor(@InjectModel(GameCard.name) private gameCardModel: Model<GameCardDocument>) {}
 
-    // get collection() {
-    //     // this.db.collection(process.env.DB_GAMECARDS_COLLECTION)
-    //     return this.dataBaseService.db.collection(process.env.DB_GAMECARDS_COLLECTION);
-    //     // return this.dataBaseService.db.collection('gameCards');
-    // }
-
     async getAllGameCards(): Promise<GameCard[]> {
         return await this.gameCardModel.find({});
         // return await this.collection.find({}).toArray();
     }
 
-    /*
-    getAllGameCards(): GameCardInformation[] {
-        const content = fs.readFileSync(this.jsonPath, 'utf8');
-        return JSON.parse(content).gameCardsInformations;
-    }
-    */
-
     async getGameCards(startIndex: number, endIndex: number) {
-        // return this.getAllGameCards().slice(startIndex, endIndex);
-        // const allGameCards = await this.getAllGameCards();
-        // console.log('allGameCards', allGameCards);
-        // return allGameCards;
         return await this.gameCardModel
             .find({})
             .skip(startIndex)
@@ -49,14 +32,6 @@ export class GameCardService {
         const content = fs.readFileSync(this.jsonPath, 'utf8');
         return JSON.parse(content).gameCardsInformations.length;
     }
-
-    // createGameCard(game): GameCardInformation {
-    //     const allGameCards = this.getAllGameCards();
-    //     const newGame = this.generateGameCard(game);
-    //     allGameCards.push(newGame);
-    //     fs.writeFileSync(this.jsonPath, JSON.stringify({ gameCardsInformations: allGameCards }));
-    //     return newGame;
-    // }
 
     async createGameCard(gameCard: GameInformation): Promise<GameCard> {
         const generatedGameCard = this.generateGameCard(gameCard);
