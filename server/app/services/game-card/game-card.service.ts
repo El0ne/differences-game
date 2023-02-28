@@ -37,7 +37,7 @@ export class GameCardService {
         return await this.gameCardModel
             .find({})
             .skip(startIndex)
-            .limit(endIndex - startIndex);
+            .limit(endIndex - startIndex + 1);
     }
 
     async getGameCardById(id: string) {
