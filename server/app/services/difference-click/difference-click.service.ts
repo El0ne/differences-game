@@ -1,7 +1,6 @@
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
-import { DifferencesObject } from '@common/differences-object';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as fs from 'fs';
@@ -17,19 +16,24 @@ export class DifferenceClickService {
         private imageDimensionsService: ImageDimensionsService,
     ) {}
 
-    getAllDifferenceArrays(): DifferencesObject[] {
-        const content = fs.readFileSync(this.jsonPath, 'utf8');
-        return JSON.parse(content).differenceObjects;
+    // getAllDifferenceArrays(): DifferencesObject[] {
+    //     // const content = fs.readFileSync(this.jsonPath, 'utf8');
+    //     // return JSON.parse(content).differenceObjects;
+    // }
+
+    async getAllDifferenceArrays(): Promise<Differences[]> {
+        return await this.differenceModel.find({});
     }
+
     async createDifferenceArray(gameId: string, differencesArray: number[][]): Promise<Differences> {
         // const allDifferenceArrays = this.getAllDifferenceArrays();
+        // allDifferenceArrays.push(newDifferenceArray);
+        // fs.writeFileSync(this.jsonPath, JSON.stringify({ differenceObjects: allDifferenceArrays }));
+        // return newDifferenceArray;
         const newDifferenceArray: Differences = {
             id: gameId,
             differences: differencesArray,
         };
-        // allDifferenceArrays.push(newDifferenceArray);
-        // fs.writeFileSync(this.jsonPath, JSON.stringify({ differenceObjects: allDifferenceArrays }));
-        // return newDifferenceArray;
         const differences = new this.differenceModel(newDifferenceArray);
         return differences.save();
     }

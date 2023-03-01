@@ -1,6 +1,7 @@
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Param, Query, Res } from '@nestjs/common';
+import { Response } from 'express';
 
 @Controller('game-click')
 export class GameClickController {
@@ -11,6 +12,13 @@ export class GameClickController {
         return this.differenceClickService.validateDifferencePositions(clickPositionX, clickPositionY, id);
     }
 
+    @Get('/diff')
+    async getDifferences(@Res() res: Response) {
+        const gameCards = await this.differenceClickService.getAllDifferenceArrays();
+        console.log('gameCards', gameCards);
+        res.status(HttpStatus.OK).send(gameCards);
+        // return this.differenceClickService.getAllDifferenceArrays();
+    }
     @Get(':id')
     getDifferencesFromId(@Param('id') stageId: string): number[][] {
         return this.differenceClickService.getDifferenceArrayFromStageID(stageId);
