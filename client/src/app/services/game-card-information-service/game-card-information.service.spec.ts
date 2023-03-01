@@ -58,7 +58,7 @@ describe('GameCardInformationService', () => {
     it('getGameCardInfo should call post on httpManager', () => {
         const postSpy = spyOn(service.http, 'post');
         const mock: GameCardDto = {
-            id: '1',
+            _id: '1',
             name: 'name',
             difficulty: 'difficult',
             baseImage: 'string',
