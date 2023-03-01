@@ -3,26 +3,35 @@ import { ImageDimensionsService } from '@app/services/image-dimensions/image-dim
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { DifferencesObject } from '@common/differences-object';
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 import * as fs from 'fs';
+import { Model } from 'mongoose';
 import * as path from 'path';
+import { Differences, DifferencesDocument } from 'schemas/differences.schemas';
 @Injectable()
 export class DifferenceClickService {
     jsonPath = path.join(process.cwd(), 'app/dataBase/differences.json');
-    constructor(private differenceCounterService: DifferencesCounterService, private imageDimensionsService: ImageDimensionsService) {}
+    constructor(
+        @InjectModel(Differences.name) private differenceModel: Model<DifferencesDocument>,
+        private differenceCounterService: DifferencesCounterService,
+        private imageDimensionsService: ImageDimensionsService,
+    ) {}
 
     getAllDifferenceArrays(): DifferencesObject[] {
         const content = fs.readFileSync(this.jsonPath, 'utf8');
         return JSON.parse(content).differenceObjects;
     }
-    createDifferenceArray(gameId: string, differencesArray: number[][]): DifferencesObject {
-        const allDifferenceArrays = this.getAllDifferenceArrays();
-        const newDifferenceArray: DifferencesObject = {
+    async createDifferenceArray(gameId: string, differencesArray: number[][]): Promise<Differences> {
+        // const allDifferenceArrays = this.getAllDifferenceArrays();
+        const newDifferenceArray: Differences = {
             id: gameId,
             differences: differencesArray,
         };
-        allDifferenceArrays.push(newDifferenceArray);
-        fs.writeFileSync(this.jsonPath, JSON.stringify({ differenceObjects: allDifferenceArrays }));
-        return newDifferenceArray;
+        // allDifferenceArrays.push(newDifferenceArray);
+        // fs.writeFileSync(this.jsonPath, JSON.stringify({ differenceObjects: allDifferenceArrays }));
+        // return newDifferenceArray;
+        const differences = new this.differenceModel(newDifferenceArray);
+        return differences.save();
     }
 
     getDifferenceArrayFromStageID(stageId: string): number[][] {
