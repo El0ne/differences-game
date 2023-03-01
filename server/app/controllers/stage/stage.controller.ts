@@ -95,9 +95,10 @@ export class StageController {
                 );
 
                 const id = uuidv4();
-                this.differenceClickService.createDifferenceArray(id, differencesArray);
 
                 if (this.gameDifficultyService.isGameValid(differencesArray)) {
+                    console.log('here');
+                    this.differenceClickService.createDifferenceArray(id, differencesArray);
                     const difficulty = this.gameDifficultyService.setGameDifficulty(differencesArray);
 
                     const data: ServerGeneratedGameInfo = {

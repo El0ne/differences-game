@@ -6,7 +6,6 @@ import { Differences, differencesSchema } from 'schemas/differences.schemas';
 import { GameCard, gameCardSchema } from 'schemas/game-cards.schemas';
 import { GameClickController } from './controllers/game-click/game-click.controller';
 import { StageController } from './controllers/stage/stage.controller';
-import { DataBaseService } from './services/data-base/data-base.service';
 import { DifferenceClickService } from './services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from './services/difference-detection/difference-detection.service';
 import { DifferencesCounterService } from './services/differences-counter/differences-counter.service';
@@ -40,7 +39,6 @@ import { PixelRadiusService } from './services/pixel-radius/pixel-radius.service
         GameDifficultyService,
         DifferenceClickService,
         DifferenceDetectionService,
-        DataBaseService,
         DifferencesCounterService,
         PixelRadiusService,
         PixelPositionService,
