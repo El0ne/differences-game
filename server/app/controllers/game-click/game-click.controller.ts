@@ -15,13 +15,6 @@ export class GameClickController {
         return await this.differenceClickService.validateDifferencePositions(clickPositionX, clickPositionY, id);
     }
 
-    // @Get('/diff')
-    // async getDifferences(@Res() res: Response) {
-    //     const gameCards = await this.differenceClickService.getAllDifferenceArrays();
-    //     console.log('gameCards', gameCards);
-    //     res.status(HttpStatus.OK).send(gameCards);
-    //     // return this.differenceClickService.getAllDifferenceArrays();
-    // }
     @Get(':id')
     async getDifferencesFromId(@Param('id') stageId: string): Promise<number[][]> {
         return await this.differenceClickService.getDifferenceArrayFromStageID(stageId);

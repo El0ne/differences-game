@@ -4,16 +4,16 @@ import { ClickDifferenceVerification } from '@common/click-difference-verificati
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import * as path from 'path';
 import { Differences, DifferencesDocument } from 'schemas/differences.schemas';
+
 @Injectable()
 export class DifferenceClickService {
-    jsonPath = path.join(process.cwd(), 'app/dataBase/differences.json');
     constructor(
         @InjectModel(Differences.name) private differenceModel: Model<DifferencesDocument>,
         private differenceCounterService: DifferencesCounterService,
         private imageDimensionsService: ImageDimensionsService,
     ) {}
+
     async getAllDifferenceArrays(): Promise<Differences[]> {
         return await this.differenceModel.find({});
     }
@@ -28,14 +28,6 @@ export class DifferenceClickService {
     }
 
     async getDifferenceArrayFromStageID(stageId: string): Promise<number[][]> {
-        // const content = fs.readFileSync(this.jsonPath, 'utf8');
-        // for (const differenceObject of JSON.parse(content).differenceObjects) {
-        //     if (differenceObject.id === stageId) {
-        //         return differenceObject.differences;
-        //     }
-        // }
-        // return [];
-
         // TODO return object and not only differences
         const differenceArray = await this.differenceModel.findOne({ id: stageId });
         return differenceArray.differences;
