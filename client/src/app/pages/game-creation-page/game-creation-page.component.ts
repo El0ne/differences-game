@@ -37,6 +37,8 @@ export class GameCreationPageComponent implements OnInit {
     differenceNumber: number = 0;
     difficulty: string = '';
 
+    createdGameInfo: GameInformation;
+
     constructor(public gameCardService: GameCardInformationService, private matDialog: MatDialog, public router: Router) {}
 
     ngOnInit(): void {
@@ -142,7 +144,7 @@ export class GameCreationPageComponent implements OnInit {
             this.isDisabled = true;
             this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
                 if (data.gameDifferenceNumber) {
-                    const gameInfo: GameInformation = {
+                    this.createdGameInfo = {
                         id: data.gameId,
                         name: this.gameTitle,
                         difficulty: data.gameDifficulty,
@@ -154,8 +156,9 @@ export class GameCreationPageComponent implements OnInit {
                     this.difficulty = data.gameDifficulty;
                     this.differenceNumber = data.gameDifferenceNumber;
                     this.image = `${STAGE}/image/difference-image.bmp`;
-                    this.gameCardService.createGame(gameInfo).subscribe();
-                    this.gameCardService.getGameCardInfoFromId(data.gameId);
+                    this.gameCardService.createGame(this.createdGameInfo).subscribe();
+                    // TODO find out what commented code does. Doesnt seem important
+                    // this.gameCardService.getGameCardInfoFromId(data.gameId);
                     this.openModal();
                 } else {
                     this.isDisabled = false;
