@@ -4,7 +4,7 @@ import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameDifficultyService } from '@app/services/game-difficulty/game-difficulty.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { GameCardDto } from '@common/game-card.dto';
-import { ImageUploadData } from '@common/image-upload-data';
+import { ImageUploadDto } from '@common/image-upload.dto';
 import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
 import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
@@ -13,7 +13,6 @@ import { diskStorage } from 'multer';
 import * as path from 'path';
 import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
-
 // based on https://www.youtube.com/watch?v=f-URVd2OKYc
 export const storage = diskStorage({
     destination: './assets/images',
@@ -86,7 +85,7 @@ export class StageController {
             { storage },
         ),
     )
-    async uploadImages(@UploadedFiles() files: ImageUploadData, @Param() param, @Res() res: Response): Promise<void> {
+    async uploadImages(@UploadedFiles() files: ImageUploadDto, @Param() param, @Res() res: Response): Promise<void> {
         try {
             if (Object.keys(files).length) {
                 const differencesArray = await this.differenceService.compareImages(
