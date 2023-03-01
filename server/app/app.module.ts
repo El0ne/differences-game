@@ -2,8 +2,8 @@ import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { GameCardModule } from 'game-card/schemas/game-card.module';
-import { GameCard, gameCardSchema } from 'game-card/schemas/game-cards.schemas';
+import { Differences, differencesSchema } from 'schemas/differences.schemas';
+import { GameCard, gameCardSchema } from 'schemas/game-cards.schemas';
 import { GameClickController } from './controllers/game-click/game-click.controller';
 import { StageController } from './controllers/stage/stage.controller';
 import { DataBaseService } from './services/data-base/data-base.service';
@@ -28,7 +28,7 @@ import { PixelRadiusService } from './services/pixel-radius/pixel-radius.service
             }),
         }),
         MongooseModule.forFeature([{ name: GameCard.name, schema: gameCardSchema }]),
-        GameCardModule,
+        MongooseModule.forFeature([{ name: Differences.name, schema: differencesSchema }]),
     ],
     controllers: [GameClickController, StageController],
     providers: [

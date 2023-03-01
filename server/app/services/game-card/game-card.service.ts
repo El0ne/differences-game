@@ -1,9 +1,9 @@
 import { GameInformation } from '@common/game-information';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { GameCard, GameCardDocument } from 'game-card/schemas/game-cards.schemas';
 import { Model } from 'mongoose';
 import * as path from 'path';
+import { GameCard, GameCardDocument } from 'schemas/game-cards.schemas';
 
 @Injectable()
 export class GameCardService {
