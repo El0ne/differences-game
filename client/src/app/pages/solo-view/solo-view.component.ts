@@ -3,10 +3,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
-import { ChatSocketService } from '@app/services/chat-socket/chat-socket.service';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
+import { SocketService } from '@app/services/socket/socket.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { RoomMessage, Validation } from '@common/chat-gateway-constants';
 import { GameCardInformation } from '@common/game-card';
@@ -51,7 +51,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         public dialog: MatDialog,
         public router: Router,
-        private chat: ChatSocketService,
+        private chat: SocketService,
     ) {}
 
     get socketId() {

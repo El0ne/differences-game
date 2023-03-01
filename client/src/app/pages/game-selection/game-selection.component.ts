@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { SocketService } from '@app/services/socket/socket.service';
 import { GameCardInformation } from '@common/game-card';
 import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
 
@@ -15,7 +16,7 @@ export class GameSelectionComponent implements OnInit {
     index: number = 0;
     isConfig: boolean | null;
 
-    constructor(public gameCardService: GameCardInformationService, public router: Router) {}
+    constructor(public gameCardService: GameCardInformationService, public router: Router, public socket: SocketService) {}
 
     ngOnInit(): void {
         this.isConfig = this.router.url === '/config';
@@ -23,6 +24,9 @@ export class GameSelectionComponent implements OnInit {
             this.numberOfGameInformations = data;
             this.selectGameCards();
         });
+        this.socket.connect();
+        this.socket.listen('yo', (data) => console.log(data));
+        this.socket.send('test', 'salut');
     }
 
     selectGameCards(): void {
