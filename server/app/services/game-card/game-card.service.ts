@@ -15,14 +15,14 @@ export class GameCardService {
         return await this.gameCardModel.find({});
     }
 
-    async getGameCards(startIndex: number, endIndex: number) {
+    async getGameCards(startIndex: number, endIndex: number): Promise<GameCard[]> {
         return await this.gameCardModel
             .find({})
             .skip(startIndex)
             .limit(endIndex - startIndex + 1);
     }
 
-    async getGameCardById(id: string) {
+    async getGameCardById(id: string): Promise<GameCard> {
         return await this.gameCardModel.findOne({ id });
     }
 
