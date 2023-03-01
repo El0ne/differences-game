@@ -87,6 +87,7 @@ export class StageController {
     )
     async uploadImages(@UploadedFiles() files: ImageUploadDto, @Param() param, @Res() res: Response): Promise<void> {
         try {
+            console.log('first');
             if (Object.keys(files).length) {
                 const differencesArray = await this.differenceService.compareImages(
                     files.baseImage[0].path,
@@ -94,14 +95,17 @@ export class StageController {
                     param.radius,
                 );
 
-                const id = uuidv4();
-
+                // const id = uuidv4();
+                console.log('here');
                 if (this.gameDifficultyService.isGameValid(differencesArray)) {
-                    this.differenceClickService.createDifferenceArray(id, differencesArray);
+                    // this.differenceClickService.createDifferenceArray(id, differencesArray);
+                    const differenceObject = await this.differenceClickService.createDifferenceArray(differencesArray);
+                    console.log('vreated');
                     const difficulty = this.gameDifficultyService.setGameDifficulty(differencesArray);
 
                     const data: ServerGeneratedGameInfo = {
-                        gameId: id,
+                        // eslint-disable-next-line no-underscore-dangle
+                        gameId: differenceObject._id,
                         originalImageName: files.baseImage[0].filename,
                         differenceImageName: files.differenceImage[0].filename,
                         gameDifficulty: difficulty,

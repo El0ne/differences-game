@@ -5,8 +5,8 @@ export type DifferencesDocument = Differences & Document;
 
 @Schema()
 export class Differences {
-    @Prop()
-    id: string;
+    // @Prop()
+    // _id: string;
 
     @Prop()
     differences: number[][];

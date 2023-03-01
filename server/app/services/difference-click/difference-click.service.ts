@@ -18,18 +18,20 @@ export class DifferenceClickService {
         return await this.differenceModel.find({});
     }
 
-    async createDifferenceArray(gameId: string, differencesArray: number[][]): Promise<Differences> {
+    async createDifferenceArray(differencesArray: number[][]) {
         const newDifferenceArray: Differences = {
-            id: gameId,
             differences: differencesArray,
         };
         const differences = new this.differenceModel(newDifferenceArray);
+        // differences.save();
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions, no-underscore-dangle
+        // differences._id;
         return differences.save();
     }
 
-    async getDifferenceArrayFromStageID(stageId: string): Promise<number[][]> {
+    async getDifferenceArrayFromStageID(_id: string): Promise<number[][]> {
         // TODO return object and not only differences
-        const differenceArray = await this.differenceModel.findOne({ id: stageId });
+        const differenceArray = await this.differenceModel.findOne({ _id });
         return differenceArray.differences;
     }
 
