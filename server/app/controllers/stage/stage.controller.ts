@@ -99,13 +99,13 @@ export class StageController {
                 console.log('here');
                 if (this.gameDifficultyService.isGameValid(differencesArray)) {
                     // this.differenceClickService.createDifferenceArray(id, differencesArray);
-                    const differenceObject = await this.differenceClickService.createDifferenceArray(differencesArray);
+                    const differenceObjectId = await this.differenceClickService.createDifferenceArray(differencesArray);
                     console.log('vreated');
                     const difficulty = this.gameDifficultyService.setGameDifficulty(differencesArray);
 
                     const data: ServerGeneratedGameInfo = {
                         // eslint-disable-next-line no-underscore-dangle
-                        gameId: differenceObject._id,
+                        gameId: differenceObjectId,
                         originalImageName: files.baseImage[0].filename,
                         differenceImageName: files.differenceImage[0].filename,
                         gameDifficulty: difficulty,

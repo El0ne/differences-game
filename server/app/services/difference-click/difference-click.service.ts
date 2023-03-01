@@ -18,15 +18,15 @@ export class DifferenceClickService {
         return await this.differenceModel.find({});
     }
 
-    async createDifferenceArray(differencesArray: number[][]) {
+    // TODO type the return value of funcion
+    async createDifferenceArray(differencesArray: number[][]): Promise<string> {
         const newDifferenceArray: Differences = {
             differences: differencesArray,
         };
         const differences = new this.differenceModel(newDifferenceArray);
-        // differences.save();
-        // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions, no-underscore-dangle
-        // differences._id;
-        return differences.save();
+        console.log('typeof differences', typeof differences);
+        // eslint-disable-next-line no-underscore-dangle
+        return (await differences.save())._id;
     }
 
     async getDifferenceArrayFromStageID(_id: string): Promise<number[][]> {
