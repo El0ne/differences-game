@@ -8,7 +8,7 @@ export type GameCardDocument = GameCard & Document;
 @Schema()
 export class GameCard {
     @Prop()
-    _id: string;
+    id: string;
 
     @Prop()
     name: string;

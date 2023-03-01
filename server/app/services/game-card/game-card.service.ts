@@ -38,7 +38,7 @@ export class GameCardService {
 
     generateGameCard(game: GameInformation): GameCard {
         return {
-            _id: game.id,
+            id: game.id,
             name: game.name,
             difficulty: game.difficulty,
             differenceNumber: game.differenceNumber,
