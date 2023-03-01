@@ -1,4 +1,4 @@
-export class GameInformation {
+export class GameCardDto {
     id: string;
     name: string;
     difficulty: string;

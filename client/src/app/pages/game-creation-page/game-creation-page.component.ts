@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { STAGE } from '@app/services/server-routes';
-import { GameInformation } from '@common/game-information';
+import { GameCardDto } from '@common/game-card.dto';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GC_PATHS } from './game-creation-constants';
@@ -37,7 +37,7 @@ export class GameCreationPageComponent implements OnInit {
     differenceNumber: number = 0;
     difficulty: string = '';
 
-    createdGameInfo: GameInformation;
+    createdGameInfo: GameCardDto;
 
     constructor(public gameCardService: GameCardInformationService, private matDialog: MatDialog, public router: Router) {}
 

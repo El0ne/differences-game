@@ -1,4 +1,4 @@
-import { GameCardDto } from '@app/model/dto/game-card.dto';
+import { GameCardDto } from '@common/game-card.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';

@@ -1,9 +1,9 @@
-import { GameCardDto } from '@app/model/dto/game-card.dto';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameDifficultyService } from '@app/services/game-difficulty/game-difficulty.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
+import { GameCardDto } from '@common/game-card.dto';
 import { ImageUploadData } from '@common/image-upload-data';
 import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
 import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
