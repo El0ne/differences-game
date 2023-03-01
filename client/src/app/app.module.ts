@@ -17,6 +17,7 @@ import { GameCreationPageComponent } from './pages/game-creation-page/game-creat
 import { GameSelectionComponent } from './pages/game-selection/game-selection.component';
 import { HomePageComponent } from './pages/home-page/home-page.component';
 import { SoloViewComponent } from './pages/solo-view/solo-view.component';
+import { HostWaitingRoomComponent } from './modals/host-waiting-room/host-waiting-room.component';
 
 /**
  * Main module that is used in main.ts.
@@ -36,6 +37,7 @@ import { SoloViewComponent } from './pages/solo-view/solo-view.component';
         ClickEventComponent,
         GameCreationPageComponent,
         ChosePlayerNameDialogComponent,
+        HostWaitingRoomComponent,
     ],
     entryComponents: [ModalPageComponent],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, MatIconModule],

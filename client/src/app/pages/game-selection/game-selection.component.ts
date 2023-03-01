@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { Router } from '@angular/router';
+import { GameCardSelectionComponent } from '@app/components/game-card-selection/game-card-selection.component';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { GameCardInformation } from '@common/game-card';
@@ -11,6 +12,7 @@ import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
     styleUrls: ['./game-selection.component.scss'],
 })
 export class GameSelectionComponent implements OnInit {
+    @ViewChildren('stages') private stages: QueryList<GameCardSelectionComponent>;
     gameCardInformations: GameCardInformation[] = [];
     numberOfGameInformations = 0;
     index: number = 0;
@@ -20,19 +22,28 @@ export class GameSelectionComponent implements OnInit {
 
     ngOnInit(): void {
         this.isConfig = this.router.url === '/config';
+        this.socket.connect();
         this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
             this.numberOfGameInformations = data;
             this.selectGameCards();
         });
-        this.socket.connect();
-        this.socket.listen('yo', (data) => console.log(data));
-        this.socket.send('test', 'salut');
+
+        this.socket.listen('gameCreated', (stageId: string) => {
+            this.stages
+                .find((gameCardSelection: GameCardSelectionComponent) => gameCardSelection.gameCardInformation.id === stageId)
+                ?.toggleCreateGame();
+        });
     }
 
     selectGameCards(): void {
         const endIndex = Math.min(this.numberOfGameInformations, this.index + GAME_CARDS_TO_DISPLAY);
         this.gameCardService.getGameCardsInformations(this.index, endIndex).subscribe((data) => {
             this.gameCardInformations = data;
+
+            this.socket.send(
+                'searchForHosts',
+                this.gameCardInformations.map((gameCardInfo: GameCardInformation) => gameCardInfo.id),
+            );
         });
     }
 

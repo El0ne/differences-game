@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { STAGE } from '@app/services/server-routes';
+import { SocketService } from '@app/services/socket/socket.service';
 import { GameCardInformation } from '@common/game-card';
 
 @Component({
@@ -11,9 +12,23 @@ export class GameCardSelectionComponent implements OnInit {
     @Input() gameCardInformation: GameCardInformation;
     @Input() isConfig: boolean | null;
     image: string = '';
+    createGameButton: boolean = true;
 
+    constructor(public socket: SocketService) {}
     ngOnInit() {
         this.image = `${STAGE}/image/${this.gameCardInformation.originalImageName}`;
+    }
+
+    toggleCreateGame() {
+        this.createGameButton = !this.createGameButton;
+    }
+
+    hostGame() {
+        this.socket.send('hostGame', this.gameCardInformation.id);
+    }
+
+    joinGame() {
+        this.socket.send('joinHost');
     }
     // TODO: ajouter la logique pour que le reset des temps et le delete se fait pour le sprint 2
 

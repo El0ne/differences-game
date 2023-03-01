@@ -3,34 +3,20 @@
         <button id="previous" routerLink="/home">Retour</button>
     </div>
     <div *ngFor="let gameCardInformation of gameCardInformations" class="card-container">
-        <app-game-card-selection [gameCardInformation]="gameCardInformation" [isConfig]="isConfig"></app-game-card-selection>
+        <app-game-card-selection #stages [gameCardInformation]="gameCardInformation"
+            [isConfig]="isConfig"></app-game-card-selection>
     </div>
     <div class="navigate-cards-container">
-        <button
-            type="button"
-            (click)="previousCards()"
-            id="show-previous-cards-button"
-            class="normal-button navigate-cards-buttons"
-            [disabled]="isShowingFirstCard()"
-        >
+        <button type="button" (click)="previousCards()" id="show-previous-cards-button"
+            class="normal-button navigate-cards-buttons" [disabled]="isShowingFirstCard()">
             <mat-icon>arrow_back</mat-icon>
         </button>
-        <button
-            type="button"
-            *ngIf="isConfig"
-            id="create-a-stage-button"
-            class="normal-button navigate-cards-buttons"
-            [routerLink]="['/creatingGame']"
-        >
+        <button type="button" *ngIf="isConfig" id="create-a-stage-button" class="normal-button navigate-cards-buttons"
+            [routerLink]="['/creatingGame']">
             Create a stage
         </button>
-        <button
-            type=" button"
-            (click)="nextCards()"
-            id="show-next-cards-button"
-            class="normal-button navigate-cards-buttons"
-            [disabled]="isShowingLastCard()"
-        >
+        <button type=" button" (click)="nextCards()" id="show-next-cards-button"
+            class="normal-button navigate-cards-buttons" [disabled]="isShowingLastCard()">
             <mat-icon>arrow_forward</mat-icon>
         </button>
     </div>

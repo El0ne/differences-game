@@ -19,7 +19,8 @@
             </div>
         </div>
         <div class="column">
-            <div class="difficulty-container" [ngClass]="gameCardInformation.difficulty === 'Difficile' ? 'difficult' : 'easy'">
+            <div class="difficulty-container"
+                [ngClass]="gameCardInformation.difficulty === 'Difficile' ? 'difficult' : 'easy'">
                 <p id="difficulty">
                     {{ gameCardInformation.difficulty }}
                 </p>
@@ -54,6 +55,7 @@
     <div class="row" *ngIf="!isConfig">
         <button class="normal-button play" [routerLink]="'/soloview/' + gameCardInformation.id">Jouer</button>
         <!-- temporary while awaiting for logic to implement the waiting room-->
-        <button class="normal-button create" [routerLink]="'/1v1/' + gameCardInformation.id">Joindre</button>
+        <button class="normal-button create" (click)="hostGame()">{{createGameButton ?
+            'Créer' : 'Joindre'}}</button>
     </div>
 </div>
