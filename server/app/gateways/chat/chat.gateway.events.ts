@@ -10,3 +10,8 @@ export enum ChatEvents {
     Hello = 'hello',
     Clock = 'clock',
 }
+
+export interface RoomManagement {
+    room: string;
+    message: string;
+}

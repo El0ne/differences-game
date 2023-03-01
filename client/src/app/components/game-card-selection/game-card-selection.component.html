@@ -53,6 +53,7 @@
     </div>
     <div class="row" *ngIf="!isConfig">
         <button class="normal-button play" [routerLink]="'/soloview/' + gameCardInformation.id">Jouer</button>
-        <button class="normal-button create" routerLink="/waitingRoom">Joindre</button>
+        <!-- temporary while awaiting for logic to implement the waiting room-->
+        <button class="normal-button create" [routerLink]="'/1v1/' + gameCardInformation.id">Joindre</button>
     </div>
 </div>

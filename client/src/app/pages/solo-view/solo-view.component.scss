@@ -1,8 +1,10 @@
 :host {
     --basic-border: #00e6f6;
+    --message: #0019f6;
+    --player2: #6b6b6b;
     --linear-background-color-1: #92089c;
     --linear-background-color-2: #a80d43;
-    --error-message-color: rgb(196, 97, 97);
+    --error-message-color: rgb(177, 32, 32);
     --send-hover: #00b7c4;
     --nav-button-color: #cf0edd;
 }
@@ -92,7 +94,7 @@ body {
     align-items: center;
     justify-content: center;
     background-color: lightgray;
-    height: 40%;
+    height: 43%;
     width: 75%;
     border-style: solid;
     border-radius: 25px;
@@ -103,14 +105,13 @@ body {
     border-style: solid;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
     background-color: white;
     height: 80%;
     width: 90%;
     margin-bottom: 5px;
     overflow-y: auto;
     overflow-x: hidden;
+    justify-content: flex-end;
 }
 
 .answer-area {
@@ -127,15 +128,23 @@ body {
 }
 
 .message {
-    background-color: var(--basic-border);
-    border-radius: 5px;
-    margin: 5px;
+    border-radius: 10px;
+    padding: 6px;
+    margin: 4px;
+    font-size: x-large;
+    color: white;
 }
 
-.error-message {
+.error {
     background-color: var(--error-message-color);
-    border-radius: 5px;
-    margin: 5px;
+}
+
+.player1 {
+    background-color: var(--message);
+}
+
+.player2 {
+    background-color: var(--player2);
 }
 
 .error-message:hover {
@@ -287,15 +296,27 @@ app-click-event {
     align-items: center;
     width: 31rem;
     height: 100%;
+    margin-bottom: 10.75%;
+}
+#double-score {
+    display: flex;
+    flex-direction: row;
+    gap: 5%;
 }
 
+#double-score:first-child {
+    padding-right: 4%;
+}
 #score {
     align-self: center;
-    padding: 2%;
+    padding-top: 2%;
+    padding-bottom: 2%;
 }
 
 #timer {
     align-self: center;
+    padding-top: 3%;
+    padding-bottom: 3%;
 }
 
 .timer-box {
@@ -379,22 +400,19 @@ app-click-event {
     gap: 100px;
     box-shadow: 0px 0px 3px black;
 }
+
 .row {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
 }
-.col-heading h1 {
-    font-family: 'Verdana';
-    font-style: normal;
-    font-weight: 700;
-    font-size: 40px;
-    line-height: 36px;
-    text-align: center;
 
-    color: white;
+.col-heading {
+    margin-top: 10%;
+    margin-bottom: 5%;
 }
+
 .col-display {
     width: 155px;
     height: 120px;
@@ -407,6 +425,7 @@ app-click-event {
     line-height: 110px;
     text-align: center;
     color: #f94f6d;
+    margin-bottom: 15%;
 }
 
 .add {
@@ -437,4 +456,15 @@ app-click-event {
         gap: 10px;
         max-height: 100%;
     }
+}
+
+.playerName {
+    font-family: 'Verdana';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 40px;
+    line-height: 36px;
+    text-align: center;
+    padding-bottom: 5%;
+    color: white;
 }
