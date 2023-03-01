@@ -1,3 +1,4 @@
+import { GameCardDto } from '@app/model/dto/game-card.dto';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
 import { GameCardService } from '@app/services/game-card/game-card.service';
@@ -64,7 +65,7 @@ export class StageController {
     }
 
     @Post('/')
-    async createGame(@Body() game, @Res() res: Response): Promise<void> {
+    async createGame(@Body() game: GameCardDto, @Res() res: Response): Promise<void> {
         try {
             if (Object.keys(game).length) {
                 const newGame = await this.gameCardService.createGameCard(game);

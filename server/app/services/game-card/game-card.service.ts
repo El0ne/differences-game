@@ -1,4 +1,4 @@
-import { GameInformation } from '@common/game-information';
+import { GameCardDto } from '@app/model/dto/game-card.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -30,13 +30,13 @@ export class GameCardService {
         return await this.gameCardModel.count();
     }
 
-    async createGameCard(gameCard: GameInformation): Promise<GameCard> {
+    async createGameCard(gameCard: GameCardDto): Promise<GameCard> {
         const generatedGameCard = this.generateGameCard(gameCard);
         const newGameCard = new this.gameCardModel(generatedGameCard);
         return newGameCard.save();
     }
 
-    generateGameCard(game: GameInformation): GameCard {
+    generateGameCard(game: GameCardDto): GameCard {
         return {
             id: game.id,
             name: game.name,
