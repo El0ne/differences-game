@@ -56,7 +56,6 @@ export class StageController {
     @Get('/:gameCardId')
     async getStageById(@Param() param, @Res() res: Response): Promise<void> {
         try {
-            console.log('param', param);
             const gameCard = await this.gameCardService.getGameCardById(param.gameCardId);
             res.status(HttpStatus.OK).send(gameCard);
         } catch {
@@ -120,7 +119,6 @@ export class StageController {
 
     @Get('/image/:imageName')
     async getImage(@Param() param, @Res() res: Response): Promise<void> {
-        console.log('param', param);
         try {
             const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);
             res.status(HttpStatus.OK).sendFile(imagePath);

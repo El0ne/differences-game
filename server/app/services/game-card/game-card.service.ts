@@ -24,7 +24,8 @@ export class GameCardService {
     }
 
     async getGameCardById(id: string): Promise<GameCard> {
-        return await this.gameCardModel.findOne({ _id: new ObjectId(id) });
+        return await this.gameCardModel.findById(new ObjectId(id));
+        // return await this.gameCardModel.findById({ _id: new ObjectId(id) });
     }
 
     async getGameCardsNumber(): Promise<number> {
