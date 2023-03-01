@@ -1,9 +1,9 @@
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
+import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
+import { GameCard, gameCardSchema } from '@app/schemas/game-cards.schemas';
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Differences, differencesSchema } from 'schemas/differences.schemas';
-import { GameCard, gameCardSchema } from 'schemas/game-cards.schemas';
 import { GameClickController } from './controllers/game-click/game-click.controller';
 import { StageController } from './controllers/stage/stage.controller';
 import { DifferenceClickService } from './services/difference-click/difference-click.service';

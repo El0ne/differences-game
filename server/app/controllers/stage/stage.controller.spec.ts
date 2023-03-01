@@ -1,5 +1,6 @@
 // @ts-ignore
 
+import { GameCard } from '@app/schemas/game-cards.schemas';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
@@ -9,13 +10,13 @@ import { ImageDimensionsService } from '@app/services/image-dimensions/image-dim
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
-import { GameCardInformation } from '@common/game-card';
 import { GameCardDto } from '@common/game-card.dto';
 import { HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { assert } from 'console';
 import * as fs from 'fs';
 import * as Jimp from 'jimp';
+import { ObjectId } from 'mongodb';
 import * as join from 'path';
 import Sinon, { stub } from 'sinon';
 import * as request from 'supertest';
@@ -113,7 +114,7 @@ describe('StageController', () => {
     });
 
     it('createGame() should call GameCardService.createGameCard() with the body as a parameter', async () => {
-        const createGameCardStub = stub(gameCardService, 'createGameCard').callsFake(() => FAKE_GAME_CARD_ARRAY[0]);
+        const createGameCardStub = stub(gameCardService, 'createGameCard').callsFake(async () => Promise.resolve(FAKE_GAME_CARD));
         const response = await request(httpServer).post('/stage').send(FAKE_GAME_INFO);
         assert(createGameCardStub.called);
         expect(response.status).toBe(HttpStatus.CREATED);
@@ -186,8 +187,8 @@ const FAKE_GAME_INFO: GameCardDto = {
     radius: 3,
     differenceNumber: 6,
 };
-const FAKE_GAME_CARD: GameCardInformation = {
-    _id: '0',
+const FAKE_GAME_CARD: GameCard = {
+    _id: new ObjectId(0),
     name: 'game.name',
     difficulty: 'Facile',
     differenceNumber: 6,
@@ -204,4 +205,4 @@ const FAKE_GAME_CARD: GameCardInformation = {
         { time: 0, name: '--' },
     ],
 };
-const FAKE_GAME_CARD_ARRAY: GameCardInformation[] = [FAKE_GAME_CARD, FAKE_GAME_CARD];
+const FAKE_GAME_CARD_ARRAY: GameCard[] = [FAKE_GAME_CARD, FAKE_GAME_CARD];
