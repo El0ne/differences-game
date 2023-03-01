@@ -145,7 +145,7 @@ export class GameCreationPageComponent implements OnInit {
             this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
                 if (data.gameDifferenceNumber) {
                     this.createdGameInfo = {
-                        id: data.gameId,
+                        _id: data.gameId,
                         name: this.gameTitle,
                         difficulty: data.gameDifficulty,
                         baseImage: data.originalImageName,

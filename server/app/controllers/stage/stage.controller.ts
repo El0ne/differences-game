@@ -56,6 +56,7 @@ export class StageController {
     @Get('/:gameCardId')
     async getStageById(@Param() param, @Res() res: Response): Promise<void> {
         try {
+            console.log('param', param);
             const gameCard = await this.gameCardService.getGameCardById(param.gameCardId);
             res.status(HttpStatus.OK).send(gameCard);
         } catch {
@@ -87,7 +88,6 @@ export class StageController {
     )
     async uploadImages(@UploadedFiles() files: ImageUploadDto, @Param() param, @Res() res: Response): Promise<void> {
         try {
-            console.log('first');
             if (Object.keys(files).length) {
                 const differencesArray = await this.differenceService.compareImages(
                     files.baseImage[0].path,
@@ -95,16 +95,11 @@ export class StageController {
                     param.radius,
                 );
 
-                // const id = uuidv4();
-                console.log('here');
                 if (this.gameDifficultyService.isGameValid(differencesArray)) {
-                    // this.differenceClickService.createDifferenceArray(id, differencesArray);
                     const differenceObjectId = await this.differenceClickService.createDifferenceArray(differencesArray);
-                    console.log('vreated');
                     const difficulty = this.gameDifficultyService.setGameDifficulty(differencesArray);
 
                     const data: ServerGeneratedGameInfo = {
-                        // eslint-disable-next-line no-underscore-dangle
                         gameId: differenceObjectId,
                         originalImageName: files.baseImage[0].filename,
                         differenceImageName: files.differenceImage[0].filename,
@@ -125,6 +120,7 @@ export class StageController {
 
     @Get('/image/:imageName')
     async getImage(@Param() param, @Res() res: Response): Promise<void> {
+        console.log('param', param);
         try {
             const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);
             res.status(HttpStatus.OK).sendFile(imagePath);

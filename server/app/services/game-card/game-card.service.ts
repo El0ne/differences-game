@@ -1,6 +1,7 @@
 import { GameCardDto } from '@common/game-card.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { ObjectId } from 'mongodb';
 import { Model } from 'mongoose';
 import * as path from 'path';
 import { GameCard, GameCardDocument } from 'schemas/game-cards.schemas';
@@ -23,7 +24,7 @@ export class GameCardService {
     }
 
     async getGameCardById(id: string): Promise<GameCard> {
-        return await this.gameCardModel.findOne({ id });
+        return await this.gameCardModel.findOne({ _id: new ObjectId(id) });
     }
 
     async getGameCardsNumber(): Promise<number> {
@@ -38,7 +39,8 @@ export class GameCardService {
 
     generateGameCard(game: GameCardDto): GameCard {
         return {
-            id: game.id,
+            // eslint-disable-next-line no-underscore-dangle
+            _id: new ObjectId(game._id),
             name: game.name,
             difficulty: game.difficulty,
             differenceNumber: game.differenceNumber,

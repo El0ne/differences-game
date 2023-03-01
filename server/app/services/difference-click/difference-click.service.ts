@@ -24,7 +24,6 @@ export class DifferenceClickService {
             differences: differencesArray,
         };
         const differences = new this.differenceModel(newDifferenceArray);
-        console.log('typeof differences', typeof differences);
         // eslint-disable-next-line no-underscore-dangle
         return (await differences.save())._id;
     }
@@ -35,8 +34,8 @@ export class DifferenceClickService {
         return differenceArray.differences;
     }
 
-    async validateDifferencePositions(clickPositionX: number, clickPositionY: number, stageId: string): Promise<ClickDifferenceVerification> {
-        const differences = await this.getDifferenceArrayFromStageID(stageId);
+    async validateDifferencePositions(clickPositionX: number, clickPositionY: number, _id: string): Promise<ClickDifferenceVerification> {
+        const differences = await this.getDifferenceArrayFromStageID(_id);
         const x = Number(clickPositionX);
         const y = Number(clickPositionY);
         const posToCheck = y * this.imageDimensionsService.getWidth() + x;

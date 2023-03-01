@@ -1,5 +1,5 @@
 export class GameCardDto {
-    id: string;
+    _id: string;
     name: string;
     difficulty: string;
     baseImage: string;
