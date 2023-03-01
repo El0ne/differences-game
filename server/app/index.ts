@@ -17,12 +17,5 @@ const bootstrap = async () => {
     SwaggerModule.setup('api/docs', app, document);
     SwaggerModule.setup('', app, document);
     await app.listen(process.env.PORT);
-    // const dataBaseService: DataBaseService = new DataBaseService();
-    // try {
-    //     await dataBaseService.start();
-    //     console.log('Connection was successful');
-    // } catch {
-    //     console.log('Connection was unsuccessful');
-    // }
 };
 bootstrap();
