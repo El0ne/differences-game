@@ -1,5 +1,6 @@
 // @ts-ignore
 
+import { GameCardDto } from '@app/model/dto/game-card.dto';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
@@ -10,7 +11,6 @@ import { ImageManagerService } from '@app/services/image-manager/image-manager.s
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { GameCardInformation } from '@common/game-card';
-import { GameInformation } from '@common/game-information';
 import { HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { assert } from 'console';
@@ -177,7 +177,7 @@ describe('StageController', () => {
     });
 });
 
-const FAKE_GAME_INFO: GameInformation = {
+const FAKE_GAME_INFO: GameCardDto = {
     id: '0',
     name: 'game.name',
     difficulty: 'Facile',

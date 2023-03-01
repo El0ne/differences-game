@@ -1,5 +1,5 @@
+import { GameCardDto } from '@app/model/dto/game-card.dto';
 import { GameCardInformation } from '@common/game-card';
-import { GameInformation } from '@common/game-information';
 import { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing/test';
 import * as path from 'path';
@@ -56,7 +56,7 @@ describe('GameCardService', () => {
     });
 });
 
-const FAKE_GAME_INFO: GameInformation = {
+const FAKE_GAME_INFO: GameCardDto = {
     id: '0',
     name: 'game.name',
     difficulty: 'Facile',
