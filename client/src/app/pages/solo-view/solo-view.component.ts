@@ -7,6 +7,7 @@ import { FoundDifferenceService } from '@app/services/found-differences/found-di
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
+import { differenceInformation } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
 import { Subject } from 'rxjs';
 import { MESSAGES_LENGTH } from './solo-view-constants';
@@ -126,5 +127,16 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     paintPixel(array: number[]): void {
         const rgbaValues = this.left.sendDifferencePixels(array);
         this.right.receiveDifferencePixels(rgbaValues, array);
+    }
+
+    handleFlash(currentDifferences: number[]): void {
+        this.left.differenceEffect(currentDifferences);
+        this.right.differenceEffect(currentDifferences);
+    }
+    emitHandler(information: differenceInformation): void {
+        this.handleFlash(information.lastDifferences);
+        this.paintPixel(information.lastDifferences);
+        this.incrementScore();
+        this.addDifferenceDetected(information.differencesPosition);
     }
 }
