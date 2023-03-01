@@ -3,8 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { GAMES } from '@app/mock/game-cards';
 import { GAME_CARDS_TO_DISPLAY } from '@app/pages/game-selection/game-selection-constants';
 import { STAGE } from '@app/services/server-routes';
-import { GameInformation } from '@common/game-information';
-
+import { GameCardDto } from '@common/game-card.dto';
 import { GameCardInformationService } from './game-card-information.service';
 
 describe('GameCardInformationService', () => {
@@ -58,7 +57,7 @@ describe('GameCardInformationService', () => {
 
     it('getGameCardInfo should call post on httpManager', () => {
         const postSpy = spyOn(service.http, 'post');
-        const mock: GameInformation = {
+        const mock: GameCardDto = {
             id: '1',
             name: 'name',
             difficulty: 'difficult',
