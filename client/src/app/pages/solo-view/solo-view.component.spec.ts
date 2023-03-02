@@ -6,6 +6,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
+import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
+import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { GameCardInformation } from '@common/game-card';
 import { of } from 'rxjs/internal/observable/of';
@@ -133,6 +135,23 @@ describe('SoloViewComponent', () => {
         component.addDifferenceDetected(1);
 
         expect(addDiffSpy).toHaveBeenCalled();
+    });
+
+    it('should open the game info modal with the correct data', () => {
+        const spy = spyOn(modalSpy, 'open').and.callThrough();
+        component.openInfoModal();
+        expect(spy).toHaveBeenCalledWith(GameInfoModalComponent, {
+            data: {
+                gameCardInfo: component.gameCardInfo,
+                numberOfDifferences: component.numberOfDifferences,
+            },
+        });
+    });
+
+    it('should open the quit game modal with disableClose set to true', () => {
+        const spy = spyOn(modalSpy, 'open').and.callThrough();
+        component.quitGame();
+        expect(spy).toHaveBeenCalledWith(QuitGameModalComponent, { disableClose: true });
     });
 
     it('paintPixel should call sendPixels and receivePixels properly', () => {
