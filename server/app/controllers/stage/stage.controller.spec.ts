@@ -37,7 +37,6 @@ describe('StageController', () => {
     let gameCardService: GameCardService;
 
     let mongoServer: MongoMemoryServer;
-    let gameCardModel: Model<GameCardDocument>;
     let connection: Connection;
 
     beforeEach(async () => {
