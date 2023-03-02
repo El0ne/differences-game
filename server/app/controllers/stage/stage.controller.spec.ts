@@ -76,14 +76,6 @@ describe('StageController', () => {
         getGameCardByIdStub = stub(gameCardService, 'getGameCardById');
     });
 
-    // beforeEach(async () => {
-    //     // mongoServer = await MongoMemoryServer.create();
-
-    //     getGameCardStub = stub(gameCardService, 'getGameCards');
-    //     getGameCardsNumberStub = stub(gameCardService, 'getGameCardsNumber');
-    //     getGameCardByIdStub = stub(gameCardService, 'getGameCardById');
-    // });
-
     afterEach((done) => {
         getGameCardStub.restore();
         getGameCardsNumberStub.restore();
@@ -101,12 +93,15 @@ describe('StageController', () => {
 
     it('getStages() should return game cards if there are at least one', async () => {
         getGameCardStub.callsFake(() => {
-            return FAKE_GAME_CARD_ARRAY;
+            return FAKE_GAME_CARD;
         });
+
+        await gameCardModel.deleteMany({});
+        await gameCardModel.create(FAKE_GAME_CARD);
         const response = await request(httpServer).get('/stage');
         assert(getGameCardStub.called);
         expect(response.status).toBe(HttpStatus.OK);
-        expect(response.body).toEqual(FAKE_GAME_CARD_ARRAY);
+        expect(response.body).toEqual(FAKE_GAME_CARD_ANSWER);
     });
 
     it('getStages() should return 500 if there is an error', async () => {
@@ -219,7 +214,7 @@ const FAKE_GAME_INFO: GameCardDto = {
     differenceNumber: 6,
 };
 const FAKE_GAME_CARD: GameCard = {
-    _id: new ObjectId(0),
+    _id: new ObjectId('00000000773db8b853265f32'),
     name: 'game.name',
     difficulty: 'Facile',
     differenceNumber: 6,
@@ -234,6 +229,25 @@ const FAKE_GAME_CARD: GameCard = {
         { time: 0, name: '--' },
         { time: 0, name: '--' },
         { time: 0, name: '--' },
+    ],
+};
+
+const FAKE_GAME_CARD_ANSWER = {
+    _id: '00000000773db8b853265f32',
+    differenceImageName: 'game.differenceImage',
+    differenceNumber: 6,
+    difficulty: 'Facile',
+    multiTimes: [
+        { name: '--', time: 0 },
+        { name: '--', time: 0 },
+        { name: '--', time: 0 },
+    ],
+    name: 'game.name',
+    originalImageName: 'game.baseImage',
+    soloTimes: [
+        { name: '--', time: 0 },
+        { name: '--', time: 0 },
+        { name: '--', time: 0 },
     ],
 };
 const FAKE_GAME_CARD_ARRAY: GameCard[] = [FAKE_GAME_CARD, FAKE_GAME_CARD];
