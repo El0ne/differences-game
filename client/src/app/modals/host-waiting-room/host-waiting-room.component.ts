@@ -16,8 +16,17 @@ export class HostWaitingRoomComponent implements OnInit {
         this.socket.listen('requestGame', (opponentName: string, opponentId: string) => {
             this.clientsInWaitingRoom.set(opponentId, opponentName);
         });
+
+        this.socket.listen('unrequestGame', (opponentId: string) => {
+            this.clientsInWaitingRoom.delete(opponentId);
+        });
     }
 
-    acceptOpponent(opponent: string): void {}
-    declineOpponent(opponent: string): void {}
+    acceptOpponent(opponentId: string): void {
+        this.socket.send('acceptOpponent', opponentId);
+    }
+    declineOpponent(opponentId: string): void {
+        this.socket.send('declineOpponent', opponentId);
+        this.clientsInWaitingRoom.delete(opponentId);
+    }
 }

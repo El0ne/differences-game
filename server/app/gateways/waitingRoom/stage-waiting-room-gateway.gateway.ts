@@ -24,33 +24,42 @@ export class StageWaitingRoomGatewayGateway {
 
     @SubscribeMessage('hostGame')
     hostGame(@ConnectedSocket() socket: Socket, @MessageBody() stageId: string): void {
-        this.logger.log(stageId);
+        this.logger.log(`game created by ${stageId}`);
         this.gameHosts.set(stageId, socket.id);
         socket.to(stageId).emit('gameCreated', stageId);
     }
 
     @SubscribeMessage('unhostGame')
     unhostGame(@ConnectedSocket() socket: Socket, @MessageBody() stageId: string): void {
+        this.logger.log(`game deleted by ${stageId}`);
         this.gameHosts.delete(stageId);
         socket.to(stageId).emit('gameDeleted', stageId);
+        socket.to(stageId).emit('matchRefused', 'raison');
     }
 
     @SubscribeMessage('joinHost')
-    joinHost(@ConnectedSocket() socket: Socket, @MessageBody() stageId: string): void {
-        socket.to(this.gameHosts.get(stageId)).emit('requestGame');
+    joinHost(@ConnectedSocket() socket: Socket, @MessageBody() stageId: string, @MessageBody() playerName: string): void {
+        socket.to(this.gameHosts.get(stageId)).emit('requestGame', playerName);
+    }
+
+    @SubscribeMessage('quitHost')
+    quitHost(@ConnectedSocket() socket: Socket, @MessageBody() stageId: string): void {
+        socket.to(this.gameHosts.get(stageId)).emit('unrequestGame');
     }
 
     @SubscribeMessage('acceptOpponent')
-    acceptOpponent(@ConnectedSocket() socket: Socket, @MessageBody() opponentId: string): void {
+    acceptOpponent(@ConnectedSocket() socket: Socket, @MessageBody() opponentId: string, @MessageBody() stageId: string): void {
         this.clearRooms(socket);
         this.clearRooms(this.server.allSockets[opponentId]);
         socket.to(opponentId).socketsJoin(socket.id);
         socket.to(opponentId).emit('matchAccepted');
+        socket.to(stageId).emit('matchRefused', 'raison'); // refuser match a tous les autres
+        this.gameHosts.delete(stageId);
     }
 
     @SubscribeMessage('declineOpponent')
-    declineOpponent(@ConnectedSocket() socket: Socket, @MessageBody() stageId: string): void {
-        socket.to(this.gameHosts.get(stageId)).emit('matchRefused');
+    declineOpponent(@ConnectedSocket() socket: Socket, @MessageBody() opponentId: string): void {
+        socket.to(opponentId).emit('matchRefused', 'raison');
     }
 
     clearRooms(socket: Socket): void {
