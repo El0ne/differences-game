@@ -3,12 +3,12 @@
 /* eslint-disable no-underscore-dangle */
 import { GameCard, GameCardDocument, gameCardSchema } from '@app/schemas/game-cards.schemas';
 import { GameCardDto } from '@common/game-card.dto';
-import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
+import { getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing/test';
 import { ObjectId } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { Connection, Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { stub } from 'sinon';
 import { GameCardService } from './game-card.service';
 
@@ -16,7 +16,7 @@ describe('GameCardService', () => {
     let service: GameCardService;
     let gameCardModel: Model<GameCardDocument>;
     let mongoServer: MongoMemoryServer;
-    let connection: Connection;
+    // let connection: Connection;
 
     beforeEach(async () => {
         mongoServer = await MongoMemoryServer.create();
@@ -35,7 +35,7 @@ describe('GameCardService', () => {
 
         service = module.get<GameCardService>(GameCardService);
         gameCardModel = module.get<Model<GameCardDocument>>(getModelToken(GameCard.name));
-        connection = await module.get(getConnectionToken());
+        // connection = await module.get(getConnectionToken());
         await gameCardModel.deleteMany({});
     });
 
@@ -43,7 +43,7 @@ describe('GameCardService', () => {
 
     afterEach((done) => {
         setTimeout(async () => {
-            await connection.close();
+            // await connection.close();
             await mongoServer.stop();
             done();
         }, DELAY_BEFORE_CLOSING_CONNECTION);
