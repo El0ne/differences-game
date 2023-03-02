@@ -8,6 +8,7 @@ import { Test } from '@nestjs/testing/test';
 import { ObjectId } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection, Model } from 'mongoose';
+import { stub } from 'sinon';
 import { GameCardService } from './game-card.service';
 
 describe('GameCardService', () => {
@@ -93,16 +94,18 @@ describe('GameCardService', () => {
         expect(gameCardsNumber).toEqual(gameAmount);
     });
 
-    //     it('createGameCard should add a game card to the list of game cards', () => {
-    //         stub(service, 'generateGameCard').callsFake(() => FAKE_GAME_CARD);
-    //         service.createGameCard(FAKE_GAME_INFO);
-    //         const allGameCards = service.getAllGameCards();
-    //         expect(allGameCards).toContainEqual(FAKE_GAME_CARD);
-    //     });
+    it('createGameCard should add a game card to the list of game cards', async () => {
+        const fakeGameCard = getFakeGameCard();
+        stub(service, 'generateGameCard').callsFake(() => fakeGameCard);
+        await service.createGameCard(FAKE_GAME_INFO);
+        // const allGameCards = await service.getAllGameCards();
+        const game = await service.getGameCardById(fakeGameCard._id.toHexString());
+        expect(game).toEqual(expect.objectContaining(fakeGameCard));
+    });
 
-    //     it('generateGameCard should create a game card from a game informations', () => {
-    //         expect(service.createGameCard(FAKE_GAME_INFO)).toEqual(FAKE_GAME_CARD);
-    //     });
+    // it('generateGameCard should create a game card from a game informations', () => {
+    //     expect(service.createGameCard(FAKE_GAME_INFO)).toEqual(FAKE_GAME_CARD);
+    // });
 });
 
 const FAKE_GAME_INFO: GameCardDto = {
