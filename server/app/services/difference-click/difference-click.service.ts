@@ -29,8 +29,7 @@ export class DifferenceClickService {
     }
 
     async getDifferenceArrayFromStageID(_id: string): Promise<number[][]> {
-        // TODO return object and not only differences
-        const differenceArray = await this.differenceModel.findOne({ _id });
+        const differenceArray = await this.differenceModel.findById(_id);
         return differenceArray ? differenceArray.differences : [];
     }
 

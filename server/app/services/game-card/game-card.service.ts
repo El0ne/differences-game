@@ -4,14 +4,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
 import { Model } from 'mongoose';
-import * as path from 'path';
 
 @Injectable()
 export class GameCardService {
-    jsonPath = path.join(process.cwd(), '/app/dataBase/game-cards-informations.json');
     constructor(@InjectModel(GameCard.name) private gameCardModel: Model<GameCardDocument>) {}
 
-    // TODO remove later if useless (i think it is)
     async getAllGameCards(): Promise<GameCard[]> {
         return await this.gameCardModel.find({});
     }

@@ -3,7 +3,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
 import { Document } from 'mongoose';
 
-// export type GameCardDocument = HydratedDocument<GameCard>;
 export type GameCardDocument = GameCard & Document;
 
 @Schema()
