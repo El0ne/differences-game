@@ -245,4 +245,3 @@ const FAKE_GAME_CARD_ANSWER = {
         { name: '--', time: 0 },
     ],
 };
-const FAKE_GAME_CARD_ARRAY: GameCard[] = [FAKE_GAME_CARD, FAKE_GAME_CARD];
