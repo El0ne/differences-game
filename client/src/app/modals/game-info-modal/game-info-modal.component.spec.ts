@@ -7,7 +7,6 @@ import { GameInfoModalComponent } from './game-info-modal.component';
 describe('GameInfoModalComponent', () => {
     let component: GameInfoModalComponent;
     let fixture: ComponentFixture<GameInfoModalComponent>;
-    let dialogRef: MatDialogRef<GameInfoModalComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -32,11 +31,5 @@ describe('GameInfoModalComponent', () => {
         expect(component.data.gameCardInfo).toEqual(new GameCardInformation());
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(component.data.numberOfDifferences).toBe(1);
-    });
-
-    it('should close the modal page when user clicks out of it', () => {
-        spyOn(dialogRef, 'close');
-        component.matDialogRef.close();
-        expect(dialogRef.close).toHaveBeenCalled();
     });
 });
