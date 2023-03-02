@@ -54,9 +54,7 @@ export class GameSelectionComponent implements OnInit {
         return this.index + GAME_CARDS_TO_DISPLAY >= this.numberOfGameInformations;
     }
 
-    refreshConfigPage() {
-        console.log('dopgjdfógjf');
-        // this.router.navigateByUrl('/config');
+    displayGameCards() {
         this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
             this.numberOfGameInformations = data;
             this.selectGameCards();
