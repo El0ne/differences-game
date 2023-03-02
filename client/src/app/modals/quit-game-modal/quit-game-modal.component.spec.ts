@@ -22,8 +22,6 @@ describe('QuitGameModalComponent', () => {
             ],
         }).compileComponents();
 
-        // router = TestBed.inject(Router);
-
         fixture = TestBed.createComponent(QuitGameModalComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();

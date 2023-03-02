@@ -23,9 +23,7 @@
                 [original]="'original'"
                 [gameCardId]="this.currentGameId"
                 [imagePath]="this.gameCardInfo.originalImageName"
-                (incrementScore)="incrementScore()"
-                (differences)="addDifferenceDetected($event)"
-                (transmitter)="paintPixel($event)"
+                (handler)="emitHandler($event)"
                 *ngIf="this.gameCardInfo"
             ></app-click-event>
         </div>
@@ -61,9 +59,7 @@
                 </div>
                 <div class="answer-area">
                     <input type="text" class="input-field" placeholder="Entrez votre message" [(ngModel)]="messageContent" />
-                    <button class="send-button" (click)="sendMessage()">
-                        <mat-icon>send</mat-icon>
-                    </button>
+                    <button class="send-button" (click)="sendMessage()"></button>
                 </div>
             </div>
         </div>
@@ -74,9 +70,7 @@
                 [original]="'different'"
                 [gameCardId]="this.currentGameId"
                 [imagePath]="this.gameCardInfo.differenceImageName"
-                (incrementScore)="incrementScore()"
-                (differences)="addDifferenceDetected($event)"
-                (transmitter)="paintPixel($event)"
+                (handler)="emitHandler($event)"
                 *ngIf="this.gameCardInfo"
             ></app-click-event>
         </div>
