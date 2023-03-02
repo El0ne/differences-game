@@ -35,6 +35,7 @@ describe('GameCardService', () => {
         service = module.get<GameCardService>(GameCardService);
         gameCardModel = module.get<Model<GameCardDocument>>(getModelToken(GameCard.name));
         connection = await module.get(getConnectionToken());
+        await gameCardModel.deleteMany({});
     });
 
     const DELAY_BEFORE_CLOSING_CONNECTION = 200;
@@ -53,7 +54,6 @@ describe('GameCardService', () => {
     });
 
     it('getAllGameCards should return all gameCards informations', async () => {
-        await gameCardModel.deleteMany({});
         expect((await service.getAllGameCards()).length).toEqual(0);
         const gameCard = getFakeGameCard();
         await gameCardModel.create(gameCard);
@@ -65,7 +65,6 @@ describe('GameCardService', () => {
         const startIndex = 0;
         const endIndex = 2;
         const answer = [];
-        await gameCardModel.deleteMany({});
         for (let i = 0; i < endIndex; i++) {
             const game = getFakeGameCard();
             await gameCardModel.create(game);
