@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { STAGE } from '@app/services/server-routes';
 import { GameCardInformation } from '@common/game-card';
 
@@ -12,10 +13,18 @@ export class GameCardSelectionComponent implements OnInit {
     @Input() isConfig: boolean | null;
     image: string = '';
 
+    constructor(private gameCardService: GameCardInformationService) {}
     ngOnInit() {
         this.image = `${STAGE}/image/${this.gameCardInformation.originalImageName}`;
     }
     // TODO: ajouter la logique pour que le reset des temps et le delete se fait pour le sprint 2
 
     // TODO: Ajouter la logique pour que les temps de configurations viennent du database pour dynamiquement les loader.
+
+    deleteGame(): void {
+        console.log('delete');
+        console.log(this.gameCardInformation._id);
+        // eslint-disable-next-line no-underscore-dangle
+        this.gameCardService.deleteGame(this.gameCardInformation._id).subscribe();
+    }
 }

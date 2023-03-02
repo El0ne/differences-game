@@ -34,6 +34,11 @@ export class GameCardService {
         return newGameCard.save();
     }
 
+    async deleteGameCard(id: string): Promise<void> {
+        console.log('id', id);
+        await this.gameCardModel.findByIdAndDelete(new ObjectId(id));
+    }
+
     generateGameCard(game: GameCardDto): GameCard {
         return {
             // eslint-disable-next-line no-underscore-dangle

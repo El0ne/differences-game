@@ -6,7 +6,7 @@ import { ImageManagerService } from '@app/services/image-manager/image-manager.s
 import { GameCardDto } from '@common/game-card.dto';
 import { ImageUploadDto } from '@common/image-upload.dto';
 import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { diskStorage } from 'multer';
@@ -34,6 +34,17 @@ export class StageController {
         private differenceClickService: DifferenceClickService,
     ) {}
 
+    @Delete('/:gameCardId')
+    async deleteGame(@Param() param, @Res() res: Response): Promise<void> {
+        console.log('gere');
+        try {
+            await this.gameCardService.deleteGameCard(param.gameCardId);
+            res.status(HttpStatus.NO_CONTENT);
+        } catch {
+            throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @Get('/')
     async getStages(@Query('index') index: number, @Query('endIndex') endIndex: number, @Res() res: Response): Promise<void> {
         try {
@@ -55,6 +66,7 @@ export class StageController {
 
     @Get('/:gameCardId')
     async getStageById(@Param() param, @Res() res: Response): Promise<void> {
+        console.log('first');
         try {
             const gameCard = await this.gameCardService.getGameCardById(param.gameCardId);
             res.status(HttpStatus.OK).send(gameCard);
