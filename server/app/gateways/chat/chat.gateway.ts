@@ -2,12 +2,14 @@ import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { DELAY_BEFORE_EMITTING_TIME, MESSAGE_MAX_LENGTH } from './chat.gateway.constants';
-import { ChatEvents, RoomManagement } from './chat.gateway.events';
+import { ChatEvents, MultiplayerRequestInformation, Room, RoomManagement } from './chat.gateway.events';
 
 @WebSocketGateway({ cors: true })
 @Injectable()
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() private server: Server;
+
+    private waitingRoom: Room[] = [];
 
     constructor(private readonly logger: Logger) {}
 
@@ -18,7 +20,69 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.Validate)
     validate(socket: Socket, message: string) {
-        socket.emit(ChatEvents.WordValidated, { validated: message.length < MESSAGE_MAX_LENGTH, originalMessage: message });
+        if (message) {
+            socket.emit(ChatEvents.WordValidated, { validated: message.length < MESSAGE_MAX_LENGTH, originalMessage: message });
+        } else {
+            socket.emit(ChatEvents.WordValidated, { validated: false });
+        }
+    }
+
+    @SubscribeMessage(ChatEvents.RoomCheck)
+    check(socket: Socket, data: MultiplayerRequestInformation) {
+        for (const room of this.waitingRoom) {
+            if (room.gameId === data.game) {
+                socket.join(room.roomId);
+                const index = this.waitingRoom.indexOf(room);
+                this.waitingRoom.splice(index, 1);
+                this.logger.log(room.awaitingPlayer, data.name);
+                this.server.to(room.roomId).emit(ChatEvents.PlayerWaiting, { room: room.roomId, adversary: room.awaitingPlayer, player: data.name });
+                return;
+            }
+        }
+        this.waitingRoom.push({ roomId: socket.id, gameId: data.game, awaitingPlayer: data.name });
+        socket.emit(ChatEvents.WaitingRoom);
+    }
+
+    @SubscribeMessage(ChatEvents.Event)
+    event(socket: Socket, data) {
+        this.logger.log(data.room);
+        if (socket.rooms.has(data.room)) {
+            const date = new Date();
+            const hour = date.getHours().toString();
+            const minutes = date.getMinutes().toString();
+            const seconds = date.getSeconds().toString();
+            let dateFormatted: string;
+            if (data.multiplayer) {
+                dateFormatted = `${hour}:${minutes}:${seconds} - ${data.event} par `;
+            } else {
+                dateFormatted = `${hour}:${minutes}:${seconds} - ${data.event}.`;
+            }
+
+            this.server.to(data.room).emit(ChatEvents.Event, { socketId: socket.id, message: dateFormatted });
+        }
+    }
+
+    @SubscribeMessage(ChatEvents.Abandon)
+    abandon(socket: Socket, data) {
+        if (socket.rooms.has(data.room)) {
+            const date = new Date();
+            const hour = date.getHours().toString();
+            const minutes = date.getMinutes().toString();
+            const seconds = date.getSeconds().toString();
+            const dateFormatted = `${hour}:${minutes}:${seconds} - ${data.name} a abandonné la partie.`;
+            this.server.to(data.room).emit(ChatEvents.Hint, { socketId: 'event', message: dateFormatted });
+        }
+    }
+    @SubscribeMessage(ChatEvents.Hint)
+    hint(socket: Socket, room: string) {
+        if (socket.rooms.has(room)) {
+            const date = new Date();
+            const hour = date.getHours().toString();
+            const minutes = date.getMinutes().toString();
+            const seconds = date.getSeconds().toString();
+            const dateFormatted = `${hour}:${minutes}:${seconds} - Indice utilisé.`;
+            this.server.to(room).emit(ChatEvents.Hint, { socketId: 'event', message: dateFormatted });
+        }
     }
 
     @SubscribeMessage(ChatEvents.BroadcastAll)

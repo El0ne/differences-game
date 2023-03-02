@@ -28,9 +28,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     showTextBox: boolean = false;
     showWinMessage: boolean = false;
     showNavBar: boolean = true;
-    playerName: string = 'Player';
-    playerName1: string = 'Player 1';
-    playerName2: string = 'Player 2';
+    player: string = 'Player';
+    opponent: string = 'Player 2';
     messages: RoomMessage[] = [];
     messageContent: string = '';
     differenceArray: number[][];
@@ -41,6 +40,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     currentGameId: string;
     endGame: Subject<void> = new Subject<void>();
     gameCardInfo: GameCardInformation;
+    currentRoom: string;
 
     // eslint-disable-next-line max-params
     constructor(
@@ -69,24 +69,14 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             });
         }
 
-        const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true });
-        dialogRef.afterClosed().subscribe((result: string) => {
-            this.playerName = result;
+        const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true, data: { game: gameId, multiplayer: this.is1v1 } });
+        dialogRef.afterClosed().subscribe(() => {
+            this.player = this.chat.names[0];
+            this.opponent = this.chat.names[1];
+            this.currentRoom = this.chat.gameRoom;
             this.showTime();
-            this.connect();
-        });
-    }
-
-    connect() {
-        if (!this.chat.liveSocket()) {
-            this.chat.connect();
             this.configureSocketReactions();
-            this.joinRoom();
-        }
-    }
-
-    joinRoom() {
-        this.chat.send('joinRoom', this.currentGameId);
+        });
     }
 
     configureSocketReactions() {
@@ -95,13 +85,25 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         });
         this.chat.listen('wordValidated', (validation: Validation) => {
             if (validation.validated) {
-                this.chat.send('roomMessage', { room: this.currentGameId, message: validation.originalMessage });
+                this.chat.send('roomMessage', { room: this.currentRoom, message: validation.originalMessage });
             } else {
                 this.showErrorMessage = true;
             }
         });
         this.chat.listen('roomMessage', (data: RoomMessage) => {
             this.messages.push(data);
+        });
+        this.chat.listen('event', (data: RoomMessage) => {
+            if (this.is1v1) {
+                if (data.socketId === this.socketId) {
+                    data.message += this.player + '.';
+                } else data.message += this.opponent + '.';
+            }
+            data.socketId = 'event';
+            this.messages.push(data);
+        });
+        this.chat.listen('hint', (message: RoomMessage) => {
+            this.messages.push(message);
         });
     }
 
@@ -126,6 +128,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.showNavBar = false;
     }
 
+    abandonPartie() {
+        this.chat.send('abandon', { name: this.player, room: this.currentRoom });
+        this.router.navigate(['/stage-selection']);
+    }
+
     // logic needed to be modified according to who adds a point
     incrementScore(): void {
         this.currentScorePlayer1 += 1;
@@ -136,6 +143,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     addDifferenceDetected(differenceIndex: number): void {
         this.foundDifferenceService.addDifferenceFound(differenceIndex);
+        this.chat.send('event', { room: this.currentRoom, multiplayer: this.is1v1, event: 'Différence trouvée' });
     }
 
     toggleInfoCard(): void {
@@ -162,5 +170,13 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     paintPixel(array: number[]): void {
         const rgbaValues = this.left.sendDifferencePixels(array);
         this.right.receiveDifferencePixels(rgbaValues, array);
+    }
+
+    handleMistake(): void {
+        this.chat.send('event', { room: this.currentRoom, multiplayer: this.is1v1, event: 'Erreur' });
+    }
+
+    hint(): void {
+        this.chat.send('hint', this.currentRoom);
     }
 }

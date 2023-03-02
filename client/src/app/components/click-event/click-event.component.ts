@@ -21,6 +21,7 @@ export class ClickEventComponent implements OnInit {
     @Output() incrementScore: EventEmitter<number> = new EventEmitter<number>();
     @Output() differences: EventEmitter<number> = new EventEmitter<number>();
     @Output() transmitter: EventEmitter<number[]> = new EventEmitter<number[]>();
+    @Output() error: EventEmitter<void> = new EventEmitter<void>();
     @ViewChild('picture', { static: true })
     picture: ElementRef<HTMLCanvasElement>;
     @ViewChild('modification', { static: true })
@@ -140,6 +141,7 @@ export class ClickEventComponent implements OnInit {
 
     displayError(e: MouseEvent): void {
         if (!this.timeout && !this.endGame) {
+            this.error.emit();
             this.emitSound(true);
             this.timeout = true;
             const rect = this.modification.nativeElement.getBoundingClientRect();

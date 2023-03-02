@@ -31,7 +31,7 @@
             </button>
         </div>
         <div class="info-option" *ngIf="showNavBar">
-            <button class="option-buttons" type="button" routerLink="/stage-selection">
+            <button class="option-buttons" type="button" (click)="abandonPartie()">
                 <mat-icon class="icon">menu</mat-icon>
             </button>
         </div>
@@ -47,12 +47,13 @@
             (incrementScore)="incrementScore()"
             (differences)="addDifferenceDetected($event)"
             (transmitter)="paintPixel($event)"
+            (error)="handleMistake()"
             *ngIf="this.gameCardInfo"
         ></app-click-event>
         <div class="game-options">
             <div id="double-score" *ngIf="is1v1">
                 <div id="score">
-                    <div class="playerName">{{ playerName1 }}</div>
+                    <div class="playerName">{{ player }}</div>
                     <!-- référence : https://codepen.io/Vivekp1118/pen/YzLOOVG -->
                     <div class="container">
                         <div class="row">
@@ -64,7 +65,7 @@
                     </div>
                 </div>
                 <div id="score">
-                    <div class="playerName">{{ playerName2 }}</div>
+                    <div class="playerName">{{ opponent }}</div>
                     <!-- référence : https://codepen.io/Vivekp1118/pen/YzLOOVG -->
                     <div class="container">
                         <div class="row">
@@ -77,7 +78,7 @@
                 </div>
             </div>
             <div id="score" *ngIf="!is1v1">
-                <div class="playerName">{{ playerName }}</div>
+                <div class="playerName">{{ player }}</div>
                 <!-- référence : https://codepen.io/Vivekp1118/pen/YzLOOVG -->
                 <div class="container">
                     <div class="row">
@@ -96,16 +97,25 @@
                 </div>
             </div>
             <div class="text-box">
-                <div class="text-area">
+                <div class="text-area" #scroll [scrollTop]="scroll.scrollHeight">
                     <div class="text-container" *ngFor="let data of messages">
-                        <div [ngClass]="data.socketId === socketId ? 'player1 message' : 'player2 message'">{{ data.message }}</div>
+                        <div *ngIf="data.socketId !== 'event'" [ngClass]="data.socketId === socketId ? 'player1 message' : 'player2 message'">
+                            {{ data.message }}
+                        </div>
+                        <div *ngIf="data.socketId === 'event'" class="error message">{{ data.message }}</div>
                     </div>
                     <div class="error message" *ngIf="showErrorMessage" (click)="untoggleErrorMessage()">
                         Votre message ne respecte pas le bon format. Cliquez ici pour enlever ce message.
                     </div>
                 </div>
                 <div class="answer-area" *ngIf="is1v1">
-                    <input type="text" class="input-field" placeholder="Entrez votre message" [(ngModel)]="messageContent" />
+                    <input
+                        type="text"
+                        (keydown.enter)="sendMessage()"
+                        class="input-field"
+                        placeholder="Entrez votre message"
+                        [(ngModel)]="messageContent"
+                    />
                     <button class="send-button" (click)="sendMessage()"></button>
                 </div>
             </div>
@@ -119,10 +129,11 @@
             (incrementScore)="incrementScore()"
             (differences)="addDifferenceDetected($event)"
             (transmitter)="paintPixel($event)"
+            (error)="handleMistake()"
             *ngIf="this.gameCardInfo"
         ></app-click-event>
-        <div class="hint-button">
-            <button class="hint" type="button">
+        <div class="hint-button" *ngIf="!is1v1">
+            <button class="hint" type="button" (click)="hint()">
                 <mat-icon class="hint-button">search</mat-icon>
             </button>
         </div>

@@ -7,6 +7,8 @@ import { environment } from 'src/environments/environment';
 })
 export class ChatSocketService {
     sio: Socket;
+    names: string[] = [];
+    gameRoom: string;
 
     connect() {
         this.sio = io(environment.serverUrl, { transports: ['websocket'], upgrade: false });

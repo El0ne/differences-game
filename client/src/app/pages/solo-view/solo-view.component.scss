@@ -103,15 +103,13 @@ body {
 .text-area {
     position: relative;
     border-style: solid;
-    display: flex;
-    flex-direction: column;
     background-color: white;
     height: 80%;
     width: 90%;
     margin-bottom: 5px;
     overflow-y: auto;
     overflow-x: hidden;
-    justify-content: flex-end;
+    scroll-behavior: auto;
 }
 
 .answer-area {
