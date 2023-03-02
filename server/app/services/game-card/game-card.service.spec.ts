@@ -9,7 +9,6 @@ import { ObjectId } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection, Model } from 'mongoose';
 import { GameCardService } from './game-card.service';
-import { gameCardsInformations } from './game-cards-test.json';
 
 describe('GameCardService', () => {
     let service: GameCardService;
@@ -77,13 +76,21 @@ describe('GameCardService', () => {
     });
 
     it('getGameCardById should return a specific game card', async () => {
-        const gameCard = service.getGameCardById('0123');
-        expect(gameCard).toEqual(gameCardsInformations.find((card) => (card.id = '0123')));
+        const game = getFakeGameCard();
+        await gameCardModel.create(game);
+        const id = game._id;
+        const gameCard = await service.getGameCardById(id.toHexString());
+        expect(gameCard).toEqual(expect.objectContaining(game));
     });
 
     it('getGameCardsNumber should return the number of gameCards informations we have', async () => {
-        const gameCardsNumber = service.getGameCardsNumber();
-        expect(gameCardsNumber).toEqual(gameCardsInformations.length);
+        const gameAmount = 2;
+        for (let i = 0; i < gameAmount; i++) {
+            const game = getFakeGameCard();
+            await gameCardModel.create(game);
+        }
+        const gameCardsNumber = await service.getGameCardsNumber();
+        expect(gameCardsNumber).toEqual(gameAmount);
     });
 
     //     it('createGameCard should add a game card to the list of game cards', () => {
