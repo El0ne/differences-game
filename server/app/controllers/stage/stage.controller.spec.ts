@@ -1,7 +1,7 @@
 // @ts-ignore
 
 import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
-import { GameCard, GameCardDocument, gameCardSchema } from '@app/schemas/game-cards.schemas';
+import { GameCard, gameCardSchema } from '@app/schemas/game-cards.schemas';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
@@ -13,14 +13,14 @@ import { PixelPositionService } from '@app/services/pixel-position/pixel-positio
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { HttpStatus } from '@nestjs/common';
-import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
+import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { assert } from 'console';
 import * as fs from 'fs';
 import * as Jimp from 'jimp';
 import { ObjectId } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { Connection, Model } from 'mongoose';
+import { Connection } from 'mongoose';
 import * as join from 'path';
 import Sinon, { stub } from 'sinon';
 import * as request from 'supertest';
@@ -68,7 +68,6 @@ describe('StageController', () => {
         httpServer = app.getHttpServer();
         controller = module.get<StageController>(StageController);
         gameCardService = module.get<GameCardService>(GameCardService);
-        gameCardModel = module.get<Model<GameCardDocument>>(getModelToken(GameCard.name));
         connection = await module.get(getConnectionToken());
         getGameCardStub = stub(gameCardService, 'getGameCards');
         getGameCardsNumberStub = stub(gameCardService, 'getGameCardsNumber');
