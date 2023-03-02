@@ -98,14 +98,16 @@ describe('GameCardService', () => {
         const fakeGameCard = getFakeGameCard();
         stub(service, 'generateGameCard').callsFake(() => fakeGameCard);
         await service.createGameCard(FAKE_GAME_INFO);
-        // const allGameCards = await service.getAllGameCards();
         const game = await service.getGameCardById(fakeGameCard._id.toHexString());
         expect(game).toEqual(expect.objectContaining(fakeGameCard));
     });
 
-    // it('generateGameCard should create a game card from a game informations', () => {
-    //     expect(service.createGameCard(FAKE_GAME_INFO)).toEqual(FAKE_GAME_CARD);
-    // });
+    it('generateGameCard should create a game card from a game informations', async () => {
+        const gameCard = getFakeGameCard();
+        gameCard._id = new ObjectId('00000000773db8b853265f32');
+        gameCard.name = 'game.name';
+        expect(await service.createGameCard(FAKE_GAME_INFO)).toEqual(expect.objectContaining(gameCard));
+    });
 });
 
 const FAKE_GAME_INFO: GameCardDto = {
