@@ -1,12 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { DELAY_BEFORE_EMITTING_TIME, MESSAGE_MAX_LENGTH } from './chat.gateway.constants';
+import { MESSAGE_MAX_LENGTH } from './chat.gateway.constants';
 import { ChatEvents, RoomManagement } from './chat.gateway.events';
 
 @WebSocketGateway({ cors: true })
 @Injectable()
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
 
     constructor(private readonly logger: Logger) {}
@@ -39,12 +39,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
     }
 
-    afterInit() {
-        setInterval(() => {
-            this.emitTime();
-        }, DELAY_BEFORE_EMITTING_TIME);
-    }
-
     handleConnection(socket: Socket) {
         this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
         // message initial
@@ -53,9 +47,5 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     handleDisconnect(socket: Socket) {
         this.logger.log(`Déconnexion par l'utilisateur avec id : ${socket.id}`);
-    }
-
-    private emitTime() {
-        this.server.emit(ChatEvents.Clock, new Date().toLocaleTimeString());
     }
 }

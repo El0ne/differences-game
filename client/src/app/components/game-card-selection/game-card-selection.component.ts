@@ -4,6 +4,7 @@ import { HostWaitingRoomComponent } from '@app/modals/host-waiting-room/host-wai
 import { STAGE } from '@app/services/server-routes';
 import { SocketService } from '@app/services/socket/socket.service';
 import { GameCardInformation } from '@common/game-card';
+import { JoinHostInWaitingRequest } from '@common/joiningHost';
 
 @Component({
     selector: 'app-game-card-selection',
@@ -29,7 +30,7 @@ export class GameCardSelectionComponent implements OnInit {
                 this.socket.send('unhostGame', this.gameCardInformation.id);
             });
         } else {
-            this.socket.send('joinHost', this.gameCardInformation.id, 'NomJoueur1');
+            this.socket.send<JoinHostInWaitingRequest>('joinHost', { stageId: this.gameCardInformation.id, playerName: 'NomJoueur1' });
         }
     }
 

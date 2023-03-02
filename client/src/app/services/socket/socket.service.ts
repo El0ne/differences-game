@@ -21,11 +21,11 @@ export class SocketService {
     liveSocket() {
         return this.sio && this.sio.connected;
     }
-    listen<T>(eventName: string, action: (...data: T[]) => void): void {
+    listen<T>(eventName: string, action: (data: T) => void): void {
         this.sio.on(eventName, action);
     }
 
-    send<T>(eventName: string, ...data: T[]): void {
+    send<T>(eventName: string, data: T): void {
         if (data) {
             this.sio.emit(eventName, data);
         } else {

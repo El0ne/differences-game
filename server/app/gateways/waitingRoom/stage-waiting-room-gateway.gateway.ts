@@ -1,3 +1,5 @@
+import { JoinHostInWaitingRequest } from '@common/joiningHost';
+import { PlayerInformations } from '@common/playerInformations';
 import { Logger } from '@nestjs/common';
 import { Injectable } from '@nestjs/common/decorators';
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -38,8 +40,9 @@ export class StageWaitingRoomGatewayGateway {
     }
 
     @SubscribeMessage('joinHost')
-    joinHost(@ConnectedSocket() socket: Socket, @MessageBody() stageId: string, @MessageBody() playerName: string): void {
-        socket.to(this.gameHosts.get(stageId)).emit('requestGame', playerName);
+    joinHost(@ConnectedSocket() socket: Socket, @MessageBody() joinRequest: JoinHostInWaitingRequest): void {
+        const playerInformations: PlayerInformations = { playerName: joinRequest.playerName, playerSocketId: socket.id };
+        socket.to(this.gameHosts.get(joinRequest.stageId)).emit('requestGame', playerInformations);
     }
 
     @SubscribeMessage('quitHost')

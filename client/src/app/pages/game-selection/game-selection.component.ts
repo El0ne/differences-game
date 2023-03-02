@@ -25,7 +25,7 @@ export class GameSelectionComponent implements OnInit {
         this.socket.connect();
 
         this.socket.listen('gameCreated', (stageId: string) => {
-            console.log('test');
+            console.log(stageId);
             this.stages.forEach((gameCardSelection: GameCardSelectionComponent) => {
                 if (gameCardSelection.gameCardInformation.id === stageId) {
                     gameCardSelection.createGameButton = false;
