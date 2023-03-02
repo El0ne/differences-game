@@ -1,6 +1,7 @@
 // @ts-ignore
 
-import { GameCard } from '@app/schemas/game-cards.schemas';
+import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
+import { GameCard, GameCardDocument, gameCardSchema } from '@app/schemas/game-cards.schemas';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
@@ -12,15 +13,20 @@ import { PixelPositionService } from '@app/services/pixel-position/pixel-positio
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { HttpStatus } from '@nestjs/common';
+import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { assert } from 'console';
 import * as fs from 'fs';
 import * as Jimp from 'jimp';
 import { ObjectId } from 'mongodb';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { Connection, Model } from 'mongoose';
 import * as join from 'path';
 import Sinon, { stub } from 'sinon';
 import * as request from 'supertest';
 import { StageController } from './stage.controller';
+
+const DELAY_BEFORE_CLOSING_CONNECTION = 200;
 
 describe('StageController', () => {
     let httpServer: unknown;
@@ -30,8 +36,20 @@ describe('StageController', () => {
     let getGameCardByIdStub;
     let gameCardService: GameCardService;
 
-    beforeAll(async () => {
+    let mongoServer: MongoMemoryServer;
+    let gameCardModel: Model<GameCardDocument>;
+    let connection: Connection;
+
+    beforeEach(async () => {
+        mongoServer = await MongoMemoryServer.create();
+        const mongoUri = await mongoServer.getUri();
+
         const module: TestingModule = await Test.createTestingModule({
+            imports: [
+                MongooseModule.forRoot(mongoUri),
+                MongooseModule.forFeature([{ name: Differences.name, schema: differencesSchema }]),
+                MongooseModule.forFeature([{ name: GameCard.name, schema: gameCardSchema }]),
+            ],
             controllers: [StageController],
             providers: [
                 GameCardService,
@@ -45,23 +63,36 @@ describe('StageController', () => {
                 DifferenceClickService,
             ],
         }).compile();
+
         const app = module.createNestApplication();
         await app.init();
         httpServer = app.getHttpServer();
         controller = module.get<StageController>(StageController);
         gameCardService = module.get<GameCardService>(GameCardService);
-    });
-
-    beforeEach(() => {
+        gameCardModel = module.get<Model<GameCardDocument>>(getModelToken(GameCard.name));
+        connection = await module.get(getConnectionToken());
         getGameCardStub = stub(gameCardService, 'getGameCards');
         getGameCardsNumberStub = stub(gameCardService, 'getGameCardsNumber');
         getGameCardByIdStub = stub(gameCardService, 'getGameCardById');
     });
 
-    afterEach(() => {
+    // beforeEach(async () => {
+    //     // mongoServer = await MongoMemoryServer.create();
+
+    //     getGameCardStub = stub(gameCardService, 'getGameCards');
+    //     getGameCardsNumberStub = stub(gameCardService, 'getGameCardsNumber');
+    //     getGameCardByIdStub = stub(gameCardService, 'getGameCardById');
+    // });
+
+    afterEach((done) => {
         getGameCardStub.restore();
         getGameCardsNumberStub.restore();
         getGameCardByIdStub.restore();
+        setTimeout(async () => {
+            await connection.close();
+            await mongoServer.stop();
+            done();
+        }, DELAY_BEFORE_CLOSING_CONNECTION);
     });
 
     it('should be defined', () => {
