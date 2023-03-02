@@ -21,7 +21,7 @@ export class SocketService {
     liveSocket() {
         return this.sio && this.sio.connected;
     }
-    listen<T>(eventName: string, action: (data: T) => void): void {
+    listen<T>(eventName: string, action: (...data: T[]) => void): void {
         this.sio.on(eventName, action);
     }
 

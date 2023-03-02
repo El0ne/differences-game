@@ -37,21 +37,20 @@ export class StageWaitingRoomGatewayGateway {
 
     @SubscribeMessage('joinHost')
     joinHost(@ConnectedSocket() socket: Socket, @MessageBody() stageId: string): void {
-        this.server.allSockets[this.gameHosts.get(stageId)].emit('requestGame', socket.id);
+        socket.to(this.gameHosts.get(stageId)).emit('requestGame');
     }
 
     @SubscribeMessage('acceptOpponent')
     acceptOpponent(@ConnectedSocket() socket: Socket, @MessageBody() opponentId: string): void {
         this.clearRooms(socket);
         this.clearRooms(this.server.allSockets[opponentId]);
-        socket.join(socket.id);
-        this.server.allSockets[opponentId].join(socket.id);
-        this.server.allSockets[opponentId].emit('matchAccepted');
+        socket.to(opponentId).socketsJoin(socket.id);
+        socket.to(opponentId).emit('matchAccepted');
     }
 
-    @SubscribeMessage('refuseOpponent')
-    refuseOpponent(@ConnectedSocket() socket: Socket, @MessageBody() stageId: string): void {
-        this.server.allSockets[this.gameHosts.get(stageId)].emit('matchRefused');
+    @SubscribeMessage('declineOpponent')
+    declineOpponent(@ConnectedSocket() socket: Socket, @MessageBody() stageId: string): void {
+        socket.to(this.gameHosts.get(stageId)).emit('matchRefused');
     }
 
     clearRooms(socket: Socket): void {

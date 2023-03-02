@@ -19,17 +19,14 @@ export class GameCardSelectionComponent implements OnInit {
         this.image = `${STAGE}/image/${this.gameCardInformation.originalImageName}`;
     }
 
-    toggleCreateGame() {
-        this.createGameButton = !this.createGameButton;
+    hostOrJoinGame() {
+        if (this.createGameButton) {
+            this.socket.send('hostGame', this.gameCardInformation.id);
+        } else {
+            this.socket.send('joinHost');
+        }
     }
 
-    hostGame() {
-        this.socket.send('hostGame', this.gameCardInformation.id);
-    }
-
-    joinGame() {
-        this.socket.send('joinHost');
-    }
     // TODO: ajouter la logique pour que le reset des temps et le delete se fait pour le sprint 2
 
     // TODO: Ajouter la logique pour que les temps de configurations viennent du database pour dynamiquement les loader.

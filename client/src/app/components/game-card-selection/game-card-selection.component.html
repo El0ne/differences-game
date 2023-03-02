@@ -55,7 +55,7 @@
     <div class="row" *ngIf="!isConfig">
         <button class="normal-button play" [routerLink]="'/soloview/' + gameCardInformation.id">Jouer</button>
         <!-- temporary while awaiting for logic to implement the waiting room-->
-        <button class="normal-button create" (click)="hostGame()">{{createGameButton ?
+        <button class="normal-button create" (click)="hostOrJoinGame()">{{createGameButton ?
             'Créer' : 'Joindre'}}</button>
     </div>
 </div>

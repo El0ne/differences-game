@@ -29,9 +29,11 @@ export class GameSelectionComponent implements OnInit {
         });
 
         this.socket.listen('gameCreated', (stageId: string) => {
-            this.stages
-                .find((gameCardSelection: GameCardSelectionComponent) => gameCardSelection.gameCardInformation.id === stageId)
-                ?.toggleCreateGame();
+            this.stages.forEach((gameCardSelection: GameCardSelectionComponent) => {
+                if (gameCardSelection.gameCardInformation.id === stageId) {
+                    gameCardSelection.createGameButton = false;
+                }
+            });
         });
     }
 

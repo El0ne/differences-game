@@ -1,0 +1,13 @@
+<div>
+    <div *ngIf="clientsInWaitingRoom.length === 0;else opponents">
+        Waiting For Opponents
+    </div>
+</div>
+
+<ng-template #opponents>
+    <div *ngFor="let opponent of clientsInWaitingRoom">
+        {{opponent}}
+        <button (click)="acceptOpponent(opponent)" class="normal-button">Accept</button>
+        <button (click)="declineOpponent(opponent)" class="normal-button">Decline</button>
+    </div>
+</ng-template>
