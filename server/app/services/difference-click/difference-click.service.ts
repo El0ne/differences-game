@@ -31,7 +31,7 @@ export class DifferenceClickService {
     async getDifferenceArrayFromStageID(_id: string): Promise<number[][]> {
         // TODO return object and not only differences
         const differenceArray = await this.differenceModel.findOne({ _id });
-        return differenceArray.differences;
+        return differenceArray ? differenceArray.differences : [];
     }
 
     async validateDifferencePositions(clickPositionX: number, clickPositionY: number, _id: string): Promise<ClickDifferenceVerification> {

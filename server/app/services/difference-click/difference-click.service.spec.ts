@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Differences, DifferencesDocument, differencesSchema } from '@app/schemas/differences.schemas';
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
@@ -6,6 +7,7 @@ import { PixelPositionService } from '@app/services/pixel-position/pixel-positio
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
+import { ObjectId } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Model } from 'mongoose';
 import { DifferenceClickService } from './difference-click.service';
@@ -63,15 +65,17 @@ describe('DifferenceClickService', () => {
         expect(await service.getAllDifferenceArrays()).toEqual([expect.objectContaining(differenceObject)]);
     });
 
-    // it('getDifferenceArrayFromStageId should return an array given a certain id', async () => {
-    //     const differences = service.getDifferenceArrayFromStageID('1');
-    //     expect(differences).toEqual(differenceObjects.find((difference) => (difference.id = '1')).differences);
-    // });
+    it('getDifferenceArrayFromStageId should return an array given a certain id', async () => {
+        const differenceObject = getFakeDifferences();
+        const id = await service.createDifferenceArray(differenceObject.differences);
+        const difference = await service.getDifferenceArrayFromStageID(id);
+        expect(difference).toEqual(differenceObject.differences);
+    });
 
-    // it('getDifferenceArrayFromStageId should return an empty array if id is not found', async () => {
-    //     const differences = service.getDifferenceArrayFromStageID('1000');
-    //     expect(differences).toEqual([]);
-    // });
+    it('getDifferenceArrayFromStageId should return an empty array if id is not found', async () => {
+        const differences = await service.getDifferenceArrayFromStageID(new ObjectId().toHexString());
+        expect(differences).toEqual([]);
+    });
 
     // it('createDifferenceArray should create a difference array given an id and the array', async () => {
     //     const differences = service.getAllDifferenceArrays();
