@@ -90,25 +90,27 @@ describe('DifferenceClickService', () => {
         expect(addedDifferencesObject).toEqual(differencesArray);
     });
 
-    // it('validateDifferencePosition should determine if click is a difference', async () => {
-    //     jest.spyOn(imageDimService, 'getWidth').mockReturnValue(640);
-    //     jest.spyOn(differenceCounterService, 'findPixelDifferenceIndex').mockReturnValue(0);
+    it('validateDifferencePosition should determine if click is a difference', async () => {
+        jest.spyOn(imageDimService, 'getWidth').mockReturnValue(640);
+        jest.spyOn(differenceCounterService, 'findPixelDifferenceIndex').mockReturnValue(0);
 
-    //     const result = service.validateDifferencePositions(0, 0, '1');
-    //     expect(result.isADifference).toBe(true);
-    //     expect(result.differenceArray).toEqual([0, 1, 2, 3]);
-    //     expect(result.differencesPosition).toEqual(0);
-    // });
+        const id = await service.createDifferenceArray(getFakeDifferencesArray());
+        const result = await service.validateDifferencePositions(0, 0, id);
+        expect(result.isADifference).toBe(true);
+        expect(result.differenceArray).toEqual([0, 1, 2, 3]);
+        expect(result.differencesPosition).toEqual(0);
+    });
 
-    // it('validateDifferencePosition should determine if click is not a difference', async () => {
-    //     jest.spyOn(imageDimService, 'getWidth').mockReturnValue(640);
-    //     jest.spyOn(differenceCounterService, 'findPixelDifferenceIndex').mockReturnValue(2);
+    it('validateDifferencePosition should determine if click is not a difference', async () => {
+        jest.spyOn(imageDimService, 'getWidth').mockReturnValue(640);
+        jest.spyOn(differenceCounterService, 'findPixelDifferenceIndex').mockReturnValue(2);
 
-    //     const result = service.validateDifferencePositions(100, 100, '1');
-    //     expect(result.isADifference).toBe(false);
-    //     expect(result.differencesPosition).toEqual(2);
-    //     expect(result.differenceArray).toEqual([]);
-    // });
+        const id = await service.createDifferenceArray(getFakeDifferencesArray());
+        const result = await service.validateDifferencePositions(100, 100, id);
+        expect(result.isADifference).toBe(false);
+        expect(result.differenceArray).toEqual([]);
+        expect(result.differencesPosition).toEqual(2);
+    });
 });
 
 const getFakeDifferences = (): Differences => ({
