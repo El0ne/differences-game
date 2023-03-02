@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-underscore-dangle */
 import { GameCard, GameCardDocument, gameCardSchema } from '@app/schemas/game-cards.schemas';
@@ -120,7 +121,6 @@ const FAKE_GAME_INFO: GameCardDto = {
     differenceNumber: 6,
 };
 
-// const id = new ObjectId(0);
 const getFakeGameCard = (): GameCard => ({
     _id: new ObjectId(),
     name: (Math.random() + 1).toString(36).substring(2),
@@ -139,35 +139,3 @@ const getFakeGameCard = (): GameCard => ({
         { time: 0, name: '--' },
     ],
 });
-
-// interface returnedGame {
-//     __v: 0;
-//     _id: ObjectId;
-//     name: string;
-//     difficulty: string;
-//     differenceNumber: number;
-//     originalImageName: string;
-//     differenceImageName: string;
-//     soloTimes: RankingBoard[];
-//     multiTimes: RankingBoard[];
-// }
-
-// const FAKE_GAME_CARD_ANSWER: returnedGame = {
-//     __v: 0,
-//     _id: id,
-//     name: 'game.name',
-//     difficulty: 'Facile',
-//     differenceNumber: 6,
-//     originalImageName: 'game.baseImage',
-//     differenceImageName: 'game.differenceImage',
-//     soloTimes: [
-//         { time: 0, name: '--' },
-//         { time: 0, name: '--' },
-//         { time: 0, name: '--' },
-//     ],
-//     multiTimes: [
-//         { time: 0, name: '--' },
-//         { time: 0, name: '--' },
-//         { time: 0, name: '--' },
-//     ],
-// };
