@@ -34,17 +34,6 @@ export class StageController {
         private differenceClickService: DifferenceClickService,
     ) {}
 
-    @Delete('/:gameCardId')
-    async deleteGame(@Param() param, @Res() res: Response): Promise<void> {
-        console.log('gere');
-        try {
-            await this.gameCardService.deleteGameCard(param.gameCardId);
-            res.status(HttpStatus.NO_CONTENT);
-        } catch {
-            throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     @Get('/')
     async getStages(@Query('index') index: number, @Query('endIndex') endIndex: number, @Res() res: Response): Promise<void> {
         try {
@@ -66,7 +55,6 @@ export class StageController {
 
     @Get('/:gameCardId')
     async getStageById(@Param() param, @Res() res: Response): Promise<void> {
-        console.log('first');
         try {
             const gameCard = await this.gameCardService.getGameCardById(param.gameCardId);
             res.status(HttpStatus.OK).send(gameCard);
@@ -83,6 +71,16 @@ export class StageController {
                 res.status(HttpStatus.CREATED).send(newGame);
             } else res.sendStatus(HttpStatus.BAD_REQUEST);
         } catch (err) {
+            throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Delete('/:gameCardId')
+    async deleteGame(@Param() param, @Res() res: Response): Promise<void> {
+        try {
+            await this.gameCardService.deleteGameCard(param.gameCardId);
+            res.status(HttpStatus.NO_CONTENT);
+        } catch {
             throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

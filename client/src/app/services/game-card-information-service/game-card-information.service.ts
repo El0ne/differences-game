@@ -40,10 +40,7 @@ export class GameCardInformationService {
         return this.http.post<ServerGeneratedGameInfo>(`${STAGE}/image/${radius}`, formData);
     }
 
-    deleteGame(gameId: string) {
-        console.log('here');
-        console.log('`${STAGE}/${gameId}`', `${STAGE}/${gameId}`);
-        // return this.http.delete(`${STAGE}/${gameId}`);
-        return this.http.delete<void>('http://localhost:3000/api/stage/6400e417671f9ffe5d138e7f');
+    deleteGame(gameId: string): Observable<void> {
+        return this.http.delete<void>(`${STAGE}/${gameId}`);
     }
 }

@@ -22,8 +22,6 @@ export class GameCardSelectionComponent implements OnInit {
     // TODO: Ajouter la logique pour que les temps de configurations viennent du database pour dynamiquement les loader.
 
     deleteGame(): void {
-        console.log('delete');
-        console.log(this.gameCardInformation._id);
         // eslint-disable-next-line no-underscore-dangle
         this.gameCardService.deleteGame(this.gameCardInformation._id).subscribe();
     }

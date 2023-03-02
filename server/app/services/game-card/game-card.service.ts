@@ -35,7 +35,6 @@ export class GameCardService {
     }
 
     async deleteGameCard(id: string): Promise<void> {
-        console.log('id', id);
         await this.gameCardModel.findByIdAndDelete(new ObjectId(id));
     }
 
