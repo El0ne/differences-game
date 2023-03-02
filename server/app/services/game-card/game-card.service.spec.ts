@@ -1,37 +1,87 @@
-import { GameCardInformation } from '@common/game-card';
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable no-underscore-dangle */
+import { GameCard, GameCardDocument, gameCardSchema } from '@app/schemas/game-cards.schemas';
 import { GameCardDto } from '@common/game-card.dto';
+import { RankingBoard } from '@common/ranking-board';
+import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing/test';
-import * as path from 'path';
+import { ObjectId } from 'mongodb';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { Connection, Model } from 'mongoose';
 import { stub } from 'sinon';
 import { GameCardService } from './game-card.service';
 import { gameCardsInformations } from './game-cards-test.json';
 
 describe('GameCardService', () => {
     let service: GameCardService;
+    let gameCardModel: Model<GameCardDocument>;
+    let mongoServer: MongoMemoryServer;
+    let connection: Connection;
 
     beforeEach(async () => {
+        mongoServer = await MongoMemoryServer.create();
+
         const module: TestingModule = await Test.createTestingModule({
+            imports: [
+                MongooseModule.forRootAsync({
+                    useFactory: () => ({
+                        uri: mongoServer.getUri(),
+                    }),
+                }),
+                MongooseModule.forFeature([{ name: GameCard.name, schema: gameCardSchema }]),
+            ],
             providers: [GameCardService],
         }).compile();
 
         service = module.get<GameCardService>(GameCardService);
-        service.jsonPath = path.join(__dirname, '/game-cards-test.json');
+        gameCardModel = module.get<Model<GameCardDocument>>(getModelToken(GameCard.name));
+        connection = await module.get(getConnectionToken());
+    });
+
+    const DELAY_BEFORE_CLOSING_CONNECTION = 200;
+
+    afterEach((done) => {
+        setTimeout(async () => {
+            await connection.close();
+            await mongoServer.stop();
+            done();
+        }, DELAY_BEFORE_CLOSING_CONNECTION);
     });
 
     it('should be defined', () => {
         expect(service).toBeDefined();
+        expect(gameCardModel).toBeDefined();
     });
 
     it('getAllGameCards should return all gameCards informations', async () => {
-        const gameCards = service.getAllGameCards();
-        expect(gameCards).toEqual(gameCardsInformations);
+        await gameCardModel.deleteMany({});
+        expect((await service.getAllGameCards()).length).toEqual(0);
+        await gameCardModel.create(FAKE_GAME_CARD);
+        expect((await service.getAllGameCards()).length).toEqual(1);
+        expect(await service.getAllGameCards()).toEqual([expect.objectContaining(FAKE_GAME_CARD_ANSWER)]);
     });
+
     it('getGameCards should return all gameCards informations between both indexes', async () => {
         const startIndex = 0;
         const endIndex = 1;
-        const gameCards = service.getGameCards(startIndex, endIndex);
-        expect(gameCards).toEqual(gameCardsInformations.slice(startIndex, endIndex));
+
+        const answer = [];
+
+        for (let i = 0; i < endIndex; i++) {
+            // gameCardModel = module.get<Model<GameCardDocument>>(getModelToken(GameCard.name));
+            // const game = FAKE_GAME_CARD;
+            // game._id = new ObjectId();
+            const game = FAKE_GAME_CARD;
+            const gameAnswer = FAKE_GAME_CARD_ANSWER;
+            const gameId = new ObjectId();
+            game._id = gameId;
+            gameAnswer._id = gameId;
+            answer.push(gameAnswer);
+            await gameCardModel.create(game);
+        }
+        const gameCards = await service.getGameCards(startIndex, endIndex);
+        expect(gameCards[0]).toEqual(expect.objectContaining(answer[0]));
     });
 
     it('getGameCardById should return a specific game card', async () => {
@@ -57,7 +107,7 @@ describe('GameCardService', () => {
 });
 
 const FAKE_GAME_INFO: GameCardDto = {
-    _id: '0',
+    _id: '00000000773db8b853265f32',
     name: 'game.name',
     difficulty: 'Facile',
     baseImage: 'game.baseImage',
@@ -65,8 +115,42 @@ const FAKE_GAME_INFO: GameCardDto = {
     radius: 3,
     differenceNumber: 6,
 };
-const FAKE_GAME_CARD: GameCardInformation = {
-    _id: '0',
+
+const id = new ObjectId(0);
+const FAKE_GAME_CARD: GameCard = {
+    _id: id,
+    name: 'game.name',
+    difficulty: 'Facile',
+    differenceNumber: 6,
+    originalImageName: 'game.baseImage',
+    differenceImageName: 'game.differenceImage',
+    soloTimes: [
+        { time: 0, name: '--' },
+        { time: 0, name: '--' },
+        { time: 0, name: '--' },
+    ],
+    multiTimes: [
+        { time: 0, name: '--' },
+        { time: 0, name: '--' },
+        { time: 0, name: '--' },
+    ],
+};
+
+interface returnedGame {
+    __v: 0;
+    _id: ObjectId;
+    name: string;
+    difficulty: string;
+    differenceNumber: number;
+    originalImageName: string;
+    differenceImageName: string;
+    soloTimes: RankingBoard[];
+    multiTimes: RankingBoard[];
+}
+
+const FAKE_GAME_CARD_ANSWER: returnedGame = {
+    __v: 0,
+    _id: id,
     name: 'game.name',
     difficulty: 'Facile',
     differenceNumber: 6,
