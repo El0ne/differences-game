@@ -4,6 +4,7 @@ import { ImageDimensionsService } from '@app/services/image-dimensions/image-dim
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { ObjectId } from 'mongodb';
 import { Model } from 'mongoose';
 
 @Injectable()
@@ -31,6 +32,11 @@ export class DifferenceClickService {
     async getDifferenceArrayFromStageID(_id: string): Promise<number[][]> {
         const differenceArray = await this.differenceModel.findById(_id);
         return differenceArray ? differenceArray.differences : [];
+    }
+
+    async deleteDifferences(id: string): Promise<void> {
+        const test = await this.differenceModel.findByIdAndDelete(new ObjectId(id));
+        console.log('test', test);
     }
 
     async validateDifferencePositions(clickPositionX: number, clickPositionY: number, _id: string): Promise<ClickDifferenceVerification> {
