@@ -1,6 +1,4 @@
 import { GameCard, GameCardDocument } from '@app/schemas/game-cards.schemas';
-import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
-import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -9,11 +7,7 @@ import { Model } from 'mongoose';
 
 @Injectable()
 export class GameCardService {
-    constructor(
-        @InjectModel(GameCard.name) private gameCardModel: Model<GameCardDocument>,
-        private differenceClickService: DifferenceClickService,
-        private imageManagerService: ImageManagerService,
-    ) {}
+    constructor(@InjectModel(GameCard.name) private gameCardModel: Model<GameCardDocument>) {}
 
     async getAllGameCards(): Promise<GameCard[]> {
         return await this.gameCardModel.find({});
@@ -40,17 +34,6 @@ export class GameCardService {
         return newGameCard.save();
     }
 
-    async deleteGameCard(id: string): Promise<void> {
-        const deletedGameCard = await this.gameCardModel.findByIdAndDelete(new ObjectId(id));
-        await this.imageManagerService.deleteImage(deletedGameCard.originalImageName);
-        await this.imageManagerService.deleteImage(deletedGameCard.differenceImageName);
-        await this.differenceClickService.deleteDifferences(deletedGameCard._id);
-        // TODO Remove populate when over with delete
-        // if ((await this.getGameCardsNumber()) === 0) {
-        //     await this.populateDB();
-        // }
-    }
-
     generateGameCard(game: GameCardDto): GameCard {
         return {
             // eslint-disable-next-line no-underscore-dangle
@@ -72,20 +55,4 @@ export class GameCardService {
             ],
         };
     }
-
-    async populateDB() {
-        for (let i = 0; i < 6; i++) {
-            this.createGameCard(getFakeGameDTO());
-        }
-    }
 }
-
-const getFakeGameDTO = (): GameCardDto => ({
-    _id: new ObjectId().toHexString(),
-    name: (Math.random() + 1).toString(36).substring(2),
-    difficulty: 'Facile',
-    baseImage: 'game.baseImage',
-    differenceImage: 'game.differenceImage',
-    radius: 3,
-    differenceNumber: 6,
-});

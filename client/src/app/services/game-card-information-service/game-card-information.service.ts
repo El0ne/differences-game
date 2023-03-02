@@ -39,8 +39,4 @@ export class GameCardInformationService {
         formData.append('differenceImage', differenceImage, differenceImage.name);
         return this.http.post<ServerGeneratedGameInfo>(`${STAGE}/image/${radius}`, formData);
     }
-
-    deleteGame(gameId: string): Observable<void> {
-        return this.http.delete<void>(`${STAGE}/${gameId}`);
-    }
 }

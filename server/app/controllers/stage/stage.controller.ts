@@ -6,7 +6,7 @@ import { ImageManagerService } from '@app/services/image-manager/image-manager.s
 import { GameCardDto } from '@common/game-card.dto';
 import { ImageUploadDto } from '@common/image-upload.dto';
 import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { diskStorage } from 'multer';
@@ -75,16 +75,6 @@ export class StageController {
         }
     }
 
-    @Delete('/:gameCardId')
-    async deleteGame(@Param() param, @Res() res: Response): Promise<void> {
-        try {
-            await this.gameCardService.deleteGameCard(param.gameCardId);
-            res.status(HttpStatus.NO_CONTENT);
-        } catch {
-            throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     @Post('/image/:radius')
     @UseInterceptors(
         FileFieldsInterceptor(
@@ -117,8 +107,8 @@ export class StageController {
                     };
                     res.status(HttpStatus.CREATED).send(data);
                 } else {
-                    this.imageManagerService.deleteImage(files.baseImage[0].filename);
-                    this.imageManagerService.deleteImage(files.differenceImage[0].filename);
+                    this.imageManagerService.deleteImage(files.baseImage[0].path);
+                    this.imageManagerService.deleteImage(files.differenceImage[0].path);
                     res.status(HttpStatus.OK).send([]);
                 }
             } else res.sendStatus(HttpStatus.BAD_REQUEST);
