@@ -18,20 +18,7 @@
 body {
     background: linear-gradient(black, #7a04eb, #bd04eb);
 }
-.info-card {
-    top: 13%;
-    left: 19%;
-    width: 62%;
-    height: 72%;
-    border-radius: 2rem;
 
-    border: 0.2rem solid #eee;
-    box-shadow: 0 0 0.2rem #eee, 0 0 0.2rem #aaa, 0 0 2rem #bc13fe, 0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
-    z-index: 1;
-    position: fixed;
-    background: linear-gradient(var(--linear-background-color-1), var(--linear-background-color-2));
-    text-align: center;
-}
 .name-input {
     top: 10%;
     left: 5%;
@@ -104,7 +91,6 @@ body {
     border-radius: 25px;
 
     border: 0.2rem solid #eee;
-    box-shadow: 0 0 0.2rem #eee, 0 0 0.2rem #aaa, 0 0 2rem #bc13fe, 0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
 }
 
 .text-area {
@@ -192,7 +178,6 @@ body {
     border: 0.2rem solid #eee;
     border-radius: 2rem;
     padding: 0.4em;
-    box-shadow: 0 0 0.2rem #eee, 0 0 0.2rem #aaa, 0 0 2rem #bc13fe, 0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
 }
 
 .image-container:hover {
@@ -309,7 +294,6 @@ app-click-event {
 
     padding: 68px 82px;
     gap: 100px;
-    box-shadow: 0 0 1px #eee, 0 0 1px #aaa, 0 0 2rem #bc13fe, 0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
 }
 .row {
     display: flex;

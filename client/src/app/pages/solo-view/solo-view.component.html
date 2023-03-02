@@ -1,30 +1,4 @@
 <body>
-    <!-- Les prochaines lignes doivent commentées doivent être conservées. On doit mettre ces infos quelque part, je ne sais juste pas où.
-        I want to overlook this with y'all lundi 
-    -->
-
-    <!-- <div class="info-card" *ngIf="showTextBox">
-        <div class="info">
-            <p class="title">{{ gameCardInfo.name }}</p>
-            <div class="title">Difficulté : {{ gameCardInfo.difficulty }}</div>
-            <div class="title">Joueurs présents : 1</div>
-            <div class="title">Nombre de différences : {{ numberOfDifferences }}</div>
-            <div class="title">Temps perdu par indice/gagné par différence : x</div>
-        </div>
-        <button class="normal-button" id="info-quit" type="button" (click)="toggleInfoCard()">
-            <mat-icon class="icon">clear</mat-icon>
-        </button>
-    </div> -->
-
-    <div class="info-card" *ngIf="showWinMessage">
-        <div class="info">
-            <p class="title">Vous Avez Gagné! Bravo!</p>
-        </div>
-        <button class="normal-button home-button" id="home-win" type="button" routerLink="/home">
-            <mat-icon class="icon">home</mat-icon>
-        </button>
-    </div>
-
     <div class="nav-bar">
         <div class="options" *ngIf="showNavBar">
             <button class="normal-button home-button option-buttons" type="button" routerLink="/home">
@@ -42,7 +16,7 @@
     </div>
 
     <div class="flex-game">
-        <div class="image-container">
+        <div class="image-container neon-border">
             <app-click-event
                 #left
                 [id]="1"
@@ -66,7 +40,7 @@
 
             <div id="score">
                 <!-- référence : https://codepen.io/Vivekp1118/pen/YzLOOVG -->
-                <div class="container">
+                <div class="container neon-border">
                     <div class="row">
                         <div class="col col-heading neon">
                             <h1>SCORE</h1>
@@ -76,7 +50,7 @@
                 </div>
             </div>
 
-            <div class="text-box">
+            <div class="text-box neon-border">
                 <div class="text-area">
                     <div *ngFor="let message of messages">
                         <div class="message">{{ message }}</div>
@@ -93,7 +67,7 @@
                 </div>
             </div>
         </div>
-        <div class="image-container">
+        <div class="image-container neon-border">
             <app-click-event
                 #right
                 [id]="2"

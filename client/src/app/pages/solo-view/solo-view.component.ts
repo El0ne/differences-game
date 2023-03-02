@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
+import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal.component';
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
@@ -84,6 +85,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.right.endGame = true;
         this.showWinMessage = true;
         this.showNavBar = false;
+
+        this.dialog.open(GameWinModalComponent, { disableClose: true });
     }
 
     incrementScore(): void {

@@ -11,9 +11,15 @@
         <div class="line title">____________</div>
     </div>
     <div class="central">
-        <input type="text" class="game-title game-container" #title (keyup)="getTitle(title.value)" placeholder="Donnez un titre à votre partie" />
+        <input
+            type="text"
+            class="game-title game-container neon-border"
+            #title
+            (keyup)="getTitle(title.value)"
+            placeholder="Donnez un titre à votre partie"
+        />
         <div class="upload-container">
-            <div class="original container">
+            <div class="original container neon-border">
                 <div class="original image">
                     <canvas #canvas1 width="640px" height="480px"></canvas>
                 </div>
@@ -27,7 +33,7 @@
             </div>
 
             <div class="middle-container">
-                <div class="tools-container">
+                <div class="tools-container neon-border">
                     <div class="row-tools">
                         <button><mat-icon class="btn-image">undo</mat-icon></button>
                         <button><mat-icon class="btn-image">rectangle</mat-icon></button>
@@ -69,7 +75,7 @@
                 </div>
             </div>
 
-            <div class="difference container">
+            <div class="difference container neon-border">
                 <div class="different image">
                     <canvas #canvas2 width="640px" height="480px"></canvas>
                 </div>

@@ -19,6 +19,7 @@ import { HomePageComponent } from './pages/home-page/home-page.component';
 import { SoloViewComponent } from './pages/solo-view/solo-view.component';
 import { GameInfoModalComponent } from './modals/game-info-modal/game-info-modal.component';
 import { QuitGameModalComponent } from './modals/quit-game-modal/quit-game-modal.component';
+import { GameWinModalComponent } from './modals/game-win-modal/game-win-modal.component';
 
 /**
  * Main module that is used in main.ts.
@@ -40,6 +41,7 @@ import { QuitGameModalComponent } from './modals/quit-game-modal/quit-game-modal
         ChosePlayerNameDialogComponent,
         GameInfoModalComponent,
         QuitGameModalComponent,
+        GameWinModalComponent,
     ],
     entryComponents: [ModalPageComponent],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, MatIconModule],
