@@ -65,17 +65,13 @@ describe('GameCardService', () => {
         const startIndex = 0;
         const endIndex = 2;
         const answer = [];
-
+        await gameCardModel.deleteMany({});
         for (let i = 0; i < endIndex; i++) {
             const game = getFakeGameCard();
             await gameCardModel.create(game);
-            // console.log('game', game);
             answer.push(game);
         }
-        // answer.push(FAKE_GAME_CARD);
         const gameCards = await service.getGameCards(startIndex, endIndex);
-        // console.log('gameCards', gameCards);
-        // console.log('answer', answer);
         for (let i = 0; i < endIndex; i++) {
             expect(gameCards[i]).toEqual(expect.objectContaining(answer[i]));
         }
