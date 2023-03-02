@@ -36,6 +36,9 @@ export class GameCardService {
 
     async deleteGameCard(id: string): Promise<void> {
         await this.gameCardModel.findByIdAndDelete(new ObjectId(id));
+        if ((await this.getGameCardsNumber()) === 0) {
+            await this.populateDB();
+        }
     }
 
     generateGameCard(game: GameCardDto): GameCard {
@@ -59,4 +62,20 @@ export class GameCardService {
             ],
         };
     }
+
+    async populateDB() {
+        for (let i = 0; i < 6; i++) {
+            this.createGameCard(getFakeGameDTO());
+        }
+    }
 }
+
+const getFakeGameDTO = (): GameCardDto => ({
+    _id: new ObjectId().toHexString(),
+    name: (Math.random() + 1).toString(36).substring(2),
+    difficulty: 'Facile',
+    baseImage: 'game.baseImage',
+    differenceImage: 'game.differenceImage',
+    radius: 3,
+    differenceNumber: 6,
+});

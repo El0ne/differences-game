@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { STAGE } from '@app/services/server-routes';
 import { GameCardInformation } from '@common/game-card';
@@ -11,6 +11,7 @@ import { GameCardInformation } from '@common/game-card';
 export class GameCardSelectionComponent implements OnInit {
     @Input() gameCardInformation: GameCardInformation;
     @Input() isConfig: boolean | null;
+    @Output() gameDeleted = new EventEmitter<void>();
     image: string = '';
 
     constructor(private gameCardService: GameCardInformationService) {}
@@ -24,5 +25,6 @@ export class GameCardSelectionComponent implements OnInit {
     deleteGame(): void {
         // eslint-disable-next-line no-underscore-dangle
         this.gameCardService.deleteGame(this.gameCardInformation._id).subscribe();
+        this.gameDeleted.emit();
     }
 }

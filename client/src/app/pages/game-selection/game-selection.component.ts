@@ -53,4 +53,13 @@ export class GameSelectionComponent implements OnInit {
     isShowingLastCard(): boolean {
         return this.index + GAME_CARDS_TO_DISPLAY >= this.numberOfGameInformations;
     }
+
+    refreshConfigPage() {
+        console.log('dopgjdfógjf');
+        // this.router.navigateByUrl('/config');
+        this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
+            this.numberOfGameInformations = data;
+            this.selectGameCards();
+        });
+    }
 }
