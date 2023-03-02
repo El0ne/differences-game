@@ -35,8 +35,7 @@ export class DifferenceClickService {
     }
 
     async deleteDifferences(id: string): Promise<void> {
-        const test = await this.differenceModel.findByIdAndDelete(new ObjectId(id));
-        console.log('test', test);
+        await this.differenceModel.findByIdAndDelete(new ObjectId(id));
     }
 
     async validateDifferencePositions(clickPositionX: number, clickPositionY: number, _id: string): Promise<ClickDifferenceVerification> {
