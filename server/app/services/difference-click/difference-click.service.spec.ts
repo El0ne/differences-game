@@ -5,11 +5,11 @@ import { DifferencesCounterService } from '@app/services/differences-counter/dif
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
-import { getModelToken, MongooseModule } from '@nestjs/mongoose';
+import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ObjectId } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { Model } from 'mongoose';
+import { Connection, Model } from 'mongoose';
 import { DifferenceClickService } from './difference-click.service';
 
 describe('DifferenceClickService', () => {
@@ -18,6 +18,7 @@ describe('DifferenceClickService', () => {
     let differenceCounterService: DifferencesCounterService;
     let differenceModel: Model<DifferencesDocument>;
     let mongoServer: MongoMemoryServer;
+    let connection: Connection;
 
     beforeEach(async () => {
         mongoServer = await MongoMemoryServer.create();
@@ -40,6 +41,7 @@ describe('DifferenceClickService', () => {
         imageDimService = module.get<ImageDimensionsService>(ImageDimensionsService);
         differenceCounterService = module.get<DifferencesCounterService>(DifferencesCounterService);
         differenceModel = module.get<Model<DifferencesDocument>>(getModelToken(Differences.name));
+        connection = await module.get(getConnectionToken());
         await differenceModel.deleteMany({});
     });
 
@@ -48,6 +50,7 @@ describe('DifferenceClickService', () => {
     afterEach((done) => {
         setTimeout(async () => {
             await mongoServer.stop();
+            await connection.close();
             done();
         }, DELAY_BEFORE_CLOSING_CONNECTION);
     });
@@ -57,7 +60,7 @@ describe('DifferenceClickService', () => {
         expect(differenceModel).toBeDefined();
     });
 
-    it('getAlldifferenceArrays should return all game differences from arrays', async () => {
+    it('getAllDifferenceArrays should return all game differences from arrays', async () => {
         expect((await service.getAllDifferenceArrays()).length).toEqual(0);
         const differenceObject = getFakeDifferences();
         await differenceModel.create(differenceObject);
@@ -66,10 +69,10 @@ describe('DifferenceClickService', () => {
     });
 
     it('getDifferenceArrayFromStageId should return an array given a certain id', async () => {
-        const differenceObject = getFakeDifferences();
-        const id = await service.createDifferenceArray(differenceObject.differences);
+        const differencesArray = getFakeDifferencesArray();
+        const id = await service.createDifferenceArray(differencesArray);
         const difference = await service.getDifferenceArrayFromStageID(id);
-        expect(difference).toEqual(differenceObject.differences);
+        expect(difference).toEqual(differencesArray);
     });
 
     it('getDifferenceArrayFromStageId should return an empty array if id is not found', async () => {
@@ -77,17 +80,15 @@ describe('DifferenceClickService', () => {
         expect(differences).toEqual([]);
     });
 
-    // it('createDifferenceArray should create a difference array given an id and the array', async () => {
-    //     const differences = service.getAllDifferenceArrays();
-    //     service.createDifferenceArray('2', [
-    //         [123, 124, 125],
-    //         [1, 2, 3],
-    //     ]);
-    //     const addedDifferences = service.getAllDifferenceArrays();
-    //     const getDifferences = service.getDifferenceArrayFromStageID('2');
-    //     expect(differences.length).not.toEqual(addedDifferences.length);
-    //     expect(getDifferences).toBeTruthy();
-    // });
+    it('createDifferenceArray should create a difference array given an id and the array', async () => {
+        const originalDifferences = await service.getAllDifferenceArrays();
+        const differencesArray = getFakeDifferencesArray();
+        const id = await service.createDifferenceArray(differencesArray);
+        const newDifferences = await service.getAllDifferenceArrays();
+        const addedDifferencesObject = await service.getDifferenceArrayFromStageID(id);
+        expect(originalDifferences.length + 1).toEqual(newDifferences.length);
+        expect(addedDifferencesObject).toEqual(differencesArray);
+    });
 
     // it('validateDifferencePosition should determine if click is a difference', async () => {
     //     jest.spyOn(imageDimService, 'getWidth').mockReturnValue(640);
@@ -111,8 +112,12 @@ describe('DifferenceClickService', () => {
 });
 
 const getFakeDifferences = (): Differences => ({
-    differences: [
+    differences: getFakeDifferencesArray(),
+});
+
+const getFakeDifferencesArray = (): number[][] => {
+    return [
         [0, 1, 2, 3],
         [7, 8, 9, 10],
-    ],
-});
+    ];
+};
