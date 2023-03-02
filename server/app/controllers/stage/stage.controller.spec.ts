@@ -95,9 +95,6 @@ describe('StageController', () => {
         getGameCardStub.callsFake(() => {
             return FAKE_GAME_CARD;
         });
-
-        await gameCardModel.deleteMany({});
-        await gameCardModel.create(FAKE_GAME_CARD);
         const response = await request(httpServer).get('/stage');
         assert(getGameCardStub.called);
         expect(response.status).toBe(HttpStatus.OK);
@@ -125,12 +122,12 @@ describe('StageController', () => {
 
     it('getStageById() should return a game card if the id is valid', async () => {
         getGameCardByIdStub.callsFake(() => {
-            return FAKE_GAME_CARD_ARRAY[0];
+            return FAKE_GAME_CARD;
         });
         const response = await request(httpServer).get('/stage/:gameCardId');
         assert(getGameCardByIdStub.called);
         expect(response.status).toBe(HttpStatus.OK);
-        expect(response.body).toEqual(FAKE_GAME_CARD_ARRAY[0]);
+        expect(response.body).toEqual(FAKE_GAME_CARD_ANSWER);
     });
 
     it('getStageById() should return 500 if there is an error', async () => {
@@ -144,7 +141,7 @@ describe('StageController', () => {
         const response = await request(httpServer).post('/stage').send(FAKE_GAME_INFO);
         assert(createGameCardStub.called);
         expect(response.status).toBe(HttpStatus.CREATED);
-        expect(response.body).toEqual(FAKE_GAME_CARD);
+        expect(response.body).toEqual(FAKE_GAME_CARD_ANSWER);
         createGameCardStub.restore();
     });
 
