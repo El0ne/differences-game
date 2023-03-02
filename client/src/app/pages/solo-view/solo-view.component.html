@@ -1,4 +1,8 @@
 <body>
+    <!-- Les prochaines lignes doivent commentées doivent être conservées. On doit mettre ces infos quelque part, je ne sais juste pas où.
+        I want to overlook this with y'all lundi 
+    -->
+
     <!-- <div class="info-card" *ngIf="showTextBox">
         <div class="info">
             <p class="title">{{ gameCardInfo.name }}</p>
@@ -39,10 +43,17 @@
 
     <div class="flex-game">
         <div class="image-container">
-            <app-click-event #left [id]="1" [original]="'original'" [gameCardId]="this.currentGameId"
-                [imagePath]="this.gameCardInfo.originalImageName" (incrementScore)="incrementScore()"
-                (differences)="addDifferenceDetected($event)" (transmitter)="paintPixel($event)"
-                *ngIf="this.gameCardInfo"></app-click-event>
+            <app-click-event
+                #left
+                [id]="1"
+                [original]="'original'"
+                [gameCardId]="this.currentGameId"
+                [imagePath]="this.gameCardInfo.originalImageName"
+                (incrementScore)="incrementScore()"
+                (differences)="addDifferenceDetected($event)"
+                (transmitter)="paintPixel($event)"
+                *ngIf="this.gameCardInfo"
+            ></app-click-event>
         </div>
         <div class="game-options">
             <div id="timer">
@@ -75,8 +86,7 @@
                     </div>
                 </div>
                 <div class="answer-area">
-                    <input type="text" class="input-field" placeholder="Entrez votre message"
-                        [(ngModel)]="messageContent" />
+                    <input type="text" class="input-field" placeholder="Entrez votre message" [(ngModel)]="messageContent" />
                     <button class="send-button" (click)="sendMessage()">
                         <mat-icon>send</mat-icon>
                     </button>
@@ -84,10 +94,17 @@
             </div>
         </div>
         <div class="image-container">
-            <app-click-event #right [id]="2" [original]="'different'" [gameCardId]="this.currentGameId"
-                [imagePath]="this.gameCardInfo.differenceImageName" (incrementScore)="incrementScore()"
-                (differences)="addDifferenceDetected($event)" (transmitter)="paintPixel($event)"
-                *ngIf="this.gameCardInfo"></app-click-event>
+            <app-click-event
+                #right
+                [id]="2"
+                [original]="'different'"
+                [gameCardId]="this.currentGameId"
+                [imagePath]="this.gameCardInfo.differenceImageName"
+                (incrementScore)="incrementScore()"
+                (differences)="addDifferenceDetected($event)"
+                (transmitter)="paintPixel($event)"
+                *ngIf="this.gameCardInfo"
+            ></app-click-event>
         </div>
         <div class="hint-button">
             <button class="hint" type="button">
