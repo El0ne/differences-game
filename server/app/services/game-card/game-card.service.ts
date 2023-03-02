@@ -42,8 +42,6 @@ export class GameCardService {
 
     async deleteGameCard(id: string): Promise<void> {
         const deletedGameCard = await this.gameCardModel.findByIdAndDelete(new ObjectId(id));
-        console.log('deletedGameCard', deletedGameCard);
-
         await this.imageManagerService.deleteImage(deletedGameCard.originalImageName);
         await this.imageManagerService.deleteImage(deletedGameCard.differenceImageName);
         // await this.differenceClickService.deleteDifferences
