@@ -1,4 +1,6 @@
 import { GameCard, GameCardDocument } from '@app/schemas/game-cards.schemas';
+import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
+import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -7,7 +9,11 @@ import { Model } from 'mongoose';
 
 @Injectable()
 export class GameCardService {
-    constructor(@InjectModel(GameCard.name) private gameCardModel: Model<GameCardDocument>) {}
+    constructor(
+        @InjectModel(GameCard.name) private gameCardModel: Model<GameCardDocument>,
+        private differenceClickService: DifferenceClickService,
+        private imageManagerService: ImageManagerService,
+    ) {}
 
     async getAllGameCards(): Promise<GameCard[]> {
         return await this.gameCardModel.find({});
@@ -35,7 +41,13 @@ export class GameCardService {
     }
 
     async deleteGameCard(id: string): Promise<void> {
-        await this.gameCardModel.findByIdAndDelete(new ObjectId(id));
+        const deletedGameCard = await this.gameCardModel.findByIdAndDelete(new ObjectId(id));
+        console.log('deletedGameCard', deletedGameCard);
+
+        await this.imageManagerService.deleteImage(deletedGameCard.originalImageName);
+        await this.imageManagerService.deleteImage(deletedGameCard.differenceImageName);
+        // await this.differenceClickService.deleteDifferences
+        // TODO Remove populate when over with delete
         if ((await this.getGameCardsNumber()) === 0) {
             await this.populateDB();
         }
