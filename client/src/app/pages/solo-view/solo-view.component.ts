@@ -30,13 +30,13 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     playerName: string;
     messages: string[] = [];
     messageContent: string = '';
-    differenceArray: number[][];
     currentScore: number = 0;
     numberOfDifferences: number;
     currentTime: number;
     currentGameId: string;
     endGame: Subject<void> = new Subject<void>();
     gameCardInfo: GameCardInformation;
+    boundActivateCheatMode = this.activateCheatMode.bind(this);
 
     // eslint-disable-next-line max-params
     constructor(
@@ -62,12 +62,29 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         dialogRef.afterClosed().subscribe((result: string) => {
             this.playerName = result;
             this.showTime();
+            document.addEventListener('keydown', this.boundActivateCheatMode, true);
         });
     }
 
     ngOnDestroy(): void {
         this.timerService.stopTimer();
         this.foundDifferenceService.clearDifferenceFound();
+        document.removeEventListener('keydown', this.boundActivateCheatMode, true);
+    }
+
+    activateCheatMode(event: KeyboardEvent) {
+        if (event.key === 't') {
+            this.left.clickEventService.getDifferences(this.currentGameId).subscribe((data) => {
+                for (const differenceNo of this.foundDifferenceService.foundDifferences) {
+                    data[differenceNo] = [];
+                }
+                for (const difference of data) {
+                    if (difference.length !== 0) {
+                        this.handleFlash(difference);
+                    }
+                }
+            });
+        }
     }
 
     showTime(): void {
@@ -133,6 +150,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.left.differenceEffect(currentDifferences);
         this.right.differenceEffect(currentDifferences);
     }
+
     emitHandler(information: differenceInformation): void {
         this.handleFlash(information.lastDifferences);
         this.paintPixel(information.lastDifferences);
