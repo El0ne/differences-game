@@ -51,6 +51,7 @@ export class GameCreationPageComponent implements OnInit {
 
     openModal() {
         const dialogRef = this.matDialog.open(ModalPageComponent, {
+            disableClose: true,
             data: {
                 image: this.image,
                 difference: this.differenceNumber,
