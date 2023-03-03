@@ -55,6 +55,7 @@ export class GameCreationPageComponent implements OnInit {
                 image: this.image,
                 difference: this.differenceNumber,
                 difficulty: this.difficulty,
+                gameInfo: this.createdGameInfo,
             },
         });
 
@@ -156,7 +157,6 @@ export class GameCreationPageComponent implements OnInit {
                     this.difficulty = data.gameDifficulty;
                     this.differenceNumber = data.gameDifferenceNumber;
                     this.image = `${STAGE}/image/difference-image.bmp`;
-                    this.gameCardService.createGame(this.createdGameInfo).subscribe();
                     this.openModal();
                 } else {
                     this.isDisabled = false;

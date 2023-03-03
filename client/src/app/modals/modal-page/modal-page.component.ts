@@ -1,6 +1,8 @@
 import { Component, Inject, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { GameCardDto } from '@common/game-card.dto';
 
 @Component({
     selector: 'app-modal-page',
@@ -8,21 +10,25 @@ import { Router } from '@angular/router';
     styleUrls: ['./modal-page.component.scss'],
 })
 export class ModalPageComponent implements OnDestroy {
+    // eslint-disable-next-line max-params
     constructor(
         @Inject(MAT_DIALOG_DATA)
         public data: {
             image: string;
             difference: number;
             difficulty: string;
+            gameInfo: GameCardDto;
         },
         public matDialogRef: MatDialogRef<ModalPageComponent>,
         public router: Router,
+        private gameCardService: GameCardInformationService,
     ) {}
 
     ngOnDestroy() {
         this.matDialogRef.close(this.data);
     }
-    close() {
+    createGame() {
+        this.gameCardService.createGame(this.data.gameInfo).subscribe();
         this.matDialogRef.close(this.data);
         this.matDialogRef.afterClosed().subscribe((result) => {
             result.image = '';
