@@ -1,41 +1,43 @@
-import { GameCardInformation } from '@common/game-card';
-import { GameInformation } from '@common/game-information';
+import { GameCard, GameCardDocument } from '@app/schemas/game-cards.schemas';
+import { GameCardDto } from '@common/game-card.dto';
 import { Injectable } from '@nestjs/common';
-import * as fs from 'fs';
-import * as path from 'path';
+import { InjectModel } from '@nestjs/mongoose';
+import { ObjectId } from 'mongodb';
+import { Model } from 'mongoose';
+
 @Injectable()
 export class GameCardService {
-    jsonPath = path.join(process.cwd(), '/app/dataBase/game-cards-informations.json');
+    constructor(@InjectModel(GameCard.name) private gameCardModel: Model<GameCardDocument>) {}
 
-    getAllGameCards(): GameCardInformation[] {
-        const content = fs.readFileSync(this.jsonPath, 'utf8');
-        return JSON.parse(content).gameCardsInformations;
-    }
-    getGameCards(startIndex: number, endIndex: number): GameCardInformation[] {
-        return this.getAllGameCards().slice(startIndex, endIndex);
+    async getAllGameCards(): Promise<GameCard[]> {
+        return await this.gameCardModel.find({});
     }
 
-    getGameCardById(id: string): GameCardInformation {
-        const allGameCards = this.getAllGameCards();
-        return allGameCards.find((game) => game.id === id);
+    async getGameCards(startIndex: number, endIndex: number): Promise<GameCard[]> {
+        return await this.gameCardModel
+            .find({})
+            .skip(startIndex)
+            .limit(endIndex - startIndex + 1);
     }
 
-    getGameCardsNumber(): number {
-        const content = fs.readFileSync(this.jsonPath, 'utf8');
-        return JSON.parse(content).gameCardsInformations.length;
+    async getGameCardById(id: string): Promise<GameCard> {
+        return await this.gameCardModel.findById(new ObjectId(id));
     }
 
-    createGameCard(game): GameCardInformation {
-        const allGameCards = this.getAllGameCards();
-        const newGame = this.generateGameCard(game);
-        allGameCards.push(newGame);
-        fs.writeFileSync(this.jsonPath, JSON.stringify({ gameCardsInformations: allGameCards }));
-        return newGame;
+    async getGameCardsNumber(): Promise<number> {
+        return await this.gameCardModel.count();
     }
 
-    generateGameCard(game: GameInformation): GameCardInformation {
+    async createGameCard(gameCard: GameCardDto): Promise<GameCard> {
+        const generatedGameCard = this.generateGameCard(gameCard);
+        const newGameCard = new this.gameCardModel(generatedGameCard);
+        return newGameCard.save();
+    }
+
+    generateGameCard(game: GameCardDto): GameCard {
         return {
-            id: game.id,
+            // eslint-disable-next-line no-underscore-dangle
+            _id: new ObjectId(game._id),
             name: game.name,
             difficulty: game.difficulty,
             differenceNumber: game.differenceNumber,

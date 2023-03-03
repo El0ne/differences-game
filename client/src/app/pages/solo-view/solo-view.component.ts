@@ -3,12 +3,16 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
+import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
+import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal.component';
+import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
 import { ChatSocketService } from '@app/services/chat-socket/chat-socket.service';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { RoomMessage, Validation } from '@common/chat-gateway-constants';
+import { differenceInformation } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
 import { Subject } from 'rxjs';
 
@@ -126,6 +130,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.right.endGame = true;
         this.showWinMessage = true;
         this.showNavBar = false;
+
+        this.dialog.open(GameWinModalComponent, { disableClose: true });
     }
 
     abandonPartie() {
@@ -146,8 +152,17 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.chat.send('event', { room: this.currentRoom, multiplayer: this.is1v1, event: 'Différence trouvée' });
     }
 
-    toggleInfoCard(): void {
-        this.showTextBox = !this.showTextBox;
+    openInfoModal() {
+        this.dialog.open(GameInfoModalComponent, {
+            data: {
+                gameCardInfo: this.gameCardInfo,
+                numberOfDifferences: this.numberOfDifferences,
+            },
+        });
+    }
+
+    quitGame() {
+        this.dialog.open(QuitGameModalComponent, { disableClose: true });
     }
 
     toggleErrorMessage(): void {
@@ -178,5 +193,15 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     hint(): void {
         this.chat.send('hint', this.currentRoom);
+    }
+    handleFlash(currentDifferences: number[]): void {
+        this.left.differenceEffect(currentDifferences);
+        this.right.differenceEffect(currentDifferences);
+    }
+    emitHandler(information: differenceInformation): void {
+        this.handleFlash(information.lastDifferences);
+        this.paintPixel(information.lastDifferences);
+        this.incrementScore();
+        this.addDifferenceDetected(information.differencesPosition);
     }
 }
