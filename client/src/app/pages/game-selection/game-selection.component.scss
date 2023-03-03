@@ -85,6 +85,13 @@ app-game-card-selection {
     width: 16rem;
 }
 
+.normal-button:disabled,
+.normal-button[disabled] {
+    border: 1px solid #999999;
+    background-color: #cccccc;
+    color: #666666;
+}
+
 #create-a-stage-button {
     font-size: x-large;
 }
