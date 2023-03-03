@@ -62,28 +62,45 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         dialogRef.afterClosed().subscribe((result: string) => {
             this.playerName = result;
             this.showTime();
-            document.addEventListener('keydown', this.boundActivateCheatMode, true);
+            document.addEventListener('keydown', (event: KeyboardEvent) => {
+                this.boundActivateCheatMode(event);
+            });
         });
     }
 
     ngOnDestroy(): void {
         this.timerService.stopTimer();
         this.foundDifferenceService.clearDifferenceFound();
-        document.removeEventListener('keydown', this.boundActivateCheatMode, true);
+        document.removeEventListener('keydown', (event: KeyboardEvent) => {
+            this.boundActivateCheatMode(event);
+        });
     }
 
     activateCheatMode(event: KeyboardEvent) {
         if (event.key === 't') {
+            let differences: number[] = [];
+
+            this.left.toggleCheatMode = !this.left.toggleCheatMode;
+            this.right.toggleCheatMode = !this.right.toggleCheatMode;
             this.left.clickEventService.getDifferences(this.currentGameId).subscribe((data) => {
                 for (const differenceNo of this.foundDifferenceService.foundDifferences) {
                     data[differenceNo] = [];
                 }
                 for (const difference of data) {
                     if (difference.length !== 0) {
-                        this.handleFlash(difference);
+                        differences = differences.concat(difference);
                     }
                 }
+                console.log(this.left.toggleCheatMode);
+                if (this.left.toggleCheatMode) this.handleFlash(differences);
             });
+        }
+    }
+
+    deactivateCheatMode(event: KeyboardEvent) {
+        if (event.key === 't') {
+            this.left.toggleCheatMode = false;
+            this.right.toggleCheatMode = false;
         }
     }
 
@@ -146,7 +163,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.right.receiveDifferencePixels(rgbaValues, array);
     }
 
-    handleFlash(currentDifferences: number[]): void {
+    async handleFlash(currentDifferences: number[]): Promise<void> {
         this.left.differenceEffect(currentDifferences);
         this.right.differenceEffect(currentDifferences);
     }

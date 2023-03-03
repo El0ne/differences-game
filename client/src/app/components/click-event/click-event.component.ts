@@ -20,6 +20,7 @@ export class ClickEventComponent implements OnInit {
     @Input() gameCardId: string;
     @Input() imagePath: string;
     @Output() handler: EventEmitter<differenceInformation> = new EventEmitter<differenceInformation>();
+    @Output() cheatModeHandler: EventEmitter<KeyboardEvent> = new EventEmitter<KeyboardEvent>();
     @ViewChild('picture', { static: true })
     picture: ElementRef<HTMLCanvasElement>;
     @ViewChild('modification', { static: true })
@@ -29,6 +30,7 @@ export class ClickEventComponent implements OnInit {
     differenceData: ClickDifferenceVerification;
     endGame: boolean;
     foundDifferences: number[];
+    toggleCheatMode: boolean = false;
 
     constructor(public clickEventService: ClickEventService, public foundDifferenceService: FoundDifferenceService) {}
 
@@ -64,6 +66,10 @@ export class ClickEventComponent implements OnInit {
                     differencesPosition: this.differenceData.differencesPosition,
                     lastDifferences: this.differenceData.differenceArray,
                 });
+                if (this.toggleCheatMode) {
+                    const keyEvent: KeyboardEvent = new KeyboardEvent('keydown', { key: 't' });
+                    this.cheatModeHandler.emit(keyEvent);
+                }
             } else {
                 this.displayError(e);
             }
@@ -92,7 +98,7 @@ export class ClickEventComponent implements OnInit {
     async differenceEffect(currentDifferences: number[]): Promise<void> {
         if (!this.endGame) {
             const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-            this.emitSound(false);
+
             this.turnDifferenceYellow(originalContext, currentDifferences);
             await this.delay(FAST_WAIT_TIME_MS);
             this.turnOffYellow(originalContext, currentDifferences);
@@ -101,6 +107,13 @@ export class ClickEventComponent implements OnInit {
             await this.delay(FAST_WAIT_TIME_MS);
             this.turnOffYellow(originalContext, currentDifferences);
             await this.delay(FAST_WAIT_TIME_MS);
+            if (this.toggleCheatMode) {
+                console.log('is running');
+                this.differenceEffect(currentDifferences);
+            } else {
+                this.emitSound(false);
+                console.log('test');
+            }
         }
     }
 
