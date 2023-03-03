@@ -41,7 +41,6 @@ export class StageWaitingRoomGatewayGateway {
     joinHost(@ConnectedSocket() socket: Socket, @MessageBody() joinRequest: JoinHostInWaitingRequest): void {
         this.logger.log(`game ${joinRequest.stageId} joined by ${joinRequest.playerName}`);
         const playerInformations: PlayerInformations = { playerName: joinRequest.playerName, playerSocketId: socket.id };
-        this.logger.log(this.gameHosts.get(joinRequest.stageId));
         socket.to(this.gameHosts.get(joinRequest.stageId)).emit(WaitingRoomEvents.RequestMatch, playerInformations);
     }
 
