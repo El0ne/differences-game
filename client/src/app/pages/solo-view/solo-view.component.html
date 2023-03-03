@@ -29,24 +29,24 @@
         </div>
         <div class="game-options">
             <div id="double-score" *ngIf="is1v1">
-                <div id="score">
+                <div class="score">
                     <div class="playerName">{{ player }}</div>
-                    <!-- référence : https://codepen.io/Vivekp1118/pen/YzLOOVG -->
-                    <div class="container">
+
+                    <div class="container neon-border">
                         <div class="row">
-                            <div class="col col-heading">
+                            <div class="col col-heading neon">
                                 <div class="playerName">SCORE</div>
                             </div>
                             <div class="col col-display" id="scoreHome">{{ currentScorePlayer1 }}</div>
                         </div>
                     </div>
                 </div>
-                <div id="score">
+                <div class="score">
                     <div class="playerName">{{ opponent }}</div>
-                    <!-- référence : https://codepen.io/Vivekp1118/pen/YzLOOVG -->
-                    <div class="container">
+
+                    <div class="container neon-border">
                         <div class="row">
-                            <div class="col col-heading">
+                            <div class="col col-heading neon">
                                 <div class="playerName">SCORE</div>
                             </div>
                             <div class="col col-display" id="scoreHome">{{ currentScorePlayer2 }}</div>
@@ -54,18 +54,20 @@
                     </div>
                 </div>
             </div>
-            <div id="score" *ngIf="!is1v1">
+
+            <div class="score" *ngIf="!is1v1">
                 <div class="playerName">{{ player }}</div>
-                <!-- référence : https://codepen.io/Vivekp1118/pen/YzLOOVG -->
-                <div class="container">
+
+                <div class="container neon-border">
                     <div class="row">
-                        <div class="col col-heading">
+                        <div class="col col-heading neon">
                             <div class="playerName">SCORE</div>
                         </div>
                         <div class="col col-display" id="scoreHome">{{ currentScorePlayer1 }}</div>
                     </div>
                 </div>
             </div>
+
             <div id="timer">
                 <div class="timer-box">
                     <div class="display">
@@ -73,33 +75,14 @@
                     </div>
                 </div>
             </div>
-            <div class="text-box">
+
+            <div class="text-box neon-border">
                 <div class="text-area" #scroll [scrollTop]="scroll.scrollHeight">
                     <div class="text-container" *ngFor="let data of messages">
                         <div *ngIf="data.socketId !== 'event'" [ngClass]="data.socketId === socketId ? 'player1 message' : 'player2 message'">
                             {{ data.message }}
                         </div>
                         <div *ngIf="data.socketId === 'event'" class="error message">{{ data.message }}</div>
-            
-            <!-- <div id="score">
-                 référence : https://codepen.io/Vivekp1118/pen/YzLOOVG 
-                <div class="container neon-border">
-                    <div class="row">
-                        <div class="col col-heading neon">
-                            <h1>SCORE</h1>
-                        </div>
-                        <div class="col col-display" id="scoreHome">{{ currentScore }}</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="text-box neon-border">
-                <div class="text-area">
-                    <div *ngFor="let message of messages">
-                        <div class="message">{{ message }}</div>
-                    </div> -->
-                    <div class="error message" *ngIf="showErrorMessage" (click)="untoggleErrorMessage()">
-                        Votre message ne respecte pas le bon format. Cliquez ici pour enlever ce message.
                     </div>
                 </div>
                 <div class="answer-area" *ngIf="is1v1">
@@ -114,6 +97,7 @@
                 </div>
             </div>
         </div>
+
         <div class="image-container neon-border">
             <app-click-event
                 #right
