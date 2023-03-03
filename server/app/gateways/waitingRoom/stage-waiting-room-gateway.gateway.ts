@@ -34,7 +34,7 @@ export class StageWaitingRoomGatewayGateway {
         this.logger.log(`game deleted by ${socket.id}`);
         this.gameHosts.delete(stageId);
         socket.to(stageId).emit(WaitingRoomEvents.GameDeleted, stageId);
-        socket.to(stageId).emit(WaitingRoomEvents.MatchRefused, 'raison');
+        socket.to(stageId).emit(WaitingRoomEvents.MatchRefused, "la partie n'a plus d'hôte");
     }
 
     @SubscribeMessage(WaitingRoomEvents.JoinHost)
@@ -58,14 +58,14 @@ export class StageWaitingRoomGatewayGateway {
         this.clearRooms(this.server.allSockets[approval.OpponentId]);
         socket.to(approval.OpponentId).socketsJoin(socket.id);
         socket.to(approval.OpponentId).emit(WaitingRoomEvents.MatchAccepted);
-        socket.to(approval.stageId).emit(WaitingRoomEvents.MatchRefused, 'raison'); // refuser match a tous les autres
+        socket.to(approval.stageId).emit(WaitingRoomEvents.MatchRefused, "l'hôte a trouvé un autre adversaire"); // refuser match a tous les autres
         this.gameHosts.delete(approval.stageId);
     }
 
     @SubscribeMessage(WaitingRoomEvents.DeclineOpponent)
     declineOpponent(@ConnectedSocket() socket: Socket, @MessageBody() opponentId: string): void {
         this.logger.log(`${socket.id} refused ${opponentId}`);
-        socket.to(opponentId).emit(WaitingRoomEvents.MatchRefused, 'raison');
+        socket.to(opponentId).emit(WaitingRoomEvents.MatchRefused, "l'hôte ne souhaite pas faire une partie avec vous");
     }
 
     clearRooms(socket: Socket): void {
