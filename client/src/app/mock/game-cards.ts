@@ -1,7 +1,7 @@
 import { GameCardInformation } from '@common/game-card';
 
 const GAME1: GameCardInformation = {
-    id: '123',
+    _id: '123',
     name: 'Library',
     difficulty: 'Difficile',
     differenceNumber: 5,
@@ -20,7 +20,7 @@ const GAME1: GameCardInformation = {
 };
 
 const GAME2: GameCardInformation = {
-    id: '123',
+    _id: '123',
     name: 'game2',
     difficulty: 'Difficile',
     differenceNumber: 5,

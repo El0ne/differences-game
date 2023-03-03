@@ -206,7 +206,7 @@ const MOCK_INFORMATION: differenceInformation = {
 };
 
 const FAKE_GAME_CARD: GameCardInformation = {
-    id: '0',
+    _id: '0',
     name: 'game.name',
     difficulty: 'Facile',
     differenceNumber: 6,

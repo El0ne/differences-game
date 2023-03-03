@@ -7,12 +7,16 @@ export class GameClickController {
     constructor(private differenceClickService: DifferenceClickService) {}
 
     @Get('/')
-    validateDifference(@Query('x') clickPositionX: number, @Query('y') clickPositionY: number, @Query('id') id: string): ClickDifferenceVerification {
-        return this.differenceClickService.validateDifferencePositions(clickPositionX, clickPositionY, id);
+    async validateDifference(
+        @Query('x') clickPositionX: number,
+        @Query('y') clickPositionY: number,
+        @Query('id') id: string,
+    ): Promise<ClickDifferenceVerification> {
+        return await this.differenceClickService.validateDifferencePositions(clickPositionX, clickPositionY, id);
     }
 
     @Get(':id')
-    getDifferencesFromId(@Param('id') stageId: string): number[][] {
-        return this.differenceClickService.getDifferenceArrayFromStageID(stageId);
+    async getDifferencesFromId(@Param('id') stageId: string): Promise<number[][]> {
+        return await this.differenceClickService.getDifferenceArrayFromStageID(stageId);
     }
 }
