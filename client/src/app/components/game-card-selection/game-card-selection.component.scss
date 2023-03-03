@@ -5,13 +5,13 @@
     margin-top: 5%;
     padding: 5%;
     display: table;
-    border: solid 3px black;
     border-radius: 15px;
 }
 
 .configuration {
     font-size: large;
     padding-left: 5%;
+    color: white;
 }
 
 .configuration > div {
@@ -20,19 +20,29 @@
     font-weight: bold;
 }
 .difficult {
-    background-color: rgba(255, 0, 0, 0.5);
+    background-color: rgba(255, 0, 0, 0.87);
+    box-shadow: 0 0 7px rgba(255, 0, 0, 0.87), 0 0 20px rgba(255, 0, 0, 0.87), 0 0 10px rgba(255, 0, 0, 0.87);
+    border: solid 3px rgba(255, 0, 0, 0.87);
 }
 .easy {
-    background-color: rgba(0, 255, 0, 0.5);
+    background-color: rgba(0, 255, 0, 0.911);
+    box-shadow: 0 0 7px rgb(0 255 0 / 91%), 0 0 20px rgb(0 255 0 / 91%), 0 0 10px rgb(0 255 0 / 91%);
+    border: solid 3px rgba(0, 255, 0, 0.911);
 }
 
 #difficulty {
+    color: white;
     font-size: large;
     font-weight: bold;
     position: relative;
     text-align: center;
     display: table-cell;
     vertical-align: middle;
+}
+
+#title-container {
+    display: flex;
+    flex-direction: row;
 }
 .nom {
     flex-basis: 15%;
@@ -43,15 +53,14 @@
     margin-left: 7.5px;
     margin-bottom: 10px;
     width: 189px;
-
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    margin-left: 2rem;
+    letter-spacing: 0.1em;
 }
 
 .row {
     display: flex;
     flex-direction: row;
+    justify-content: space-evenly;
 }
 
 .column {
@@ -91,9 +100,10 @@
 }
 
 .ranking {
-    border: 2px black solid;
+    border: 2px rgb(255, 255, 255) solid;
     flex-basis: 50%;
     padding: 0;
+    color: white;
 }
 
 .gametype {
@@ -123,10 +133,14 @@
     width: 35rem;
     border-style: solid;
     border-width: 2px;
-    border-color: black;
-    box-shadow: 5px 10px;
+    border: 0.2rem solid #eee;
+    border-radius: 2rem;
     position: relative;
-    background-color: rgba(255, 255, 255, 0.301);
+    background-color: rgb(0, 0, 0);
+}
+
+.card:hover {
+    border: 0.3rem solid #fff;
 }
 
 .photo {
@@ -139,4 +153,9 @@
     height: 90%;
     margin-top: 5%;
     margin-left: 5%;
+}
+
+.option-button {
+    height: 3rem;
+    width: 8rem;
 }

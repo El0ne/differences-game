@@ -7,6 +7,8 @@ import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
+import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
+import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { differenceInformation } from '@common/difference-information';
@@ -52,18 +54,6 @@ describe('SoloViewComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
-    });
-
-    it('showTextBox attribute should turn to true when toggleInfoCard is called and showTextBox is false', () => {
-        component.showTextBox = false;
-        component.toggleInfoCard();
-        expect(component.showTextBox).toBeTrue();
-    });
-
-    it('showTextBox attribute should turn to false when toggleInfoCard is called and showTextBox is true', () => {
-        component.showTextBox = true;
-        component.toggleInfoCard();
-        expect(component.showTextBox).toBeFalse();
     });
 
     it('showErrorMessage attribute should be turned to true if toggleErrorMessage is called and showErrorMessage is false', () => {
@@ -159,6 +149,23 @@ describe('SoloViewComponent', () => {
         component.addDifferenceDetected(1);
 
         expect(addDiffSpy).toHaveBeenCalled();
+    });
+
+    it('should open the game info modal with the correct data', () => {
+        const spy = spyOn(modalSpy, 'open').and.callThrough();
+        component.openInfoModal();
+        expect(spy).toHaveBeenCalledWith(GameInfoModalComponent, {
+            data: {
+                gameCardInfo: component.gameCardInfo,
+                numberOfDifferences: component.numberOfDifferences,
+            },
+        });
+    });
+
+    it('should open the quit game modal with disableClose set to true', () => {
+        const spy = spyOn(modalSpy, 'open').and.callThrough();
+        component.quitGame();
+        expect(spy).toHaveBeenCalledWith(QuitGameModalComponent, { disableClose: true });
     });
 
     it('paintPixel should call sendPixels and receivePixels properly', () => {
