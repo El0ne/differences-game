@@ -4,6 +4,7 @@ import { GameCardSelectionComponent } from '@app/components/game-card-selection/
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { GameCardInformation } from '@common/game-card';
+import { WaitingRoomEvents } from '@common/waiting-room-socket-communication';
 import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
 
 @Component({
@@ -24,8 +25,7 @@ export class GameSelectionComponent implements OnInit {
         this.isConfig = this.router.url === '/config';
         this.socket.connect();
 
-        this.socket.listen('gameCreated', (stageId: string) => {
-            console.log(stageId);
+        this.socket.listen(WaitingRoomEvents.GameCreated, (stageId: string) => {
             this.stages.forEach((gameCardSelection: GameCardSelectionComponent) => {
                 if (gameCardSelection.gameCardInformation.id === stageId) {
                     gameCardSelection.createGameButton = false;
@@ -33,7 +33,7 @@ export class GameSelectionComponent implements OnInit {
             });
         });
 
-        this.socket.listen('gameDeleted', (stageId: string) => {
+        this.socket.listen(WaitingRoomEvents.GameDeleted, (stageId: string) => {
             this.stages.forEach((gameCardSelection: GameCardSelectionComponent) => {
                 if (gameCardSelection.gameCardInformation.id === stageId) {
                     gameCardSelection.createGameButton = true;
@@ -53,7 +53,7 @@ export class GameSelectionComponent implements OnInit {
             this.gameCardInformations = data;
 
             this.socket.send(
-                'searchForHosts',
+                WaitingRoomEvents.ScanForHost,
                 this.gameCardInformations.map((gameCardInfo: GameCardInformation) => gameCardInfo.id),
             );
         });

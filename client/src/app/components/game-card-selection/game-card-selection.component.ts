@@ -4,7 +4,7 @@ import { HostWaitingRoomComponent } from '@app/modals/host-waiting-room/host-wai
 import { STAGE } from '@app/services/server-routes';
 import { SocketService } from '@app/services/socket/socket.service';
 import { GameCardInformation } from '@common/game-card';
-import JoinHostInWaitingRequest from '@common/joining-host';
+import { JoinHostInWaitingRequest, WaitingRoomEvents } from '@common/waiting-room-socket-communication';
 
 @Component({
     selector: 'app-game-card-selection',
@@ -24,13 +24,16 @@ export class GameCardSelectionComponent implements OnInit {
 
     hostOrJoinGame() {
         if (this.createGameButton) {
-            this.socket.send('hostGame', this.gameCardInformation.id);
+            this.socket.send(WaitingRoomEvents.HostGame, this.gameCardInformation.id);
             const dialogRef = this.dialog.open(HostWaitingRoomComponent, { disableClose: true });
             dialogRef.afterClosed().subscribe(() => {
-                this.socket.send('unhostGame', this.gameCardInformation.id);
+                this.socket.send(WaitingRoomEvents.UnhostGame, this.gameCardInformation.id);
             });
         } else {
-            this.socket.send<JoinHostInWaitingRequest>('joinHost', { stageId: this.gameCardInformation.id, playerName: 'NomJoueur1' });
+            this.socket.send<JoinHostInWaitingRequest>(WaitingRoomEvents.JoinHost, {
+                stageId: this.gameCardInformation.id,
+                playerName: 'NomJoueur1',
+            });
         }
     }
 

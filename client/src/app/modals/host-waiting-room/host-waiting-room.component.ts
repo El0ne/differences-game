@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { SocketService } from '@app/services/socket/socket.service';
-import PlayerInformations from '@common/player-informations';
+import { PlayerInformations, WaitingRoomEvents } from '@common/waiting-room-socket-communication';
 
 @Component({
     selector: 'app-host-waiting-room',
@@ -14,20 +14,20 @@ export class HostWaitingRoomComponent implements OnInit {
     constructor(public dialogRef: MatDialogRef<HostWaitingRoomComponent>, public socket: SocketService) {}
 
     ngOnInit(): void {
-        this.socket.listen<PlayerInformations>('requestGame', (opponentInformations: PlayerInformations) => {
+        this.socket.listen<PlayerInformations>(WaitingRoomEvents.RequestMatch, (opponentInformations: PlayerInformations) => {
             this.clientsInWaitingRoom.set(opponentInformations.playerSocketId, opponentInformations.playerName);
         });
 
-        this.socket.listen('unrequestGame', (opponentId: string) => {
+        this.socket.listen(WaitingRoomEvents.UnrequestMatch, (opponentId: string) => {
             this.clientsInWaitingRoom.delete(opponentId);
         });
     }
 
     acceptOpponent(opponentId: string): void {
-        this.socket.send('acceptOpponent', opponentId);
+        this.socket.send(WaitingRoomEvents.AcceptOpponent, opponentId);
     }
     declineOpponent(opponentId: string): void {
-        this.socket.send('declineOpponent', opponentId);
+        this.socket.send(WaitingRoomEvents.DeclineOpponent, opponentId);
         this.clientsInWaitingRoom.delete(opponentId);
     }
 }

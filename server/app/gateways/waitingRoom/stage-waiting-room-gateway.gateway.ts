@@ -1,6 +1,4 @@
-import JoinHostInWaitingRequest from '@common/joining-host';
-import OpponentAppoval from '@common/opponent-approval';
-import PlayerInformations from '@common/player-informations';
+import { JoinHostInWaitingRequest, OpponentAppoval, PlayerInformations, WaitingRoomEvents } from '@common/waiting-room-socket-communication';
 import { Logger } from '@nestjs/common';
 import { Injectable } from '@nestjs/common/decorators';
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -13,60 +11,60 @@ export class StageWaitingRoomGatewayGateway {
 
     constructor(private readonly logger: Logger) {}
 
-    @SubscribeMessage('searchForHosts')
+    @SubscribeMessage(WaitingRoomEvents.ScanForHost)
     searchForHosts(@ConnectedSocket() socket: Socket, @MessageBody() stagesIds: string[]): void {
         this.clearRooms(socket);
         socket.join(stagesIds);
         for (const stageId of stagesIds) {
             if (this.gameHosts.has(stageId)) {
-                socket.emit('gameCreated', stageId);
+                socket.emit(WaitingRoomEvents.GameCreated, stageId);
             }
         }
     }
 
-    @SubscribeMessage('hostGame')
+    @SubscribeMessage(WaitingRoomEvents.HostGame)
     hostGame(@ConnectedSocket() socket: Socket, @MessageBody() stageId: string): void {
         this.logger.log(`game created by ${stageId}`);
         this.gameHosts.set(stageId, socket.id);
-        socket.to(stageId).emit('gameCreated', stageId);
+        socket.to(stageId).emit(WaitingRoomEvents.GameCreated, stageId);
     }
 
-    @SubscribeMessage('unhostGame')
+    @SubscribeMessage(WaitingRoomEvents.UnhostGame)
     unhostGame(@ConnectedSocket() socket: Socket, @MessageBody() stageId: string): void {
         this.logger.log(`game deleted by ${socket.id}`);
         this.gameHosts.delete(stageId);
-        socket.to(stageId).emit('gameDeleted', stageId);
-        socket.to(stageId).emit('matchRefused', 'raison');
+        socket.to(stageId).emit(WaitingRoomEvents.GameDeleted, stageId);
+        socket.to(stageId).emit(WaitingRoomEvents.MatchRefused, 'raison');
     }
 
-    @SubscribeMessage('joinHost')
+    @SubscribeMessage(WaitingRoomEvents.JoinHost)
     joinHost(@ConnectedSocket() socket: Socket, @MessageBody() joinRequest: JoinHostInWaitingRequest): void {
         this.logger.log(`game ${joinRequest.stageId} joined by ${joinRequest.playerName}`);
         const playerInformations: PlayerInformations = { playerName: joinRequest.playerName, playerSocketId: socket.id };
-        socket.to(this.gameHosts.get(joinRequest.stageId)).emit('requestGame', playerInformations);
+        socket.to(this.gameHosts.get(joinRequest.stageId)).emit(WaitingRoomEvents.RequestMatch, playerInformations);
     }
 
-    @SubscribeMessage('quitHost')
+    @SubscribeMessage(WaitingRoomEvents.QuitHost)
     quitHost(@ConnectedSocket() socket: Socket, @MessageBody() stageId: string): void {
-        this.logger.log(`game ${stageId} quiited by ${socket.id}`);
-        socket.to(this.gameHosts.get(stageId)).emit('unrequestGame', socket.id);
+        this.logger.log(`game ${stageId} quited by ${socket.id}`);
+        socket.to(this.gameHosts.get(stageId)).emit(WaitingRoomEvents.UnrequestMatch, socket.id);
     }
 
-    @SubscribeMessage('acceptOpponent')
+    @SubscribeMessage(WaitingRoomEvents.AcceptOpponent)
     acceptOpponent(@ConnectedSocket() socket: Socket, @MessageBody() approval: OpponentAppoval): void {
         this.logger.log(`${socket.id} accepted ${approval.OpponentId}`);
         this.clearRooms(socket);
         this.clearRooms(this.server.allSockets[approval.OpponentId]);
         socket.to(approval.OpponentId).socketsJoin(socket.id);
-        socket.to(approval.OpponentId).emit('matchAccepted');
-        socket.to(approval.stageId).emit('matchRefused', 'raison'); // refuser match a tous les autres
+        socket.to(approval.OpponentId).emit(WaitingRoomEvents.MatchAccepted);
+        socket.to(approval.stageId).emit(WaitingRoomEvents.MatchRefused, 'raison'); // refuser match a tous les autres
         this.gameHosts.delete(approval.stageId);
     }
 
-    @SubscribeMessage('declineOpponent')
+    @SubscribeMessage(WaitingRoomEvents.DeclineOpponent)
     declineOpponent(@ConnectedSocket() socket: Socket, @MessageBody() opponentId: string): void {
         this.logger.log(`${socket.id} refused ${opponentId}`);
-        socket.to(opponentId).emit('matchRefused', 'raison');
+        socket.to(opponentId).emit(WaitingRoomEvents.MatchRefused, 'raison');
     }
 
     clearRooms(socket: Socket): void {
