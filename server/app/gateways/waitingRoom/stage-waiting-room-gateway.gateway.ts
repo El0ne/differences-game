@@ -24,7 +24,7 @@ export class StageWaitingRoomGatewayGateway {
 
     @SubscribeMessage(WaitingRoomEvents.HostGame)
     hostGame(@ConnectedSocket() socket: Socket, @MessageBody() stageId: string): void {
-        this.logger.log(`game created by ${stageId}`);
+        this.logger.log(`game created by ${socket.id}`);
         this.gameHosts.set(stageId, socket.id);
         socket.to(stageId).emit(WaitingRoomEvents.GameCreated, stageId);
     }
@@ -41,6 +41,7 @@ export class StageWaitingRoomGatewayGateway {
     joinHost(@ConnectedSocket() socket: Socket, @MessageBody() joinRequest: JoinHostInWaitingRequest): void {
         this.logger.log(`game ${joinRequest.stageId} joined by ${joinRequest.playerName}`);
         const playerInformations: PlayerInformations = { playerName: joinRequest.playerName, playerSocketId: socket.id };
+        this.logger.log(this.gameHosts.get(joinRequest.stageId));
         socket.to(this.gameHosts.get(joinRequest.stageId)).emit(WaitingRoomEvents.RequestMatch, playerInformations);
     }
 
@@ -71,5 +72,6 @@ export class StageWaitingRoomGatewayGateway {
         for (const room of socket.rooms) {
             socket.leave(room);
         }
+        socket.join(socket.id);
     }
 }
