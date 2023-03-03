@@ -5,7 +5,7 @@ import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSo
 import { Server, Socket } from 'socket.io';
 @WebSocketGateway()
 @Injectable()
-export class StageWaitingRoomGatewayGateway {
+export class StageWaitingRoomGateway {
     @WebSocketServer() private server: Server;
     gameHosts: Map<string, string> = new Map<string, string>(); // <stageId, hostSocketId>
 
