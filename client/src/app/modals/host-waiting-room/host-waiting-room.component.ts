@@ -26,17 +26,29 @@ export class HostWaitingRoomComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.socket.listen<PlayerInformations>(WaitingRoomEvents.RequestMatch, (opponentInformations: PlayerInformations) => {
-            this.clientsInWaitingRoom.set(opponentInformations.playerSocketId, opponentInformations.playerName);
-        });
+        if (this.waitingRoomInfo.isHost) {
+            this.socket.listen<PlayerInformations>(WaitingRoomEvents.RequestMatch, (opponentInformations: PlayerInformations) => {
+                this.clientsInWaitingRoom.set(opponentInformations.playerSocketId, opponentInformations.playerName);
+            });
 
-        this.socket.listen(WaitingRoomEvents.UnrequestMatch, (opponentId: string) => {
-            this.clientsInWaitingRoom.delete(opponentId);
-        });
+            this.socket.listen(WaitingRoomEvents.UnrequestMatch, (opponentId: string) => {
+                this.clientsInWaitingRoom.delete(opponentId);
+            });
+        } else {
+            this.socket.listen<PlayerInformations>(WaitingRoomEvents.MatchAccepted, () => {
+                alert('match Accepted');
+            });
+
+            this.socket.listen(WaitingRoomEvents.MatchRefused, (refusedReason: string) => {
+                alert(refusedReason);
+                this.dialogRef.close();
+            });
+        }
     }
 
     ngOnDestroy(): void {
-        this.socket.send(WaitingRoomEvents.UnhostGame, this.waitingRoomInfo.stageId);
+        if (this.waitingRoomInfo.isHost)
+            this.socket.send(this.waitingRoomInfo.isHost ? WaitingRoomEvents.UnhostGame : WaitingRoomEvents.QuitHost, this.waitingRoomInfo.stageId);
     }
 
     acceptOpponent(opponentId: string): void {

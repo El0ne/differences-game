@@ -25,14 +25,14 @@ export class GameCardSelectionComponent implements OnInit {
     hostOrJoinGame() {
         if (this.createGameButton) {
             this.socket.send(WaitingRoomEvents.HostGame, this.gameCardInformation.id);
-            const data: WaitingRoomDataPassing = { stageId: this.gameCardInformation.id, isHost: this.createGameButton };
-            this.dialog.open(HostWaitingRoomComponent, { disableClose: true, data });
         } else {
             this.socket.send<JoinHostInWaitingRequest>(WaitingRoomEvents.JoinHost, {
                 stageId: this.gameCardInformation.id,
                 playerName: 'NomJoueur1',
             });
         }
+        const data: WaitingRoomDataPassing = { stageId: this.gameCardInformation.id, isHost: this.createGameButton };
+        this.dialog.open(HostWaitingRoomComponent, { disableClose: true, data });
     }
 
     // TODO: ajouter la logique pour que le reset des temps et le delete se fait pour le sprint 2
