@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { HostWaitingRoomComponent } from '@app/modals/host-waiting-room/host-waiting-room.component';
+import { HostWaitingRoomComponent, WaitingRoomDataPassing } from '@app/modals/host-waiting-room/host-waiting-room.component';
 import { STAGE } from '@app/services/server-routes';
 import { SocketService } from '@app/services/socket/socket.service';
 import { GameCardInformation } from '@common/game-card';
@@ -25,7 +25,8 @@ export class GameCardSelectionComponent implements OnInit {
     hostOrJoinGame() {
         if (this.createGameButton) {
             this.socket.send(WaitingRoomEvents.HostGame, this.gameCardInformation.id);
-            this.dialog.open(HostWaitingRoomComponent, { disableClose: true, data: { stageId: this.gameCardInformation.id } });
+            const data: WaitingRoomDataPassing = { stageId: this.gameCardInformation.id, isHost: this.createGameButton };
+            this.dialog.open(HostWaitingRoomComponent, { disableClose: true, data });
         } else {
             this.socket.send<JoinHostInWaitingRequest>(WaitingRoomEvents.JoinHost, {
                 stageId: this.gameCardInformation.id,
