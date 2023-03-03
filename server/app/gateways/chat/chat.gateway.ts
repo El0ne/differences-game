@@ -27,6 +27,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
     }
 
+    // temporary function in order to test chat functionality.
+    // it will be removed when time for integration (no use to test in this scenario)
     @SubscribeMessage(ChatEvents.RoomCheck)
     check(socket: Socket, data: MultiplayerRequestInformation) {
         for (const room of this.waitingRoom) {
@@ -45,7 +47,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.Event)
     event(socket: Socket, data) {
-        this.logger.log(data.room);
         if (socket.rooms.has(data.room)) {
             const date = new Date();
             const hour = date.getHours().toString();
