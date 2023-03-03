@@ -182,7 +182,7 @@ describe('GameCreationPageComponent', () => {
         spyOn(component.gameCardService, 'uploadImages').and.returnValue(of(mockServerInfo));
 
         const mockGameCardInfo: GameCardInformation = {
-            id: '',
+            _id: '',
             name: '',
             difficulty: '',
             originalImageName: '',
@@ -208,7 +208,6 @@ describe('GameCreationPageComponent', () => {
             component.radius,
         );
         expect(component.gameCardService.createGame).toHaveBeenCalled();
-        expect(component.gameCardService.getGameCardInfoFromId).toHaveBeenCalled();
         expect(component.openModal).toHaveBeenCalled();
     }));
 
