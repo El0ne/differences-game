@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { SocketService } from '@app/services/socket/socket.service';
-import { PlayerInformations } from '@common/playerInformations';
+import PlayerInformations from '@common/player-informations';
 
 @Component({
     selector: 'app-host-waiting-room',

@@ -4,7 +4,7 @@ import { HostWaitingRoomComponent } from '@app/modals/host-waiting-room/host-wai
 import { STAGE } from '@app/services/server-routes';
 import { SocketService } from '@app/services/socket/socket.service';
 import { GameCardInformation } from '@common/game-card';
-import { JoinHostInWaitingRequest } from '@common/joiningHost';
+import JoinHostInWaitingRequest from '@common/joining-host';
 
 @Component({
     selector: 'app-game-card-selection',
