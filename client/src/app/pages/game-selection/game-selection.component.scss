@@ -58,9 +58,19 @@ app-game-card-selection {
     // grid-template-columns: 50% 50%;
     // grid-template-rows: 35% 35%;
     height: 80%;
-    display: flex;
-    justify-content: space-evenly;
+    // display: flex;
+    // justify-content: space-evenly;
     width: 100%;
+
+    display: grid;
+}
+
+.config {
+    grid-template-columns: 33% 33% 33%;
+}
+
+.selection {
+    grid-template-columns: 50% 50%;
 }
 
 .card-container {

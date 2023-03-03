@@ -2,7 +2,13 @@
     <div class="header">
         <button id="previous" routerLink="/home">Retour</button>
     </div>
-    <div class="game-cards-container">
+    <div
+        class="game-cards-container"
+        [ngClass]="{
+            config: isConfig,
+            selection: !isConfig
+        }"
+    >
         <div class="card-container">
             <div
                 *ngFor="let gameCardInformation of gameCardInformations; let even = even"
