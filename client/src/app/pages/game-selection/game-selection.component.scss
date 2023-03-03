@@ -12,7 +12,6 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    // justify-content: center;
     padding-top: 8%;
 }
 .game-constants {
@@ -33,7 +32,6 @@ app-game-card-selection {
     width: 10%;
     margin: 1%;
     font-size: 24px;
-
     cursor: pointer;
     text-align: center;
     text-decoration: none;
@@ -54,14 +52,8 @@ app-game-card-selection {
     transform: translateY(4px);
 }
 .game-cards-container {
-    // display: grid;
-    // grid-template-columns: 50% 50%;
-    // grid-template-rows: 35% 35%;
     height: 80%;
-    // display: flex;
-    // justify-content: space-evenly;
     width: 100%;
-
     display: grid;
 }
 
@@ -76,10 +68,7 @@ app-game-card-selection {
 .card-container {
     display: flex;
     flex-direction: column;
-    // justify-content: space-between;
     align-items: center;
-    // width: 100%;
-    // margin: 0 auto;
 }
 
 .card {
@@ -89,9 +78,6 @@ app-game-card-selection {
 .navigate-cards-container {
     display: flex;
     justify-content: space-around;
-    // grid-template-columns: 1 1 1;
-    // grid-row: 4 / 5;
-    // grid-column: 1 / 3;
 }
 
 .navigate-button {
@@ -99,15 +85,6 @@ app-game-card-selection {
     width: 16rem;
 }
 
-#show-previous-cards-button {
-    grid-column: 1 / 2;
-}
-
 #create-a-stage-button {
-    grid-column: 2 / 3;
     font-size: x-large;
-}
-
-#show-next-cards-button {
-    grid-column: 3 / 4;
 }
