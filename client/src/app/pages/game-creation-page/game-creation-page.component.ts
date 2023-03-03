@@ -157,8 +157,6 @@ export class GameCreationPageComponent implements OnInit {
                     this.differenceNumber = data.gameDifferenceNumber;
                     this.image = `${STAGE}/image/difference-image.bmp`;
                     this.gameCardService.createGame(this.createdGameInfo).subscribe();
-                    // TODO find out what commented code does. Doesnt seem important
-                    // this.gameCardService.getGameCardInfoFromId(data.gameId);
                     this.openModal();
                 } else {
                     this.isDisabled = false;
