@@ -6,7 +6,7 @@
 </div>
 
 <ng-template #opponents>
-    <div *ngFor="let opponentId of clientsInWaitingRoom.keys()">
+    <div *ngFor="let opponentId of clientsInWaitingRoom.keys()" class="opponents-container">
         NOM : {{clientsInWaitingRoom.get(opponentId)}}
         <button (click)="acceptOpponent(opponentId)" class="normal-button">Accept</button>
         <button (click)="declineOpponent(opponentId)" class="normal-button">Decline</button>

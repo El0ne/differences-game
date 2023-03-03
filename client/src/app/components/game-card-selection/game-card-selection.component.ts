@@ -25,10 +25,7 @@ export class GameCardSelectionComponent implements OnInit {
     hostOrJoinGame() {
         if (this.createGameButton) {
             this.socket.send(WaitingRoomEvents.HostGame, this.gameCardInformation.id);
-            const dialogRef = this.dialog.open(HostWaitingRoomComponent, { disableClose: true });
-            dialogRef.afterClosed().subscribe(() => {
-                this.socket.send(WaitingRoomEvents.UnhostGame, this.gameCardInformation.id);
-            });
+            this.dialog.open(HostWaitingRoomComponent, { disableClose: true, data: { stageId: this.gameCardInformation.id } });
         } else {
             this.socket.send<JoinHostInWaitingRequest>(WaitingRoomEvents.JoinHost, {
                 stageId: this.gameCardInformation.id,

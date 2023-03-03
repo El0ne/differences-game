@@ -1,4 +1,4 @@
-import { JoinHostInWaitingRequest, OpponentAppoval, PlayerInformations, WaitingRoomEvents } from '@common/waiting-room-socket-communication';
+import { JoinHostInWaitingRequest, OpponentApproval, PlayerInformations, WaitingRoomEvents } from '@common/waiting-room-socket-communication';
 import { Logger } from '@nestjs/common';
 import { Injectable } from '@nestjs/common/decorators';
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -52,12 +52,12 @@ export class StageWaitingRoomGatewayGateway {
     }
 
     @SubscribeMessage(WaitingRoomEvents.AcceptOpponent)
-    acceptOpponent(@ConnectedSocket() socket: Socket, @MessageBody() approval: OpponentAppoval): void {
-        this.logger.log(`${socket.id} accepted ${approval.OpponentId}`);
+    acceptOpponent(@ConnectedSocket() socket: Socket, @MessageBody() approval: OpponentApproval): void {
+        this.logger.log(`${socket.id} accepted ${approval.opponentId}`);
         this.clearRooms(socket);
-        this.clearRooms(this.server.allSockets[approval.OpponentId]);
-        socket.to(approval.OpponentId).socketsJoin(socket.id);
-        socket.to(approval.OpponentId).emit(WaitingRoomEvents.MatchAccepted);
+        this.clearRooms(this.server.allSockets[approval.opponentId]);
+        socket.to(approval.opponentId).socketsJoin(socket.id);
+        socket.to(approval.opponentId).emit(WaitingRoomEvents.MatchAccepted);
         socket.to(approval.stageId).emit(WaitingRoomEvents.MatchRefused, "l'hôte a trouvé un autre adversaire"); // refuser match a tous les autres
         this.gameHosts.delete(approval.stageId);
     }
@@ -69,6 +69,7 @@ export class StageWaitingRoomGatewayGateway {
     }
 
     clearRooms(socket: Socket): void {
+        // will have to change if the socket uses any other room
         for (const room of socket.rooms) {
             socket.leave(room);
         }

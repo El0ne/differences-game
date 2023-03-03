@@ -14,9 +14,9 @@ export enum WaitingRoomEvents {
     MatchRefused = 'matchRefused',
 }
 
-export interface OpponentAppoval {
+export interface OpponentApproval {
     stageId: string;
-    OpponentId: string;
+    opponentId: string;
 }
 
 export interface PlayerInformations {
