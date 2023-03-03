@@ -28,11 +28,9 @@
             ></app-click-event>
         </div>
         <div class="game-options">
-            <div id="timer">
-                <div class="timer-box">
-                    <div class="display">
-                        <div id="time">{{ timesConvertion(this.timerService.currentTime) }}</div>
-                    </div>
+            <div class="timer-box">
+                <div class="display">
+                    <div id="time">{{ timesConvertion(this.timerService.currentTime) }}</div>
                 </div>
             </div>
 
@@ -73,11 +71,6 @@
                 (handler)="emitHandler($event)"
                 *ngIf="this.gameCardInfo"
             ></app-click-event>
-        </div>
-        <div class="hint-button">
-            <button class="hint" type="button">
-                <mat-icon class="hint-button">search</mat-icon>
-            </button>
         </div>
     </div>
 </body>
