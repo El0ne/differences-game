@@ -8,7 +8,7 @@ import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GameClickController } from './controllers/game-click/game-click.controller';
-import { StageWaitingRoomGatewayGateway } from './gateways/waitingRoom/stage-waiting-room-gateway.gateway';
+import { StageWaitingRoomGatewayGateway } from './gateways/waitingRoom/stage-waiting-room.gateway';
 import { DifferenceClickService } from './services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from './services/difference-detection/difference-detection.service';
 import { DifferencesCounterService } from './services/differences-counter/differences-counter.service';

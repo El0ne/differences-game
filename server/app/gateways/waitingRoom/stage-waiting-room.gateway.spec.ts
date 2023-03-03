@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { StageWaitingRoomGatewayGateway } from './stage-waiting-room-gateway.gateway';
+import { StageWaitingRoomGatewayGateway } from './stage-waiting-room.gateway';
 
 describe('StageWaitingRoomGatewayGateway', () => {
     let gateway: StageWaitingRoomGatewayGateway;
