@@ -1,63 +1,118 @@
-import { GameCardInformation } from '@common/game-card';
-import { GameInformation } from '@common/game-information';
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable no-underscore-dangle */
+import { GameCard, GameCardDocument, gameCardSchema } from '@app/schemas/game-cards.schemas';
+import { GameCardDto } from '@common/game-card.dto';
+import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing/test';
-import * as path from 'path';
+import { ObjectId } from 'mongodb';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { Connection, Model } from 'mongoose';
 import { stub } from 'sinon';
 import { GameCardService } from './game-card.service';
-import { gameCardsInformations } from './game-cards-test.json';
 
 describe('GameCardService', () => {
     let service: GameCardService;
+    let gameCardModel: Model<GameCardDocument>;
+    let mongoServer: MongoMemoryServer;
+    let connection: Connection;
 
     beforeEach(async () => {
+        mongoServer = await MongoMemoryServer.create();
+
         const module: TestingModule = await Test.createTestingModule({
+            imports: [
+                MongooseModule.forRootAsync({
+                    useFactory: () => ({
+                        uri: mongoServer.getUri(),
+                    }),
+                }),
+                MongooseModule.forFeature([{ name: GameCard.name, schema: gameCardSchema }]),
+            ],
             providers: [GameCardService],
         }).compile();
 
         service = module.get<GameCardService>(GameCardService);
-        service.jsonPath = path.join(__dirname, '/game-cards-test.json');
+        gameCardModel = module.get<Model<GameCardDocument>>(getModelToken(GameCard.name));
+        connection = await module.get(getConnectionToken());
+        await gameCardModel.deleteMany({});
+    });
+
+    const DELAY_BEFORE_CLOSING_CONNECTION = 200;
+
+    afterEach((done) => {
+        setTimeout(async () => {
+            await connection.close();
+            await mongoServer.stop();
+            done();
+        }, DELAY_BEFORE_CLOSING_CONNECTION);
     });
 
     it('should be defined', () => {
         expect(service).toBeDefined();
+        expect(gameCardModel).toBeDefined();
     });
 
     it('getAllGameCards should return all gameCards informations', async () => {
-        const gameCards = service.getAllGameCards();
-        expect(gameCards).toEqual(gameCardsInformations);
+        expect((await service.getAllGameCards()).length).toEqual(0);
+        const gameCard = getFakeGameCard();
+        await gameCardModel.create(gameCard);
+        expect((await service.getAllGameCards()).length).toEqual(1);
+        expect(await service.getAllGameCards()).toEqual([expect.objectContaining(gameCard)]);
     });
+
     it('getGameCards should return all gameCards informations between both indexes', async () => {
         const startIndex = 0;
-        const endIndex = 1;
-        const gameCards = service.getGameCards(startIndex, endIndex);
-        expect(gameCards).toEqual(gameCardsInformations.slice(startIndex, endIndex));
+        const endIndex = 2;
+        const answer = [];
+        for (let i = 0; i < endIndex; i++) {
+            const game = getFakeGameCard();
+            await gameCardModel.create(game);
+            answer.push(game);
+        }
+        const gameCards = await service.getGameCards(startIndex, endIndex);
+        for (let i = 0; i < endIndex; i++) {
+            expect(gameCards[i]).toEqual(expect.objectContaining(answer[i]));
+        }
     });
 
     it('getGameCardById should return a specific game card', async () => {
-        const gameCard = service.getGameCardById('0123');
-        expect(gameCard).toEqual(gameCardsInformations.find((card) => (card.id = '0123')));
+        const game = getFakeGameCard();
+        await gameCardModel.create(game);
+        const id = game._id;
+        const gameCard = await service.getGameCardById(id.toHexString());
+        expect(gameCard).toEqual(expect.objectContaining(game));
     });
 
     it('getGameCardsNumber should return the number of gameCards informations we have', async () => {
-        const gameCardsNumber = service.getGameCardsNumber();
-        expect(gameCardsNumber).toEqual(gameCardsInformations.length);
+        const gameAmount = 2;
+        for (let i = 0; i < gameAmount; i++) {
+            const game = getFakeGameCard();
+            await gameCardModel.create(game);
+        }
+        const gameCardsNumber = await service.getGameCardsNumber();
+        expect(gameCardsNumber).toEqual(gameAmount);
     });
 
-    it('createGameCard should add a game card to the list of game cards', () => {
-        stub(service, 'generateGameCard').callsFake(() => FAKE_GAME_CARD);
-        service.createGameCard(FAKE_GAME_INFO);
-        const allGameCards = service.getAllGameCards();
-        expect(allGameCards).toContainEqual(FAKE_GAME_CARD);
+    it('createGameCard should add a game card to the list of game cards', async () => {
+        const fakeGameCard = getFakeGameCard();
+        stub(service, 'generateGameCard').callsFake(() => fakeGameCard);
+        await service.createGameCard(FAKE_GAME_INFO);
+        const game = await service.getGameCardById(fakeGameCard._id.toHexString());
+        expect(game).toEqual(expect.objectContaining(fakeGameCard));
     });
 
-    it('generateGameCard should create a game card from a game informations', () => {
-        expect(service.createGameCard(FAKE_GAME_INFO)).toEqual(FAKE_GAME_CARD);
+    it('generateGameCard should create a game card from a game informations', async () => {
+        const gameCard = getFakeGameCard();
+        gameCard._id = new ObjectId('00000000773db8b853265f32');
+        gameCard.name = 'game.name';
+        expect(await service.createGameCard(FAKE_GAME_INFO)).toEqual(expect.objectContaining(gameCard));
     });
 });
 
-const FAKE_GAME_INFO: GameInformation = {
-    id: '0',
+const FAKE_GAME_INFO: GameCardDto = {
+    _id: '00000000773db8b853265f32',
     name: 'game.name',
     difficulty: 'Facile',
     baseImage: 'game.baseImage',
@@ -65,9 +120,10 @@ const FAKE_GAME_INFO: GameInformation = {
     radius: 3,
     differenceNumber: 6,
 };
-const FAKE_GAME_CARD: GameCardInformation = {
-    id: '0',
-    name: 'game.name',
+
+const getFakeGameCard = (): GameCard => ({
+    _id: new ObjectId(),
+    name: (Math.random() + 1).toString(36).substring(2),
     difficulty: 'Facile',
     differenceNumber: 6,
     originalImageName: 'game.baseImage',
@@ -82,4 +138,4 @@ const FAKE_GAME_CARD: GameCardInformation = {
         { time: 0, name: '--' },
         { time: 0, name: '--' },
     ],
-};
+});

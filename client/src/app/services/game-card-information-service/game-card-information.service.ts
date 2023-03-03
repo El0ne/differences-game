@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { STAGE } from '@app/services/server-routes';
 import { GameCardInformation } from '@common/game-card';
-import { GameInformation } from '@common/game-information';
+import { GameCardDto } from '@common/game-card.dto';
 import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
 import { Observable } from 'rxjs';
 
@@ -25,7 +25,7 @@ export class GameCardInformationService {
         return this.http.get<number>(`${STAGE}/info`);
     }
 
-    createGame(gameInfo: GameInformation): Observable<GameCardInformation> {
+    createGame(gameInfo: GameCardDto): Observable<GameCardInformation> {
         // content-type was causing a linting error otherwise
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const headers = { 'content-type': 'application/json' };
