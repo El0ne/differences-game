@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
+import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
+import { GameCard, gameCardSchema } from '@app/schemas/game-cards.schemas';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
@@ -6,18 +8,33 @@ import { PixelPositionService } from '@app/services/pixel-position/pixel-positio
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { HttpStatus } from '@nestjs/common';
+import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { Connection } from 'mongoose';
 import { stub } from 'sinon';
 import * as request from 'supertest';
 import { GameClickController } from './game-click.controller';
+
+const DELAY_BEFORE_CLOSING_CONNECTION = 200;
 
 describe('GameClickController', () => {
     let controller: GameClickController;
     let httpServer: unknown;
     let differenceClickService;
 
-    beforeAll(async () => {
+    let mongoServer: MongoMemoryServer;
+    let connection: Connection;
+
+    beforeEach(async () => {
+        mongoServer = await MongoMemoryServer.create();
+        const mongoUri = await mongoServer.getUri();
         const module: TestingModule = await Test.createTestingModule({
+            imports: [
+                MongooseModule.forRoot(mongoUri),
+                MongooseModule.forFeature([{ name: Differences.name, schema: differencesSchema }]),
+                MongooseModule.forFeature([{ name: GameCard.name, schema: gameCardSchema }]),
+            ],
             controllers: [GameClickController],
             providers: [DifferenceClickService, DifferencesCounterService, PixelRadiusService, PixelPositionService, ImageDimensionsService],
         }).compile();
@@ -27,6 +44,15 @@ describe('GameClickController', () => {
         httpServer = app.getHttpServer();
         controller = module.get<GameClickController>(GameClickController);
         differenceClickService = module.get<DifferenceClickService>(DifferenceClickService);
+        connection = await module.get(getConnectionToken());
+    });
+
+    afterEach((done) => {
+        setTimeout(async () => {
+            await connection.close();
+            await mongoServer.stop();
+            done();
+        }, DELAY_BEFORE_CLOSING_CONNECTION);
     });
 
     it('should be defined', () => {

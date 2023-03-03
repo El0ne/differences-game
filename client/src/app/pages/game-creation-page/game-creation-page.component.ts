@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { STAGE } from '@app/services/server-routes';
-import { GameInformation } from '@common/game-information';
+import { GameCardDto } from '@common/game-card.dto';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GC_PATHS } from './game-creation-constants';
@@ -36,6 +36,8 @@ export class GameCreationPageComponent implements OnInit {
     image: string = '';
     differenceNumber: number = 0;
     difficulty: string = '';
+
+    createdGameInfo: GameCardDto;
 
     constructor(public gameCardService: GameCardInformationService, private matDialog: MatDialog, public router: Router) {}
 
@@ -142,8 +144,8 @@ export class GameCreationPageComponent implements OnInit {
             this.isDisabled = true;
             this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
                 if (data.gameDifferenceNumber) {
-                    const gameInfo: GameInformation = {
-                        id: data.gameId,
+                    this.createdGameInfo = {
+                        _id: data.gameId,
                         name: this.gameTitle,
                         difficulty: data.gameDifficulty,
                         baseImage: data.originalImageName,
@@ -154,8 +156,7 @@ export class GameCreationPageComponent implements OnInit {
                     this.difficulty = data.gameDifficulty;
                     this.differenceNumber = data.gameDifferenceNumber;
                     this.image = `${STAGE}/image/difference-image.bmp`;
-                    this.gameCardService.createGame(gameInfo).subscribe();
-                    this.gameCardService.getGameCardInfoFromId(data.gameId);
+                    this.gameCardService.createGame(this.createdGameInfo).subscribe();
                     this.openModal();
                 } else {
                     this.isDisabled = false;

@@ -1,5 +1,5 @@
-export class GameInformation {
-    id: string;
+export class GameCardDto {
+    _id: string;
     name: string;
     difficulty: string;
     baseImage: string;

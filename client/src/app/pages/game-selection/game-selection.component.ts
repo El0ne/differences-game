@@ -26,7 +26,7 @@ export class GameSelectionComponent implements OnInit {
     }
 
     selectGameCards(): void {
-        const endIndex = Math.min(this.numberOfGameInformations, this.index + GAME_CARDS_TO_DISPLAY);
+        const endIndex = Math.min(this.numberOfGameInformations, this.index + GAME_CARDS_TO_DISPLAY) - 1;
         this.gameCardService.getGameCardsInformations(this.index, endIndex).subscribe((data) => {
             this.gameCardInformations = data;
         });

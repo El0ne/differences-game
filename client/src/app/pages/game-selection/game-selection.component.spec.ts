@@ -58,17 +58,17 @@ describe('GameSelectionComponent', () => {
         expect(component.isConfig).toBeFalsy();
     });
 
-    it('selectGameCards() should put the end Index at 4 more than index unless there is less than 4 other gameCards to show', () => {
+    it('selectGameCards() should put the end Index at 3 more than index unless there is less than 4 other gameCards to show', () => {
         spyOn(component.gameCardService, 'getGameCardsInformations').and.returnValue(of(GAMES));
         component.index = 0;
         component.numberOfGameInformations = 5;
         component.selectGameCards();
-        expect(component.gameCardService.getGameCardsInformations).toHaveBeenCalledWith(component.index, component.index + GAME_CARDS_TO_DISPLAY);
+        expect(component.gameCardService.getGameCardsInformations).toHaveBeenCalledWith(component.index, component.index + GAME_CARDS_TO_DISPLAY - 1);
 
-        component.index = 4;
+        component.index = 3;
         component.numberOfGameInformations = 5;
         component.selectGameCards();
-        expect(component.gameCardService.getGameCardsInformations).toHaveBeenCalledWith(component.index, component.numberOfGameInformations);
+        expect(component.gameCardService.getGameCardsInformations).toHaveBeenCalledWith(component.index, component.numberOfGameInformations - 1);
     });
 
     it('previousCards() should not call selectGameCards() if index is 0', () => {
