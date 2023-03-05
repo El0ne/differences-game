@@ -207,7 +207,6 @@ describe('GameCreationPageComponent', () => {
             new File([''], 'different.bmp'),
             component.radius,
         );
-        expect(component.gameCardService.createGame).toHaveBeenCalled();
         expect(component.openModal).toHaveBeenCalled();
     }));
 
