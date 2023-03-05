@@ -29,19 +29,19 @@ export class ModalPageComponent implements OnDestroy {
     }
     createGame(): void {
         this.gameCardService.createGame(this.data.gameInfo).subscribe();
-        this.matDialogRef.close(this.data);
-        this.matDialogRef.afterClosed().subscribe((result) => {
-            result.image = '';
-            this.router.navigate(['/config']);
-        });
+        this.redirection('/config');
     }
 
     deleteImages(): void {
         // TODO call service to delete images uploaded and difference object
+        this.redirection('/creatingGame');
+    }
+
+    redirection(path: string): void {
         this.matDialogRef.close(this.data);
         this.matDialogRef.afterClosed().subscribe((result) => {
             result.image = '';
-            this.router.navigate(['/creatingGame']);
+            this.router.navigate([path]);
         });
     }
 }
