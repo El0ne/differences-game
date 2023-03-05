@@ -1,5 +1,5 @@
 <div>
-    <button (click)="dialogRef.close()">Annuler</button>
+    <button (click)="handleCancel()">Annuler</button>
     <div *ngIf="waitingRoomInfo.isHost;else clientView">
         <div *ngIf="clientsInWaitingRoom.size === 0;else opponents">
             En attente d'opposants

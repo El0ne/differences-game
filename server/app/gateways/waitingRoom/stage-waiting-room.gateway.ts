@@ -2,6 +2,7 @@ import { JoinHostInWaitingRequest, OpponentApproval, PlayerInformations, Waiting
 import { Logger } from '@nestjs/common';
 import { Injectable } from '@nestjs/common/decorators';
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { randomUUID } from 'crypto';
 import { Server, Socket } from 'socket.io';
 @WebSocketGateway()
 @Injectable()
@@ -53,12 +54,17 @@ export class StageWaitingRoomGateway {
     @SubscribeMessage(WaitingRoomEvents.AcceptOpponent)
     acceptOpponent(@ConnectedSocket() socket: Socket, @MessageBody() approval: OpponentApproval): void {
         this.logger.log(`${socket.id} accepted ${approval.opponentId}`);
-        this.clearRooms(socket);
-        this.clearRooms(this.server.allSockets[approval.opponentId]);
-        socket.to(approval.opponentId).socketsJoin(socket.id);
-        socket.to(approval.opponentId).emit(WaitingRoomEvents.MatchAccepted);
-        socket.to(approval.stageId).emit(WaitingRoomEvents.MatchRefused, "l'hôte a trouvé un autre adversaire"); // refuser match a tous les autres
-        this.gameHosts.delete(approval.stageId);
+        const opponentSocket: Socket = this.server.sockets.sockets.get(approval.opponentId);
+        if (opponentSocket) {
+            this.clearRooms(socket);
+            this.clearRooms(opponentSocket);
+            const roomId = randomUUID();
+            socket.join(roomId);
+            opponentSocket.join(roomId);
+            socket.to(approval.opponentId).emit(WaitingRoomEvents.MatchAccepted);
+            socket.to(approval.stageId).emit(WaitingRoomEvents.MatchRefused, "l'hôte a trouvé un autre adversaire");
+            this.gameHosts.delete(approval.stageId);
+        }
     }
 
     @SubscribeMessage(WaitingRoomEvents.DeclineOpponent)

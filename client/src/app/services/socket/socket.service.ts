@@ -24,6 +24,9 @@ export class SocketService {
     listen<T>(eventName: string, action: (data: T) => void): void {
         this.sio.on(eventName, action);
     }
+    delete(eventName: string): void {
+        this.sio.off(eventName);
+    }
 
     send<T>(eventName: string, data: T): void {
         if (data) {

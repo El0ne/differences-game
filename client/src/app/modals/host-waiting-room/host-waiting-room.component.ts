@@ -33,10 +33,12 @@ export class HostWaitingRoomComponent implements OnInit, OnDestroy {
 
             this.socket.listen(WaitingRoomEvents.UnrequestMatch, (opponentId: string) => {
                 this.clientsInWaitingRoom.delete(opponentId);
+                console.log(JSON.stringify(this.clientsInWaitingRoom));
             });
         } else {
-            this.socket.listen<PlayerInformations>(WaitingRoomEvents.MatchAccepted, () => {
-                alert('match Accepted');
+            this.socket.listen(WaitingRoomEvents.MatchAccepted, () => {
+                alert('match accepte');
+                this.dialogRef.close();
             });
 
             this.socket.listen(WaitingRoomEvents.MatchRefused, (refusedReason: string) => {
@@ -47,8 +49,11 @@ export class HostWaitingRoomComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        if (this.waitingRoomInfo.isHost)
-            this.socket.send(this.waitingRoomInfo.isHost ? WaitingRoomEvents.UnhostGame : WaitingRoomEvents.QuitHost, this.waitingRoomInfo.stageId);
+        this.socket.send(this.waitingRoomInfo.isHost ? WaitingRoomEvents.UnhostGame : WaitingRoomEvents.QuitHost, this.waitingRoomInfo.stageId);
+    }
+
+    handleCancel(): void {
+        this.socket.send(this.waitingRoomInfo.isHost ? WaitingRoomEvents.UnhostGame : WaitingRoomEvents.QuitHost, this.waitingRoomInfo.stageId);
     }
 
     acceptOpponent(opponentId: string): void {
