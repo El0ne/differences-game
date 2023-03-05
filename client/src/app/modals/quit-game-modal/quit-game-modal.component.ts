@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { ChatSocketService } from '@app/services/chat-socket/chat-socket.service';
+import { ChatSocketService } from '@app/services/socket/socket.service';
 import { PlayersInformation } from '@common/chat-dialog-constants';
 
 @Component({

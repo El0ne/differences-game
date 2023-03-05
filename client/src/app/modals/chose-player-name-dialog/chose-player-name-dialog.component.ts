@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { ChatSocketService } from '@app/services/chat-socket/chat-socket.service';
+import { ChatSocketService } from '@app/services/socket/socket.service';
 import { GameConditions, PlayersInformation } from '@common/chat-dialog-constants';
 
 @Component({
@@ -26,9 +26,6 @@ export class ChosePlayerNameDialogComponent {
     }
 
     configureSocketReactions() {
-        this.chat.listen('hello', (data: string) => {
-            console.log(data);
-        });
         this.chat.listen('PlayerWaiting', (data: PlayersInformation) => {
             this.awaitingPlayer = false;
             if (this.chat.names[0] === data.player) {

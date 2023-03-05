@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { TestBed } from '@angular/core/testing';
 
-import { ChatSocketService } from './chat-socket.service';
+import { ChatSocketService } from './socket.service';
 
 describe('ChatSocketService', () => {
     let service: ChatSocketService;

@@ -10,9 +10,9 @@ import { ClickEventComponent } from '@app/components/click-event/click-event.com
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
-import { ChatSocketService } from '@app/services/chat-socket/chat-socket.service';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { ChatSocketService } from '@app/services/socket/socket.service';
 import { differenceInformation } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
 import { of } from 'rxjs';
