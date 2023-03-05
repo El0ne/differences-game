@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
@@ -13,7 +13,7 @@ import { GC_PATHS } from './game-creation-constants';
     templateUrl: './game-creation-page.component.html',
     styleUrls: ['./game-creation-page.component.scss'],
 })
-export class GameCreationPageComponent {
+export class GameCreationPageComponent implements AfterViewInit {
     @ViewChild('canvas1') myOgCanvas: ElementRef;
     @ViewChild('canvas2') myDiffCanvas: ElementRef;
 
@@ -23,6 +23,7 @@ export class GameCreationPageComponent {
     isRectEnabled: boolean = false;
     isEraserEnabled: boolean = false;
     color: string = '#ff124f';
+    drawCtx: CanvasRenderingContext2D;
 
     readonly paths = GC_PATHS;
 
@@ -42,6 +43,11 @@ export class GameCreationPageComponent {
     createdGameInfo: GameCardDto;
 
     constructor(public gameCardService: GameCardInformationService, private matDialog: MatDialog, public router: Router) {}
+
+    ngAfterViewInit() {
+        const drawingCanvas = this.drawnCanvas.nativeElement;
+        this.drawCtx = drawingCanvas.getContext('2d');
+    }
 
     getTitle(title: string): void {
         this.gameTitle = title;
@@ -173,35 +179,41 @@ export class GameCreationPageComponent {
         }
     }
 
-    // drawRectangle() {}
+    drawRectangle() {
+        const width = 50;
+        const height = 60;
+        this.drawnCanvas.nativeElement.addEventListener('click', (e: MouseEvent) => {
+            const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
+
+            console.log('is drawn.', e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+            this.drawCtx.fillRect(e.clientX - canvasRect.left - width / 2, e.clientY - canvasRect.top - height / 2, width, height);
+        });
+    }
     drawPen() {
         let isPainting = false;
 
         if (this.isPenEnabled) {
-            const drawingCanvas = this.drawnCanvas.nativeElement;
-            const drawCtx = drawingCanvas.getContext('2d');
-
-            drawingCanvas.addEventListener('mousedown', () => {
+            this.drawnCanvas.nativeElement.addEventListener('mousedown', () => {
                 isPainting = true;
             });
 
-            drawingCanvas.addEventListener('mouseup', () => {
+            this.drawnCanvas.nativeElement.addEventListener('mouseup', () => {
                 isPainting = false;
-                drawCtx.beginPath(); // to add later
+                this.drawCtx.beginPath(); // to add later
             });
 
-            drawingCanvas.addEventListener('mousemove', (e: MouseEvent) => {
+            this.drawnCanvas.nativeElement.addEventListener('mousemove', (e: MouseEvent) => {
                 if (isPainting) {
-                    const canvasRect = drawingCanvas.getBoundingClientRect();
+                    const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
 
-                    drawCtx.lineWidth = 10;
-                    drawCtx.lineCap = 'round';
-                    drawCtx.strokeStyle = this.color;
+                    this.drawCtx.lineWidth = 10;
+                    this.drawCtx.lineCap = 'round';
+                    this.drawCtx.strokeStyle = this.color;
 
-                    drawCtx.lineTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
-                    drawCtx.stroke();
-                    drawCtx.beginPath();
-                    drawCtx.moveTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+                    this.drawCtx.lineTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+                    this.drawCtx.stroke();
+                    this.drawCtx.beginPath();
+                    this.drawCtx.moveTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
                 }
             });
         }
