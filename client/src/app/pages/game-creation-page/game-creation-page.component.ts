@@ -159,6 +159,8 @@ export class GameCreationPageComponent implements OnInit {
                     this.differenceNumber = data.gameDifferenceNumber;
                     this.image = `${STAGE}/image/difference-image.bmp`;
                     this.openModal();
+                    this.isDisabled = false;
+                    console.log('this.isDisabled', this.isDisabled);
                 } else {
                     this.isDisabled = false;
                     alert("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
