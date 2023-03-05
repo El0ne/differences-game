@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
@@ -6,7 +6,6 @@ import { GameCardInformationService } from '@app/services/game-card-information-
 import { STAGE } from '@app/services/server-routes';
 import { GameCardDto } from '@common/game-card.dto';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
-import { BehaviorSubject, Observable } from 'rxjs';
 import { GC_PATHS } from './game-creation-constants';
 
 @Component({
@@ -14,13 +13,16 @@ import { GC_PATHS } from './game-creation-constants';
     templateUrl: './game-creation-page.component.html',
     styleUrls: ['./game-creation-page.component.scss'],
 })
-export class GameCreationPageComponent implements OnInit {
+export class GameCreationPageComponent implements AfterViewInit {
     @ViewChild('canvas1') myOgCanvas: ElementRef;
     @ViewChild('canvas2') myDiffCanvas: ElementRef;
 
-    modal: BehaviorSubject<'open' | 'close'> = new BehaviorSubject<'open' | 'close'>('close');
+    @ViewChild('drawingCanvas2') drawnCanvas: ElementRef;
 
-    display$: Observable<'open' | 'close'>;
+    isPenEnabled: boolean = false;
+    isRectEnabled: boolean = false;
+    isEraserEnabled: boolean = false;
+    color: string = '#ff124f';
 
     readonly paths = GC_PATHS;
 
@@ -39,10 +41,13 @@ export class GameCreationPageComponent implements OnInit {
 
     createdGameInfo: GameCardDto;
 
+    private drawCtx: CanvasRenderingContext2D;
+
     constructor(public gameCardService: GameCardInformationService, private matDialog: MatDialog, public router: Router) {}
 
-    ngOnInit(): void {
-        this.display$ = this.modal.asObservable();
+    ngAfterViewInit() {
+        const drawingCanvas = this.drawnCanvas.nativeElement;
+        this.drawCtx = drawingCanvas.getContext('2d');
     }
 
     getTitle(title: string): void {
@@ -161,6 +166,45 @@ export class GameCreationPageComponent implements OnInit {
                 } else {
                     this.isDisabled = false;
                     alert("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
+                }
+            });
+        }
+    }
+
+    togglePen() {
+        this.isPenEnabled = !this.isPenEnabled;
+        console.log('is pen enabled:', this.isPenEnabled);
+        if (this.isPenEnabled) this.drawPen();
+    }
+    // startPosition() {}
+
+    drawPen() {
+        let isPainting = false;
+
+        if (this.isPenEnabled) {
+            this.drawnCanvas.nativeElement.addEventListener('mousedown', () => {
+                isPainting = true;
+                console.log('isPaiting:', isPainting);
+            });
+            this.drawnCanvas.nativeElement.addEventListener('mouseup', () => {
+                isPainting = false;
+                // this.drawCtx.beginPath(); //to add later
+                console.log('isPaiting:', isPainting);
+            });
+            this.drawnCanvas.nativeElement.addEventListener('mousemove', (e: MouseEvent) => {
+                if (isPainting) {
+                    console.log('isDrawing:');
+
+                    this.drawCtx.lineWidth = 10;
+                    this.drawCtx.lineCap = 'round';
+                    this.drawCtx.strokeStyle = this.color;
+                    console.log('x:', e.clientX);
+                    console.log('y:', e.clientY);
+
+                    this.drawCtx.lineTo(e.clientX, e.clientY);
+                    this.drawCtx.stroke();
+                    this.drawCtx.beginPath();
+                    this.drawCtx.moveTo(e.clientX, e.clientY);
                 }
             });
         }
