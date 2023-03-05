@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
@@ -13,7 +13,7 @@ import { GC_PATHS } from './game-creation-constants';
     templateUrl: './game-creation-page.component.html',
     styleUrls: ['./game-creation-page.component.scss'],
 })
-export class GameCreationPageComponent implements AfterViewInit {
+export class GameCreationPageComponent {
     @ViewChild('canvas1') myOgCanvas: ElementRef;
     @ViewChild('canvas2') myDiffCanvas: ElementRef;
 
@@ -41,14 +41,7 @@ export class GameCreationPageComponent implements AfterViewInit {
 
     createdGameInfo: GameCardDto;
 
-    private drawCtx: CanvasRenderingContext2D;
-
     constructor(public gameCardService: GameCardInformationService, private matDialog: MatDialog, public router: Router) {}
-
-    ngAfterViewInit() {
-        const drawingCanvas = this.drawnCanvas.nativeElement;
-        this.drawCtx = drawingCanvas.getContext('2d');
-    }
 
     getTitle(title: string): void {
         this.gameTitle = title;
@@ -174,37 +167,41 @@ export class GameCreationPageComponent implements AfterViewInit {
     togglePen() {
         this.isPenEnabled = !this.isPenEnabled;
         console.log('is pen enabled:', this.isPenEnabled);
-        if (this.isPenEnabled) this.drawPen();
-    }
-    // startPosition() {}
 
+        if (this.isPenEnabled) {
+            this.drawPen();
+        }
+    }
+
+    // drawRectangle() {}
     drawPen() {
         let isPainting = false;
 
         if (this.isPenEnabled) {
-            this.drawnCanvas.nativeElement.addEventListener('mousedown', () => {
+            const drawingCanvas = this.drawnCanvas.nativeElement;
+            const drawCtx = drawingCanvas.getContext('2d');
+
+            drawingCanvas.addEventListener('mousedown', () => {
                 isPainting = true;
-                console.log('isPaiting:', isPainting);
             });
-            this.drawnCanvas.nativeElement.addEventListener('mouseup', () => {
+
+            drawingCanvas.addEventListener('mouseup', () => {
                 isPainting = false;
-                // this.drawCtx.beginPath(); //to add later
-                console.log('isPaiting:', isPainting);
+                drawCtx.beginPath(); // to add later
             });
-            this.drawnCanvas.nativeElement.addEventListener('mousemove', (e: MouseEvent) => {
+
+            drawingCanvas.addEventListener('mousemove', (e: MouseEvent) => {
                 if (isPainting) {
-                    console.log('isDrawing:');
+                    const canvasRect = drawingCanvas.getBoundingClientRect();
 
-                    this.drawCtx.lineWidth = 10;
-                    this.drawCtx.lineCap = 'round';
-                    this.drawCtx.strokeStyle = this.color;
-                    console.log('x:', e.clientX);
-                    console.log('y:', e.clientY);
+                    drawCtx.lineWidth = 10;
+                    drawCtx.lineCap = 'round';
+                    drawCtx.strokeStyle = this.color;
 
-                    this.drawCtx.lineTo(e.clientX, e.clientY);
-                    this.drawCtx.stroke();
-                    this.drawCtx.beginPath();
-                    this.drawCtx.moveTo(e.clientX, e.clientY);
+                    drawCtx.lineTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+                    drawCtx.stroke();
+                    drawCtx.beginPath();
+                    drawCtx.moveTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
                 }
             });
         }
