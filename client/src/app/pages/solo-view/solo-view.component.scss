@@ -1,56 +1,14 @@
 :host {
     --basic-border: #00e6f6;
-    --linear-background-color-1: #92089c;
-    --linear-background-color-2: #a80d43;
     --error-message-color: rgb(196, 97, 97);
-    --send-hover: #00b7c4;
-    --nav-button-color: #cf0edd;
 }
 
 .icon {
     color: #000000;
 }
 
-.name-field {
-    align-self: center;
-}
-
 body {
     background: linear-gradient(black, #7a04eb, #bd04eb);
-}
-
-.name-input {
-    top: 10%;
-    left: 5%;
-    width: 90%;
-    height: 70%;
-}
-.info {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.title {
-    font-family: 'Verdana';
-    font-style: normal;
-    font-weight: 200;
-    font-size: 40px;
-    line-height: 36px;
-    text-align: center;
-    color: white;
-}
-
-#info-quit {
-    bottom: 3%;
-    right: 3%;
-    position: absolute;
-}
-
-#home-win {
-    bottom: 3%;
-    left: 3%;
-    position: absolute;
 }
 
 .nav-bar {
@@ -67,11 +25,6 @@ body {
     display: flex;
 }
 
-.middle-options {
-    border-style: solid;
-    display: inline-block;
-}
-
 .info-option {
     margin-right: 2%;
 }
@@ -83,13 +36,10 @@ body {
     align-items: center;
     justify-content: center;
     background-color: black;
-
     height: 40%;
     width: 75%;
-
     border-style: solid;
     border-radius: 25px;
-
     border: 0.2rem solid #eee;
 }
 
@@ -170,10 +120,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-
     width: 680px;
     height: 516px;
-
     border-style: solid;
     border: 0.2rem solid #eee;
     border-radius: 2rem;
@@ -187,7 +135,6 @@ body {
 app-click-event {
     border-style: solid;
     border-color: rgba(255, 255, 255, 0);
-
     width: 640px;
     height: 480px;
     float: right;
@@ -208,11 +155,8 @@ app-click-event {
     padding: 2%;
 }
 
-#timer {
-    align-self: center;
-}
-
 .timer-box {
+    align-self: center;
     width: 360px;
     height: 100px;
     border: 0.2rem solid #eee;
@@ -221,7 +165,7 @@ app-click-event {
     border-radius: 10px;
 }
 
-.timer-box .display {
+.display {
     display: inline-block;
     position: relative;
     top: 50%;
@@ -234,39 +178,12 @@ app-click-event {
     text-align: center;
 }
 
-.timer-box .display #time {
+#time {
     line-height: 85px;
     color: #fff;
     font-size: 50px;
     font-weight: 600;
     letter-spacing: 1px;
-}
-
-.hint-button {
-    position: absolute;
-    bottom: -1%;
-    right: 10px;
-    justify-content: center;
-    margin: 1rem;
-}
-.hint {
-    transform: scale(1.5);
-    border-style: hidden;
-    align-self: end;
-    background-color: rgba(255, 255, 255, 0);
-}
-
-.hint:hover {
-    transform: scale(1.7);
-    cursor: pointer;
-}
-.hint-logo {
-    height: 100%;
-    width: 100%;
-    -webkit-filter: invert(1);
-    -webkit-transform: scaleX(-1);
-    transform: scaleX(-1);
-    filter: invert(1);
 }
 
 #differences {
@@ -291,10 +208,10 @@ app-click-event {
     justify-content: space-around;
     align-items: center;
     color: white;
-
     padding: 68px 82px;
     gap: 100px;
 }
+
 .row {
     display: flex;
     justify-content: center;
@@ -315,9 +232,7 @@ app-click-event {
     width: 155px;
     height: 120px;
     background-color: #bd04eb;
-    box-shadow: 0 0 7px #bd04eb, 0 0 20px #bd04eb, 0 0 10px #bd04eb;
     border: solid 3px white;
-
     border-radius: 5px;
     font-family: 'Silkscreen', cursive;
     font-style: normal;
@@ -328,21 +243,6 @@ app-click-event {
     color: white;
 }
 
-.add {
-    width: 45px;
-    height: 45px;
-    border: 2px solid white;
-    border-radius: 5px;
-    font-family: 'Silkscreen', cursive;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 18px;
-    line-height: 28px;
-    text-align: center;
-    color: white;
-    line-height: 35px;
-    background: transparent;
-}
 @media only screen and (max-width: 600px) {
     body {
         overflow-y: scroll;
