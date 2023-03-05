@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { DELAY_BEFORE_EMITTING_TIME, MESSAGE_MAX_LENGTH } from './chat.gateway.constants';
-import { ChatEvents, MultiplayerRequestInformation, Room, RoomManagement } from './chat.gateway.events';
+import { AbandonGame, ChatEvents, MultiplayerRequestInformation, Room, RoomEvent, RoomManagement } from './chat.gateway.events';
 
 @WebSocketGateway({ cors: true })
 @Injectable()
@@ -47,7 +47,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(ChatEvents.Event)
-    event(socket: Socket, data) {
+    event(socket: Socket, data: RoomEvent) {
         if (socket.rooms.has(data.room)) {
             const date = new Date();
             const hour = date.getHours().toString();
@@ -65,15 +65,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(ChatEvents.Abandon)
-    abandon(socket: Socket, data) {
-        this.logger.log('here');
+    abandon(socket: Socket, data: AbandonGame) {
         if (socket.rooms.has(data.room)) {
             const date = new Date();
             const hour = date.getHours().toString();
             const minutes = date.getMinutes().toString();
             const seconds = date.getSeconds().toString();
             const dateFormatted = `${hour}:${minutes}:${seconds} - ${data.name} a abandonné la partie.`;
-            this.server.to(data.room).emit(ChatEvents.Hint, { socketId: 'event', message: dateFormatted });
+            this.server.to(data.room).emit(ChatEvents.Abandon, { socketId: socket.id, message: dateFormatted });
         }
     }
     @SubscribeMessage(ChatEvents.Hint)

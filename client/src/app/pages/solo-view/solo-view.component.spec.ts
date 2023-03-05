@@ -35,7 +35,6 @@ describe('SoloViewComponent', () => {
         };
         chatSocketServiceMock = jasmine.createSpyObj('ChatSocketService', ['connect', 'disconnect', 'liveSocket', 'listen', 'send']);
         chatSocketServiceMock.sio = jasmine.createSpyObj('Socket', ['on', 'emit', 'disconnect']);
-        // chatSocketServiceMock.sio.id = 'mockSocket';
         chatSocketServiceMock.names = ['player', 'opponent'];
         chatSocketServiceMock.gameRoom = 'game';
 
@@ -63,6 +62,9 @@ describe('SoloViewComponent', () => {
                 case 'hint': {
                     callback({ socketId: 'hint', message: 'Test message' });
                     break;
+                }
+                case 'abandon': {
+                    callback({ socketId: 'abandon', message: 'abandon' });
                 }
                 // No default
             }
@@ -118,13 +120,16 @@ describe('SoloViewComponent', () => {
     it('ConfigureSocketReactions should configure sockets correctly & react properly according to event', () => {
         const listenSpy = spyOn(chatSocketServiceMock, 'listen').and.callThrough();
         const sendSpy = spyOn(chatSocketServiceMock, 'send').and.callThrough();
+        const finishGameSpy = spyOn(component, 'finishGame');
         chatSocketServiceMock.sio.id = 'mockSocket';
         component.configureSocketReactions();
-        expect(listenSpy).toHaveBeenCalledTimes(4);
-        expect(component.messages.length).toEqual(5);
+        expect(listenSpy).toHaveBeenCalledTimes(5);
+        expect(component.messages.length).toEqual(6);
         expect(sendSpy).toHaveBeenCalled();
-        expect(component.messages[component.messages.length - 1].socketId).toEqual('hint');
-        expect(component.messages[component.messages.length - 2].socketId).toEqual('event');
+        expect(component.messages[component.messages.length - 2].socketId).toEqual('hint');
+        expect(component.messages[component.messages.length - 3].socketId).toEqual('event');
+        expect(component.messages[component.messages.length - 1].socketId).toEqual('event');
+        expect(finishGameSpy).toHaveBeenCalled();
     });
 
     it('handleMistake should send an event called event to socket server with extra information', () => {

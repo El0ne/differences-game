@@ -106,6 +106,13 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.chat.listen('hint', (message: RoomMessage) => {
             this.messages.push(message);
         });
+        this.chat.listen('abandon', (message: RoomMessage) => {
+            if (!(message.socketId === this.socketId)) {
+                this.finishGame();
+            }
+            message.socketId = 'event';
+            this.messages.push(message);
+        });
     }
 
     ngOnDestroy(): void {
