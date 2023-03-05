@@ -171,24 +171,17 @@ export class GameCreationPageComponent implements AfterViewInit {
         }
     }
 
-    togglePen() {
-        this.isPenEnabled = !this.isPenEnabled;
-        console.log('is pen enabled:', this.isPenEnabled);
-
-        if (this.isPenEnabled) {
-            this.drawPen();
-        }
-    }
-
     drawRectangle() {
         const width = 50;
         const height = 60;
-        this.drawnCanvas.nativeElement.addEventListener('click', (e: MouseEvent) => {
-            const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
+        if (this.isRectEnabled) {
+            this.drawnCanvas.nativeElement.addEventListener('click', (e: MouseEvent) => {
+                const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
 
-            console.log('rectangle is drawn.', e.clientX - canvasRect.left, e.clientY - canvasRect.top);
-            this.drawCtx.fillRect(e.clientX - canvasRect.left - width / 2, e.clientY - canvasRect.top - height / 2, width, height);
-        });
+                console.log('rectangle is drawn.', e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+                this.drawCtx.fillRect(e.clientX - canvasRect.left - width / 2, e.clientY - canvasRect.top - height / 2, width, height);
+            });
+        }
     }
 
     drawPen() {
@@ -223,22 +216,61 @@ export class GameCreationPageComponent implements AfterViewInit {
 
     erase() {
         let isErasing = false;
+        if (this.isEraserEnabled) {
+            this.drawnCanvas.nativeElement.addEventListener('mousedown', () => {
+                isErasing = true;
+            });
 
-        this.drawnCanvas.nativeElement.addEventListener('mousedown', () => {
-            isErasing = true;
-        });
+            this.drawnCanvas.nativeElement.addEventListener('mouseup', () => {
+                isErasing = false;
+            });
 
-        this.drawnCanvas.nativeElement.addEventListener('mouseup', () => {
-            isErasing = false;
-        });
+            this.drawnCanvas.nativeElement.addEventListener('mousemove', (e: MouseEvent) => {
+                if (isErasing) {
+                    const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
+                    console.log('isErasing', e.clientX - canvasRect.left, e.clientY - canvasRect.top);
 
-        this.drawnCanvas.nativeElement.addEventListener('mousemove', (e: MouseEvent) => {
-            if (isErasing) {
-                const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
-                console.log('isErasing', e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+                    this.drawCtx.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, 10, 10);
+                }
+            });
+        }
+    }
 
-                this.drawCtx.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, 10, 10);
-            }
-        });
+    removingEventListener() {
+        this.drawnCanvas.nativeElement.removeEventListener('mousedown', this.drawPen);
+        this.drawnCanvas.nativeElement.removeEventListener('mousemove', this.drawPen);
+        this.drawnCanvas.nativeElement.removeEventListener('mouseup', this.drawPen);
+        this.drawnCanvas.nativeElement.removeEventListener('click', this.drawRectangle);
+        this.drawnCanvas.nativeElement.removeEventListener('mousedown', this.erase);
+        this.drawnCanvas.nativeElement.removeEventListener('mousemove', this.erase);
+        this.drawnCanvas.nativeElement.removeEventListener('mouseup', this.erase);
+    }
+
+    toggleButton(id: string) {
+        switch (id) {
+            case 'pen':
+                this.isPenEnabled = !this.isPenEnabled;
+                console.log('is pen enabled:', this.isPenEnabled);
+                this.isRectEnabled = false;
+                this.isEraserEnabled = false;
+                this.drawPen();
+
+                break;
+            case 'rectangle':
+                this.isRectEnabled = !this.isRectEnabled;
+                console.log('is rect enabled:', this.isRectEnabled);
+                this.isPenEnabled = false;
+                this.isEraserEnabled = false;
+                this.drawRectangle();
+
+                break;
+            case 'erase':
+                this.isEraserEnabled = !this.isEraserEnabled;
+                console.log('is eraser enabled:', this.isEraserEnabled);
+                this.isRectEnabled = false;
+                this.isPenEnabled = false;
+                this.erase();
+                break;
+        }
     }
 }
