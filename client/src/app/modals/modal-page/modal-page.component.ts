@@ -27,7 +27,7 @@ export class ModalPageComponent implements OnDestroy {
     ngOnDestroy() {
         this.matDialogRef.close(this.data);
     }
-    createGame() {
+    createGame(): void {
         this.gameCardService.createGame(this.data.gameInfo).subscribe();
         this.matDialogRef.close(this.data);
         this.matDialogRef.afterClosed().subscribe((result) => {
@@ -36,7 +36,7 @@ export class ModalPageComponent implements OnDestroy {
         });
     }
 
-    deleteImages() {
+    deleteImages(): void {
         // TODO call service to delete images uploaded and difference object
         this.matDialogRef.close(this.data);
         this.matDialogRef.afterClosed().subscribe((result) => {
