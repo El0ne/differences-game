@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 
 import { ChosePlayerNameDialogComponent } from './chose-player-name-dialog.component';
@@ -9,6 +9,7 @@ describe('ChosePlayerNameDialogComponent', () => {
     let component: ChosePlayerNameDialogComponent;
     let fixture: ComponentFixture<ChosePlayerNameDialogComponent>;
     let matDialogSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
+    const data = { game: 'game', multiplayer: true };
 
     beforeEach(async () => {
         matDialogSpy = jasmine.createSpyObj('MatDialogRef<ChosePlayerNameDialogComponent>', ['close']);
@@ -18,7 +19,10 @@ describe('ChosePlayerNameDialogComponent', () => {
         await TestBed.configureTestingModule({
             declarations: [ChosePlayerNameDialogComponent],
             imports: [MatDialogModule, MatIconModule, FormsModule],
-            providers: [{ provide: MatDialogRef, useValue: matDialogSpy }],
+            providers: [
+                { provide: MatDialogRef, useValue: matDialogSpy },
+                { provide: MAT_DIALOG_DATA, useValue: data },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(ChosePlayerNameDialogComponent);
@@ -37,10 +41,8 @@ describe('ChosePlayerNameDialogComponent', () => {
     });
 
     it('validateName should turn nameErrorMessage to false if message is fine', () => {
-        const dialogRefSpy = spyOn(component.dialogRef, 'close').and.returnValue();
         component.playerName = 'good name';
         component.validateName();
         expect(component.showNameErrorMessage).toBeFalsy();
-        expect(dialogRefSpy).toHaveBeenCalledWith('good name');
     });
 });

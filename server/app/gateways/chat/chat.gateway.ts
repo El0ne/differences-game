@@ -20,10 +20,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.Validate)
     validate(socket: Socket, message: string) {
-        if (message) {
-            socket.emit(ChatEvents.WordValidated, { validated: message.length < MESSAGE_MAX_LENGTH, originalMessage: message });
+        if (message && message.length < MESSAGE_MAX_LENGTH) {
+            socket.emit(ChatEvents.WordValidated, { validated: true, originalMessage: message });
         } else {
-            socket.emit(ChatEvents.WordValidated, { validated: false });
+            const error = 'Votre message ne respecte pas le bon format. Veuillez entrer un nouveau message';
+            socket.emit(ChatEvents.WordValidated, { validated: false, originalMessage: error });
         }
     }
 
@@ -65,6 +66,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.Abandon)
     abandon(socket: Socket, data) {
+        this.logger.log('here');
         if (socket.rooms.has(data.room)) {
             const date = new Date();
             const hour = date.getHours().toString();
@@ -100,7 +102,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     roomMessage(socket: Socket, message: RoomManagement) {
         // Seulement un membre de la salle peut envoyer un message aux autres
         if (socket.rooms.has(message.room)) {
-            this.server.to(message.room).emit(ChatEvents.RoomMessage, { socketId: socket.id, message: message.message });
+            const transformedMessage = message.message.toString();
+            this.server.to(message.room).emit(ChatEvents.RoomMessage, { socketId: socket.id, message: transformedMessage });
         }
     }
 

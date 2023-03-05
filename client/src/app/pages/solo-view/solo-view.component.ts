@@ -84,14 +84,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     configureSocketReactions() {
-        this.chat.listen('hello', (data: string) => {
-            console.log(data);
-        });
         this.chat.listen('wordValidated', (validation: Validation) => {
             if (validation.validated) {
                 this.chat.send('roomMessage', { room: this.currentRoom, message: validation.originalMessage });
             } else {
-                this.showErrorMessage = true;
+                this.messages.push({ socketId: 'event', message: validation.originalMessage });
             }
         });
         this.chat.listen('roomMessage', (data: RoomMessage) => {
@@ -134,11 +131,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.dialog.open(GameWinModalComponent, { disableClose: true });
     }
 
-    abandonPartie() {
-        this.chat.send('abandon', { name: this.player, room: this.currentRoom });
-        this.router.navigate(['/stage-selection']);
-    }
-
     // logic needed to be modified according to who adds a point
     incrementScore(): void {
         this.currentScorePlayer1 += 1;
@@ -162,19 +154,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     quitGame() {
-        this.dialog.open(QuitGameModalComponent, { disableClose: true });
-    }
-
-    toggleErrorMessage(): void {
-        if (!this.showErrorMessage) {
-            this.showErrorMessage = !this.showErrorMessage;
-        }
-    }
-
-    untoggleErrorMessage(): void {
-        if (this.showErrorMessage) {
-            this.showErrorMessage = !this.showErrorMessage;
-        }
+        this.dialog.open(QuitGameModalComponent, { disableClose: true, data: { player: this.player, room: this.currentRoom } });
     }
 
     sendMessage(): void {

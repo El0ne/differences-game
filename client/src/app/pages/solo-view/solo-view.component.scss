@@ -2,57 +2,17 @@
     --basic-border: #00e6f6;
     --message: #0019f6;
     --player2: #6b6b6b;
-    --linear-background-color-1: #92089c;
-    --linear-background-color-2: #a80d43;
     --error-message-color: rgb(177, 32, 32);
-    --send-hover: #00b7c4;
-    --nav-button-color: #cf0edd;
-}
-
-.icon {
-    color: #000000;
-}
-
-.name-field {
-    align-self: center;
 }
 
 body {
     background: linear-gradient(black, #7a04eb, #bd04eb);
 }
 
-.name-input {
-    top: 10%;
-    left: 5%;
-    width: 90%;
-    height: 70%;
-}
-.info {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.title {
-    font-family: 'Verdana';
-    font-style: normal;
-    font-weight: 200;
-    font-size: 40px;
-    line-height: 36px;
-    text-align: center;
-    color: white;
-}
-
-#info-quit {
-    bottom: 3%;
-    right: 3%;
-    position: absolute;
-}
-
-#home-win {
-    bottom: 3%;
-    left: 3%;
-    position: absolute;
+.option-buttons {
+    width: 13rem;
+    height: 4rem;
+    margin-top: 1rem;
 }
 
 .nav-bar {
@@ -67,11 +27,6 @@ body {
 }
 .options {
     display: flex;
-}
-
-.middle-options {
-    border-style: solid;
-    display: inline-block;
 }
 
 .info-option {
@@ -104,6 +59,7 @@ body {
     margin-bottom: 5px;
     overflow-y: auto;
     overflow-x: hidden;
+    overflow-wrap: break-word;
     scroll-behavior: auto;
 }
 
@@ -126,6 +82,7 @@ body {
     margin: 4px;
     font-size: x-large;
     color: white;
+    line-height: 1.1;
 }
 
 .error {
@@ -140,27 +97,12 @@ body {
     background-color: var(--player2);
 }
 
-.error-message:hover {
-    cursor: pointer;
-}
-
 .send-button {
     background-color: var(--basic-border);
     border-radius: 50%;
     box-shadow: 0 0 7px var(--basic-border), 0 0 20px var(--basic-border), 0 0 10px var(--basic-border);
     border: solid 2px var(--basic-border);
     display: flex;
-}
-
-.send-button:hover {
-    background-color: var(--send-hover);
-    cursor: pointer;
-}
-
-.option-buttons {
-    width: 13rem;
-    height: 4rem;
-    margin-top: 1rem;
 }
 
 .flex-game {
@@ -187,10 +129,6 @@ body {
     padding: 0.4em;
 }
 
-.image-container:hover {
-    border: 0.3rem solid #fff;
-}
-
 app-click-event {
     border-style: solid;
     border-color: rgba(255, 255, 255, 0);
@@ -215,10 +153,7 @@ app-click-event {
     gap: 5%;
 }
 
-#double-score:first-child {
-    padding-right: 4%;
-}
-#score {
+.score {
     margin-top: 1.5rem;
     align-self: center;
     padding-top: 2%;
@@ -275,27 +210,6 @@ app-click-event {
     background-color: rgba(255, 255, 255, 0);
 }
 
-.hint:hover {
-    transform: scale(1.7);
-    cursor: pointer;
-}
-.hint-logo {
-    height: 100%;
-    width: 100%;
-    -webkit-filter: invert(1);
-    -webkit-transform: scaleX(-1);
-    transform: scaleX(-1);
-    filter: invert(1);
-}
-
-#differences {
-    border-style: solid;
-    border-color: var(--basic-border);
-    width: 640px;
-    height: 480px;
-    float: right;
-}
-
 // référence : https://codepen.io/Vivekp1118/pen/YzLOOVG
 @import url('https://fonts.googleapis.com/css2?family=Silkscreen&display=swap');
 
@@ -322,16 +236,6 @@ app-click-event {
     flex-direction: column;
 }
 
-.col-heading h1 {
-    font-family: 'Verdana';
-    font-style: normal;
-    font-weight: 700;
-    font-size: 40px;
-    line-height: 36px;
-    text-align: center;
-    letter-spacing: 0.05em;
-}
-
 .col-display {
     width: 155px;
     height: 120px;
@@ -349,21 +253,6 @@ app-click-event {
     color: white;
 }
 
-.add {
-    width: 45px;
-    height: 45px;
-    border: 2px solid white;
-    border-radius: 5px;
-    font-family: 'Silkscreen', cursive;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 18px;
-    line-height: 28px;
-    text-align: center;
-    color: white;
-    line-height: 35px;
-    background: transparent;
-}
 @media only screen and (max-width: 600px) {
     body {
         overflow-y: scroll;
