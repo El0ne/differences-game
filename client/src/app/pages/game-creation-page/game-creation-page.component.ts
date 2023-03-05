@@ -85,6 +85,7 @@ export class GameCreationPageComponent implements AfterViewInit {
     clearSecondFile(canvas: HTMLCanvasElement, id: string): void {
         this.differentFile = null;
         this.clearSingleFile(canvas, id);
+        this.drawCtx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
     }
 
     fileValidation(e: Event): void {
@@ -185,10 +186,11 @@ export class GameCreationPageComponent implements AfterViewInit {
         this.drawnCanvas.nativeElement.addEventListener('click', (e: MouseEvent) => {
             const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
 
-            console.log('is drawn.', e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+            console.log('rectangle is drawn.', e.clientX - canvasRect.left, e.clientY - canvasRect.top);
             this.drawCtx.fillRect(e.clientX - canvasRect.left - width / 2, e.clientY - canvasRect.top - height / 2, width, height);
         });
     }
+
     drawPen() {
         let isPainting = false;
 
@@ -217,5 +219,26 @@ export class GameCreationPageComponent implements AfterViewInit {
                 }
             });
         }
+    }
+
+    erase() {
+        let isErasing = false;
+
+        this.drawnCanvas.nativeElement.addEventListener('mousedown', () => {
+            isErasing = true;
+        });
+
+        this.drawnCanvas.nativeElement.addEventListener('mouseup', () => {
+            isErasing = false;
+        });
+
+        this.drawnCanvas.nativeElement.addEventListener('mousemove', (e: MouseEvent) => {
+            if (isErasing) {
+                const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
+                console.log('isErasing', e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+
+                this.drawCtx.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, 10, 10);
+            }
+        });
     }
 }
