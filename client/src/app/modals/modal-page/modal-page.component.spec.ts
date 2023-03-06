@@ -19,7 +19,7 @@ describe('ModalPageComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [ModalPageComponent],
-            imports: [MatDialogModule, RouterTestingModule, HttpClientTestingModule],
+            imports: [MatDialogModule, RouterTestingModule.withRoutes([{ path: 'config', redirectTo: '' }]), HttpClientTestingModule],
             providers: [
                 {
                     provide: MatDialog,
@@ -62,29 +62,15 @@ describe('ModalPageComponent', () => {
     //     expect(routerSpy).toHaveBeenCalledWith(['/config']);
     // });
 
-    // it('should close the dialog on destroy', () => {
-    //     const dialogRefSpyObject = jasmine.createSpyObj({ close: null });
-    //     component.matDialogRef = dialogRefSpyObject;
+    it('should close the dialog on destroy', () => {
+        component.matDialogRef = dialogRefSpyObject;
 
-    //     component.ngOnDestroy();
+        component.ngOnDestroy();
 
-    //     expect(dialogRefSpyObject.close).toHaveBeenCalledWith(component.data);
-    // });
+        expect(dialogRefSpyObject.close).toHaveBeenCalledWith(component.data);
+    });
 
     it('createGame should call create game from service and redirection', () => {
-        // expect(gameCardServiceMock.createGame).toHaveBeenCalled();
-
-        // spyOn(gameCardServiceMock, 'createGame');
-        // expect(gameCardServiceMock.createGame).toHaveBeenCalled();
-        // expect(component.redirection).toHaveBeenCalledWith('config');
-        // const gameCardServiceMock = jasmine.createSpyObj('GameCardService', ['createGame']);
-
-        // component.createGame();
-
-        // // Assert
-        // expect(gameCardServiceMock.createGame).toHaveBeenCalled();
-        // expect(component.redirection).toHaveBeenCalledWith('/config');
-
         const redirectionMock = spyOn(component, 'redirection');
         const serviceCreateGameMock = spyOn(gameCardService, 'createGame').and.returnValue(of(GAMES[0]));
         component.createGame();
