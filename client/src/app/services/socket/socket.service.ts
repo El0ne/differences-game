@@ -5,7 +5,7 @@ import { environment } from 'src/environments/environment';
 @Injectable({
     providedIn: 'root',
 })
-export class ChatSocketService {
+export class SocketService {
     sio: Socket;
     names: string[] = [];
     gameRoom: string;
@@ -25,7 +25,7 @@ export class ChatSocketService {
         this.sio.on(eventName, action);
     }
 
-    send<T>(eventName: string, data?: T): void {
+    send<T>(eventName: string, data: T): void {
         if (data) {
             this.sio.emit(eventName, data);
         } else {

@@ -9,7 +9,7 @@ import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-mo
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
-import { ChatSocketService } from '@app/services/socket/socket.service';
+import { SocketService } from '@app/services/socket/socket.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { RoomMessage, Validation } from '@common/chat-gateway-constants';
 import { differenceInformation } from '@common/difference-information';
@@ -55,7 +55,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         public dialog: MatDialog,
         public router: Router,
-        private chat: ChatSocketService,
+        private chat: SocketService,
     ) {}
 
     get socketId() {
