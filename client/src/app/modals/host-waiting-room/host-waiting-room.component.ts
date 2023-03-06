@@ -1,7 +1,7 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { SocketService } from '@app/services/socket/socket.service';
-import { OpponentApproval, PlayerInformations, WaitingRoomEvents } from '@common/waiting-room-socket-communication';
+import { PlayerInformations, WaitingRoomEvents } from '@common/waiting-room-socket-communication';
 
 export interface WaitingRoomDataPassing {
     stageId: string;
@@ -55,15 +55,15 @@ export class HostWaitingRoomComponent implements OnInit, OnDestroy {
     }
 
     handleCancel(): void {
-        this.socket.send(this.waitingRoomInfo.isHost ? WaitingRoomEvents.UnhostGame : WaitingRoomEvents.QuitHost, this.waitingRoomInfo.stageId);
+        this.socket.send(this.waitingRoomInfo.isHost ? WaitingRoomEvents.UnhostGame : WaitingRoomEvents.QuitHost);
         this.dialogRef.close();
     }
 
     acceptOpponent(opponentId: string): void {
-        this.socket.send<OpponentApproval>(WaitingRoomEvents.AcceptOpponent, { opponentId, stageId: this.waitingRoomInfo.stageId });
+        this.socket.send<string>(WaitingRoomEvents.AcceptOpponent, opponentId);
     }
     declineOpponent(opponentId: string): void {
-        this.socket.send(WaitingRoomEvents.DeclineOpponent, opponentId);
+        this.socket.send<string>(WaitingRoomEvents.DeclineOpponent, opponentId);
         this.clientsInWaitingRoom.delete(opponentId);
     }
 }

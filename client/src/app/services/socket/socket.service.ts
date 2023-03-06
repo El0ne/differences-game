@@ -28,7 +28,7 @@ export class SocketService {
         this.sio.off(eventName);
     }
 
-    send<T>(eventName: string, data: T): void {
+    send<T>(eventName: string, data?: T): void {
         if (data) {
             this.sio.emit(eventName, data);
         } else {

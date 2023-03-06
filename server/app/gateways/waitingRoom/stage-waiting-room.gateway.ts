@@ -1,12 +1,12 @@
-import { JoinHostInWaitingRequest, OpponentApproval, PlayerInformations, WaitingRoomEvents } from '@common/waiting-room-socket-communication';
+import { JoinHostInWaitingRequest, PlayerInformations, WaitingRoomEvents } from '@common/waiting-room-socket-communication';
 import { Logger } from '@nestjs/common';
 import { Injectable } from '@nestjs/common/decorators';
-import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { randomUUID } from 'crypto';
 import { Server, Socket } from 'socket.io';
 @WebSocketGateway()
 @Injectable()
-export class StageWaitingRoomGateway {
+export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
     gameHosts: Map<string, string> = new Map<string, string>(); // <stageId, hostSocketId>
 
@@ -27,50 +27,60 @@ export class StageWaitingRoomGateway {
     hostGame(@ConnectedSocket() socket: Socket, @MessageBody() stageId: string): void {
         this.logger.log(`game created by ${socket.id}`);
         this.gameHosts.set(stageId, socket.id);
+        socket.data.stageInHosting = stageId;
         socket.to(stageId).emit(WaitingRoomEvents.GameCreated, stageId);
     }
 
     @SubscribeMessage(WaitingRoomEvents.UnhostGame)
-    unhostGame(@ConnectedSocket() socket: Socket, @MessageBody() stageId: string): void {
+    unhostGame(@ConnectedSocket() socket: Socket): void {
         this.logger.log(`game deleted by ${socket.id}`);
-        this.gameHosts.delete(stageId);
-        socket.to(stageId).emit(WaitingRoomEvents.GameDeleted, stageId);
-        socket.to(stageId).emit(WaitingRoomEvents.MatchRefused, "la partie n'a plus d'hôte");
+        this.gameHosts.delete(socket.data.stageInHosting);
+        socket.to(socket.data.stageInHosting).emit(WaitingRoomEvents.MatchRefused, "la partie n'a plus d'hôte");
+        socket.to(socket.data.stageInHosting).emit(WaitingRoomEvents.GameDeleted, socket.data.stageInHosting);
+        socket.data.stageInHosting = undefined;
     }
 
     @SubscribeMessage(WaitingRoomEvents.JoinHost)
     joinHost(@ConnectedSocket() socket: Socket, @MessageBody() joinRequest: JoinHostInWaitingRequest): void {
         this.logger.log(`game ${joinRequest.stageId} joined by ${joinRequest.playerName}`);
+        socket.data.stageInWaiting = joinRequest.stageId;
         const playerInformations: PlayerInformations = { playerName: joinRequest.playerName, playerSocketId: socket.id };
         socket.to(this.gameHosts.get(joinRequest.stageId)).emit(WaitingRoomEvents.RequestMatch, playerInformations);
     }
 
     @SubscribeMessage(WaitingRoomEvents.QuitHost)
-    quitHost(@ConnectedSocket() socket: Socket, @MessageBody() stageId: string): void {
-        this.logger.log(`game ${stageId} quited by ${socket.id}`);
-        socket.to(this.gameHosts.get(stageId)).emit(WaitingRoomEvents.UnrequestMatch, socket.id);
+    quitHost(@ConnectedSocket() socket: Socket): void {
+        this.logger.log(`game ${socket.data.stageInWaiting} quited by ${socket.id}`);
+        socket.to(this.gameHosts.get(socket.data.stageInWaiting)).emit(WaitingRoomEvents.UnrequestMatch, socket.id);
     }
 
     @SubscribeMessage(WaitingRoomEvents.AcceptOpponent)
-    acceptOpponent(@ConnectedSocket() socket: Socket, @MessageBody() approval: OpponentApproval): void {
-        this.logger.log(`${socket.id} accepted ${approval.opponentId}`);
-        const opponentSocket: Socket = this.server.sockets.sockets.get(approval.opponentId);
-        if (opponentSocket) {
-            this.clearRooms(socket);
-            this.clearRooms(opponentSocket);
-            const roomId = randomUUID();
-            socket.join(roomId);
-            opponentSocket.join(roomId);
-            socket.to(approval.opponentId).emit(WaitingRoomEvents.MatchAccepted);
-            socket.to(approval.stageId).emit(WaitingRoomEvents.MatchRefused, "l'hôte a trouvé un autre adversaire");
-            this.gameHosts.delete(approval.stageId);
-        }
+    acceptOpponent(@ConnectedSocket() socket: Socket, @MessageBody() opponentId: string): void {
+        this.logger.log(`${socket.id} accepted ${opponentId}`);
+        const opponentSocket: Socket = this.server.sockets.sockets.get(opponentId);
+        this.clearRooms(socket);
+        this.clearRooms(opponentSocket);
+        const roomId = randomUUID();
+        socket.join(roomId);
+        opponentSocket.join(roomId);
+        socket.to(opponentId).emit(WaitingRoomEvents.MatchAccepted);
+        socket.to(socket.data.stageInHosting).emit(WaitingRoomEvents.MatchRefused, "l'hôte a trouvé un autre adversaire");
+        socket.to(socket.data.stageInHosting).emit(WaitingRoomEvents.GameDeleted, socket.data.stageInHosting);
+        this.gameHosts.delete(socket.data.stageInHosting);
     }
 
     @SubscribeMessage(WaitingRoomEvents.DeclineOpponent)
     declineOpponent(@ConnectedSocket() socket: Socket, @MessageBody() opponentId: string): void {
         this.logger.log(`${socket.id} refused ${opponentId}`);
         socket.to(opponentId).emit(WaitingRoomEvents.MatchRefused, "l'hôte ne souhaite pas faire une partie avec vous");
+    }
+
+    handleDisconnect(socket: Socket) {
+        if (socket.data.stageInHosting) {
+            this.unhostGame(socket);
+        } else if (socket.data.stageInWaiting) {
+            this.quitHost(socket);
+        }
     }
 
     clearRooms(socket: Socket): void {

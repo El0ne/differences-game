@@ -24,7 +24,7 @@ export class GameCardSelectionComponent implements OnInit {
 
     hostOrJoinGame() {
         if (this.createGameButton) {
-            this.socket.send(WaitingRoomEvents.HostGame, this.gameCardInformation.id);
+            this.socket.send<string>(WaitingRoomEvents.HostGame, this.gameCardInformation.id);
         } else {
             this.socket.send<JoinHostInWaitingRequest>(WaitingRoomEvents.JoinHost, {
                 stageId: this.gameCardInformation.id,
