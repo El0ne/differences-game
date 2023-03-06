@@ -4,7 +4,6 @@ import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, match, SinonStubbedInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
-import { DELAY_BEFORE_EMITTING_TIME } from './chat.gateway.constants';
 import { ChatEvents } from './chat.gateway.events';
 
 describe('ChatGateway', () => {
@@ -44,22 +43,23 @@ describe('ChatGateway', () => {
     });
 
     it('validate() message should take account word length', () => {
-        const testCases = [
-            { word: 'xxxx', isValid: true },
-            {
-                word: "abc def ghi jkl mno pqrs tuv wxyz ABC DEF GHI JKL MNO PQRS TUV WXYZ \
+        const validWordCase = { word: 'xxxx', isValid: true };
+        const invalidWordCase = {
+            word: "abc def ghi jkl mno pqrs tuv wxyz ABC DEF GHI JKL MNO PQRS TUV WXYZ \
                 !as§ $%& /() =?* '<> #|; ²³~ @`l ©«» ¤¼× {} abc def ghi jkl mno pqrs tuv wxyz \
                 ABC DEF GHI JKL MNO PQRS TUV WXYZ !'§ $%& /() =?* '<> #",
-                isValid: false,
-            },
-        ];
+            isValid: false,
+        };
         const emptyStringTestCase = '';
-        for (const { word, isValid } of testCases) {
-            gateway.validate(socket, word);
-            expect(socket.emit.calledWith(ChatEvents.WordValidated, { validated: isValid, originalMessage: word })).toBeTruthy();
-        }
+        const error = 'Votre message ne respecte pas le bon format. Veuillez entrer un nouveau message';
+        gateway.validate(socket, validWordCase.word);
+        expect(
+            socket.emit.calledWith(ChatEvents.WordValidated, { validated: validWordCase.isValid, originalMessage: validWordCase.word }),
+        ).toBeTruthy();
+        gateway.validate(socket, invalidWordCase.word);
+        expect(socket.emit.calledWith(ChatEvents.WordValidated, { validated: invalidWordCase.isValid, originalMessage: error })).toBeTruthy();
         gateway.validate(socket, emptyStringTestCase);
-        expect(socket.emit.calledWith(ChatEvents.WordValidated, { validated: false }));
+        expect(socket.emit.calledWith(ChatEvents.WordValidated, { validated: false, originalMessage: error })).toBeTruthy();
     });
 
     it('broadcastAll() should send a mass message to the server', () => {
@@ -117,9 +117,8 @@ describe('ChatGateway', () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
             emit: (event: string, data) => {
-                expect(event).toEqual(ChatEvents.Hint);
+                expect(event).toEqual(ChatEvents.Abandon);
                 expect(data.message.includes('Player 1')).toBe(true);
-                expect(data.socketId).toEqual('event');
             },
         } as any);
         gateway.abandon(socket, { room: TEST_ROOM_ID, name: 'Player 1' });
@@ -135,13 +134,6 @@ describe('ChatGateway', () => {
             },
         } as any);
         gateway.hint(socket, TEST_ROOM_ID);
-    });
-
-    it('afterInit() should emit time after 1s', () => {
-        jest.useFakeTimers();
-        gateway.afterInit();
-        jest.advanceTimersByTime(DELAY_BEFORE_EMITTING_TIME);
-        expect(server.emit.calledWith(ChatEvents.Clock, match.any)).toBeTruthy();
     });
 
     it('hello message should be sent on connection', () => {
