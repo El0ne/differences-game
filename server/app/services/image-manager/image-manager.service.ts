@@ -4,6 +4,8 @@ import * as fs from 'fs';
 @Injectable()
 export class ImageManagerService {
     deleteImage(imagePath: string): void {
-        fs.unlink(`assets/images/${imagePath}`, () => {});
+        fs.unlink(`assets/images/${imagePath}`, (err) => {
+            throw err;
+        });
     }
 }
