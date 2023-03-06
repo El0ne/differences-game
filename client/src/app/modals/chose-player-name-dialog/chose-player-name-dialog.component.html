@@ -2,9 +2,11 @@
     <div class="info">
         <p class="title">Entrez votre nom</p>
     </div>
-    <input type="text" class="name-field" placeholder="Entrez votre nom" [(ngModel)]="playerName" cdkFocusInitial />
-    <p class="title" *ngIf="showNameErrorMessage">Nom invalide</p>
-    <button class="option-buttons win-button" id="info-quit" type="button" (click)="validateName()">
-        <mat-icon class="icon">check</mat-icon>
-    </button>
+    <div class="input">
+        <input type="text" class="name-field" placeholder="Entrez votre nom" [(ngModel)]="playerName" cdkFocusInitial />
+        <p class="title" *ngIf="showNameErrorMessage">Nom invalide</p>
+        <button class="option-buttons win-button" id="info-quit" type="button" (click)="validateName()">
+            <mat-icon class="icon">check</mat-icon>
+        </button>
+    </div>
 </div>

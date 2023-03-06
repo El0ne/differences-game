@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
-import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
@@ -68,13 +67,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.numberOfDifferences = this.gameCardInfo.differenceNumber;
             });
         }
-
-        const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true });
-        dialogRef.afterClosed().subscribe((result: string) => {
-            this.playerName = result;
-            this.showTime();
-            this.connect();
-        });
     }
 
     connect() {

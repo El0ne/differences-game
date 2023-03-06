@@ -1,5 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { HostWaitingRoomComponent, WaitingRoomDataPassing } from '@app/modals/host-waiting-room/host-waiting-room.component';
 import { STAGE } from '@app/services/server-routes';
 import { SocketService } from '@app/services/socket/socket.service';
@@ -17,7 +19,9 @@ export class GameCardSelectionComponent implements OnInit {
     image: string = '';
     createGameButton: boolean = true;
 
-    constructor(public socket: SocketService, public dialog: MatDialog) {}
+    playerName: string = 'Player';
+
+    constructor(public socket: SocketService, public dialog: MatDialog, public router: Router) {}
     ngOnInit() {
         this.image = `${STAGE}/image/${this.gameCardInformation.originalImageName}`;
     }
@@ -35,6 +39,13 @@ export class GameCardSelectionComponent implements OnInit {
         this.dialog.open(HostWaitingRoomComponent, { disableClose: true, data });
     }
 
+    selectPlayerName() {
+        const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true });
+        dialogRef.afterClosed().subscribe((result: string) => {
+            this.playerName = result;
+            this.router.navigate(['/soloview/' + this.gameCardInformation.id]);
+        });
+    }
     // TODO: ajouter la logique pour que le reset des temps et le delete se fait pour le sprint 2
 
     // TODO: Ajouter la logique pour que les temps de configurations viennent du database pour dynamiquement les loader.
