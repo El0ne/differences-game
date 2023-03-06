@@ -73,7 +73,9 @@ describe('ModalPageComponent', () => {
     it('createGame should call create game from service and redirection', () => {
         const redirectionMock = spyOn(component, 'redirection');
         const serviceCreateGameMock = spyOn(gameCardService, 'createGame').and.returnValue(of(GAMES[0]));
+
         component.createGame();
+
         expect(serviceCreateGameMock).toHaveBeenCalled();
         expect(redirectionMock).toHaveBeenCalledWith('/config');
     });

@@ -1,4 +1,4 @@
-import { Component, Inject, OnDestroy } from '@angular/core';
+import { Component, Inject, NgZone, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
@@ -22,6 +22,7 @@ export class ModalPageComponent implements OnDestroy {
         public matDialogRef: MatDialogRef<ModalPageComponent>,
         public router: Router,
         private gameCardService: GameCardInformationService,
+        private ngZone: NgZone,
     ) {}
 
     ngOnDestroy() {
@@ -41,7 +42,9 @@ export class ModalPageComponent implements OnDestroy {
         this.matDialogRef.close(this.data);
         this.matDialogRef.afterClosed().subscribe((result) => {
             result.image = '';
-            this.router.navigate([path]);
+            this.ngZone.run(() => {
+                this.router.navigate([path]);
+            });
         });
     }
 }
