@@ -54,7 +54,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     ) {}
 
     get socketId() {
-        return this.chat.sio.id ? this.chat.sio.id : '';
+        return this.chat.socketId;
     }
 
     ngOnInit(): void {

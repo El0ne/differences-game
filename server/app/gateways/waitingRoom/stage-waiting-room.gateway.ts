@@ -1,4 +1,4 @@
-import { JoinHostInWaitingRequest, PlayerInformations, WaitingRoomEvents } from '@common/waiting-room-socket-communication';
+import { AcceptationInformation, JoinHostInWaitingRequest, PlayerInformations, WaitingRoomEvents } from '@common/waiting-room-socket-communication';
 import { Logger } from '@nestjs/common';
 import { Injectable } from '@nestjs/common/decorators';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -55,15 +55,17 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
     }
 
     @SubscribeMessage(WaitingRoomEvents.AcceptOpponent)
-    acceptOpponent(@ConnectedSocket() socket: Socket, @MessageBody() opponentId: string): void {
-        this.logger.log(`${socket.id} accepted ${opponentId}`);
-        const opponentSocket: Socket = this.server.sockets.sockets.get(opponentId);
+    acceptOpponent(@ConnectedSocket() socket: Socket, @MessageBody() acceptation: PlayerInformations): void {
+        this.logger.log(`${socket.id} accepted ${acceptation.playerSocketId}`);
+        const opponentSocket: Socket = this.server.sockets.sockets.get(acceptation.playerSocketId);
         this.clearRooms(socket);
         this.clearRooms(opponentSocket);
         const roomId = randomUUID();
         socket.join(roomId);
         opponentSocket.join(roomId);
-        socket.to(opponentId).emit(WaitingRoomEvents.MatchAccepted);
+        const acceptationInfo: AcceptationInformation = { playerName: acceptation.playerName, playerSocketId: socket.id, roomId };
+        socket.to(acceptation.playerSocketId).emit(WaitingRoomEvents.MatchAccepted, acceptationInfo);
+        socket.emit(WaitingRoomEvents.MatchConfirmed, roomId);
         socket.to(socket.data.stageInHosting).emit(WaitingRoomEvents.MatchRefused, "l'hôte a trouvé un autre adversaire");
         socket.to(socket.data.stageInHosting).emit(WaitingRoomEvents.GameDeleted, socket.data.stageInHosting);
         this.gameHosts.delete(socket.data.stageInHosting);

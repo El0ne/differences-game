@@ -1,7 +1,8 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { SocketService } from '@app/services/socket/socket.service';
-import { PlayerInformations, WaitingRoomEvents } from '@common/waiting-room-socket-communication';
+import { AcceptationInformation, PlayerInformations, WaitingRoomEvents } from '@common/waiting-room-socket-communication';
 
 export interface WaitingRoomDataPassing {
     stageId: string;
@@ -17,8 +18,10 @@ export class HostWaitingRoomComponent implements OnInit, OnDestroy {
     clientsInWaitingRoom: Map<string, string> = new Map<string, string>();
     waitingRoomInfo: WaitingRoomDataPassing;
 
+    // eslint-disable-next-line max-params
     constructor(
         public dialogRef: MatDialogRef<HostWaitingRoomComponent>,
+        public router: Router,
         public socket: SocketService,
         @Inject(MAT_DIALOG_DATA) data: WaitingRoomDataPassing,
     ) {
@@ -34,9 +37,17 @@ export class HostWaitingRoomComponent implements OnInit, OnDestroy {
             this.socket.listen(WaitingRoomEvents.UnrequestMatch, (opponentId: string) => {
                 this.clientsInWaitingRoom.delete(opponentId);
             });
+
+            this.socket.listen(WaitingRoomEvents.MatchConfirmed, (roomId: string) => {
+                this.socket.gameRoom = roomId;
+                this.router.navigate(['/1v1/' + this.waitingRoomInfo.stageId]);
+                this.dialogRef.close();
+            });
         } else {
-            this.socket.listen(WaitingRoomEvents.MatchAccepted, () => {
-                alert('match accepte');
+            this.socket.listen<AcceptationInformation>(WaitingRoomEvents.MatchAccepted, (acceptationInfo: AcceptationInformation) => {
+                this.socket.names.set(acceptationInfo.playerSocketId, acceptationInfo.playerName);
+                this.socket.gameRoom = acceptationInfo.roomId;
+                this.router.navigate(['/1v1/' + this.waitingRoomInfo.stageId]);
                 this.dialogRef.close();
             });
 
@@ -52,6 +63,7 @@ export class HostWaitingRoomComponent implements OnInit, OnDestroy {
         this.socket.delete(WaitingRoomEvents.UnrequestMatch);
         this.socket.delete(WaitingRoomEvents.MatchAccepted);
         this.socket.delete(WaitingRoomEvents.MatchRefused);
+        this.socket.delete(WaitingRoomEvents.MatchConfirmed);
     }
 
     handleCancel(): void {
@@ -60,7 +72,11 @@ export class HostWaitingRoomComponent implements OnInit, OnDestroy {
     }
 
     acceptOpponent(opponentId: string): void {
-        this.socket.send<string>(WaitingRoomEvents.AcceptOpponent, opponentId);
+        this.socket.send<PlayerInformations>(WaitingRoomEvents.AcceptOpponent, {
+            playerSocketId: opponentId,
+            playerName: this.socket.names.get(this.socket.socketId) as string,
+        });
+        this.socket.names.set(opponentId, this.clientsInWaitingRoom.get(opponentId) as string);
     }
     declineOpponent(opponentId: string): void {
         this.socket.send<string>(WaitingRoomEvents.DeclineOpponent, opponentId);

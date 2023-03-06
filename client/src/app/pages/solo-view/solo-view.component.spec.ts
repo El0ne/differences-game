@@ -1,12 +1,11 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
-import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameCardInformation } from '@common/game-card';
@@ -17,8 +16,6 @@ import { SoloViewComponent } from './solo-view.component';
 describe('SoloViewComponent', () => {
     let component: SoloViewComponent;
     let fixture: ComponentFixture<SoloViewComponent>;
-    let modalSpy: MatDialog;
-    let afterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
     let mockService: GameCardInformationService;
     const mockActivatedRoute = { snapshot: { paramMap: { get: () => '234' } } };
     const mockRouter = { url: '1v1/234' };
@@ -28,17 +25,12 @@ describe('SoloViewComponent', () => {
         mockService.getGameCardInfoFromId = () => {
             return of(SERVICE_MOCK_GAME_CARD);
         };
-        modalSpy = jasmine.createSpyObj('MatDialog', ['open']);
-        afterClosedSpy = jasmine.createSpyObj('MatDialogRef<ChosePlayerNameDialogComponent>', ['afterClosed']);
-        afterClosedSpy.afterClosed = () => of('test');
-        modalSpy.open = () => afterClosedSpy;
 
         await TestBed.configureTestingModule({
-            declarations: [SoloViewComponent, ClickEventComponent, ChosePlayerNameDialogComponent],
+            declarations: [SoloViewComponent, ClickEventComponent],
             imports: [FormsModule, HttpClientTestingModule, RouterTestingModule, MatIconModule, MatDialogModule],
             providers: [
                 { provide: ClickEventService },
-                { provide: MatDialog, useValue: modalSpy },
                 { provide: ActivatedRoute, useValue: mockActivatedRoute },
                 { provide: Router, useValue: mockRouter },
                 { provide: GameCardInformationService, useValue: mockService },
@@ -148,10 +140,6 @@ describe('SoloViewComponent', () => {
         component.finishGame();
         expect(component.showNavBar).toBeFalse();
         expect(component.showWinMessage).toBeTrue();
-    });
-
-    it('the playerName should be initialized after the modal is closed', () => {
-        expect(component.playerName).toBe('test');
     });
 
     it('showTime should call startTimer of service', () => {

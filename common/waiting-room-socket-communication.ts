@@ -12,11 +12,16 @@ export enum WaitingRoomEvents {
     DeclineOpponent = 'declineOpponent',
     MatchAccepted = 'matchAccepted',
     MatchRefused = 'matchRefused',
+    MatchConfirmed = 'matchConfirmed',
 }
 
 export interface PlayerInformations {
     playerName: string;
     playerSocketId: string;
+}
+
+export interface AcceptationInformation extends PlayerInformations {
+    roomId: string;
 }
 
 export interface JoinHostInWaitingRequest {

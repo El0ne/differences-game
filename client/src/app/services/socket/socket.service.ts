@@ -7,8 +7,12 @@ import { environment } from 'src/environments/environment';
 })
 export class SocketService {
     sio: Socket;
-    names: string[];
+    names: Map<string, string> = new Map<string, string>();
     gameRoom: string;
+
+    get socketId() {
+        return this.sio.id ? this.sio.id : '';
+    }
 
     connect() {
         this.sio = io(environment.serverUrl, { transports: ['websocket'], upgrade: false });
@@ -16,6 +20,7 @@ export class SocketService {
 
     disconnect() {
         this.sio.disconnect();
+        this.names.clear();
     }
 
     liveSocket() {

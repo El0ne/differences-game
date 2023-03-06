@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
+import { SocketService } from '@app/services/socket/socket.service';
 
 @Component({
     selector: 'app-chose-player-name-dialog',
@@ -9,12 +10,13 @@ import { MatDialogRef } from '@angular/material/dialog';
 export class ChosePlayerNameDialogComponent {
     showNameErrorMessage: boolean = false;
     playerName: string = '';
-    constructor(public dialogRef: MatDialogRef<ChosePlayerNameDialogComponent>) {}
+    constructor(public dialogRef: MatDialogRef<ChosePlayerNameDialogComponent>, public socket: SocketService) {}
 
     validateName(): void {
         const testName = this.playerName;
         if (testName.replace(/\s/g, '') !== '') {
-            this.dialogRef.close(this.playerName);
+            this.socket.names.set(this.socket.socketId, testName);
+            this.dialogRef.close();
         } else {
             this.showNameErrorMessage = true;
         }
