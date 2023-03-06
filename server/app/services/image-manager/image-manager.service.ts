@@ -5,7 +5,6 @@ import * as fs from 'fs';
 export class ImageManagerService {
     async deleteImage(imagePath: string): Promise<void> {
         await fs.unlink(`assets/images/${imagePath}`, (err) => {
-            console.log('deleted');
             console.log(err);
         });
     }

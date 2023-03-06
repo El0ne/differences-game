@@ -86,7 +86,6 @@ export class StageController {
         ),
     )
     async uploadImages(@UploadedFiles() files: ImageUploadDto, @Param() param, @Res() res: Response): Promise<void> {
-        console.log('here');
         try {
             if (Object.keys(files).length) {
                 const differencesArray = await this.differenceService.compareImages(

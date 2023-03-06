@@ -201,7 +201,7 @@ describe('StageController', () => {
     });
 
     it('deleteImage() should call imageManagerService.deleteImage() with the image name as a parameter', async () => {
-        jest.spyOn(imageManagerService, 'deleteImage'); // .mockResolvedValue(undefined);
+        jest.spyOn(imageManagerService, 'deleteImage');
 
         const response = await request(httpServer).del('/stage/image/test.bmp');
 
@@ -210,8 +210,9 @@ describe('StageController', () => {
     });
 
     it('deleteImage() should return 500 if the request is invalid', async () => {
-        jest.spyOn(imageManagerService, 'deleteImage');
-
+        jest.spyOn(imageManagerService, 'deleteImage').mockImplementationOnce(() => {
+            throw new Error();
+        });
         const wrongImage = 'wrong_image.bmp';
         const response = await request(httpServer).delete(`/stage/image/${wrongImage}`);
 
