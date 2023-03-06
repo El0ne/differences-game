@@ -20,8 +20,15 @@ export class GameCreationPageComponent implements AfterViewInit {
     @ViewChild('drawingCanvas2') drawnCanvas: ElementRef;
 
     isPenEnabled: boolean = false;
+    isPainting: boolean = false;
+
     isRectEnabled: boolean = false;
+    widthRect: number = 50;
+    heightRect: number = 60;
+
     isEraserEnabled: boolean = false;
+    isErasing: boolean = false;
+
     color: string = '#ff124f';
     drawCtx: CanvasRenderingContext2D;
 
@@ -144,8 +151,24 @@ export class GameCreationPageComponent implements AfterViewInit {
         return true;
     }
 
+    mergeCanvas() {
+        const diffContext = this.myDiffCanvas.nativeElement.getContext('2d');
+        diffContext.drawImage(this.drawnCanvas.nativeElement, 0, 0);
+        // this.drawCtx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height); // just here to verify that merge works well
+        const binaryData = new Uint8Array(
+            this.myDiffCanvas.nativeElement
+                .toDataURL('image/bmp')
+                .split(',')[1]
+                .split('')
+                .map((c: string) => c.charCodeAt(0)),
+        );
+        const blob = new Blob([binaryData], { type: 'image/bmp' });
+        this.differentFile = new File([blob], 'mergedImage.bmp', { type: 'image/bmp' });
+    }
+
     async save(): Promise<void> {
         if (this.saveVerification() && this.originalFile && this.differentFile) {
+            this.mergeCanvas();
             this.isDisabled = true;
             this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
                 if (data.gameDifferenceNumber) {
@@ -172,81 +195,121 @@ export class GameCreationPageComponent implements AfterViewInit {
     }
 
     drawRectangle() {
-        const width = 50;
-        const height = 60;
-        if (this.isRectEnabled) {
-            this.drawnCanvas.nativeElement.addEventListener('click', (e: MouseEvent) => {
-                const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
+        this.drawnCanvas.nativeElement.addEventListener('click', (e: MouseEvent) => {
+            const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
 
-                console.log('rectangle is drawn.', e.clientX - canvasRect.left, e.clientY - canvasRect.top);
-                this.drawCtx.fillRect(e.clientX - canvasRect.left - width / 2, e.clientY - canvasRect.top - height / 2, width, height);
-            });
-        }
+            console.log('rectangle is drawn.', e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+            this.drawCtx.fillRect(
+                e.clientX - canvasRect.left - this.widthRect / 2,
+                e.clientY - canvasRect.top - this.heightRect / 2,
+                this.widthRect,
+                this.heightRect,
+            );
+        });
     }
 
     drawPen() {
-        let isPainting = false;
+        this.drawnCanvas.nativeElement.addEventListener('mousedown', () => {
+            this.isPainting = true;
+        });
 
-        if (this.isPenEnabled) {
-            this.drawnCanvas.nativeElement.addEventListener('mousedown', () => {
-                isPainting = true;
-            });
+        this.drawnCanvas.nativeElement.addEventListener('mouseup', () => {
+            this.isPainting = false;
+            this.drawCtx.beginPath(); // to add later
+        });
 
-            this.drawnCanvas.nativeElement.addEventListener('mouseup', () => {
-                isPainting = false;
-                this.drawCtx.beginPath(); // to add later
-            });
+        this.drawnCanvas.nativeElement.addEventListener('mousemove', (e: MouseEvent) => {
+            if (this.isPainting) {
+                const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
 
-            this.drawnCanvas.nativeElement.addEventListener('mousemove', (e: MouseEvent) => {
-                if (isPainting) {
-                    const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
+                this.drawCtx.lineWidth = 10;
+                this.drawCtx.lineCap = 'round';
+                this.drawCtx.strokeStyle = this.color;
 
-                    this.drawCtx.lineWidth = 10;
-                    this.drawCtx.lineCap = 'round';
-                    this.drawCtx.strokeStyle = this.color;
-
-                    this.drawCtx.lineTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
-                    this.drawCtx.stroke();
-                    this.drawCtx.beginPath();
-                    this.drawCtx.moveTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
-                }
-            });
-        }
+                this.drawCtx.lineTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+                this.drawCtx.stroke();
+                this.drawCtx.beginPath();
+                this.drawCtx.moveTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+            }
+        });
     }
 
     erase() {
-        let isErasing = false;
-        if (this.isEraserEnabled) {
-            this.drawnCanvas.nativeElement.addEventListener('mousedown', () => {
-                isErasing = true;
-            });
+        this.drawnCanvas.nativeElement.addEventListener('mousedown', () => {
+            this.isErasing = true;
+        });
 
-            this.drawnCanvas.nativeElement.addEventListener('mouseup', () => {
-                isErasing = false;
-            });
+        this.drawnCanvas.nativeElement.addEventListener('mouseup', () => {
+            this.isErasing = false;
+        });
 
-            this.drawnCanvas.nativeElement.addEventListener('mousemove', (e: MouseEvent) => {
-                if (isErasing) {
-                    const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
-                    console.log('isErasing', e.clientX - canvasRect.left, e.clientY - canvasRect.top);
-
-                    this.drawCtx.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, 10, 10);
-                }
-            });
-        }
+        this.drawnCanvas.nativeElement.addEventListener('mousemove', (e: MouseEvent) => {
+            if (this.isErasing) {
+                const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
+                console.log('isErasing', e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+                this.drawCtx.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, 10, 10);
+            }
+        });
     }
 
-    removingEventListener() {
-        this.drawnCanvas.nativeElement.removeEventListener('mousedown', this.drawPen);
-        this.drawnCanvas.nativeElement.removeEventListener('mousemove', this.drawPen);
-        this.drawnCanvas.nativeElement.removeEventListener('mouseup', this.drawPen);
-        this.drawnCanvas.nativeElement.removeEventListener('click', this.drawRectangle);
-        this.drawnCanvas.nativeElement.removeEventListener('mousedown', this.erase);
-        this.drawnCanvas.nativeElement.removeEventListener('mousemove', this.erase);
-        this.drawnCanvas.nativeElement.removeEventListener('mouseup', this.erase);
+    removingListeners() {
+        console.log('eventRemoved');
+        this.drawnCanvas.nativeElement.removeEventListener('mousedown', () => {
+            this.isPainting = true;
+        });
+
+        this.drawnCanvas.nativeElement.removeEventListener('mouseup', () => {
+            this.isPainting = false;
+            this.drawCtx.beginPath(); // to add later
+        });
+
+        this.drawnCanvas.nativeElement.removeEventListener('mousemove', (e: MouseEvent) => {
+            if (this.isPainting) {
+                const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
+
+                this.drawCtx.lineWidth = 10;
+                this.drawCtx.lineCap = 'round';
+                this.drawCtx.strokeStyle = this.color;
+
+                this.drawCtx.lineTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+                this.drawCtx.stroke();
+                this.drawCtx.beginPath();
+                this.drawCtx.moveTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+            }
+        });
+
+        this.drawnCanvas.nativeElement.removeEventListener('click', (e: MouseEvent) => {
+            const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
+
+            console.log('rectangle is drawn.', e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+            this.drawCtx.fillRect(
+                e.clientX - canvasRect.left - this.widthRect / 2,
+                e.clientY - canvasRect.top - this.heightRect / 2,
+                this.widthRect,
+                this.heightRect,
+            );
+        });
+
+        this.drawnCanvas.nativeElement.removeEventListener('mousedown', () => {
+            this.isErasing = true;
+        });
+
+        this.drawnCanvas.nativeElement.removeEventListener('mouseup', () => {
+            this.isErasing = false;
+        });
+
+        this.drawnCanvas.nativeElement.removeEventListener('mousemove', (e: MouseEvent) => {
+            if (this.isErasing) {
+                const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
+                console.log('isErasing', e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+                this.drawCtx.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, 10, 10);
+            }
+        });
     }
 
     toggleButton(id: string) {
+        this.removingListeners();
+
         switch (id) {
             case 'pen':
                 this.isPenEnabled = !this.isPenEnabled;
