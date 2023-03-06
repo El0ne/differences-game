@@ -200,14 +200,14 @@ describe('StageController', () => {
         });
     });
 
-    // it('deleteImage() should call imageManagerService.deleteImage() with the image name as a parameter', async () => {
-    //     jest.spyOn(imageManagerService, 'deleteImage'); // .mockResolvedValue(undefined);
+    it('deleteImage() should call imageManagerService.deleteImage() with the image name as a parameter', async () => {
+        jest.spyOn(imageManagerService, 'deleteImage'); // .mockResolvedValue(undefined);
 
-    //     const response = await request(httpServer).del('/stage/image/test.bmp');
+        const response = await request(httpServer).del('/stage/image/test.bmp');
 
-    //     expect(response.status).toBe(HttpStatus.NO_CONTENT);
-    //     expect(imageManagerService.deleteImage).toHaveBeenCalledWith('test.bmp');
-    // });
+        expect(response.status).toBe(HttpStatus.NO_CONTENT);
+        expect(imageManagerService.deleteImage).toHaveBeenCalledWith('test.bmp');
+    });
 
     it('deleteImage() should return 500 if the request is invalid', async () => {
         jest.spyOn(imageManagerService, 'deleteImage');
