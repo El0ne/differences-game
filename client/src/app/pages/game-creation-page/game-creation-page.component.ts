@@ -3,7 +3,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
-import { STAGE } from '@app/services/server-routes';
 import { GameCardDto } from '@common/game-card.dto';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 import { GC_PATHS } from './game-creation-constants';
@@ -20,16 +19,15 @@ export class GameCreationPageComponent implements AfterViewInit {
     @ViewChild('drawingCanvas2') drawnCanvas: ElementRef;
 
     isPenEnabled: boolean = false;
-    isPainting: boolean = false;
-
     isRectEnabled: boolean = false;
-    widthRect: number = 50;
-    heightRect: number = 60;
-
     isEraserEnabled: boolean = false;
-    isErasing: boolean = false;
+
+    isUserClicking: boolean = false;
+    rectInitialPosX: number;
+    rectInitialPosY: number;
 
     color: string = '#ff124f';
+
     drawCtx: CanvasRenderingContext2D;
 
     readonly paths = GC_PATHS;
@@ -48,6 +46,8 @@ export class GameCreationPageComponent implements AfterViewInit {
     difficulty: string = '';
 
     createdGameInfo: GameCardDto;
+
+    private listener: (e: MouseEvent) => void;
 
     constructor(public gameCardService: GameCardInformationService, private matDialog: MatDialog, public router: Router) {}
 
@@ -168,83 +168,116 @@ export class GameCreationPageComponent implements AfterViewInit {
 
     async save(): Promise<void> {
         if (this.saveVerification() && this.originalFile && this.differentFile) {
+            console.log(this.differentFile);
             this.mergeCanvas();
+            console.log(this.differentFile);
+
             this.isDisabled = true;
-            this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
-                if (data.gameDifferenceNumber) {
-                    this.createdGameInfo = {
-                        _id: data.gameId,
-                        name: this.gameTitle,
-                        difficulty: data.gameDifficulty,
-                        baseImage: data.originalImageName,
-                        differenceImage: data.differenceImageName,
-                        radius: this.radius,
-                        differenceNumber: data.gameDifferenceNumber,
-                    };
-                    this.difficulty = data.gameDifficulty;
-                    this.differenceNumber = data.gameDifferenceNumber;
-                    this.image = `${STAGE}/image/difference-image.bmp`;
-                    this.gameCardService.createGame(this.createdGameInfo).subscribe();
-                    this.openModal();
-                } else {
-                    this.isDisabled = false;
-                    alert("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
-                }
-            });
+            // this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
+            //     if (data.gameDifferenceNumber) {
+            //         this.createdGameInfo = {
+            //             _id: data.gameId,
+            //             name: this.gameTitle,
+            //             difficulty: data.gameDifficulty,
+            //             baseImage: data.originalImageName,
+            //             differenceImage: data.differenceImageName,
+            //             radius: this.radius,
+            //             differenceNumber: data.gameDifferenceNumber,
+            //         };
+            //         this.difficulty = data.gameDifficulty;
+            //         this.differenceNumber = data.gameDifferenceNumber;
+            //         this.image = `${STAGE}/image/difference-image.bmp`;
+            //         this.gameCardService.createGame(this.createdGameInfo).subscribe();
+            //         this.openModal();
+            //     } else {
+            //         this.isDisabled = false;
+            //         alert("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
+            //     }
+            // });
+        }
+    }
+
+    startRec(e: MouseEvent) {
+        this.isUserClicking = true;
+        this.rectInitialPosX = e.clientX;
+        this.rectInitialPosY = e.clientY;
+    }
+
+    stopRec() {
+        this.isUserClicking = false;
+    }
+
+    paintRectangle(e: MouseEvent) {
+        if (this.isUserClicking) {
+            const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
+            this.drawCtx.strokeRect(
+                this.rectInitialPosX,
+                this.rectInitialPosY,
+                e.clientX - canvasRect.left - this.rectInitialPosX,
+                e.clientY - canvasRect.top - this.rectInitialPosY,
+            );
         }
     }
 
     drawRectangle() {
-        this.drawnCanvas.nativeElement.addEventListener('click', (e: MouseEvent) => {
+        console.log('inDrawRectangle', this);
+
+        this.listener = this.startRec.bind(this);
+        this.drawnCanvas.nativeElement.addEventListener('mousedown', this.listener);
+
+        this.listener = this.stopRec.bind(this);
+        this.drawnCanvas.nativeElement.addEventListener('mouseup', this.listener);
+
+        this.listener = this.paintRectangle.bind(this);
+        this.drawnCanvas.nativeElement.addEventListener('mousemove', this.listener);
+    }
+
+    startPen() {
+        this.isUserClicking = true;
+    }
+
+    stopPen() {
+        this.isUserClicking = false;
+        this.drawCtx.beginPath();
+    }
+
+    writing(e: MouseEvent) {
+        if (this.isUserClicking) {
             const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
 
-            console.log('rectangle is drawn.', e.clientX - canvasRect.left, e.clientY - canvasRect.top);
-            this.drawCtx.fillRect(
-                e.clientX - canvasRect.left - this.widthRect / 2,
-                e.clientY - canvasRect.top - this.heightRect / 2,
-                this.widthRect,
-                this.heightRect,
-            );
-        });
+            this.drawCtx.lineWidth = 10;
+            this.drawCtx.lineCap = 'round';
+            this.drawCtx.strokeStyle = this.color;
+
+            this.drawCtx.lineTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+            this.drawCtx.stroke();
+            this.drawCtx.beginPath();
+            this.drawCtx.moveTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+        }
     }
 
     drawPen() {
-        this.drawnCanvas.nativeElement.addEventListener('mousedown', () => {
-            this.isPainting = true;
-        });
+        this.listener = this.startPen.bind(this);
+        this.drawnCanvas.nativeElement.addEventListener('mousedown', this.listener);
 
-        this.drawnCanvas.nativeElement.addEventListener('mouseup', () => {
-            this.isPainting = false;
-            this.drawCtx.beginPath(); // to add later
-        });
+        this.listener = this.stopPen.bind(this);
+        this.drawnCanvas.nativeElement.addEventListener('mouseup', this.listener);
 
-        this.drawnCanvas.nativeElement.addEventListener('mousemove', (e: MouseEvent) => {
-            if (this.isPainting) {
-                const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
-
-                this.drawCtx.lineWidth = 10;
-                this.drawCtx.lineCap = 'round';
-                this.drawCtx.strokeStyle = this.color;
-
-                this.drawCtx.lineTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
-                this.drawCtx.stroke();
-                this.drawCtx.beginPath();
-                this.drawCtx.moveTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
-            }
-        });
+        this.listener = this.writing.bind(this);
+        this.drawnCanvas.nativeElement.addEventListener('mousemove', this.listener);
     }
 
     erase() {
         this.drawnCanvas.nativeElement.addEventListener('mousedown', () => {
-            this.isErasing = true;
+            this.isUserClicking = true;
         });
 
         this.drawnCanvas.nativeElement.addEventListener('mouseup', () => {
-            this.isErasing = false;
+            this.isUserClicking = false;
         });
 
         this.drawnCanvas.nativeElement.addEventListener('mousemove', (e: MouseEvent) => {
-            if (this.isErasing) {
+            if (this.isUserClicking) {
                 const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
                 console.log('isErasing', e.clientX - canvasRect.left, e.clientY - canvasRect.top);
                 this.drawCtx.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, 10, 10);
@@ -253,58 +286,12 @@ export class GameCreationPageComponent implements AfterViewInit {
     }
 
     removingListeners() {
-        console.log('eventRemoved');
-        this.drawnCanvas.nativeElement.removeEventListener('mousedown', () => {
-            this.isPainting = true;
-        });
+        // console.log('listeners removed');
+        // this.drawnCanvas.nativeElement.removeEventListener('click', this.listener);
 
-        this.drawnCanvas.nativeElement.removeEventListener('mouseup', () => {
-            this.isPainting = false;
-            this.drawCtx.beginPath(); // to add later
-        });
-
-        this.drawnCanvas.nativeElement.removeEventListener('mousemove', (e: MouseEvent) => {
-            if (this.isPainting) {
-                const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
-
-                this.drawCtx.lineWidth = 10;
-                this.drawCtx.lineCap = 'round';
-                this.drawCtx.strokeStyle = this.color;
-
-                this.drawCtx.lineTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
-                this.drawCtx.stroke();
-                this.drawCtx.beginPath();
-                this.drawCtx.moveTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
-            }
-        });
-
-        this.drawnCanvas.nativeElement.removeEventListener('click', (e: MouseEvent) => {
-            const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
-
-            console.log('rectangle is drawn.', e.clientX - canvasRect.left, e.clientY - canvasRect.top);
-            this.drawCtx.fillRect(
-                e.clientX - canvasRect.left - this.widthRect / 2,
-                e.clientY - canvasRect.top - this.heightRect / 2,
-                this.widthRect,
-                this.heightRect,
-            );
-        });
-
-        this.drawnCanvas.nativeElement.removeEventListener('mousedown', () => {
-            this.isErasing = true;
-        });
-
-        this.drawnCanvas.nativeElement.removeEventListener('mouseup', () => {
-            this.isErasing = false;
-        });
-
-        this.drawnCanvas.nativeElement.removeEventListener('mousemove', (e: MouseEvent) => {
-            if (this.isErasing) {
-                const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
-                console.log('isErasing', e.clientX - canvasRect.left, e.clientY - canvasRect.top);
-                this.drawCtx.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, 10, 10);
-            }
-        });
+        this.drawnCanvas.nativeElement.removeEventListener('mousedown', this.listener);
+        this.drawnCanvas.nativeElement.removeEventListener('mouseup', this.listener);
+        this.drawnCanvas.nativeElement.removeEventListener('mousemove', this.listener);
     }
 
     toggleButton(id: string) {

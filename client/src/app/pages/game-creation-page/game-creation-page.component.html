@@ -22,8 +22,7 @@
             <div class="original container neon-border">
                 <div class="original image">
                     <canvas #canvas1 width="640px" height="480px" style="z-index: 1"></canvas>
-                    <!-- keeping this in case we are told that both pictures need to be drawn on -->
-                    <!-- <canvas #drawingCanvas1 width="640px" height="480px" style="z-index: 1; margin-left: -640px; position: absolute"></canvas> -->
+                    <canvas #drawingCanvas1 width="640px" height="480px" style="z-index: 1; margin-left: -640px; position: absolute"></canvas>
                 </div>
                 <div class="upload-delete">
                     <button id="reset-original" (click)="clearFirstFile(this.myOgCanvas.nativeElement, 'upload-original')">X</button>
