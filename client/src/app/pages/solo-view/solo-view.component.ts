@@ -62,18 +62,22 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         dialogRef.afterClosed().subscribe((result: string) => {
             this.playerName = result;
             this.showTime();
-            document.addEventListener('keydown', (event: KeyboardEvent) => {
-                this.boundActivateCheatMode(event);
-            });
+            document.addEventListener('keydown', this.boundActivateCheatMode);
         });
     }
 
     ngOnDestroy(): void {
         this.timerService.stopTimer();
         this.foundDifferenceService.clearDifferenceFound();
-        document.removeEventListener('keydown', (event: KeyboardEvent) => {
-            this.boundActivateCheatMode(event);
-        });
+        document.removeEventListener('keydown', this.boundActivateCheatMode);
+    }
+
+    resetDifferences(event: KeyboardEvent) {
+        this.left.toggleCheatMode = !this.left.toggleCheatMode;
+        this.right.toggleCheatMode = !this.right.toggleCheatMode;
+        setTimeout(() => {
+            this.activateCheatMode(event);
+        }, 400);
     }
 
     activateCheatMode(event: KeyboardEvent) {
@@ -86,12 +90,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 for (const differenceNo of this.foundDifferenceService.foundDifferences) {
                     data[differenceNo] = [];
                 }
+
                 for (const difference of data) {
                     if (difference.length !== 0) {
                         differences = differences.concat(difference);
                     }
                 }
-                console.log(this.left.toggleCheatMode);
                 if (this.left.toggleCheatMode) this.handleFlash(differences);
             });
         }
@@ -163,13 +167,15 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.right.receiveDifferencePixels(rgbaValues, array);
     }
 
-    async handleFlash(currentDifferences: number[]): Promise<void> {
+    handleFlash(currentDifferences: number[]): void {
         this.left.differenceEffect(currentDifferences);
         this.right.differenceEffect(currentDifferences);
     }
 
     emitHandler(information: differenceInformation): void {
-        this.handleFlash(information.lastDifferences);
+        if (!this.left.toggleCheatMode) {
+            this.handleFlash(information.lastDifferences);
+        }
         this.paintPixel(information.lastDifferences);
         this.incrementScore();
         this.addDifferenceDetected(information.differencesPosition);

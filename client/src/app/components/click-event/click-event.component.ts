@@ -95,6 +95,11 @@ export class ClickEventComponent implements OnInit {
         return new Promise((res) => setTimeout(res, ms));
     }
 
+    async clearEffect() {
+        const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
+        await this.turnOffYellow(originalContext, this.foundDifferenceService.foundDifferences);
+    }
+
     async differenceEffect(currentDifferences: number[]): Promise<void> {
         if (!this.endGame) {
             const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
@@ -107,13 +112,11 @@ export class ClickEventComponent implements OnInit {
             await this.delay(FAST_WAIT_TIME_MS);
             this.turnOffYellow(originalContext, currentDifferences);
             await this.delay(FAST_WAIT_TIME_MS);
+
             if (this.toggleCheatMode) {
-                console.log('is running');
                 this.differenceEffect(currentDifferences);
-            } else {
-                this.emitSound(false);
-                console.log('test');
             }
+            // this.emitSound(false);
         }
     }
 
