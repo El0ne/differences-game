@@ -201,9 +201,14 @@ describe('StageController', () => {
     });
 
     it('deleteImage() should call imageManagerService.deleteImage() with the image name as a parameter', async () => {
+        const image = new Jimp(1, 1, 'white', (err) => {
+            if (err) throw err;
+        });
+
+        image.write('assets/images/test.bmp');
         jest.spyOn(imageManagerService, 'deleteImage');
 
-        const response = await request(httpServer).del('/stage/image/test.bmp');
+        const response = await request(httpServer).delete('/stage/image/test.bmp');
 
         expect(response.status).toBe(HttpStatus.NO_CONTENT);
         expect(imageManagerService.deleteImage).toHaveBeenCalledWith('test.bmp');
