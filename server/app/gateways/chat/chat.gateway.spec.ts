@@ -4,7 +4,7 @@ import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, match, SinonStubbedInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
-import { ChatEvents } from './chat.gateway.events';
+import { ChatEvents } from '../../../../common/chat.gateway.events';
 
 describe('ChatGateway', () => {
     let gateway: ChatGateway;
@@ -128,7 +128,7 @@ describe('ChatGateway', () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
             emit: (event: string, data) => {
-                expect(event).toEqual(ChatEvents.Hint);
+                expect(event).toEqual(ChatEvents.Event);
                 expect(data.message.includes('Indice')).toBe(true);
                 expect(data.socketId).toEqual('event');
             },
@@ -144,5 +144,16 @@ describe('ChatGateway', () => {
     it('socket disconnection should be logged', () => {
         gateway.handleDisconnect(socket);
         expect(logger.log.calledOnce).toBeTruthy();
+    });
+
+    it('dateCreator should return current time', () => {
+        const date = new Date();
+        const hour = date.getHours().toString();
+        const minutes = date.getMinutes().toString();
+        const seconds = date.getSeconds().toString();
+        const expectedDate = gateway.dateCreator();
+        expect(expectedDate.hour).toEqual(hour);
+        expect(expectedDate.minutes).toEqual(minutes);
+        expect(+expectedDate.seconds).toBeCloseTo(+seconds);
     });
 });

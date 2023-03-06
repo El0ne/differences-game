@@ -124,12 +124,11 @@ describe('SoloViewComponent', () => {
         const finishGameSpy = spyOn(component, 'finishGame');
         chatSocketServiceMock.sio.id = 'mockSocket';
         component.configureSocketReactions();
-        expect(listenSpy).toHaveBeenCalledTimes(5);
-        expect(component.messages.length).toEqual(6);
+        expect(listenSpy).toHaveBeenCalledTimes(4);
+        expect(component.messages.length).toEqual(5);
         expect(sendSpy).toHaveBeenCalled();
-        expect(component.messages[component.messages.length - 2].socketId).toEqual('hint');
-        expect(component.messages[component.messages.length - 3].socketId).toEqual('event');
-        expect(component.messages[component.messages.length - 1].socketId).toEqual('event');
+        expect(component.messages[component.messages.length - 3].socketId).toEqual('test');
+        expect(component.messages[component.messages.length - 1].socketId).toEqual('abandon');
         expect(finishGameSpy).toHaveBeenCalled();
     });
 

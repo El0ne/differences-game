@@ -6,4 +6,5 @@ export interface Validation {
 export interface RoomMessage {
     socketId: string;
     message: string;
+    event: boolean;
 }

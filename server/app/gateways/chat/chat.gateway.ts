@@ -1,8 +1,8 @@
+import { AbandonGame, ChatEvents, MultiplayerRequestInformation, Room, RoomEvent, RoomManagement } from '@common/chat.gateway.events';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { MESSAGE_MAX_LENGTH } from './chat.gateway.constants';
-import { AbandonGame, ChatEvents, MultiplayerRequestInformation, Room, RoomEvent, RoomManagement } from './chat.gateway.events';
 
 @WebSocketGateway({ cors: true })
 @Injectable()
@@ -49,41 +49,32 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage(ChatEvents.Event)
     event(socket: Socket, data: RoomEvent) {
         if (socket.rooms.has(data.room)) {
-            const date = new Date();
-            const hour = date.getHours().toString();
-            const minutes = date.getMinutes().toString();
-            const seconds = date.getSeconds().toString();
+            const date = this.dateCreator();
             let dateFormatted: string;
             if (data.multiplayer) {
-                dateFormatted = `${hour}:${minutes}:${seconds} - ${data.event} par `;
+                dateFormatted = `${date.hour}:${date.minutes}:${date.seconds} - ${data.event} par `;
             } else {
-                dateFormatted = `${hour}:${minutes}:${seconds} - ${data.event}.`;
+                dateFormatted = `${date.hour}:${date.minutes}:${date.seconds} - ${data.event}.`;
             }
 
-            this.server.to(data.room).emit(ChatEvents.Event, { socketId: socket.id, message: dateFormatted });
+            this.server.to(data.room).emit(ChatEvents.Event, { socketId: socket.id, message: dateFormatted, event: true });
         }
     }
 
     @SubscribeMessage(ChatEvents.Abandon)
     abandon(socket: Socket, data: AbandonGame) {
         if (socket.rooms.has(data.room)) {
-            const date = new Date();
-            const hour = date.getHours().toString();
-            const minutes = date.getMinutes().toString();
-            const seconds = date.getSeconds().toString();
-            const dateFormatted = `${hour}:${minutes}:${seconds} - ${data.name} a abandonné la partie.`;
-            this.server.to(data.room).emit(ChatEvents.Abandon, { socketId: socket.id, message: dateFormatted });
+            const date = this.dateCreator();
+            const dateFormatted = `${date.hour}:${date.minutes}:${date.seconds} - ${data.name} a abandonné la partie.`;
+            this.server.to(data.room).emit(ChatEvents.Abandon, { socketId: socket.id, message: dateFormatted, event: true });
         }
     }
     @SubscribeMessage(ChatEvents.Hint)
     hint(socket: Socket, room: string) {
         if (socket.rooms.has(room)) {
-            const date = new Date();
-            const hour = date.getHours().toString();
-            const minutes = date.getMinutes().toString();
-            const seconds = date.getSeconds().toString();
-            const dateFormatted = `${hour}:${minutes}:${seconds} - Indice utilisé.`;
-            this.server.to(room).emit(ChatEvents.Hint, { socketId: 'event', message: dateFormatted });
+            const date = this.dateCreator();
+            const dateFormatted = `${date.hour}:${date.minutes}:${date.seconds} - Indice utilisé.`;
+            this.server.to(room).emit(ChatEvents.Event, { socketId: 'event', message: dateFormatted, event: true });
         }
     }
 
@@ -102,7 +93,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         // Seulement un membre de la salle peut envoyer un message aux autres
         if (socket.rooms.has(message.room)) {
             const transformedMessage = message.message.toString();
-            this.server.to(message.room).emit(ChatEvents.RoomMessage, { socketId: socket.id, message: transformedMessage });
+            this.server.to(message.room).emit(ChatEvents.RoomMessage, { socketId: socket.id, message: transformedMessage, event: false });
         }
     }
 
@@ -114,5 +105,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     handleDisconnect(socket: Socket) {
         this.logger.log(`Déconnexion par l'utilisateur avec id : ${socket.id}`);
+    }
+
+    dateCreator() {
+        const date = new Date();
+        const hour = date.getHours().toString();
+        const minutes = date.getMinutes().toString();
+        const seconds = date.getSeconds().toString();
+        return { hour, minutes, seconds };
     }
 }

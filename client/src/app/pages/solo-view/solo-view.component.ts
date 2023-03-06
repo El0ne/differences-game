@@ -12,6 +12,7 @@ import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to
 import { SocketService } from '@app/services/socket/socket.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { RoomMessage, Validation } from '@common/chat-gateway-constants';
+import { ChatEvents, RoomEvent, RoomManagement } from '@common/chat.gateway.events';
 import { differenceInformation } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
 import { Subject } from 'rxjs';
@@ -26,7 +27,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     left: ClickEventComponent;
     @ViewChild('right')
     right: ClickEventComponent;
-    is1v1: boolean | null;
+    is1v1: boolean;
     showErrorMessage: boolean = false;
     showNameErrorMessage: boolean = false;
     showTextBox: boolean = false;
@@ -76,7 +77,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true, data: { game: gameId, multiplayer: this.is1v1 } });
         dialogRef.afterClosed().subscribe(() => {
             this.player = this.chat.names[0];
-            this.opponent = this.chat.names[1];
+            if (this.is1v1) {
+                this.opponent = this.chat.names[1];
+            } else this.opponent = '';
             this.currentRoom = this.chat.gameRoom;
             this.showTime();
             this.configureSocketReactions();
@@ -84,33 +87,24 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     configureSocketReactions() {
-        this.chat.listen('wordValidated', (validation: Validation) => {
+        this.chat.listen<Validation>(ChatEvents.WordValidated, (validation: Validation) => {
             if (validation.validated) {
-                this.chat.send('roomMessage', { room: this.currentRoom, message: validation.originalMessage });
+                this.chat.send<RoomManagement>(ChatEvents.RoomMessage, { room: this.currentRoom, message: validation.originalMessage });
             } else {
-                this.messages.push({ socketId: 'event', message: validation.originalMessage });
+                this.messages.push({ socketId: this.socketId, message: validation.originalMessage, event: true });
             }
         });
-        this.chat.listen('roomMessage', (data: RoomMessage) => {
+        this.chat.listen<RoomMessage>(ChatEvents.RoomMessage, (data: RoomMessage) => {
             this.messages.push(data);
         });
-        this.chat.listen('event', (data: RoomMessage) => {
-            if (this.is1v1) {
-                if (data.socketId === this.socketId) {
-                    data.message += this.player + '.';
-                } else data.message += this.opponent + '.';
-            }
-            data.socketId = 'event';
+        this.chat.listen<RoomMessage>(ChatEvents.Event, (data: RoomMessage) => {
             this.messages.push(data);
         });
-        this.chat.listen('hint', (message: RoomMessage) => {
-            this.messages.push(message);
-        });
-        this.chat.listen('abandon', (message: RoomMessage) => {
+        this.chat.listen<RoomMessage>(ChatEvents.Abandon, (message: RoomMessage) => {
             if (!(message.socketId === this.socketId)) {
                 this.finishGame();
             }
-            message.socketId = 'event';
+            this.opponent = '';
             this.messages.push(message);
         });
     }
@@ -175,11 +169,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     handleMistake(): void {
-        this.chat.send('event', { room: this.currentRoom, multiplayer: this.is1v1, event: 'Erreur' });
+        this.chat.send<RoomEvent>(ChatEvents.Event, { room: this.currentRoom, multiplayer: this.is1v1, event: 'Erreur' });
     }
 
     hint(): void {
-        this.chat.send('hint', this.currentRoom);
+        this.chat.send<string>(ChatEvents.Hint, this.currentRoom);
     }
     handleFlash(currentDifferences: number[]): void {
         this.left.differenceEffect(currentDifferences);

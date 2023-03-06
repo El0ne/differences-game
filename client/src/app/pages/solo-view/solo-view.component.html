@@ -80,10 +80,12 @@
             <div class="text-box neon-border">
                 <div class="text-area" #scroll [scrollTop]="scroll.scrollHeight">
                     <div class="text-container" *ngFor="let data of messages">
-                        <div *ngIf="data.socketId !== 'event'" [ngClass]="data.socketId === socketId ? 'player1 message' : 'player2 message'">
+                        <div *ngIf="!data.event" [ngClass]="data.socketId === socketId ? 'player1 message' : 'player2 message'">
                             {{ data.message }}
                         </div>
-                        <div *ngIf="data.socketId === 'event'" class="error message">{{ data.message }}</div>
+                        <div *ngIf="data.event" class="error message">
+                            {{ data.message }} {{ is1v1 && data.socketId === socketId ? player : opponent }}
+                        </div>
                     </div>
                 </div>
                 <div class="answer-area" *ngIf="is1v1">
