@@ -4,6 +4,7 @@ import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angu
 import { RouterTestingModule } from '@angular/router/testing';
 import { GAMES } from '@app/mock/game-cards';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { GameCardDto } from '@common/game-card.dto';
 import { of } from 'rxjs';
 
 import { ModalPageComponent } from './modal-page.component';
@@ -82,7 +83,28 @@ describe('ModalPageComponent', () => {
 
     it('deleteImages should call redirection', () => {
         const redirectionMock = spyOn(component, 'redirection');
+        const serviceDeleteImageMock = spyOn(gameCardService, 'deleteImage').and.returnValue(of());
+
+        // component.data.gameInfo.baseImage = 'test';
+        // component.data.gameInfo.differenceImage = 'tes3';
+
+        // component.deleteImages();
+        // expect(serviceDeleteImageMock).toHaveBeenCalledWith(component.data.gameInfo.baseImage);
+        // expect(redirectionMock).toHaveBeenCalledWith('/creatingGame');
+
+        // component.data = { gameInfo: { baseImage: 'image1.jpg', differenceImage: 'image2.jpg' } };
+        component.data = {
+            image: 'string',
+            difference: 0,
+            difficulty: 'e',
+            gameInfo: getFakeGameCardDTO(),
+        };
         component.deleteImages();
+
+        expect(serviceDeleteImageMock).toHaveBeenCalledTimes(2);
+        expect(serviceDeleteImageMock).toHaveBeenCalledWith(component.data.gameInfo.baseImage);
+        expect(serviceDeleteImageMock).toHaveBeenCalledWith(component.data.gameInfo.differenceImage);
+        expect(redirectionMock).toHaveBeenCalledTimes(1);
         expect(redirectionMock).toHaveBeenCalledWith('/creatingGame');
     });
 
@@ -93,3 +115,15 @@ describe('ModalPageComponent', () => {
         // expect(routerSpy).toHaveBeenCalledWith(['/config']);
     });
 });
+
+const getFakeGameCardDTO = (): GameCardDto => {
+    return {
+        _id: 'string',
+        name: 'string',
+        difficulty: 'string',
+        baseImage: 'string',
+        differenceImage: 'string',
+        radius: 3,
+        differenceNumber: 3,
+    };
+};
