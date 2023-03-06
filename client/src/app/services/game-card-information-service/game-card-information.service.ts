@@ -39,4 +39,9 @@ export class GameCardInformationService {
         formData.append('differenceImage', differenceImage, differenceImage.name);
         return this.http.post<ServerGeneratedGameInfo>(`${STAGE}/image/${radius}`, formData);
     }
+
+    deleteImage(image: string) {
+        console.log('service');
+        return this.http.delete(`${STAGE}/image/${image}`);
+    }
 }
