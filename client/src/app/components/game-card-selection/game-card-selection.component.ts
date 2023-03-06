@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { HostWaitingRoomComponent } from '@app/modals/host-waiting-room/host-waiting-room.component';
@@ -24,14 +25,14 @@ export class GameCardSelectionComponent implements OnInit {
 
     hostOrJoinGame() {
         if (this.createGameButton) {
-            this.socket.send(WaitingRoomEvents.HostGame, this.gameCardInformation.id);
+            this.socket.send(WaitingRoomEvents.HostGame, this.gameCardInformation._id);
             const dialogRef = this.dialog.open(HostWaitingRoomComponent, { disableClose: true });
             dialogRef.afterClosed().subscribe(() => {
-                this.socket.send(WaitingRoomEvents.UnhostGame, this.gameCardInformation.id);
+                this.socket.send(WaitingRoomEvents.UnhostGame, this.gameCardInformation._id);
             });
         } else {
             this.socket.send<JoinHostInWaitingRequest>(WaitingRoomEvents.JoinHost, {
-                stageId: this.gameCardInformation.id,
+                stageId: this.gameCardInformation._id,
                 playerName: 'NomJoueur1',
             });
         }

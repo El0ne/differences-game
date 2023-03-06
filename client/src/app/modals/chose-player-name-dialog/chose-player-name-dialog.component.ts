@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { ChatSocketService } from '@app/services/socket/socket.service';
+import { SocketService } from '@app/services/socket/socket.service';
 import { GameConditions, PlayersInformation } from '@common/chat-dialog-constants';
 
 @Component({
@@ -14,7 +14,7 @@ export class ChosePlayerNameDialogComponent {
     playerName: string = '';
     constructor(
         public dialogRef: MatDialogRef<ChosePlayerNameDialogComponent>,
-        private chat: ChatSocketService,
+        private chat: SocketService,
         @Inject(MAT_DIALOG_DATA) public conditions: GameConditions,
     ) {
         this.chat.connect();

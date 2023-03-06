@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { ChatSocketService } from '@app/services/socket/socket.service';
+import { SocketService } from '@app/services/socket/socket.service';
 import { PlayersInformation } from '@common/chat-dialog-constants';
 
 @Component({
@@ -14,7 +14,7 @@ export class QuitGameModalComponent {
     constructor(
         public matDialogRef: MatDialogRef<QuitGameModalComponent>,
         public router: Router,
-        private chat: ChatSocketService,
+        private chat: SocketService,
         @Inject(MAT_DIALOG_DATA) public abandon: PlayersInformation,
     ) {}
 

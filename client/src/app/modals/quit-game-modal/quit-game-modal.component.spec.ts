@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { ChatSocketService } from '@app/services/socket/socket.service';
+import { SocketService } from '@app/services/socket/socket.service';
 
 import { QuitGameModalComponent } from './quit-game-modal.component';
 
@@ -10,7 +10,7 @@ describe('QuitGameModalComponent', () => {
     let fixture: ComponentFixture<QuitGameModalComponent>;
     let matDialogRefMock: MatDialogRef<QuitGameModalComponent>;
     let routerMock: Router;
-    let mockChatService: ChatSocketService;
+    let mockChatService: SocketService;
     const data = { player: 'Jasper', room: 'testRoom' };
 
     beforeEach(async () => {
@@ -34,7 +34,7 @@ describe('QuitGameModalComponent', () => {
                     provide: MAT_DIALOG_DATA,
                     useValue: data,
                 },
-                { provide: ChatSocketService, useValue: mockChatService },
+                { provide: SocketService, useValue: mockChatService },
             ],
         }).compileComponents();
 

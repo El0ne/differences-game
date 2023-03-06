@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { TestBed } from '@angular/core/testing';
 
-import { ChatSocketService } from './socket.service';
+import { SocketService } from './socket.service';
 
 describe('ChatSocketService', () => {
-    let service: ChatSocketService;
+    let service: SocketService;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
-        service = TestBed.inject(ChatSocketService);
+        service = TestBed.inject(SocketService);
         service.sio = jasmine.createSpyObj('Socket', ['on', 'emit', 'disconnect']);
     });
 
