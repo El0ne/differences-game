@@ -56,12 +56,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         public dialog: MatDialog,
         public router: Router,
-        private chat: SocketService,
+        public chat: SocketService,
     ) {}
-
-    get socketId() {
-        return this.chat.sio.id ? this.chat.sio.id : '';
-    }
 
     ngOnInit(): void {
         const gameId = this.route.snapshot.paramMap.get('stageId');
@@ -91,7 +87,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             if (validation.validated) {
                 this.chat.send<RoomManagement>(ChatEvents.RoomMessage, { room: this.currentRoom, message: validation.originalMessage });
             } else {
-                this.messages.push({ socketId: this.socketId, message: validation.originalMessage, event: true });
+                this.messages.push({ socketId: this.chat.socketId, message: validation.originalMessage, event: true });
             }
         });
         this.chat.listen<RoomMessage>(ChatEvents.RoomMessage, (data: RoomMessage) => {
@@ -101,7 +97,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.messages.push(data);
         });
         this.chat.listen<RoomMessage>(ChatEvents.Abandon, (message: RoomMessage) => {
-            if (!(message.socketId === this.socketId)) {
+            if (!(message.socketId === this.chat.socketId)) {
                 this.finishGame();
             }
             this.opponent = '';

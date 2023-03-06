@@ -10,6 +10,10 @@ export class SocketService {
     names: string[] = [];
     gameRoom: string;
 
+    get socketId() {
+        return this.sio.id ? this.sio.id : '';
+    }
+
     connect() {
         this.sio = io(environment.serverUrl, { transports: ['websocket'], upgrade: false });
     }

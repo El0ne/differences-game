@@ -16,6 +16,13 @@ describe('ChatSocketService', () => {
         expect(service).toBeTruthy();
     });
 
+    it('get SocketId() should return the socketId if valid', () => {
+        const socketId = '';
+        expect(socketId).toEqual(service['socketId']);
+        service.sio.id = '123';
+        expect(service['socketId']).toEqual('123');
+    });
+
     it('connect should connect to a local server', () => {
         (service.sio as unknown) = undefined;
         service.connect();

@@ -154,13 +154,6 @@ describe('SoloViewComponent', () => {
         expect(component.messageContent).toBe('');
     });
 
-    it('get SocketId() should return the socketId if valid', () => {
-        const socketId = component.socketId;
-        expect(socketId).toEqual(component['socketId']);
-        chatSocketServiceMock.sio.id = 'mockSocket';
-        expect(component['socketId']).toEqual('mockSocket');
-    });
-
     it('should increment counter when increment counter is called', () => {
         component.currentScorePlayer1 = 0;
         component.incrementScore();
