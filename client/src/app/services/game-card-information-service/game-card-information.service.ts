@@ -40,7 +40,7 @@ export class GameCardInformationService {
         return this.http.post<ServerGeneratedGameInfo>(`${STAGE}/image/${radius}`, formData);
     }
 
-    deleteImage(image: string) {
-        return this.http.delete(`${STAGE}/image/${image}`);
+    deleteImage(image: string): Observable<void> {
+        return this.http.delete<void>(`${STAGE}/image/${image}`);
     }
 }
