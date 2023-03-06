@@ -41,7 +41,6 @@ export class GameCardInformationService {
     }
 
     deleteImage(image: string) {
-        console.log('service');
         return this.http.delete(`${STAGE}/image/${image}`);
     }
 }

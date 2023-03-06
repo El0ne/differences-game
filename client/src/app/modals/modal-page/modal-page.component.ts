@@ -35,7 +35,6 @@ export class ModalPageComponent implements OnDestroy {
 
     deleteImages(): void {
         // TODO call service to delete images uploaded and difference object
-        console.log(this.data);
         this.gameCardService.deleteImage(this.data.gameInfo.baseImage).subscribe();
         this.gameCardService.deleteImage(this.data.gameInfo.differenceImage).subscribe();
         this.redirection('/creatingGame');

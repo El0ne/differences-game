@@ -36,9 +36,7 @@ export class StageController {
 
     @Delete('/image/:imageName')
     async deleteImage(@Param() param, @Res() res: Response): Promise<void> {
-        console.log('first');
         try {
-            console.log('delete server');
             this.imageManagerService.deleteImage(param.imageName);
             res.status(HttpStatus.NO_CONTENT);
         } catch (err) {
@@ -99,7 +97,6 @@ export class StageController {
     )
     async uploadImages(@UploadedFiles() files: ImageUploadDto, @Param() param, @Res() res: Response): Promise<void> {
         try {
-            console.log('upload');
             if (Object.keys(files).length) {
                 const differencesArray = await this.differenceService.compareImages(
                     files.baseImage[0].path,
@@ -133,8 +130,6 @@ export class StageController {
     @Get('/image/:imageName')
     async getImage(@Param() param, @Res() res: Response): Promise<void> {
         try {
-            console.log('get');
-
             const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);
             res.status(HttpStatus.OK).sendFile(imagePath);
         } catch (err) {
