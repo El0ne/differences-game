@@ -12,7 +12,7 @@ import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-mo
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
-import { ChatSocketService } from '@app/services/socket/socket.service';
+import { SocketService } from '@app/services/socket/socket.service';
 import { differenceInformation } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
 import { of } from 'rxjs';
@@ -24,7 +24,7 @@ describe('SoloViewComponent', () => {
     let modalSpy: MatDialog;
     let afterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
     let mockService: GameCardInformationService;
-    let chatSocketServiceMock: ChatSocketService;
+    let chatSocketServiceMock: SocketService;
     const mockActivatedRoute = { snapshot: { paramMap: { get: () => '234' } } };
     const mockRouter = { url: '1v1/234' };
 
@@ -87,7 +87,7 @@ describe('SoloViewComponent', () => {
                 { provide: ActivatedRoute, useValue: mockActivatedRoute },
                 { provide: Router, useValue: mockRouter },
                 { provide: GameCardInformationService, useValue: mockService },
-                { provide: ChatSocketService, useValue: chatSocketServiceMock },
+                { provide: SocketService, useValue: chatSocketServiceMock },
             ],
         }).compileComponents();
 
