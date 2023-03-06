@@ -1,18 +1,18 @@
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import { StageWaitingRoomGatewayGateway } from './stage-waiting-room-gateway.gateway';
 
 describe('StageWaitingRoomGatewayGateway', () => {
     let gateway: StageWaitingRoomGatewayGateway;
     let logger: SinonStubbedInstance<Logger>;
-    let socket: SinonStubbedInstance<Socket>;
+    // let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
 
     beforeEach(async () => {
         logger = createStubInstance(Logger);
-        socket = createStubInstance<Socket>(Socket);
+        // socket = createStubInstance<Socket>(Socket);
         server = createStubInstance<Server>(Server);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
