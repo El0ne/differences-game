@@ -3,9 +3,7 @@ import * as fs from 'fs';
 
 @Injectable()
 export class ImageManagerService {
-    async deleteImage(imagePath: string): Promise<void> {
-        await fs.unlink(`assets/images/${imagePath}`, (err) => {
-            console.log(err);
-        });
+    deleteImage(imagePath: string): void {
+        fs.unlink(`assets/images/${imagePath}`, () => {});
     }
 }

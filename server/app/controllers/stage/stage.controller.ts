@@ -107,8 +107,8 @@ export class StageController {
                     };
                     res.status(HttpStatus.CREATED).send(data);
                 } else {
-                    await this.imageManagerService.deleteImage(files.baseImage[0].path);
-                    await this.imageManagerService.deleteImage(files.differenceImage[0].path);
+                    this.imageManagerService.deleteImage(files.baseImage[0].path);
+                    this.imageManagerService.deleteImage(files.differenceImage[0].path);
                     res.status(HttpStatus.OK).send([]);
                 }
             } else res.sendStatus(HttpStatus.BAD_REQUEST);
@@ -130,7 +130,7 @@ export class StageController {
     @Delete('/image/:imageName')
     async deleteImage(@Param() param, @Res() res: Response): Promise<void> {
         try {
-            await this.imageManagerService.deleteImage(param.imageName);
+            this.imageManagerService.deleteImage(param.imageName);
             res.status(HttpStatus.NO_CONTENT).send([]);
         } catch (err) {
             res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
