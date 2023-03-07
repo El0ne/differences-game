@@ -117,8 +117,8 @@ export class ClickEventComponent implements OnInit {
 
     emitSound(isErrorSound: boolean): void {
         const sound = new Audio();
-        if (!isErrorSound) sound.src = '/assets/ding.mp3';
-        else sound.src = '/assets/Error.mp3';
+        if (!isErrorSound) sound.src = 'assets/ding.mp3';
+        else sound.src = 'assets/Error.mp3';
         sound.play();
     }
 
