@@ -23,12 +23,16 @@ export class GameCreationPageComponent implements AfterViewInit {
     canvas2ZIndex: number = 2;
 
     isRectEnabled: boolean = false;
+    isPenEnabled: boolean = false;
+    isEraserEnabled: boolean = false;
 
     isUserClicking: boolean = false;
     rectInitialPosX: number;
     rectInitialPosY: number;
 
     color: string = '#ff124f';
+    penSize: number = 1;
+    eraserSize: number = 10;
 
     drawCtx: CanvasRenderingContext2D;
     rectCtx: CanvasRenderingContext2D;
@@ -258,7 +262,7 @@ export class GameCreationPageComponent implements AfterViewInit {
         if (this.isUserClicking) {
             const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
 
-            this.drawCtx.lineWidth = 10;
+            this.drawCtx.lineWidth = this.penSize;
             this.drawCtx.lineCap = 'round';
             this.drawCtx.strokeStyle = this.color;
 
@@ -283,7 +287,7 @@ export class GameCreationPageComponent implements AfterViewInit {
     startErase(e: MouseEvent) {
         this.isUserClicking = true;
         const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
-        this.drawCtx.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, 10, 10);
+        this.drawCtx.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, this.eraserSize, this.eraserSize);
     }
 
     stopErase() {
@@ -293,7 +297,7 @@ export class GameCreationPageComponent implements AfterViewInit {
     erasing(e: MouseEvent) {
         if (this.isUserClicking) {
             const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
-            this.drawCtx.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, 10, 10);
+            this.drawCtx.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, this.eraserSize, this.eraserSize);
         }
     }
 
@@ -332,10 +336,13 @@ export class GameCreationPageComponent implements AfterViewInit {
 
     toggleButton(id: string) {
         this.removingListeners();
+        this.isPenEnabled = false;
+        this.isRectEnabled = false;
+        this.isEraserEnabled = false;
 
         switch (id) {
             case 'pen':
-                this.isRectEnabled = false;
+                this.isPenEnabled = true;
                 this.changeZindex();
                 this.drawPen();
 
@@ -347,7 +354,7 @@ export class GameCreationPageComponent implements AfterViewInit {
 
                 break;
             case 'erase':
-                this.isRectEnabled = false;
+                this.isEraserEnabled = true;
                 this.changeZindex();
                 this.erase();
                 break;

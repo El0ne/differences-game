@@ -183,6 +183,32 @@ output {
     width: 100%;
 }
 
+#title-pen {
+    font-size: small;
+    color: white;
+    margin: 0;
+}
+
+.pen-range {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: baseline;
+}
+
+#title-eraser {
+    font-size: small;
+    color: white;
+    margin: 0;
+}
+
+.eraser-range {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: baseline;
+}
+
 .color-container {
     display: flex;
     flex-direction: column;
@@ -207,6 +233,13 @@ label {
     color: white;
     cursor: pointer;
     align-self: center;
+}
+
+.range-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: baseline;
 }
 
 #radius-range {

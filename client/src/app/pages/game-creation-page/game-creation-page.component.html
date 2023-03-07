@@ -43,6 +43,38 @@
                         <button><mat-icon class="btn-image" (click)="toggleButton('pen')">edit</mat-icon></button>
                         <button><img class="btn-image-src" src="{{ paths.erase }}" (click)="toggleButton('erase')" /></button>
                     </div>
+                    <div class="pen-enabled" *ngIf="isPenEnabled">
+                        <h1 id="title-pen">Taille du tracé :</h1>
+                        <div class="pen-range">
+                            <input
+                                type="range"
+                                id="radius-range"
+                                [(ngModel)]="penSize"
+                                min="1"
+                                max="50"
+                                value="1"
+                                step="1"
+                                oninput="this.nextElementSibling.value = this.value"
+                            />
+                            <output>1</output>
+                        </div>
+                    </div>
+                    <div class="eraser-enabled" *ngIf="isEraserEnabled">
+                        <h1 id="title-eraser">Taille de l'efface :</h1>
+                        <div class="eraser-range">
+                            <input
+                                type="range"
+                                id="radius-range"
+                                [(ngModel)]="eraserSize"
+                                min="10"
+                                max="200"
+                                value="10"
+                                step="10"
+                                oninput="this.nextElementSibling.value = this.value"
+                            />
+                            <output>10</output>
+                        </div>
+                    </div>
                     <div class="row-tools">
                         <button><mat-icon class="btn-image">content_copy</mat-icon></button>
                         <button><img class="btn-image-src" src="{{ paths.invert }}" /></button>
