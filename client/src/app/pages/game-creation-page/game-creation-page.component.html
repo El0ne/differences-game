@@ -48,7 +48,7 @@
                         <button><img class="btn-image-src" src="{{ paths.invert }}" /></button>
                     </div>
                     <div class="color-container">
-                        <input type="color" id="color-picker" value="#ff124f" />
+                        <input type="color" [(ngModel)]="color" id="color-picker" value="#ff124f" />
                         <label for="color-picker">Choisir une couleur</label>
                     </div>
                     <div class="diff-range-container">
@@ -78,8 +78,21 @@
 
             <div class="difference container neon-border">
                 <div class="different image">
-                    <canvas #canvas2 width="640px" height="480px" style="z-index: 2"></canvas>
-                    <canvas #drawingCanvas2 width="640px" height="480px" style="z-index: 1; margin-left: -640px; position: absolute"></canvas>
+                    <canvas #canvas2 width="640px" height="480px" style="z-index: 1"></canvas>
+                    <canvas
+                        #drawingCanvas2
+                        width="640px"
+                        height="480px"
+                        [style.zIndex]="canvas1ZIndex"
+                        style="margin-left: -640px; position: absolute"
+                    ></canvas>
+                    <canvas
+                        #drawingCanvas3
+                        width="640px"
+                        height="480px"
+                        [style.zIndex]="canvas2ZIndex"
+                        style="margin-left: -640px; position: absolute"
+                    ></canvas>
                 </div>
                 <div class="upload-delete">
                     <button id="reset-different" (click)="clearSecondFile(this.myDiffCanvas.nativeElement, 'upload-different')">X</button>
