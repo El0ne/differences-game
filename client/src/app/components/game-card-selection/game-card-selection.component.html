@@ -1,8 +1,22 @@
-<div class="card neon-border">
+<div class="card">
     <div class="row">
         <div class="column">
-            <p class="nom neon">{{ gameCardInformation.name }}</p>
+            <p class="nom">{{ gameCardInformation.name }}</p>
             <img [src]="this.image" class="photo" />
+        </div>
+        <div class="column configuration" *ngIf="isConfig">
+            <div>
+                Temps de pénalité pour l'utilisation d'un indice :
+                <div>5 secondes</div>
+            </div>
+            <div>
+                Temps initial du compte à rebours :
+                <div>30 secondes</div>
+            </div>
+            <div>
+                Temps gagné avec la découverte d'une différence :
+                <div>5 secondes</div>
+            </div>
         </div>
         <div class="column">
             <div class="difficulty-container" [ngClass]="gameCardInformation.difficulty === 'Difficile' ? 'difficult' : 'easy'">
