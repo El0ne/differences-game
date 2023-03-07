@@ -162,8 +162,8 @@ export class GameCreationPageComponent {
     }
 
     mergeCanvas() {
-        const diffContext = this.myDiffCanvas.nativeElement.getContext('2d');
-        diffContext.drawImage(this.diffDrawnCanvas.nativeElement, 0, 0);
+        // const diffContext = this.myDiffCanvas.nativeElement.getContext('2d');
+        // diffContext.drawImage(this.diffDrawnCanvas.nativeElement, 0, 0);
         // this.drawCtx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height); // just here to verify that merge works well
         const binaryData = new Uint8Array(
             this.myDiffCanvas.nativeElement
@@ -321,7 +321,13 @@ export class GameCreationPageComponent {
 
         const canvasRect = this.drawingCanvas1.getBoundingClientRect();
 
-        if (ctx1) ctx1.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, this.eraserSize, this.eraserSize);
+        if (ctx1)
+            ctx1.clearRect(
+                e.clientX - canvasRect.left - this.eraserSize / 2,
+                e.clientY - canvasRect.top - this.eraserSize / 2,
+                this.eraserSize,
+                this.eraserSize,
+            );
     }
 
     stopErase() {
@@ -334,7 +340,12 @@ export class GameCreationPageComponent {
 
         if (ctx1 && this.isUserClicking) {
             const canvasRect = this.drawingCanvas1.getBoundingClientRect();
-            ctx1.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, this.eraserSize, this.eraserSize);
+            ctx1.clearRect(
+                e.clientX - canvasRect.left - this.eraserSize / 2,
+                e.clientY - canvasRect.top - this.eraserSize / 2,
+                this.eraserSize,
+                this.eraserSize,
+            );
         }
     }
 
