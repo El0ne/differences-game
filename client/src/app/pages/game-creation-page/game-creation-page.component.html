@@ -89,8 +89,12 @@
                         </div>
                     </div>
                     <div class="row-tools">
-                        <button><mat-icon class="btn-image">content_copy</mat-icon></button>
+                        <button (click)="toggleButton('duplicate')"><mat-icon class="btn-image">content_copy</mat-icon></button>
                         <button (click)="invert()"><img class="btn-image-src (clik)" src="{{ paths.invert }}" /></button>
+                    </div>
+                    <div *ngIf="isDuplicateEnabled" class="select-duplicate-side">
+                        <button (click)="duplicate('left')"><mat-icon class="btn-image">arrow_back</mat-icon></button>
+                        <button (click)="duplicate('right')"><mat-icon class="btn-image">arrow_forward</mat-icon></button>
                     </div>
                     <div class="color-container">
                         <input type="color" [(ngModel)]="color" id="color-picker" value="#ff124f" />

@@ -30,6 +30,7 @@ export class GameCreationPageComponent {
     isRectEnabled: boolean = false;
     isPenEnabled: boolean = false;
     isEraserEnabled: boolean = false;
+    isDuplicateEnabled: boolean = false;
 
     isUserClicking: boolean = false;
     rectInitialPosX: number;
@@ -389,6 +390,7 @@ export class GameCreationPageComponent {
         this.isPenEnabled = false;
         this.isRectEnabled = false;
         this.isEraserEnabled = false;
+        this.isDuplicateEnabled = false;
 
         switch (id) {
             case 'pen':
@@ -407,6 +409,9 @@ export class GameCreationPageComponent {
                 this.isEraserEnabled = true;
                 this.changeZindex();
                 this.erase();
+                break;
+            case 'duplicate':
+                this.isDuplicateEnabled = true;
                 break;
         }
     }
@@ -429,5 +434,18 @@ export class GameCreationPageComponent {
         }
 
         if (ctxOgRectangle) ctxOgRectangle.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+    }
+
+    duplicate(side: string) {
+        const ctxDiffDrawing = this.diffDrawnCanvas.nativeElement.getContext('2d');
+        const ctxOgDrawing = this.ogDrawnCanvas.nativeElement.getContext('2d');
+
+        if (side === 'right') {
+            console.log('right');
+            ctxDiffDrawing.drawImage(this.ogDrawnCanvas.nativeElement, 0, 0);
+        } else if (side === 'left') {
+            console.log('left');
+            ctxOgDrawing.drawImage(this.diffDrawnCanvas.nativeElement, 0, 0);
+        }
     }
 }
