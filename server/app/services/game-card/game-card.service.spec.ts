@@ -1,7 +1,14 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-underscore-dangle */
+import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
 import { GameCard, GameCardDocument, gameCardSchema } from '@app/schemas/game-cards.schemas';
+import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
+import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
+import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
+import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
+import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
+import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { TestingModule } from '@nestjs/testing';
@@ -28,9 +35,20 @@ describe('GameCardService', () => {
                         uri: mongoServer.getUri(),
                     }),
                 }),
-                MongooseModule.forFeature([{ name: GameCard.name, schema: gameCardSchema }]),
+                MongooseModule.forFeature([
+                    { name: GameCard.name, schema: gameCardSchema },
+                    { name: Differences.name, schema: differencesSchema },
+                ]),
             ],
-            providers: [GameCardService],
+            providers: [
+                GameCardService,
+                DifferenceClickService,
+                ImageManagerService,
+                DifferencesCounterService,
+                ImageDimensionsService,
+                PixelRadiusService,
+                PixelPositionService,
+            ],
         }).compile();
 
         service = module.get<GameCardService>(GameCardService);
