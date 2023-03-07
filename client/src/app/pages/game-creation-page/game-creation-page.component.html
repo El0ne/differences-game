@@ -22,7 +22,20 @@
             <div class="original container neon-border">
                 <div class="original image">
                     <canvas #canvas1 width="640px" height="480px" style="z-index: 1"></canvas>
-                    <canvas #drawingCanvas1 width="640px" height="480px" style="z-index: 1; margin-left: -640px; position: absolute"></canvas>
+                    <canvas
+                        #drawingCanvas1
+                        width="640px"
+                        height="480px"
+                        [style.zIndex]="canvas1ZIndex"
+                        style="margin-left: -640px; position: absolute"
+                    ></canvas>
+                    <canvas
+                        #drawingCanvas4
+                        width="640px"
+                        height="480px"
+                        [style.zIndex]="canvas2ZIndex"
+                        style="margin-left: -640px; position: absolute"
+                    ></canvas>
                 </div>
                 <div class="upload-delete">
                     <button id="reset-original" (click)="clearFirstFile(this.myOgCanvas.nativeElement, 'upload-original')">X</button>
@@ -52,11 +65,11 @@
                                 [(ngModel)]="penSize"
                                 min="1"
                                 max="50"
-                                value="1"
+                                value="10"
                                 step="1"
                                 oninput="this.nextElementSibling.value = this.value"
                             />
-                            <output>1</output>
+                            <output>10</output>
                         </div>
                     </div>
                     <div class="eraser-enabled" *ngIf="isEraserEnabled">
@@ -67,12 +80,12 @@
                                 id="radius-range"
                                 [(ngModel)]="eraserSize"
                                 min="10"
-                                max="200"
-                                value="10"
+                                max="400"
+                                value="50"
                                 step="10"
                                 oninput="this.nextElementSibling.value = this.value"
                             />
-                            <output>10</output>
+                            <output>50</output>
                         </div>
                     </div>
                     <div class="row-tools">

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
@@ -12,12 +12,17 @@ import { GC_PATHS } from './game-creation-constants';
     templateUrl: './game-creation-page.component.html',
     styleUrls: ['./game-creation-page.component.scss'],
 })
-export class GameCreationPageComponent implements AfterViewInit {
+export class GameCreationPageComponent {
     @ViewChild('canvas1') myOgCanvas: ElementRef;
     @ViewChild('canvas2') myDiffCanvas: ElementRef;
 
-    @ViewChild('drawingCanvas2') drawnCanvas: ElementRef;
-    @ViewChild('drawingCanvas3') rectCanvas: ElementRef;
+    @ViewChild('drawingCanvas1') ogDrawnCanvas: ElementRef;
+    @ViewChild('drawingCanvas2') diffDrawnCanvas: ElementRef;
+    @ViewChild('drawingCanvas3') diffRectCanvas: ElementRef;
+    @ViewChild('drawingCanvas4') ogRectCanvas: ElementRef;
+
+    drawingCanvas1: HTMLCanvasElement;
+    drawingCanvas2: HTMLCanvasElement;
 
     canvas1ZIndex: number = 3;
     canvas2ZIndex: number = 2;
@@ -31,12 +36,8 @@ export class GameCreationPageComponent implements AfterViewInit {
     rectInitialPosY: number;
 
     color: string = '#ff124f';
-    penSize: number = 1;
-    eraserSize: number = 10;
-
-    drawCtx: CanvasRenderingContext2D;
-    rectCtx: CanvasRenderingContext2D;
-
+    penSize: number = 10;
+    eraserSize: number = 50;
     readonly paths = GC_PATHS;
 
     gameTitle: string = '';
@@ -55,16 +56,9 @@ export class GameCreationPageComponent implements AfterViewInit {
     createdGameInfo: GameCardDto;
 
     private listener: (e: MouseEvent) => void;
+    private listener2: (e: MouseEvent) => void;
 
     constructor(public gameCardService: GameCardInformationService, private matDialog: MatDialog, public router: Router) {}
-
-    ngAfterViewInit() {
-        const drawingCanvas = this.drawnCanvas.nativeElement;
-        this.drawCtx = drawingCanvas.getContext('2d');
-
-        const rectangleCanvas = this.rectCanvas.nativeElement;
-        this.rectCtx = rectangleCanvas.getContext('2d');
-    }
 
     getTitle(title: string): void {
         this.gameTitle = title;
@@ -102,7 +96,7 @@ export class GameCreationPageComponent implements AfterViewInit {
     clearSecondFile(canvas: HTMLCanvasElement, id: string): void {
         this.differentFile = null;
         this.clearSingleFile(canvas, id);
-        this.drawCtx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+        // this.drawCtx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
     }
 
     fileValidation(e: Event): void {
@@ -163,7 +157,7 @@ export class GameCreationPageComponent implements AfterViewInit {
 
     mergeCanvas() {
         const diffContext = this.myDiffCanvas.nativeElement.getContext('2d');
-        diffContext.drawImage(this.drawnCanvas.nativeElement, 0, 0);
+        diffContext.drawImage(this.diffDrawnCanvas.nativeElement, 0, 0);
         // this.drawCtx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height); // just here to verify that merge works well
         const binaryData = new Uint8Array(
             this.myDiffCanvas.nativeElement
@@ -207,8 +201,20 @@ export class GameCreationPageComponent implements AfterViewInit {
         }
     }
 
+    choseCanvas(e: MouseEvent) {
+        if (e.target === this.diffRectCanvas.nativeElement) {
+            console.log('in diff canvas');
+            this.drawingCanvas1 = this.diffDrawnCanvas.nativeElement;
+            this.drawingCanvas2 = this.diffRectCanvas.nativeElement;
+        } else if (e.target === this.ogRectCanvas.nativeElement) {
+            console.log('in og canvas');
+            this.drawingCanvas1 = this.ogDrawnCanvas.nativeElement;
+            this.drawingCanvas2 = this.ogRectCanvas.nativeElement;
+        }
+    }
+
     startRec(e: MouseEvent) {
-        const canvasRect = this.rectCanvas.nativeElement.getBoundingClientRect();
+        const canvasRect = this.drawingCanvas2.getBoundingClientRect();
 
         this.isUserClicking = true;
         this.rectInitialPosX = e.clientX - canvasRect.left;
@@ -216,18 +222,23 @@ export class GameCreationPageComponent implements AfterViewInit {
     }
 
     stopRec() {
+        const ctx1 = this.drawingCanvas1.getContext('2d');
+        const ctx2 = this.drawingCanvas2.getContext('2d');
+
         this.isUserClicking = false;
-        this.drawCtx.drawImage(this.rectCanvas.nativeElement, 0, 0);
-        this.rectCtx.clearRect(0, 0, this.rectCanvas.nativeElement.width, this.rectCanvas.nativeElement.height);
+        if (ctx1) ctx1.drawImage(this.drawingCanvas2, 0, 0);
+        if (ctx2) ctx2.clearRect(0, 0, this.drawingCanvas2.width, this.drawingCanvas2.height);
     }
 
     paintRectangle(e: MouseEvent) {
-        if (this.isUserClicking) {
-            console.log('coucou');
-            const canvasRect = this.rectCanvas.nativeElement.getBoundingClientRect();
-            this.rectCtx.fillStyle = this.color;
-            this.rectCtx.clearRect(0, 0, this.rectCanvas.nativeElement.width, this.rectCanvas.nativeElement.height); // Clears the previous canvas
-            this.rectCtx.fillRect(
+        this.choseCanvas(e);
+        const ctx2 = this.drawingCanvas2.getContext('2d');
+        if (ctx2 && this.isUserClicking) {
+            const canvasRect = this.drawingCanvas2.getBoundingClientRect();
+            ctx2.fillStyle = this.color;
+            ctx2.clearRect(0, 0, this.drawingCanvas2.width, this.drawingCanvas2.height); // Clears the previous canvas
+
+            ctx2.fillRect(
                 this.rectInitialPosX,
                 this.rectInitialPosY,
                 e.clientX - canvasRect.left - this.rectInitialPosX,
@@ -240,88 +251,103 @@ export class GameCreationPageComponent implements AfterViewInit {
         console.log('inDrawRectangle', this);
 
         this.listener = this.startRec.bind(this);
-        this.rectCanvas.nativeElement.addEventListener('mousedown', this.listener);
+        this.ogRectCanvas.nativeElement.addEventListener('mousedown', this.listener);
+        this.diffRectCanvas.nativeElement.addEventListener('mousedown', this.listener);
 
         this.listener = this.stopRec.bind(this);
-        this.rectCanvas.nativeElement.addEventListener('mouseup', this.listener);
+        this.ogRectCanvas.nativeElement.addEventListener('mouseup', this.listener);
+        this.diffRectCanvas.nativeElement.addEventListener('mouseup', this.listener);
 
         this.listener = this.paintRectangle.bind(this);
-        this.rectCanvas.nativeElement.addEventListener('mousemove', this.listener);
+        this.ogRectCanvas.nativeElement.addEventListener('mousemove', this.listener);
+        this.diffRectCanvas.nativeElement.addEventListener('mousemove', this.listener);
     }
 
-    startPen() {
-        this.isUserClicking = true;
-    }
+    // startPen() {
+    //     this.isUserClicking = true;
+    // }
 
-    stopPen() {
-        this.isUserClicking = false;
-        this.drawCtx.beginPath();
-    }
+    // stopPen() {
+    //     const ctx1 = this.drawingCanvas1.getContext('2d');
+    //     if (ctx1) {
+    //         this.isUserClicking = false;
+    //         ctx1.beginPath();
+    //     }
+    // }
 
-    writing(e: MouseEvent) {
-        if (this.isUserClicking) {
-            const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
+    // writing(e: MouseEvent) {
+    //     this.choseCanvas(e);
+    //     const ctx1 = this.drawingCanvas1?.getContext('2d');
+    //     if (ctx1 && this.isUserClicking) {
+    //         const canvasRect = this.drawingCanvas1.getBoundingClientRect();
 
-            this.drawCtx.lineWidth = this.penSize;
-            this.drawCtx.lineCap = 'round';
-            this.drawCtx.strokeStyle = this.color;
+    //         ctx1.lineWidth = this.penSize;
+    //         ctx1.lineCap = 'round';
+    //         ctx1.strokeStyle = this.color;
 
-            this.drawCtx.lineTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
-            this.drawCtx.stroke();
-            this.drawCtx.beginPath();
-            this.drawCtx.moveTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
-        }
-    }
+    //         ctx1.lineTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+    //         ctx1.stroke();
+    //         ctx1.beginPath();
+    //         ctx1.moveTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+    //     }
+    // }
 
-    drawPen() {
-        this.listener = this.startPen.bind(this);
-        this.drawnCanvas.nativeElement.addEventListener('mousedown', this.listener);
+    // drawPen() {
+    //     this.listener = this.startPen.bind(this);
+    //     this.ogDrawnCanvas.nativeElement.addEventListener('mousedown', this.listener);
+    //     this.diffDrawnCanvas.nativeElement.addEventListener('mousedown', this.listener);
 
-        this.listener = this.stopPen.bind(this);
-        this.drawnCanvas.nativeElement.addEventListener('mouseup', this.listener);
+    //     this.listener = this.stopPen.bind(this);
+    //     this.ogDrawnCanvas.nativeElement.addEventListener('mouseup', this.listener);
+    //     this.diffDrawnCanvas.nativeElement.addEventListener('mouseup', this.listener);
 
-        this.listener = this.writing.bind(this);
-        this.drawnCanvas.nativeElement.addEventListener('mousemove', this.listener);
-    }
+    //     this.listener = this.writing.bind(this);
+    //     this.ogDrawnCanvas.nativeElement.addEventListener('mousemove', this.listener);
+    //     this.diffDrawnCanvas.nativeElement.addEventListener('mousemove', this.listener);
+    // }
 
-    startErase(e: MouseEvent) {
-        this.isUserClicking = true;
-        const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
-        this.drawCtx.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, this.eraserSize, this.eraserSize);
-    }
+    // startErase(e: MouseEvent) {
+    //     // this.isUserClicking = true;
+    //     // const canvasRect = this.diffDrawnCanvas.nativeElement.getBoundingClientRect();
+    //     // this.drawCtx.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, this.eraserSize, this.eraserSize);
+    // }
 
-    stopErase() {
-        this.isUserClicking = false;
-    }
+    // stopErase() {
+    //     this.isUserClicking = false;
+    // }
 
-    erasing(e: MouseEvent) {
-        if (this.isUserClicking) {
-            const canvasRect = this.drawnCanvas.nativeElement.getBoundingClientRect();
-            this.drawCtx.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, this.eraserSize, this.eraserSize);
-        }
-    }
+    // erasing(e: MouseEvent) {
+    //     if (this.isUserClicking) {
+    //         const canvasRect = this.diffDrawnCanvas.nativeElement.getBoundingClientRect();
+    //         // this.drawCtx.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, this.eraserSize, this.eraserSize);
+    //     }
+    // }
 
-    erase() {
-        this.listener = this.startErase.bind(this);
-        this.drawnCanvas.nativeElement.addEventListener('mousedown', this.listener);
-        this.listener = this.stopErase.bind(this);
-        this.drawnCanvas.nativeElement.addEventListener('mouseup', this.listener);
-        this.listener = this.erasing.bind(this);
-        this.drawnCanvas.nativeElement.addEventListener('mousemove', this.listener);
-    }
+    // erase() {
+    //     this.listener2 = this.startErase.bind(this);
+    //     this.diffDrawnCanvas.nativeElement.addEventListener('mousedown', this.listener2);
+    //     this.listener = this.stopErase.bind(this);
+    //     this.diffDrawnCanvas.nativeElement.addEventListener('mouseup', this.listener);
+    //     this.listener = this.erasing.bind(this);
+    //     this.diffDrawnCanvas.nativeElement.addEventListener('mousemove', this.listener);
+    // }
 
     removingListeners() {
-        this.rectCanvas.nativeElement.removeEventListener('mousedown', this.listener);
-        this.rectCanvas.nativeElement.removeEventListener('mouseup', this.listener);
-        this.rectCanvas.nativeElement.removeEventListener('mousemove', this.listener);
+        this.ogRectCanvas.nativeElement.removeEventListener('mousedown', this.listener);
+        this.diffRectCanvas.nativeElement.removeEventListener('mousedown', this.listener);
+        this.ogRectCanvas.nativeElement.removeEventListener('mouseup', this.listener);
+        this.diffRectCanvas.nativeElement.removeEventListener('mouseup', this.listener);
+        this.ogRectCanvas.nativeElement.removeEventListener('mousemove', this.listener);
+        this.diffRectCanvas.nativeElement.removeEventListener('mousemove', this.listener);
 
-        this.drawnCanvas.nativeElement.removeEventListener('mousedown', this.listener);
-        this.drawnCanvas.nativeElement.removeEventListener('mouseup', this.listener);
-        this.drawnCanvas.nativeElement.removeEventListener('mousemove', this.listener);
+        this.ogDrawnCanvas.nativeElement.removeEventListener('mousedown', this.listener);
+        this.diffDrawnCanvas.nativeElement.removeEventListener('mousedown', this.listener);
+        this.ogDrawnCanvas.nativeElement.removeEventListener('mouseup', this.listener);
+        this.diffDrawnCanvas.nativeElement.removeEventListener('mouseup', this.listener);
+        this.ogDrawnCanvas.nativeElement.removeEventListener('mousemove', this.listener);
+        this.diffDrawnCanvas.nativeElement.removeEventListener('mousemove', this.listener);
 
-        this.drawnCanvas.nativeElement.removeEventListener('mousedown', this.listener);
-        this.drawnCanvas.nativeElement.removeEventListener('mouseup', this.listener);
-        this.drawnCanvas.nativeElement.removeEventListener('mousemove', this.listener);
+        this.diffDrawnCanvas.nativeElement.removeEventListener('mousedown', this.listener2);
     }
 
     changeZindex() {
@@ -344,7 +370,7 @@ export class GameCreationPageComponent implements AfterViewInit {
             case 'pen':
                 this.isPenEnabled = true;
                 this.changeZindex();
-                this.drawPen();
+                // this.drawPen();
 
                 break;
             case 'rectangle':
@@ -356,7 +382,7 @@ export class GameCreationPageComponent implements AfterViewInit {
             case 'erase':
                 this.isEraserEnabled = true;
                 this.changeZindex();
-                this.erase();
+                // this.erase();
                 break;
         }
     }
