@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
+import { ChatEvents } from '@common/chat.gateway.events';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, match, SinonStubbedInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
-import { ChatEvents } from '../../../../common/chat.gateway.events';
 
 describe('ChatGateway', () => {
     let gateway: ChatGateway;
