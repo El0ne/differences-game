@@ -202,11 +202,11 @@ export class GameCreationPageComponent {
     }
 
     choseCanvas(e: MouseEvent) {
-        if (e.target === this.diffRectCanvas.nativeElement) {
+        if ([this.diffRectCanvas.nativeElement, this.diffDrawnCanvas.nativeElement].includes(e.target)) {
             console.log('in diff canvas');
             this.drawingCanvas1 = this.diffDrawnCanvas.nativeElement;
             this.drawingCanvas2 = this.diffRectCanvas.nativeElement;
-        } else if (e.target === this.ogRectCanvas.nativeElement) {
+        } else if ([this.ogRectCanvas.nativeElement, this.ogDrawnCanvas.nativeElement].includes(e.target)) {
             console.log('in og canvas');
             this.drawingCanvas1 = this.ogDrawnCanvas.nativeElement;
             this.drawingCanvas2 = this.ogRectCanvas.nativeElement;
@@ -263,53 +263,56 @@ export class GameCreationPageComponent {
         this.diffRectCanvas.nativeElement.addEventListener('mousemove', this.listener);
     }
 
-    // startPen() {
-    //     this.isUserClicking = true;
-    // }
+    startPen() {
+        console.log('starting drawing');
+        this.isUserClicking = true;
+    }
 
-    // stopPen() {
-    //     const ctx1 = this.drawingCanvas1.getContext('2d');
-    //     if (ctx1) {
-    //         this.isUserClicking = false;
-    //         ctx1.beginPath();
-    //     }
-    // }
+    stopPen() {
+        console.log('stopped writing');
+        const ctx1 = this.drawingCanvas1.getContext('2d');
+        if (ctx1) {
+            this.isUserClicking = false;
+            ctx1.beginPath();
+        }
+    }
 
-    // writing(e: MouseEvent) {
-    //     this.choseCanvas(e);
-    //     const ctx1 = this.drawingCanvas1?.getContext('2d');
-    //     if (ctx1 && this.isUserClicking) {
-    //         const canvasRect = this.drawingCanvas1.getBoundingClientRect();
+    writing(e: MouseEvent) {
+        this.choseCanvas(e);
+        const ctx1 = this.drawingCanvas1.getContext('2d');
 
-    //         ctx1.lineWidth = this.penSize;
-    //         ctx1.lineCap = 'round';
-    //         ctx1.strokeStyle = this.color;
+        if (ctx1 && this.isUserClicking) {
+            const canvasRect = this.drawingCanvas1.getBoundingClientRect();
 
-    //         ctx1.lineTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
-    //         ctx1.stroke();
-    //         ctx1.beginPath();
-    //         ctx1.moveTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
-    //     }
-    // }
+            ctx1.lineWidth = this.penSize;
+            ctx1.lineCap = 'round';
+            ctx1.strokeStyle = this.color;
 
-    // drawPen() {
-    //     this.listener = this.startPen.bind(this);
-    //     this.ogDrawnCanvas.nativeElement.addEventListener('mousedown', this.listener);
-    //     this.diffDrawnCanvas.nativeElement.addEventListener('mousedown', this.listener);
+            ctx1.lineTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+            ctx1.stroke();
+            ctx1.beginPath();
+            ctx1.moveTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+        }
+    }
 
-    //     this.listener = this.stopPen.bind(this);
-    //     this.ogDrawnCanvas.nativeElement.addEventListener('mouseup', this.listener);
-    //     this.diffDrawnCanvas.nativeElement.addEventListener('mouseup', this.listener);
+    drawPen() {
+        this.listener = this.startPen.bind(this);
+        this.ogDrawnCanvas.nativeElement.addEventListener('mousedown', this.listener);
+        this.diffDrawnCanvas.nativeElement.addEventListener('mousedown', this.listener);
 
-    //     this.listener = this.writing.bind(this);
-    //     this.ogDrawnCanvas.nativeElement.addEventListener('mousemove', this.listener);
-    //     this.diffDrawnCanvas.nativeElement.addEventListener('mousemove', this.listener);
-    // }
+        this.listener = this.stopPen.bind(this);
+        this.ogDrawnCanvas.nativeElement.addEventListener('mouseup', this.listener);
+        this.diffDrawnCanvas.nativeElement.addEventListener('mouseup', this.listener);
+
+        this.listener = this.writing.bind(this);
+        this.ogDrawnCanvas.nativeElement.addEventListener('mousemove', this.listener);
+        this.diffDrawnCanvas.nativeElement.addEventListener('mousemove', this.listener);
+    }
 
     // startErase(e: MouseEvent) {
-    //     // this.isUserClicking = true;
-    //     // const canvasRect = this.diffDrawnCanvas.nativeElement.getBoundingClientRect();
-    //     // this.drawCtx.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, this.eraserSize, this.eraserSize);
+    //     this.isUserClicking = true;
+    //     const canvasRect = this.diffDrawnCanvas.nativeElement.getBoundingClientRect();
+    //     this.drawCtx.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, this.eraserSize, this.eraserSize);
     // }
 
     // stopErase() {
@@ -319,7 +322,7 @@ export class GameCreationPageComponent {
     // erasing(e: MouseEvent) {
     //     if (this.isUserClicking) {
     //         const canvasRect = this.diffDrawnCanvas.nativeElement.getBoundingClientRect();
-    //         // this.drawCtx.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, this.eraserSize, this.eraserSize);
+    //         this.drawCtx.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, this.eraserSize, this.eraserSize);
     //     }
     // }
 
@@ -370,7 +373,7 @@ export class GameCreationPageComponent {
             case 'pen':
                 this.isPenEnabled = true;
                 this.changeZindex();
-                // this.drawPen();
+                this.drawPen();
 
                 break;
             case 'rectangle':
