@@ -91,12 +91,17 @@ export class GameCreationPageComponent {
     clearFirstFile(canvas: HTMLCanvasElement, id: string): void {
         this.originalFile = null;
         this.clearSingleFile(canvas, id);
+
+        const drawCtx = this.ogDrawnCanvas.nativeElement.getContext('2d');
+        drawCtx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
     }
 
     clearSecondFile(canvas: HTMLCanvasElement, id: string): void {
         this.differentFile = null;
         this.clearSingleFile(canvas, id);
-        // this.drawCtx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+
+        const drawCtx = this.diffDrawnCanvas.nativeElement.getContext('2d');
+        drawCtx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
     }
 
     fileValidation(e: Event): void {
@@ -309,31 +314,42 @@ export class GameCreationPageComponent {
         this.diffDrawnCanvas.nativeElement.addEventListener('mousemove', this.listener);
     }
 
-    // startErase(e: MouseEvent) {
-    //     this.isUserClicking = true;
-    //     const canvasRect = this.diffDrawnCanvas.nativeElement.getBoundingClientRect();
-    //     this.drawCtx.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, this.eraserSize, this.eraserSize);
-    // }
+    startErase(e: MouseEvent) {
+        this.isUserClicking = true;
+        const ctx1 = this.drawingCanvas1.getContext('2d');
 
-    // stopErase() {
-    //     this.isUserClicking = false;
-    // }
+        const canvasRect = this.drawingCanvas1.getBoundingClientRect();
 
-    // erasing(e: MouseEvent) {
-    //     if (this.isUserClicking) {
-    //         const canvasRect = this.diffDrawnCanvas.nativeElement.getBoundingClientRect();
-    //         this.drawCtx.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, this.eraserSize, this.eraserSize);
-    //     }
-    // }
+        if (ctx1) ctx1.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, this.eraserSize, this.eraserSize);
+    }
 
-    // erase() {
-    //     this.listener2 = this.startErase.bind(this);
-    //     this.diffDrawnCanvas.nativeElement.addEventListener('mousedown', this.listener2);
-    //     this.listener = this.stopErase.bind(this);
-    //     this.diffDrawnCanvas.nativeElement.addEventListener('mouseup', this.listener);
-    //     this.listener = this.erasing.bind(this);
-    //     this.diffDrawnCanvas.nativeElement.addEventListener('mousemove', this.listener);
-    // }
+    stopErase() {
+        this.isUserClicking = false;
+    }
+
+    erasing(e: MouseEvent) {
+        this.choseCanvas(e);
+        const ctx1 = this.drawingCanvas1.getContext('2d');
+
+        if (ctx1 && this.isUserClicking) {
+            const canvasRect = this.drawingCanvas1.getBoundingClientRect();
+            ctx1.clearRect(e.clientX - canvasRect.left, e.clientY - canvasRect.top, this.eraserSize, this.eraserSize);
+        }
+    }
+
+    erase() {
+        this.listener2 = this.startErase.bind(this);
+        this.ogDrawnCanvas.nativeElement.addEventListener('mousedown', this.listener2);
+        this.diffDrawnCanvas.nativeElement.addEventListener('mousedown', this.listener2);
+
+        this.listener = this.stopErase.bind(this);
+        this.ogDrawnCanvas.nativeElement.addEventListener('mouseup', this.listener);
+        this.diffDrawnCanvas.nativeElement.addEventListener('mouseup', this.listener);
+
+        this.listener = this.erasing.bind(this);
+        this.ogDrawnCanvas.nativeElement.addEventListener('mousemove', this.listener);
+        this.diffDrawnCanvas.nativeElement.addEventListener('mousemove', this.listener);
+    }
 
     removingListeners() {
         this.ogRectCanvas.nativeElement.removeEventListener('mousedown', this.listener);
@@ -350,7 +366,12 @@ export class GameCreationPageComponent {
         this.ogDrawnCanvas.nativeElement.removeEventListener('mousemove', this.listener);
         this.diffDrawnCanvas.nativeElement.removeEventListener('mousemove', this.listener);
 
+        this.ogDrawnCanvas.nativeElement.removeEventListener('mousedown', this.listener2);
         this.diffDrawnCanvas.nativeElement.removeEventListener('mousedown', this.listener2);
+        this.ogDrawnCanvas.nativeElement.removeEventListener('mouseup', this.listener);
+        this.diffDrawnCanvas.nativeElement.removeEventListener('mouseup', this.listener);
+        this.ogDrawnCanvas.nativeElement.removeEventListener('mousemove', this.listener);
+        this.diffDrawnCanvas.nativeElement.removeEventListener('mousemove', this.listener);
     }
 
     changeZindex() {
@@ -385,7 +406,7 @@ export class GameCreationPageComponent {
             case 'erase':
                 this.isEraserEnabled = true;
                 this.changeZindex();
-                // this.erase();
+                this.erase();
                 break;
         }
     }
