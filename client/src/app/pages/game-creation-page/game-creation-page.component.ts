@@ -410,4 +410,24 @@ export class GameCreationPageComponent {
                 break;
         }
     }
+
+    invert() {
+        const ctxDiffDrawing = this.diffDrawnCanvas.nativeElement.getContext('2d');
+        const ctxOgDrawing = this.ogDrawnCanvas.nativeElement.getContext('2d');
+        const ctxOgRectangle = this.ogRectCanvas.nativeElement.getContext('2d');
+
+        if (ctxOgRectangle) ctxOgRectangle.drawImage(this.diffDrawnCanvas.nativeElement, 0, 0);
+
+        if (ctxDiffDrawing) {
+            ctxDiffDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+            ctxDiffDrawing.drawImage(this.ogDrawnCanvas.nativeElement, 0, 0);
+        }
+
+        if (ctxOgDrawing) {
+            ctxOgDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+            ctxOgDrawing.drawImage(this.ogRectCanvas.nativeElement, 0, 0);
+        }
+
+        if (ctxOgRectangle) ctxOgRectangle.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+    }
 }
