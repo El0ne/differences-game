@@ -44,6 +44,7 @@ export class GameCardService {
         const deletedGameCard = await this.gameCardModel.findByIdAndDelete(new ObjectId(id));
         await this.imageManagerService.deleteImage(deletedGameCard.originalImageName);
         await this.imageManagerService.deleteImage(deletedGameCard.differenceImageName);
+        // eslint-disable-next-line no-underscore-dangle
         await this.differenceClickService.deleteDifferences(deletedGameCard._id);
         // TODO Remove populate when over with delete
         // if ((await this.getGameCardsNumber()) === 0) {

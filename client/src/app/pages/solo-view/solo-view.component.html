@@ -1,66 +1,44 @@
 <body>
-    <div class="info-card" *ngIf="showTextBox">
-        <div class="info">
-            <p class="title">{{ gameCardInfo.name }}</p>
-            <div class="title">Difficulté : {{ gameCardInfo.difficulty }}</div>
-            <div class="title">Joueurs présents : 1</div>
-            <div class="title">Nombre de différences : {{ numberOfDifferences }}</div>
-            <div class="title">Temps perdu par indice/gagné par différence : x</div>
-        </div>
-        <button class="option-buttons" id="info-quit" type="button" (click)="toggleInfoCard()">
-            <mat-icon class="icon">clear</mat-icon>
-        </button>
-    </div>
-
-    <div class="info-card" *ngIf="showWinMessage">
-        <div class="info">
-            <p class="title">Vous Avez Gagné! Bravo!</p>
-        </div>
-        <button class="option-buttons home-button" id="home-win" type="button" routerLink="/home">
-            <mat-icon class="icon">home</mat-icon>
-        </button>
-    </div>
-
     <div class="nav-bar">
         <div class="options" *ngIf="showNavBar">
-            <button class="option-buttons home-button" type="button" routerLink="/home">
+            <button class="normal-button home-button option-buttons" type="button" routerLink="/home">
                 <mat-icon class="icon">home</mat-icon>
             </button>
-            <button class="option-buttons" type="button" (click)="toggleInfoCard()">
+            <button class="normal-button option-buttons" type="button" (click)="openInfoModal()">
                 <mat-icon class="icon">info</mat-icon>
             </button>
         </div>
         <div class="info-option" *ngIf="showNavBar">
-            <button class="option-buttons" type="button" routerLink="/stage-selection">
-                <mat-icon class="icon">menu</mat-icon>
+            <button class="normal-button option-buttons" type="button" (click)="quitGame()">
+                <mat-icon class="icon">logout</mat-icon>
             </button>
         </div>
     </div>
 
     <div class="flex-game">
-        <app-click-event
-            #left
-            [id]="1"
-            [original]="'original'"
-            [gameCardId]="this.currentGameId"
-            [imagePath]="this.gameCardInfo.originalImageName"
-            (handler)="emitHandler($event)"
-            *ngIf="this.gameCardInfo"
-        ></app-click-event>
+        <div class="image-container neon-border">
+            <app-click-event
+                #left
+                [id]="1"
+                [original]="'original'"
+                [gameCardId]="this.currentGameId"
+                [imagePath]="this.gameCardInfo.originalImageName"
+                (handler)="emitHandler($event)"
+                *ngIf="this.gameCardInfo"
+            ></app-click-event>
+        </div>
         <div class="game-options">
-            <div id="timer">
-                <div class="timer-box">
-                    <div class="display">
-                        <div id="time">{{ timesConvertion(this.timerService.currentTime) }}</div>
-                    </div>
+            <div class="timer-box">
+                <div class="display">
+                    <div id="time">{{ timesConvertion(this.timerService.currentTime) }}</div>
                 </div>
             </div>
 
             <div id="score">
                 <!-- référence : https://codepen.io/Vivekp1118/pen/YzLOOVG -->
-                <div class="container">
+                <div class="container neon-border">
                     <div class="row">
-                        <div class="col col-heading">
+                        <div class="col col-heading neon">
                             <h1>SCORE</h1>
                         </div>
                         <div class="col col-display" id="scoreHome">{{ currentScore }}</div>
@@ -68,7 +46,7 @@
                 </div>
             </div>
 
-            <div class="text-box">
+            <div class="text-box neon-border">
                 <div class="text-area">
                     <div *ngFor="let message of messages">
                         <div class="message">{{ message }}</div>
@@ -83,19 +61,16 @@
                 </div>
             </div>
         </div>
-        <app-click-event
-            #right
-            [id]="2"
-            [original]="'different'"
-            [gameCardId]="this.currentGameId"
-            [imagePath]="this.gameCardInfo.differenceImageName"
-            (handler)="emitHandler($event)"
-            *ngIf="this.gameCardInfo"
-        ></app-click-event>
-        <div class="hint-button">
-            <button class="hint" type="button">
-                <mat-icon class="hint-button">search</mat-icon>
-            </button>
+        <div class="image-container neon-border">
+            <app-click-event
+                #right
+                [id]="2"
+                [original]="'different'"
+                [gameCardId]="this.currentGameId"
+                [imagePath]="this.gameCardInfo.differenceImageName"
+                (handler)="emitHandler($event)"
+                *ngIf="this.gameCardInfo"
+            ></app-click-event>
         </div>
     </div>
 </body>

@@ -1,11 +1,13 @@
 import { HttpClientModule } from '@angular/common/http';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { By } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
+import { GameCardInformation } from '@common/game-card';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
+import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
 import { of } from 'rxjs';
 import { GameCreationPageComponent } from './game-creation-page.component';
 
@@ -51,6 +53,7 @@ describe('GameCreationPageComponent', () => {
         component.getTitle(input);
         expect(component.gameTitle).toBe(input);
     });
+
     it('should clear the single file', () => {
         component.clearSingleFile(canvasOg, 'upload-original');
 
@@ -158,4 +161,75 @@ describe('GameCreationPageComponent', () => {
 
         expect(component.saveVerification).toBeTruthy();
     });
+
+    it('should open modal page and save information if saveVerification is true', fakeAsync(() => {
+        spyOn(window, 'alert');
+
+        component.gameTitle = 'My Game';
+        component.originalFile = new File([''], 'original.bmp');
+        component.differentFile = new File([''], 'different.bmp');
+
+        spyOn(component, 'saveVerification').and.returnValue(true);
+        spyOn(component, 'openModal');
+
+        const mockServerInfo: ServerGeneratedGameInfo = {
+            gameId: '',
+            originalImageName: '',
+            differenceImageName: '',
+            gameDifficulty: '',
+            gameDifferenceNumber: 5,
+        };
+        spyOn(component.gameCardService, 'uploadImages').and.returnValue(of(mockServerInfo));
+
+        const mockGameCardInfo: GameCardInformation = {
+            _id: '',
+            name: '',
+            difficulty: '',
+            originalImageName: '',
+            differenceImageName: '',
+            differenceNumber: 0,
+            soloTimes: [],
+            multiTimes: [],
+        };
+        spyOn(component.gameCardService, 'createGame').and.returnValue(of(mockGameCardInfo));
+        spyOn(component.gameCardService, 'getGameCardInfoFromId').and.returnValue(of(mockGameCardInfo));
+
+        component.gameTitle = 'My Game';
+        component.originalFile = new File([''], 'original.bmp');
+        component.differentFile = new File([''], 'different.bmp');
+
+        component.save();
+
+        expect(component.saveVerification).toHaveBeenCalled();
+        expect(component.isDisabled).toBe(true);
+        expect(component.gameCardService.uploadImages).toHaveBeenCalledWith(
+            new File([''], 'original.bmp'),
+            new File([''], 'different.bmp'),
+            component.radius,
+        );
+        expect(component.gameCardService.createGame).toHaveBeenCalled();
+        expect(component.openModal).toHaveBeenCalled();
+    }));
+
+    it('should send alert if not good number of differences', fakeAsync(() => {
+        spyOn(window, 'alert');
+
+        component.gameTitle = 'My Game';
+        component.originalFile = new File([''], 'original.bmp');
+        component.differentFile = new File([''], 'different.bmp');
+
+        spyOn(component, 'saveVerification').and.returnValue(true);
+        spyOn(component, 'openModal');
+
+        const mockServerInfo: ServerGeneratedGameInfo = {
+            gameId: '',
+            originalImageName: '',
+            differenceImageName: '',
+            gameDifficulty: '',
+            gameDifferenceNumber: 0,
+        };
+        spyOn(component.gameCardService, 'uploadImages').and.returnValue(of(mockServerInfo));
+        component.save();
+        expect(window.alert).toHaveBeenCalledWith("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
+    }));
 });
