@@ -75,7 +75,7 @@
                                 step="1"
                                 oninput="this.nextElementSibling.value = this.value"
                             />
-                            <output>10</output>
+                            <output>{{ penSize }}</output>
                         </div>
                     </div>
                     <div class="eraser-enabled" *ngIf="isEraserEnabled">
@@ -91,7 +91,7 @@
                                 step="10"
                                 oninput="this.nextElementSibling.value = this.value"
                             />
-                            <output>50</output>
+                            <output>{{ eraserSize }}</output>
                         </div>
                     </div>
                     <div class="row-tools">
@@ -120,7 +120,7 @@
                                 step="3"
                                 oninput="this.nextElementSibling.value = this.value"
                             />
-                            <output>3</output>
+                            <output>{{ radius }}</output>
                         </div>
                         <label for="radius-range">Rayon du détecteur de différence</label>
                     </div>
