@@ -70,4 +70,11 @@ describe('GameCardInformationService', () => {
         service.createGame(mock);
         expect(postSpy).toHaveBeenCalled();
     });
+
+    it('deleteGame should make a delete request', () => {
+        const deleteSpy = spyOn(service.http, 'delete');
+
+        service.deleteGame('gameID');
+        expect(deleteSpy).toHaveBeenCalled();
+    });
 });
