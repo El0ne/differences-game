@@ -5,7 +5,7 @@ import { STAGE } from '@app/services/server-routes';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { differenceInformation } from '@common/difference-information';
 import { Observable } from 'rxjs';
-import { FAST_WAIT_TIME_MS, HEIGHT, WAIT_TIME_MS, WIDTH } from './click-event-constant';
+import { FAST_WAIT_TIME_MS, FLASH_AMOUNT, HEIGHT, WAIT_TIME_MS, WIDTH } from './click-event-constant';
 
 @Component({
     selector: 'app-click-event',
@@ -19,7 +19,7 @@ export class ClickEventComponent implements OnInit {
     @Input() original: string;
     @Input() gameCardId: string;
     @Input() imagePath: string;
-    @Output() handler: EventEmitter<differenceInformation> = new EventEmitter<differenceInformation>();
+    @Output() differenceDetected: EventEmitter<differenceInformation> = new EventEmitter<differenceInformation>();
     @Output() mistake: EventEmitter<void> = new EventEmitter<void>();
     @ViewChild('picture', { static: true })
     picture: ElementRef<HTMLCanvasElement>;
@@ -54,24 +54,24 @@ export class ClickEventComponent implements OnInit {
         return new Array(x, y);
     }
 
-    isDifferent(e: MouseEvent) {
-        this.clickEventService.isADifference(this.getCoordInImage(e)[0], this.getCoordInImage(e)[1], this.gameCardId).subscribe((data) => {
+    isDifferent(click: MouseEvent): void {
+        this.clickEventService.isADifference(this.getCoordInImage(click)[0], this.getCoordInImage(click)[1], this.gameCardId).subscribe((data) => {
             this.differenceData = data;
             if (
                 this.differenceData.isADifference &&
                 !this.foundDifferenceService.foundDifferences.includes(this.differenceData.differencesPosition)
             ) {
-                this.handler.emit({
+                this.differenceDetected.emit({
                     differencesPosition: this.differenceData.differencesPosition,
                     lastDifferences: this.differenceData.differenceArray,
                 });
             } else {
-                this.displayError(e);
+                this.displayError(click);
             }
         });
     }
 
-    turnDifferenceYellow(originalContext: CanvasRenderingContext2D, differences: number[]) {
+    turnDifferenceYellow(originalContext: CanvasRenderingContext2D, differences: number[]): void {
         for (const pixel of differences) {
             const pos: number[] = this.positionToPixel(pixel);
             originalContext.fillStyle = '#FFD700';
@@ -79,14 +79,14 @@ export class ClickEventComponent implements OnInit {
         }
     }
 
-    turnOffYellow(originalContext: CanvasRenderingContext2D, differences: number[]) {
+    turnOffYellow(originalContext: CanvasRenderingContext2D, differences: number[]): void {
         for (const pixel of differences) {
             const pos: number[] = this.positionToPixel(pixel);
             originalContext.clearRect(pos[0], pos[1], 1, 1);
         }
     }
 
-    async delay(ms: number) {
+    async delay(ms: number): Promise<void> {
         return new Promise((res) => setTimeout(res, ms));
     }
 
@@ -94,14 +94,12 @@ export class ClickEventComponent implements OnInit {
         if (!this.endGame) {
             const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
             this.emitSound(false);
-            this.turnDifferenceYellow(originalContext, currentDifferences);
-            await this.delay(FAST_WAIT_TIME_MS);
-            this.turnOffYellow(originalContext, currentDifferences);
-            await this.delay(FAST_WAIT_TIME_MS);
-            this.turnDifferenceYellow(originalContext, currentDifferences);
-            await this.delay(FAST_WAIT_TIME_MS);
-            this.turnOffYellow(originalContext, currentDifferences);
-            await this.delay(FAST_WAIT_TIME_MS);
+            for (let i = 0; i < FLASH_AMOUNT; i++) {
+                this.turnDifferenceYellow(originalContext, currentDifferences);
+                await this.delay(FAST_WAIT_TIME_MS);
+                this.turnOffYellow(originalContext, currentDifferences);
+                await this.delay(FAST_WAIT_TIME_MS);
+            }
         }
     }
 
@@ -123,14 +121,14 @@ export class ClickEventComponent implements OnInit {
         sound.play();
     }
 
-    displayError(e: MouseEvent): void {
+    displayError(click: MouseEvent): void {
         if (!this.timeout && !this.endGame) {
             this.mistake.emit();
             this.emitSound(true);
             this.timeout = true;
             const rect = this.modification.nativeElement.getBoundingClientRect();
-            const x = Math.floor(e.clientX - rect.left);
-            const y = Math.floor(e.clientY - rect.top);
+            const x = Math.floor(click.clientX - rect.left);
+            const y = Math.floor(click.clientY - rect.top);
             const context = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
             context.font = '30pt Arial';
             context.fillStyle = 'red';

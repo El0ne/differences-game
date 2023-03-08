@@ -10,8 +10,8 @@ import { Router } from '@angular/router';
 export class GameWinModalComponent {
     constructor(public matDialogRef: MatDialogRef<GameWinModalComponent>, public router: Router) {}
 
-    confirm() {
+    confirm(): void {
         this.matDialogRef.close();
-        this.router.navigate(['/home']);
+        this.router.navigate(['/stage-selection']);
     }
 }

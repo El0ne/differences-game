@@ -12,6 +12,7 @@ import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-di
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
+import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { differenceInformation } from '@common/difference-information';
@@ -26,10 +27,14 @@ describe('SoloViewComponent', () => {
     let afterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
     let mockService: GameCardInformationService;
     let chatSocketServiceMock: SocketService;
+    let foundDifferenceServiceSpy: FoundDifferenceService;
+
     const mockActivatedRoute = { snapshot: { paramMap: { get: () => '234' } } };
     const mockRouter = { url: '1v1/234' };
 
     beforeEach(async () => {
+        foundDifferenceServiceSpy = jasmine.createSpyObj('FoundDifferenceService', ['addDifferenceFound', 'clearDifferenceFound']);
+
         mockService = jasmine.createSpyObj('GameCardInformationService', ['getGameCardInfoFromId']);
         mockService.getGameCardInfoFromId = () => {
             return of(SERVICE_MOCK_GAME_CARD);
@@ -53,15 +58,6 @@ describe('SoloViewComponent', () => {
                 }
                 case 'roomMessage': {
                     callback({ socketId: 'test', message: 'Test message' });
-                    break;
-                }
-                case 'event': {
-                    callback({ socketId: 'test', message: 'Test message' });
-                    callback({ socketId: 'mockSocket', message: 'Test message' });
-                    break;
-                }
-                case 'hint': {
-                    callback({ socketId: 'hint', message: 'Test message' });
                     break;
                 }
                 case 'abandon': {
@@ -89,6 +85,7 @@ describe('SoloViewComponent', () => {
                 { provide: Router, useValue: mockRouter },
                 { provide: GameCardInformationService, useValue: mockService },
                 { provide: SocketService, useValue: chatSocketServiceMock },
+                { provide: FoundDifferenceService, useValue: foundDifferenceServiceSpy },
             ],
         }).compileComponents();
 
@@ -103,7 +100,7 @@ describe('SoloViewComponent', () => {
     });
 
     it('should set the current gameCard id according to value in route and request gameCard as well as game player information', () => {
-        spyOn(component.dialog, 'open').and.returnValue({ afterClosed: () => of(true) } as MatDialogRef<ChosePlayerNameDialogComponent>);
+        spyOn(modalSpy, 'open').and.returnValue({ afterClosed: () => of(true) } as MatDialogRef<ChosePlayerNameDialogComponent>);
         const showTimeSpy = spyOn(component, 'showTime');
         const configureSocketReactionsSpy = spyOn(component, 'configureSocketReactions');
         component.ngOnInit();
@@ -124,10 +121,10 @@ describe('SoloViewComponent', () => {
         const finishGameSpy = spyOn(component, 'finishGame');
         chatSocketServiceMock.sio.id = 'mockSocket';
         component.configureSocketReactions();
-        expect(listenSpy).toHaveBeenCalledTimes(4);
-        expect(component.messages.length).toEqual(5);
+        expect(listenSpy).toHaveBeenCalledTimes(3);
+        expect(component.messages.length).toEqual(3);
         expect(sendSpy).toHaveBeenCalled();
-        expect(component.messages[component.messages.length - 3].socketId).toEqual('test');
+        expect(component.messages[component.messages.length - 2].socketId).toEqual('test');
         expect(component.messages[component.messages.length - 1].socketId).toEqual('abandon');
         expect(finishGameSpy).toHaveBeenCalled();
     });
@@ -187,11 +184,9 @@ describe('SoloViewComponent', () => {
     });
 
     it('addDifferenceDetected should call addDifferenceFound of service', () => {
-        const addDiffSpy = spyOn(component.foundDifferenceService, 'addDifferenceFound');
-
         component.addDifferenceDetected(1);
 
-        expect(addDiffSpy).toHaveBeenCalled();
+        expect(foundDifferenceServiceSpy.addDifferenceFound).toHaveBeenCalled();
     });
 
     it('should open the game info modal with the correct data', () => {

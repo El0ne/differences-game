@@ -7,12 +7,10 @@ import { StageWaitingRoomGatewayGateway } from './stage-waiting-room-gateway.gat
 describe('StageWaitingRoomGatewayGateway', () => {
     let gateway: StageWaitingRoomGatewayGateway;
     let logger: SinonStubbedInstance<Logger>;
-    // let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
 
     beforeEach(async () => {
         logger = createStubInstance(Logger);
-        // socket = createStubInstance<Socket>(Socket);
         server = createStubInstance<Server>(Server);
         const module: TestingModule = await Test.createTestingModule({
             providers: [

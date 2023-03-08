@@ -89,11 +89,11 @@ describe('ChatGateway', () => {
         gateway.roomMessage(socket, { room: TEST_ROOM_ID, message: 'X' });
     });
 
-    it('event() should emit event and return a string containing event and par when multiplayer', () => {
+    it('event() should emit RoomMessage and return a string containing event and par when multiplayer', () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
             emit: (event: string, data) => {
-                expect(event).toEqual(ChatEvents.Event);
+                expect(event).toEqual(ChatEvents.RoomMessage);
                 expect(data.message.includes('Error')).toBe(true);
                 expect(data.message.includes('par')).toBe(true);
             },
@@ -101,11 +101,11 @@ describe('ChatGateway', () => {
         gateway.event(socket, { room: TEST_ROOM_ID, event: 'Error', multiplayer: true });
     });
 
-    it('event() should emit event and return a string containing event without par', () => {
+    it('event() should emit RoomMessage and return a string containing event without par', () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
             emit: (event: string, data) => {
-                expect(event).toEqual(ChatEvents.Event);
+                expect(event).toEqual(ChatEvents.RoomMessage);
                 expect(data.message.includes('Différence')).toBe(true);
                 expect(data.message.includes('par')).toBe(false);
             },
@@ -113,7 +113,7 @@ describe('ChatGateway', () => {
         gateway.event(socket, { room: TEST_ROOM_ID, event: 'Différence', multiplayer: false });
     });
 
-    it('abandon should emit a hint event and include player name in the alert message', () => {
+    it('abandon should emit a abandon event and include player name in the alert message', () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
             emit: (event: string, data) => {
@@ -124,11 +124,11 @@ describe('ChatGateway', () => {
         gateway.abandon(socket, { room: TEST_ROOM_ID, name: 'Player 1' });
     });
 
-    it('hint should emit hint event and include a socketid called Event', () => {
+    it('hint should emit RoomMessage event and include a socketid called Event', () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
             emit: (event: string, data) => {
-                expect(event).toEqual(ChatEvents.Event);
+                expect(event).toEqual(ChatEvents.RoomMessage);
                 expect(data.message.includes('Indice')).toBe(true);
                 expect(data.socketId).toEqual('event');
             },
@@ -150,10 +150,8 @@ describe('ChatGateway', () => {
         const date = new Date();
         const hour = date.getHours().toString();
         const minutes = date.getMinutes().toString();
-        const seconds = date.getSeconds().toString();
         const expectedDate = gateway.dateCreator();
-        expect(expectedDate.hour).toEqual(hour);
-        expect(expectedDate.minutes).toEqual(minutes);
-        expect(+expectedDate.seconds).toBeCloseTo(+seconds);
+        expect(expectedDate.includes(hour)).toBe(true);
+        expect(expectedDate.includes(minutes)).toBe(true);
     });
 });

@@ -52,10 +52,10 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         public timerService: TimerSoloService,
         private convertService: SecondToMinuteService,
         private gameCardInfoService: GameCardInformationService,
-        public foundDifferenceService: FoundDifferenceService,
+        private foundDifferenceService: FoundDifferenceService,
         private route: ActivatedRoute,
-        public dialog: MatDialog,
-        public router: Router,
+        private dialog: MatDialog,
+        private router: Router,
         public chat: SocketService,
     ) {}
 
@@ -82,7 +82,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         });
     }
 
-    configureSocketReactions() {
+    configureSocketReactions(): void {
         this.chat.listen<Validation>(ChatEvents.WordValidated, (validation: Validation) => {
             if (validation.validated) {
                 this.chat.send<RoomManagement>(ChatEvents.RoomMessage, { room: this.currentRoom, message: validation.originalMessage });
@@ -91,9 +91,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             }
         });
         this.chat.listen<RoomMessage>(ChatEvents.RoomMessage, (data: RoomMessage) => {
-            this.messages.push(data);
-        });
-        this.chat.listen<RoomMessage>(ChatEvents.Event, (data: RoomMessage) => {
             this.messages.push(data);
         });
         this.chat.listen<RoomMessage>(ChatEvents.Abandon, (message: RoomMessage) => {
@@ -141,7 +138,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.chat.send('event', { room: this.currentRoom, multiplayer: this.is1v1, event: 'Différence trouvée' });
     }
 
-    openInfoModal() {
+    openInfoModal(): void {
         this.dialog.open(GameInfoModalComponent, {
             data: {
                 gameCardInfo: this.gameCardInfo,
@@ -150,7 +147,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         });
     }
 
-    quitGame() {
+    quitGame(): void {
         this.dialog.open(QuitGameModalComponent, { disableClose: true, data: { player: this.player, room: this.currentRoom } });
     }
 

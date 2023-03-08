@@ -13,7 +13,7 @@ export class ChosePlayerNameDialogComponent {
     awaitingPlayer: boolean = false;
     playerName: string = '';
     constructor(
-        public dialogRef: MatDialogRef<ChosePlayerNameDialogComponent>,
+        private dialogRef: MatDialogRef<ChosePlayerNameDialogComponent>,
         private chat: SocketService,
         @Inject(MAT_DIALOG_DATA) public conditions: GameConditions,
     ) {

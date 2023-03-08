@@ -9,6 +9,7 @@ import { ClickEventService } from '@app/services/click-event/click-event.service
 import { STAGE } from '@app/services/server-routes';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { of, Subject } from 'rxjs';
+import { FLASH_AMOUNT } from './click-event-constant';
 import { DIFFERENCE_FOUND, DIFFERENCE_NOT_FOUND, TEST_DIFFERENCES } from './click-event-constants-testing';
 import { ClickEventComponent } from './click-event.component';
 describe('ClickEventComponent', () => {
@@ -204,8 +205,8 @@ describe('ClickEventComponent', () => {
         spyOn(component, 'emitSound').and.callFake(() => {});
         await component.differenceEffect([0]);
 
-        expect(turnYellowSpy).toHaveBeenCalledTimes(2);
-        expect(turnOffYellowSpy).toHaveBeenCalledTimes(2);
+        expect(turnYellowSpy).toHaveBeenCalledTimes(FLASH_AMOUNT);
+        expect(turnOffYellowSpy).toHaveBeenCalledTimes(FLASH_AMOUNT);
     });
 
     it('component should draw image on canvas on init', waitForAsync(async () => {

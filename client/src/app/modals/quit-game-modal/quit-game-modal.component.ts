@@ -10,21 +10,22 @@ import { PlayersInformation } from '@common/chat-dialog-constants';
     styleUrls: ['./quit-game-modal.component.scss'],
 })
 export class QuitGameModalComponent {
+    image: string = '../../../assets/crying-black-guy-meme.gif';
     // eslint-disable-next-line max-params
     constructor(
-        public matDialogRef: MatDialogRef<QuitGameModalComponent>,
-        public router: Router,
+        private matDialogRef: MatDialogRef<QuitGameModalComponent>,
+        private router: Router,
         private chat: SocketService,
         @Inject(MAT_DIALOG_DATA) public abandon: PlayersInformation,
     ) {}
 
-    confirm() {
+    confirm(): void {
         this.chat.send('abandon', { name: this.abandon.player, room: this.abandon.room });
         this.matDialogRef.close();
         this.router.navigate(['/stage-selection']);
     }
 
-    cancel() {
+    cancel(): void {
         this.matDialogRef.close();
     }
 }

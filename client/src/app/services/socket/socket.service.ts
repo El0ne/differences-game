@@ -10,7 +10,7 @@ export class SocketService {
     names: string[] = [];
     gameRoom: string;
 
-    get socketId() {
+    get socketId(): string {
         return this.sio.id ? this.sio.id : '';
     }
 

@@ -14,12 +14,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     constructor(private readonly logger: Logger) {}
 
     @SubscribeMessage(ChatEvents.Message)
-    message(_: Socket, message: string) {
+    message(_: Socket, message: string): void {
         this.logger.log(`Message reçu : ${message}`);
     }
 
     @SubscribeMessage(ChatEvents.Validate)
-    validate(socket: Socket, message: string) {
+    validate(socket: Socket, message: string): void {
         if (message && message.length < MESSAGE_MAX_LENGTH) {
             socket.emit(ChatEvents.WordValidated, { validated: true, originalMessage: message });
         } else {
@@ -31,7 +31,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // temporary function in order to test chat functionality.
     // it will be removed when time for integration (no use to test in this scenario)
     @SubscribeMessage(ChatEvents.RoomCheck)
-    check(socket: Socket, data: MultiplayerRequestInformation) {
+    check(socket: Socket, data: MultiplayerRequestInformation): void {
         for (const room of this.waitingRoom) {
             if (room.gameId === data.game) {
                 socket.join(room.roomId);
@@ -47,39 +47,39 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     @SubscribeMessage(ChatEvents.Event)
-    event(socket: Socket, data: RoomEvent) {
+    event(socket: Socket, data: RoomEvent): void {
         if (socket.rooms.has(data.room)) {
             const date = this.dateCreator();
             let dateFormatted: string;
             if (data.multiplayer) {
-                dateFormatted = `${date.hour}:${date.minutes}:${date.seconds} - ${data.event} par `;
+                dateFormatted = `${date} - ${data.event} par `;
             } else {
-                dateFormatted = `${date.hour}:${date.minutes}:${date.seconds} - ${data.event}.`;
+                dateFormatted = `${date} - ${data.event}.`;
             }
 
-            this.server.to(data.room).emit(ChatEvents.Event, { socketId: socket.id, message: dateFormatted, event: true });
+            this.server.to(data.room).emit(ChatEvents.RoomMessage, { socketId: socket.id, message: dateFormatted, event: true });
         }
     }
 
     @SubscribeMessage(ChatEvents.Abandon)
-    abandon(socket: Socket, data: AbandonGame) {
+    abandon(socket: Socket, data: AbandonGame): void {
         if (socket.rooms.has(data.room)) {
             const date = this.dateCreator();
-            const dateFormatted = `${date.hour}:${date.minutes}:${date.seconds} - ${data.name} a abandonné la partie.`;
+            const dateFormatted = `${date} - ${data.name} a abandonné la partie.`;
             this.server.to(data.room).emit(ChatEvents.Abandon, { socketId: socket.id, message: dateFormatted, event: true });
         }
     }
     @SubscribeMessage(ChatEvents.Hint)
-    hint(socket: Socket, room: string) {
+    hint(socket: Socket, room: string): void {
         if (socket.rooms.has(room)) {
             const date = this.dateCreator();
-            const dateFormatted = `${date.hour}:${date.minutes}:${date.seconds} - Indice utilisé.`;
-            this.server.to(room).emit(ChatEvents.Event, { socketId: 'event', message: dateFormatted, event: true });
+            const dateFormatted = `${date} - Indice utilisé.`;
+            this.server.to(room).emit(ChatEvents.RoomMessage, { socketId: 'event', message: dateFormatted, event: true });
         }
     }
 
     @SubscribeMessage(ChatEvents.BroadcastAll)
-    broadcastAll(socket: Socket, message: string) {
+    broadcastAll(socket: Socket, message: string): void {
         this.server.emit(ChatEvents.MassMessage, `${socket.id} : ${message}`);
     }
 
@@ -89,7 +89,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     @SubscribeMessage(ChatEvents.RoomMessage)
-    roomMessage(socket: Socket, message: RoomManagement) {
+    roomMessage(socket: Socket, message: RoomManagement): void {
         // Seulement un membre de la salle peut envoyer un message aux autres
         if (socket.rooms.has(message.room)) {
             const transformedMessage = message.message.toString();
@@ -97,21 +97,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
     }
 
-    handleConnection(socket: Socket) {
+    handleConnection(socket: Socket): void {
         this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
         // message initial
         socket.emit(ChatEvents.Hello, 'Hello World!');
     }
 
-    handleDisconnect(socket: Socket) {
+    handleDisconnect(socket: Socket): void {
         this.logger.log(`Déconnexion par l'utilisateur avec id : ${socket.id}`);
     }
 
-    dateCreator() {
+    dateCreator(): string {
         const date = new Date();
         const hour = date.getHours().toString();
         const minutes = date.getMinutes().toString();
         const seconds = date.getSeconds().toString();
-        return { hour, minutes, seconds };
+        const dateFormatted = `${hour}:${minutes}:${seconds}`;
+        return dateFormatted;
     }
 }
