@@ -1,4 +1,4 @@
-export interface ImageInformation {
+export interface ImageDto {
     fieldname: string;
     originalname: string;
     encoding: string;

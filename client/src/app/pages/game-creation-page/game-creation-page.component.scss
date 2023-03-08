@@ -1,5 +1,5 @@
 body {
-    background: linear-gradient(black, #7a04eb);
+    background: linear-gradient(black, #7a04eb, #bd04eb);
 }
 .header-button-container {
     display: flex;
@@ -121,7 +121,6 @@ button:active {
     border: 1px solid #eee;
     border-radius: 2rem;
     padding: 0.4em;
-    box-shadow: 0 0 1px #eee, 0 0 1px #aaa, 0 0 2rem #bc13fe, 0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
 }
 .container {
     border-style: solid;
@@ -130,7 +129,6 @@ button:active {
     border: 0.2rem solid #eee;
     border-radius: 2rem;
     padding: 0.4em;
-    box-shadow: 0 0 0.2rem #eee, 0 0 0.2rem #aaa, 0 0 2rem #bc13fe, 0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
 }
 
 output {
@@ -171,7 +169,6 @@ output {
     border: 0.2rem solid #fff;
     border-radius: 2rem;
     padding: 0.4em;
-    box-shadow: 0 0 0.2rem #fff, 0 0 0.2rem #fff, 0 0 2rem #bc13fe, 0 0 0.8rem #bc13fe, 0 0 2.8rem #bc13fe, inset 0 0 1.3rem #bc13fe;
 }
 .row-tools {
     width: 100%;
@@ -249,70 +246,4 @@ button {
     margin-top: 15%;
     align-self: center;
     text-align: center;
-}
-
-section {
-    visibility: hidden;
-    opacity: 0;
-
-    &.open {
-        visibility: inherit;
-        opacity: 1;
-    }
-
-    display: block;
-
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-
-    background: rgba(0, 0, 0, 0.5);
-    transition: opacity 250ms ease-in;
-
-    > div {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-
-        height: 700px;
-        width: 900px;
-
-        background: linear-gradient(0.25turn, #ff5f6d, #ffc371);
-        padding: 64px;
-
-        border-radius: 8px;
-
-        box-shadow: 0 0 8px 4px rgba(0, 0, 0, 0.1);
-
-        display: flex;
-        flex-direction: column;
-    }
-
-    h1 {
-        margin: 5%;
-        color: white;
-    }
-
-    .continue {
-        height: 4rem;
-        width: 7rem;
-    }
-
-    .diff-image {
-        width: 640px;
-        height: 480px;
-        background-color: white;
-        top: 50%;
-        left: 50%;
-        align-self: center;
-    }
-
-    .info-diff {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-around;
-    }
 }

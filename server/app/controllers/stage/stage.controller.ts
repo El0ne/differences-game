@@ -3,8 +3,8 @@ import { DifferenceDetectionService } from '@app/services/difference-detection/d
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameDifficultyService } from '@app/services/game-difficulty/game-difficulty.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
-import { GameCardInformation } from '@common/game-card';
-import { ImageUploadData } from '@common/image-upload-data';
+import { GameCardDto } from '@common/game-card.dto';
+import { ImageUploadDto } from '@common/image-upload.dto';
 import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
 import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
@@ -13,7 +13,6 @@ import { diskStorage } from 'multer';
 import * as path from 'path';
 import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
-
 // based on https://www.youtube.com/watch?v=f-URVd2OKYc
 export const storage = diskStorage({
     destination: './assets/images',
@@ -36,37 +35,39 @@ export class StageController {
     ) {}
 
     @Get('/')
-    getStages(@Query('index') index: number, @Query('endIndex') endIndex: number, @Res() res: Response): void {
+    async getStages(@Query('index') index: number, @Query('endIndex') endIndex: number, @Res() res: Response): Promise<void> {
         try {
-            res.status(HttpStatus.OK).send(this.gameCardService.getGameCards(index, endIndex));
+            const gameCards = await this.gameCardService.getGameCards(index, endIndex);
+            res.status(HttpStatus.OK).send(gameCards);
         } catch (error) {
             throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @Get('/info')
-    getNbOfStages(): number {
+    async getNbOfStages(): Promise<number> {
         try {
-            return this.gameCardService.getGameCardsNumber();
+            return await this.gameCardService.getGameCardsNumber();
         } catch {
             throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @Get('/:gameCardId')
-    getStageById(@Param() param): GameCardInformation {
+    async getStageById(@Param() param, @Res() res: Response): Promise<void> {
         try {
-            return this.gameCardService.getGameCardById(param.gameCardId);
+            const gameCard = await this.gameCardService.getGameCardById(param.gameCardId);
+            res.status(HttpStatus.OK).send(gameCard);
         } catch {
             throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @Post('/')
-    createGame(@Body() game, @Res() res: Response) {
+    async createGame(@Body() game: GameCardDto, @Res() res: Response): Promise<void> {
         try {
             if (Object.keys(game).length) {
-                const newGame = this.gameCardService.createGameCard(game);
+                const newGame = await this.gameCardService.createGameCard(game);
                 res.status(HttpStatus.CREATED).send(newGame);
             } else res.sendStatus(HttpStatus.BAD_REQUEST);
         } catch (err) {
@@ -84,7 +85,7 @@ export class StageController {
             { storage },
         ),
     )
-    async uploadImages(@UploadedFiles() files: ImageUploadData, @Param() param, @Res() res: Response): Promise<void> {
+    async uploadImages(@UploadedFiles() files: ImageUploadDto, @Param() param, @Res() res: Response): Promise<void> {
         try {
             if (Object.keys(files).length) {
                 const differencesArray = await this.differenceService.compareImages(
@@ -93,14 +94,12 @@ export class StageController {
                     param.radius,
                 );
 
-                const id = uuidv4();
-                this.differenceClickService.createDifferenceArray(id, differencesArray);
-
                 if (this.gameDifficultyService.isGameValid(differencesArray)) {
+                    const differenceObjectId = await this.differenceClickService.createDifferenceArray(differencesArray);
                     const difficulty = this.gameDifficultyService.setGameDifficulty(differencesArray);
 
                     const data: ServerGeneratedGameInfo = {
-                        gameId: id,
+                        gameId: differenceObjectId,
                         originalImageName: files.baseImage[0].filename,
                         differenceImageName: files.differenceImage[0].filename,
                         gameDifficulty: difficulty,
@@ -119,7 +118,7 @@ export class StageController {
     }
 
     @Get('/image/:imageName')
-    getImage(@Param() param, @Res() res: Response): void {
+    async getImage(@Param() param, @Res() res: Response): Promise<void> {
         try {
             const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);
             res.status(HttpStatus.OK).sendFile(imagePath);

@@ -1,22 +1,8 @@
-<div class="card">
+<div class="card neon-border">
     <div class="row">
         <div class="column">
-            <p class="nom">{{ gameCardInformation.name }}</p>
+            <p class="nom neon">{{ gameCardInformation.name }}</p>
             <img [src]="this.image" class="photo" />
-        </div>
-        <div class="column configuration" *ngIf="isConfig">
-            <div>
-                Temps de pénalité pour l'utilisation d'un indice :
-                <div>5 secondes</div>
-            </div>
-            <div>
-                Temps initial du compte à rebours :
-                <div>30 secondes</div>
-            </div>
-            <div>
-                Temps gagné avec la découverte d'une différence :
-                <div>5 secondes</div>
-            </div>
         </div>
         <div class="column">
             <div class="difficulty-container" [ngClass]="gameCardInformation.difficulty === 'Difficile' ? 'difficult' : 'easy'">
@@ -48,11 +34,11 @@
         </div>
     </div>
     <div class="row" *ngIf="isConfig">
-        <button class="normal-button play">Supprimer</button>
-        <button class="normal-button create">Réinitialiser</button>
+        <button class="normal-button option-button">Supprimer</button>
+        <button class="normal-button option-button">Réinitialiser</button>
     </div>
     <div class="row" *ngIf="!isConfig">
-        <button class="normal-button play" [routerLink]="'/soloview/' + gameCardInformation.id">Jouer</button>
-        <button class="normal-button create" routerLink="/waitingRoom">Joindre</button>
+        <button class="normal-button play option-button" [routerLink]="'/soloview/' + gameCardInformation._id">Jouer</button>
+        <button class="normal-button create option-button" routerLink="/waitingRoom">Joindre</button>
     </div>
 </div>
