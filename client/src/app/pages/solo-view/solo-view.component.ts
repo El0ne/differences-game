@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
+import { FAST_WAIT_TIME_MS } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
@@ -72,15 +73,15 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         document.removeEventListener('keydown', this.boundActivateCheatMode);
     }
 
-    resetDifferences(event: KeyboardEvent) {
+    resetDifferences(event: KeyboardEvent): void {
         this.left.toggleCheatMode = !this.left.toggleCheatMode;
         this.right.toggleCheatMode = !this.right.toggleCheatMode;
         setTimeout(() => {
             this.activateCheatMode(event);
-        }, 400);
+        }, FAST_WAIT_TIME_MS);
     }
 
-    activateCheatMode(event: KeyboardEvent) {
+    activateCheatMode(event: KeyboardEvent): void {
         if (event.key === 't') {
             let differences: number[] = [];
 
@@ -98,13 +99,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 }
                 if (this.left.toggleCheatMode) this.handleFlash(differences);
             });
-        }
-    }
-
-    deactivateCheatMode(event: KeyboardEvent) {
-        if (event.key === 't') {
-            this.left.toggleCheatMode = false;
-            this.right.toggleCheatMode = false;
         }
     }
 
