@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
-import { HostWaitingRoomComponent, WaitingRoomDataPassing } from '@app/modals/host-waiting-room/host-waiting-room.component';
+import { WaitingRoomComponent, WaitingRoomDataPassing } from '@app/modals/waiting-room/waiting-room.component';
 import { STAGE } from '@app/services/server-routes';
 import { SocketService } from '@app/services/socket/socket.service';
 import { GameCardInformation } from '@common/game-card';
@@ -36,7 +36,7 @@ export class GameCardSelectionComponent implements OnInit {
             });
         }
         const data: WaitingRoomDataPassing = { stageId: this.gameCardInformation.id, isHost: this.createGameButton };
-        this.dialog.open(HostWaitingRoomComponent, { disableClose: true, data });
+        this.dialog.open(WaitingRoomComponent, { disableClose: true, data });
     }
 
     selectPlayerName(isSoloGame: boolean) {

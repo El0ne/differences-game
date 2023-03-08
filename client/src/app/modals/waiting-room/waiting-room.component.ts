@@ -11,16 +11,17 @@ export interface WaitingRoomDataPassing {
 
 @Component({
     selector: 'app-host-waiting-room',
-    templateUrl: './host-waiting-room.component.html',
-    styleUrls: ['./host-waiting-room.component.scss'],
+    templateUrl: './waiting-room.component.html',
+    styleUrls: ['./waiting-room.component.scss'],
 })
-export class HostWaitingRoomComponent implements OnInit, OnDestroy {
+export class WaitingRoomComponent implements OnInit, OnDestroy {
     clientsInWaitingRoom: Map<string, string> = new Map<string, string>();
     waitingRoomInfo: WaitingRoomDataPassing;
 
+    // raison: besoin de tous les parametres
     // eslint-disable-next-line max-params
     constructor(
-        public dialogRef: MatDialogRef<HostWaitingRoomComponent>,
+        public dialogRef: MatDialogRef<WaitingRoomComponent>,
         public router: Router,
         public socket: SocketService,
         @Inject(MAT_DIALOG_DATA) data: WaitingRoomDataPassing,
@@ -39,16 +40,12 @@ export class HostWaitingRoomComponent implements OnInit, OnDestroy {
             });
 
             this.socket.listen(WaitingRoomEvents.MatchConfirmed, (roomId: string) => {
-                this.socket.gameRoom = roomId;
-                this.router.navigate(['/1v1/' + this.waitingRoomInfo.stageId]);
-                this.dialogRef.close();
+                this.navigateTo1v1(roomId);
             });
         } else {
             this.socket.listen<AcceptationInformation>(WaitingRoomEvents.MatchAccepted, (acceptationInfo: AcceptationInformation) => {
                 this.socket.names.set(acceptationInfo.playerSocketId, acceptationInfo.playerName);
-                this.socket.gameRoom = acceptationInfo.roomId;
-                this.router.navigate(['/1v1/' + this.waitingRoomInfo.stageId]);
-                this.dialogRef.close();
+                this.navigateTo1v1(acceptationInfo.roomId);
             });
 
             this.socket.listen(WaitingRoomEvents.MatchRefused, (refusedReason: string) => {
@@ -56,6 +53,12 @@ export class HostWaitingRoomComponent implements OnInit, OnDestroy {
                 this.dialogRef.close();
             });
         }
+    }
+
+    navigateTo1v1(gameRoom: string) {
+        this.socket.gameRoom = gameRoom;
+        this.dialogRef.close();
+        this.router.navigate(['/1v1/' + this.waitingRoomInfo.stageId]);
     }
 
     ngOnDestroy(): void {

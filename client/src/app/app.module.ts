@@ -13,11 +13,11 @@ import { ClickEventComponent } from './components/click-event/click-event.compon
 import { GameCardSelectionComponent } from './components/game-card-selection/game-card-selection.component';
 import { ChosePlayerNameDialogComponent } from './modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { ModalPageComponent } from './modals/modal-page/modal-page.component';
+import { WaitingRoomComponent } from './modals/waiting-room/waiting-room.component';
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 import { GameSelectionComponent } from './pages/game-selection/game-selection.component';
 import { HomePageComponent } from './pages/home-page/home-page.component';
 import { SoloViewComponent } from './pages/solo-view/solo-view.component';
-import { HostWaitingRoomComponent } from './modals/host-waiting-room/host-waiting-room.component';
 
 /**
  * Main module that is used in main.ts.
@@ -37,7 +37,7 @@ import { HostWaitingRoomComponent } from './modals/host-waiting-room/host-waitin
         ClickEventComponent,
         GameCreationPageComponent,
         ChosePlayerNameDialogComponent,
-        HostWaitingRoomComponent,
+        WaitingRoomComponent,
     ],
     entryComponents: [ModalPageComponent],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, MatIconModule],

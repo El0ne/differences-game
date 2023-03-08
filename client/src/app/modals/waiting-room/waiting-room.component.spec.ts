@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { HostWaitingRoomComponent } from './host-waiting-room.component';
+import { WaitingRoomComponent } from './waiting-room.component';
 
-describe('HostWaitingRoomComponent', () => {
-    let component: HostWaitingRoomComponent;
-    let fixture: ComponentFixture<HostWaitingRoomComponent>;
+describe('WaitingRoomComponent', () => {
+    let component: WaitingRoomComponent;
+    let fixture: ComponentFixture<WaitingRoomComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [HostWaitingRoomComponent],
+            declarations: [WaitingRoomComponent],
         }).compileComponents();
 
-        fixture = TestBed.createComponent(HostWaitingRoomComponent);
+        fixture = TestBed.createComponent(WaitingRoomComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

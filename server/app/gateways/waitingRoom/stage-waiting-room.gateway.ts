@@ -8,7 +8,7 @@ import { Server, Socket } from 'socket.io';
 @Injectable()
 export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
-    gameHosts: Map<string, string> = new Map<string, string>(); // <stageId, hostSocketId>
+    gameHosts: Map<string, string> = new Map<string, string>();
 
     constructor(private readonly logger: Logger) {}
 
@@ -86,7 +86,7 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
     }
 
     clearRooms(socket: Socket): void {
-        // will have to change if the socket uses any other room
+        // TODO will have to change if the socket uses any other room in the project
         for (const room of socket.rooms) {
             socket.leave(room);
         }
