@@ -51,7 +51,7 @@ export class GameSelectionComponent implements OnInit {
         return this.index + GAME_CARDS_TO_DISPLAY >= this.numberOfGameInformations;
     }
 
-    displayGameCards() {
+    displayGameCards(): void {
         this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
             this.numberOfGameInformations = data;
             this.selectGameCards();
