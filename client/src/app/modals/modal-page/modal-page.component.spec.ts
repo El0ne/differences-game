@@ -13,9 +13,7 @@ describe('ModalPageComponent', () => {
     let component: ModalPageComponent;
     let fixture: ComponentFixture<ModalPageComponent>;
     let gameCardService: GameCardInformationService;
-    // let createdGame: Subject<GameCardInformation>;
     let dialogRefSpyObject: MatDialogRef<ModalPageComponent>;
-    // let routerSpy: Router;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -35,33 +33,16 @@ describe('ModalPageComponent', () => {
                 { provide: MAT_DIALOG_DATA, useValue: {} },
                 { provide: MatDialogRef, useValue: {} },
                 GameCardInformationService,
-                // { provide: GameCardInformationService, useValue: gameCardServiceMock },
             ],
         }).compileComponents();
 
-        // gameCardServiceMock = jasmine.createSpyObj('GameCardInformationService', ['createGame']);
-        // createdGame = new Subject<GameCardInformation>();
-        // gameCardServiceMock.createGame = () => {
-        //     createdGame.next(GAMES[0]);
-        //     return createdGame.asObservable();
-        // };
         dialogRefSpyObject = jasmine.createSpyObj({ afterClosed: of({}), close: null });
-        // routerSpy = spyOn(TestBed.inject(Router), 'navigate');
         fixture = TestBed.createComponent(ModalPageComponent);
         component = fixture.componentInstance;
         component.matDialogRef = dialogRefSpyObject;
         fixture.detectChanges();
         gameCardService = TestBed.inject(GameCardInformationService);
     });
-
-    // it('should close the dialog and move to the configuration page when user decides to create game', () => {
-    //     component.matDialogRef = dialogRefSpyObject;
-
-    //     component.createGame();
-
-    //     expect(dialogRefSpyObject.close).toHaveBeenCalled();
-    //     expect(routerSpy).toHaveBeenCalledWith(['/config']);
-    // });
 
     it('should close the dialog on destroy', () => {
         component.matDialogRef = dialogRefSpyObject;
@@ -85,14 +66,6 @@ describe('ModalPageComponent', () => {
         const redirectionMock = spyOn(component, 'redirection');
         const serviceDeleteImageMock = spyOn(gameCardService, 'deleteImage').and.returnValue(of());
 
-        // component.data.gameInfo.baseImage = 'test';
-        // component.data.gameInfo.differenceImage = 'tes3';
-
-        // component.deleteImages();
-        // expect(serviceDeleteImageMock).toHaveBeenCalledWith(component.data.gameInfo.baseImage);
-        // expect(redirectionMock).toHaveBeenCalledWith('/creatingGame');
-
-        // component.data = { gameInfo: { baseImage: 'image1.jpg', differenceImage: 'image2.jpg' } };
         component.data = {
             image: 'string',
             difference: 0,
@@ -112,7 +85,6 @@ describe('ModalPageComponent', () => {
         component.createGame();
 
         expect(dialogRefSpyObject.close).toHaveBeenCalled();
-        // expect(routerSpy).toHaveBeenCalledWith(['/config']);
     });
 });
 
