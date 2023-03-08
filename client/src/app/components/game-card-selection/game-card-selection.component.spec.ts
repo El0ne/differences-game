@@ -16,9 +16,6 @@ describe('GameCardSelectionComponent', () => {
     const gameCardServiceSpyObj = jasmine.createSpyObj('GameCardInformationService', ['deleteGame']);
     gameCardServiceSpyObj.deleteGame.and.returnValue(of());
     let gameCardServiceSpy: GameCardInformationService;
-    // const gameCardServiceMock = {
-    //     deleteGame: jasmine.createSpy().and.returnValue(of(null)),
-    // };
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -41,11 +38,7 @@ describe('GameCardSelectionComponent', () => {
 
     it('deleteGame should call gameCardService.deleteGame and gameDeleted.emit', () => {
         component.gameCardInformation = GAMES[0];
-        // const gameCardServiceMock = {
-        //     deleteGame: jasmine.createSpy().and.returnValue(of()),
-        // };
         const gameDeletedSpy = spyOn(component.gameDeleted, 'emit');
-        // const gameCardServiceMock = spyOn(gameCardServiceSpy, 'deleteGame').and.returnValue(of());
         component.deleteGame();
         expect(gameCardServiceSpy.deleteGame).toHaveBeenCalledWith(component.gameCardInformation._id);
         expect(gameDeletedSpy).toHaveBeenCalled();
