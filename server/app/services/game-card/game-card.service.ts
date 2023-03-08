@@ -44,17 +44,12 @@ export class GameCardService {
         const deletedGameCard = await this.gameCardModel.findByIdAndDelete(new ObjectId(id));
         await this.imageManagerService.deleteImage(deletedGameCard.originalImageName);
         await this.imageManagerService.deleteImage(deletedGameCard.differenceImageName);
-        // eslint-disable-next-line no-underscore-dangle
         await this.differenceClickService.deleteDifferences(deletedGameCard._id);
         // TODO Remove populate when over with delete
-        // if ((await this.getGameCardsNumber()) === 0) {
-        //     await this.populateDB();
-        // }
     }
 
     generateGameCard(game: GameCardDto): GameCard {
         return {
-            // eslint-disable-next-line no-underscore-dangle
             _id: new ObjectId(game._id),
             name: game.name,
             difficulty: game.difficulty,
@@ -73,20 +68,3 @@ export class GameCardService {
             ],
         };
     }
-
-    // async populateDB() {
-    //     for (let i = 0; i < 6; i++) {
-    //         this.createGameCard(getFakeGameDTO());
-    //     }
-    // }
-}
-
-const getFakeGameDTO = (): GameCardDto => ({
-    _id: new ObjectId().toHexString(),
-    name: (Math.random() + 1).toString(36).substring(2),
-    difficulty: 'Facile',
-    baseImage: 'game.baseImage',
-    differenceImage: 'game.differenceImage',
-    radius: 3,
-    differenceNumber: 6,
-});
