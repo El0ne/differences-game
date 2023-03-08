@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { GameCard, GameCardDocument } from '@app/schemas/game-cards.schemas';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
