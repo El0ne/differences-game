@@ -24,6 +24,8 @@ describe('GameCardService', () => {
     let gameCardModel: Model<GameCardDocument>;
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
+    let imageManagerService: ImageManagerService;
+    let differenceClickService: DifferenceClickService;
 
     beforeEach(async () => {
         mongoServer = await MongoMemoryServer.create();
@@ -52,6 +54,8 @@ describe('GameCardService', () => {
         }).compile();
 
         service = module.get<GameCardService>(GameCardService);
+        imageManagerService = module.get<ImageManagerService>(ImageManagerService);
+        differenceClickService = module.get<DifferenceClickService>(DifferenceClickService);
         gameCardModel = module.get<Model<GameCardDocument>>(getModelToken(GameCard.name));
         connection = await module.get(getConnectionToken());
         await gameCardModel.deleteMany({});
@@ -121,6 +125,19 @@ describe('GameCardService', () => {
         expect(game).toEqual(expect.objectContaining(fakeGameCard));
     });
 
+    it('deleteGameCard should delete a gameCard, its 2 images and call the deleteDifferences service', async () => {
+        const gameCard = getFakeGameCard();
+        const imageManagerServiceMock = jest.spyOn(imageManagerService, 'deleteImage').mockImplementation();
+        const differenceClickServiceMock = jest.spyOn(differenceClickService, 'deleteDifferences').mockImplementation();
+
+        await gameCardModel.create(gameCard);
+
+        await service.deleteGameCard(gameCard._id.toHexString());
+
+        expect(imageManagerServiceMock).toHaveBeenCalledWith(gameCard.originalImageName);
+        expect(imageManagerServiceMock).toHaveBeenCalledWith(gameCard.differenceImageName);
+        expect(differenceClickServiceMock).toHaveBeenCalledWith(gameCard._id);
+    });
     it('generateGameCard should create a game card from a game informations', async () => {
         const gameCard = getFakeGameCard();
         gameCard._id = new ObjectId('00000000773db8b853265f32');

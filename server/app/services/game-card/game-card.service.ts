@@ -74,11 +74,11 @@ export class GameCardService {
         };
     }
 
-    async populateDB() {
-        for (let i = 0; i < 6; i++) {
-            this.createGameCard(getFakeGameDTO());
-        }
-    }
+    // async populateDB() {
+    //     for (let i = 0; i < 6; i++) {
+    //         this.createGameCard(getFakeGameDTO());
+    //     }
+    // }
 }
 
 const getFakeGameDTO = (): GameCardDto => ({
