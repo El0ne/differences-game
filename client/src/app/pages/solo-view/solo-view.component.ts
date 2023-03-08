@@ -180,8 +180,4 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.incrementScore();
         this.addDifferenceDetected(information.differencesPosition);
     }
-
-    test() {
-        this.chat.send('start timer', this.chat.gameRoom);
-    }
 }
