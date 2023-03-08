@@ -11,6 +11,7 @@ import { GameCardDto } from '@common/game-card.dto';
 })
 export class ModalPageComponent implements OnDestroy {
     // eslint-disable-next-line max-params
+    // We have more than 3 necessary parameters
     constructor(
         @Inject(MAT_DIALOG_DATA)
         public data: {
