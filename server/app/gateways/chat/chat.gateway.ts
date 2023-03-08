@@ -84,7 +84,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     @SubscribeMessage(ChatEvents.JoinRoom)
-    joinRoom(socket: Socket, room: string) {
+    joinRoom(socket: Socket, room: string): void {
         socket.join(room);
     }
 
