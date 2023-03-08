@@ -33,8 +33,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     showTextBox: boolean = false;
     showWinMessage: boolean = false;
     showNavBar: boolean = true;
-    player: string = 'Player';
-    opponent: string = 'Player 2';
+    player: string;
+    opponent: string;
     messages: RoomMessage[] = [];
     messageContent: string = '';
     differenceArray: number[][];
@@ -60,6 +60,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit(): void {
+        this.player = 'Player';
+        this.opponent = 'Player 2';
         const gameId = this.route.snapshot.paramMap.get('stageId');
         this.is1v1 = this.router.url.includes('1v1');
         if (gameId) {
