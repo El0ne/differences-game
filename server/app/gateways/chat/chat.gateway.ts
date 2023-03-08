@@ -20,6 +20,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage(ChatEvents.Validate)
     validate(socket: Socket, message: string): void {
+        // console.log('server');
         if (message && message.length < MESSAGE_MAX_LENGTH) {
             socket.emit(ChatEvents.WordValidated, { validated: true, originalMessage: message });
         } else {
@@ -96,6 +97,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.server.to(message.room).emit(ChatEvents.RoomMessage, { socketId: socket.id, message: transformedMessage, event: false });
         }
     }
+
+    @SubscribeMessage('start timer')
+    timer(socket: Socket): void {
+        let timerCount = 0;
+        setInterval(() => {
+            timerCount++;
+            socket.emit(ChatEvents.Elouan, timerCount);
+        }, 1000);
+    }
+
+    // // @SubscribeMessage('start timer')
+    // startTimer(room: string): void {
+    //     let timerCount = 0;
+    //     setInterval(() => {
+    //         timerCount++;
+    //         this.server.to(room).emit(ChatEvents.Elouan, timerCount);
+    //     }, 1000);
+    // }
 
     handleConnection(socket: Socket): void {
         this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
