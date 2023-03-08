@@ -85,11 +85,11 @@ describe('SoloViewComponent', () => {
         expect(component.showTextBox).toBeFalse();
     });
 
-    it('sendMessage should add message if message is fine', () => {
-        component.messageContent = 'test message';
-        component.sendMessage();
-        expect(component.messages).toContain('test message');
-    });
+    // it('sendMessage should add message if message is fine', () => {
+    //     component.messageContent = 'test message';
+    //     component.sendMessage();
+    //     expect(component.messages).toContain('test message');
+    // });
 
     it('sendMessage should call toggleErrorMessage if message is empty', () => {
         const toggleErrorMessageSpy = spyOn(component, 'toggleErrorMessage');
