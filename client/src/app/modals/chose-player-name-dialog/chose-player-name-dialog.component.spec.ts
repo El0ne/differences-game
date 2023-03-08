@@ -12,8 +12,6 @@ describe('ChosePlayerNameDialogComponent', () => {
 
     beforeEach(async () => {
         matDialogSpy = jasmine.createSpyObj('MatDialogRef<ChosePlayerNameDialogComponent>', ['close']);
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        matDialogSpy.close = () => {};
 
         await TestBed.configureTestingModule({
             declarations: [ChosePlayerNameDialogComponent],
@@ -37,10 +35,11 @@ describe('ChosePlayerNameDialogComponent', () => {
     });
 
     it('validateName should turn nameErrorMessage to false if message is fine', () => {
-        const dialogRefSpy = spyOn(component.dialogRef, 'close').and.returnValue();
         component.playerName = 'good name';
+        const namesMapSpy = spyOn(component.socket.names, 'set').and.callThrough();
+        spyOnProperty(component.socket, 'socketId').and.returnValue('123');
         component.validateName();
         expect(component.showNameErrorMessage).toBeFalsy();
-        expect(dialogRefSpy).toHaveBeenCalledWith('good name');
+        expect(namesMapSpy).toHaveBeenCalledWith('123', 'good name');
     });
 });
