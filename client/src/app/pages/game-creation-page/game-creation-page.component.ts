@@ -398,31 +398,40 @@ export class GameCreationPageComponent {
 
     toggleButton(id: string) {
         this.removingListeners();
-        this.isPenEnabled = false;
-        this.isRectEnabled = false;
-        this.isEraserEnabled = false;
-        this.isDuplicateEnabled = false;
 
         switch (id) {
             case 'pen':
-                this.isPenEnabled = true;
+                this.isPenEnabled = !this.isPenEnabled;
+                this.isRectEnabled = false;
+                this.isEraserEnabled = false;
+                this.isDuplicateEnabled = false;
                 this.changeZindex();
-                this.drawPen();
+                if (this.isPenEnabled) this.drawPen();
 
                 break;
             case 'rectangle':
-                this.isRectEnabled = true;
+                this.isRectEnabled = !this.isRectEnabled;
+                this.isPenEnabled = false;
+                this.isEraserEnabled = false;
+                this.isDuplicateEnabled = false;
+                console.log(this.isRectEnabled);
                 this.changeZindex();
-                this.drawRectangle();
+                if (this.isRectEnabled) this.drawRectangle();
 
                 break;
             case 'erase':
-                this.isEraserEnabled = true;
+                this.isEraserEnabled = !this.isEraserEnabled;
+                this.isPenEnabled = false;
+                this.isRectEnabled = false;
+                this.isDuplicateEnabled = false;
                 this.changeZindex();
-                this.erase();
+                if (this.isEraserEnabled) this.erase();
                 break;
             case 'duplicate':
-                this.isDuplicateEnabled = true;
+                this.isDuplicateEnabled = !this.isDuplicateEnabled;
+                this.isPenEnabled = false;
+                this.isRectEnabled = false;
+                this.isEraserEnabled = false;
                 break;
         }
     }
