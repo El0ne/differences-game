@@ -47,10 +47,9 @@ describe('ChosePlayerNameDialogComponent', () => {
     it('validateName should turn nameErrorMessage to false if message is fine', () => {
         component.playerName = 'good name';
         const namesMapSpy = spyOn(socketServiceSpy.names, 'set').and.callThrough();
-        // spyOnProperty(socketServiceSpy, 'socketId', 'get').and.returnValue('123');
-        // socketServiceSpy.socketId
+        Object.defineProperty(socketServiceSpy, 'socketId', { value: '123' });
         component.validateName();
         expect(component.showNameErrorMessage).toBeFalsy();
-        expect(namesMapSpy).toHaveBeenCalled();
+        expect(namesMapSpy).toHaveBeenCalledWith('123', 'good name');
     });
 });
