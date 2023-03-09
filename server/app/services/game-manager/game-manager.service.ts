@@ -27,16 +27,19 @@ export class GameManagerService {
     addGame(id: string) {
         console.log('Game started:', id);
 
-        // const currentTest = this.gamePlayedInformation.get(id);
-        // if (currentTest) {
-        //     currentTest.numberOfGames += 1;
-        //     this.gamePlayedInformation.set(id, currentTest);
-        // } else {
-        //     this.gamePlayedInformation.set(id, {
-        //         numberOfGames: 1,
-        //         deleted: false,
-        //     });
-        // }
+        const currentTest = this.gamePlayedInformation.get(id);
+        console.log('currentTest', currentTest);
+        if (currentTest) {
+            currentTest.numberOfGames += 1;
+            console.log('currentTest.numberOfGames', currentTest.numberOfGames);
+            this.gamePlayedInformation.set(id, currentTest);
+        } else {
+            this.gamePlayedInformation.set(id, {
+                numberOfGames: 1,
+                deleted: false,
+            });
+        }
+        console.log('map ', this.gamePlayedInformation);
     }
 
     deleteGame(id: string) {

@@ -50,15 +50,17 @@ export class StageController {
         private gameManagerService: GameManagerService,
     ) {}
 
+    // TODO create a type for id
     @Put('/end-game')
-    endGame(@Body() id: string) {
-        this.gameManagerService.endGame(id);
+    endGame(@Body() id) {
+        console.log('id received', id);
+        this.gameManagerService.endGame(id.gameId);
     }
 
     @Put('/start-game')
-    startGame(@Body() id: string) {
-        console.log('server');
-        this.gameManagerService.addGame(id);
+    startGame(@Body() id) {
+        console.log('id received', id);
+        this.gameManagerService.addGame(id.gameId);
     }
 
     @Get('/')
