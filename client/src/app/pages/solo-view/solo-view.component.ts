@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
@@ -50,6 +50,23 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         public dialog: MatDialog,
     ) {}
+
+    @HostListener('window:beforeunload')
+    unloadHandler() {
+        // Handle user leaving the website
+        this.gameCardInfoService.endGame(this.currentGameId).subscribe();
+    }
+
+    @HostListener('window:unload')
+    beforeUnloadHandler() {
+        // Handle page refresh
+        // TODO => fix to only endGamewhen game deleted (cuz we immediately recreate it after)
+        // Causes problem otherwise cuz we could potentially delete the difference array when there are still people playing
+        console.log(this.gameCardInfoService.getGameCardInfoFromId('640a24a3fe433892c6d3ddb0').subscribe());
+        // if game was deleted
+        this.gameCardInfoService.endGame(this.currentGameId).subscribe();
+        // redirect
+    }
 
     ngOnInit(): void {
         const gameId = this.route.snapshot.paramMap.get('stageId');

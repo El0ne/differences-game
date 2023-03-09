@@ -2,11 +2,26 @@ import { DifferenceClickService } from '@app/services/difference-click/differenc
 import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameDifficultyService } from '@app/services/game-difficulty/game-difficulty.service';
+import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { ImageUploadDto } from '@common/image-upload.dto';
 import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpException,
+    HttpStatus,
+    Param,
+    Post,
+    Put,
+    Query,
+    Res,
+    UploadedFiles,
+    UseInterceptors,
+} from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { diskStorage } from 'multer';
@@ -32,7 +47,13 @@ export class StageController {
         private imageManagerService: ImageManagerService,
         private differenceService: DifferenceDetectionService,
         private differenceClickService: DifferenceClickService,
+        private gameManagerService: GameManagerService,
     ) {}
+
+    @Put('/abandon')
+    endGame(@Body() id: string) {
+        this.gameManagerService.endGame(id);
+    }
 
     @Get('/')
     async getStages(@Query('index') index: number, @Query('endIndex') endIndex: number, @Res() res: Response): Promise<void> {

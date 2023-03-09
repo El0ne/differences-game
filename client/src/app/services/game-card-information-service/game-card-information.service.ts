@@ -43,4 +43,8 @@ export class GameCardInformationService {
     deleteGame(gameId: string): Observable<void> {
         return this.http.delete<void>(`${STAGE}/${gameId}`);
     }
+
+    endGame(gameId: string) {
+        return this.http.put(`${STAGE}/abandon`, { gameId });
+    }
 }

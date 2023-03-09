@@ -11,6 +11,7 @@ import { DifferenceDetectionService } from './services/difference-detection/diff
 import { DifferencesCounterService } from './services/differences-counter/differences-counter.service';
 import { GameCardService } from './services/game-card/game-card.service';
 import { GameDifficultyService } from './services/game-difficulty/game-difficulty.service';
+import { GameManagerService } from './services/game-manager/game-manager.service';
 import { ImageDimensionsService } from './services/image-dimensions/image-dimensions.service';
 import { ImageManagerService } from './services/image-manager/image-manager.service';
 import { PixelPositionService } from './services/pixel-position/pixel-position/pixel-position.service';
@@ -44,6 +45,7 @@ import { PixelRadiusService } from './services/pixel-radius/pixel-radius.service
         PixelPositionService,
         ImageDimensionsService,
         ImageManagerService,
+        GameManagerService,
     ],
 })
 export class AppModule {}
