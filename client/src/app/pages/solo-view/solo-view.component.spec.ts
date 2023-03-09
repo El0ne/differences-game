@@ -39,7 +39,7 @@ describe('SoloViewComponent', () => {
         mockService.getGameCardInfoFromId = () => {
             return of(SERVICE_MOCK_GAME_CARD);
         };
-        chatSocketServiceMock = jasmine.createSpyObj('ChatSocketService', ['connect', 'disconnect', 'liveSocket', 'listen', 'send']);
+        chatSocketServiceMock = jasmine.createSpyObj('SocketService', ['connect', 'disconnect', 'liveSocket', 'listen', 'send']);
         chatSocketServiceMock.sio = jasmine.createSpyObj('Socket', ['on', 'emit', 'disconnect']);
         chatSocketServiceMock.names = ['player', 'opponent'];
         chatSocketServiceMock.gameRoom = 'game';
