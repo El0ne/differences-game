@@ -16,7 +16,7 @@ export enum ChatEvents {
     Hello = 'hello',
     Clock = 'clock',
 
-    Elouan = 'elouan',
+    Elouan = 'ef',
 }
 
 export interface RoomManagement {

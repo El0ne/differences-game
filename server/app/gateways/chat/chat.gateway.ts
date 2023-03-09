@@ -98,24 +98,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
     }
 
-    @SubscribeMessage('start timer')
-    timer(socket: Socket): void {
-        let timerCount = 0;
-        setInterval(() => {
-            timerCount++;
-            socket.emit(ChatEvents.Elouan, timerCount);
-        }, 1000);
-    }
-
-    // // @SubscribeMessage('start timer')
-    // startTimer(room: string): void {
-    //     let timerCount = 0;
-    //     setInterval(() => {
-    //         timerCount++;
-    //         this.server.to(room).emit(ChatEvents.Elouan, timerCount);
-    //     }, 1000);
-    // }
-
     handleConnection(socket: Socket): void {
         this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
         // message initial
