@@ -13,14 +13,14 @@ export class GameManagerService {
 
     endGame(id: string) {
         console.log('Game ended:', id);
-        // const currentTest = this.gamePlayedInformation.get(id);
-        // if (currentTest.numberOfGames === 1) {
-        //     this.gamePlayedInformation.delete(id);
-        //     // service to delete difference
-        // } else {
-        //     currentTest.numberOfGames -= 1;
-        //     this.gamePlayedInformation.set(id, currentTest);
-        // }
+        const currentTest = this.gamePlayedInformation.get(id);
+        if (currentTest.numberOfGames === 1 && currentTest.deleted) {
+            this.gamePlayedInformation.delete(id);
+            // service to delete difference
+        } else {
+            currentTest.numberOfGames -= 1;
+            this.gamePlayedInformation.set(id, currentTest);
+        }
         console.log('this.gamePlayedInformation', this.gamePlayedInformation);
     }
 
@@ -46,5 +46,8 @@ export class GameManagerService {
         const currentTest = this.gamePlayedInformation.get(id);
         currentTest.deleted = true;
         this.gamePlayedInformation.set(id, currentTest);
+        if (currentTest.numberOfGames === 0) {
+            // service to delete difference
+        }
     }
 }
