@@ -10,7 +10,7 @@ import { SocketService } from '@app/services/socket/socket.service';
 export class ChosePlayerNameDialogComponent {
     showNameErrorMessage: boolean = false;
     playerName: string = '';
-    constructor(public dialogRef: MatDialogRef<ChosePlayerNameDialogComponent>, public socket: SocketService) {}
+    constructor(private dialogRef: MatDialogRef<ChosePlayerNameDialogComponent>, private socket: SocketService) {}
 
     validateName(): void {
         const testName = this.playerName;
