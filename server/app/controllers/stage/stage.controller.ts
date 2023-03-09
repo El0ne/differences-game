@@ -50,9 +50,15 @@ export class StageController {
         private gameManagerService: GameManagerService,
     ) {}
 
-    @Put('/abandon')
+    @Put('/end-game')
     endGame(@Body() id: string) {
         this.gameManagerService.endGame(id);
+    }
+
+    @Put('/start-game')
+    startGame(@Body() id: string) {
+        console.log('server');
+        this.gameManagerService.addGame(id);
     }
 
     @Get('/')

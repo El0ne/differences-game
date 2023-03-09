@@ -44,7 +44,14 @@ export class GameCardInformationService {
         return this.http.delete<void>(`${STAGE}/${gameId}`);
     }
 
-    endGame(gameId: string) {
-        return this.http.put(`${STAGE}/abandon`, { gameId });
+    // TODO check if PUT should return something.
+    endGame(gameId: string): Observable<void> {
+        return this.http.put<void>(`${STAGE}/end-game`, { gameId });
+    }
+
+    // TODO check with team if its better to add only one endpoint and pass boolean instead
+    playGame(gameId: string): Observable<void> {
+        console.log('http call');
+        return this.http.put<void>(`${STAGE}/start-game`, { gameId });
     }
 }

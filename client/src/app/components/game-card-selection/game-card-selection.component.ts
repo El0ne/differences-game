@@ -1,3 +1,5 @@
+/* eslint-disable no-underscore-dangle */
+// because we the _id property causes linting errorz
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { STAGE } from '@app/services/server-routes';
@@ -23,8 +25,11 @@ export class GameCardSelectionComponent implements OnInit {
     // TODO: Ajouter la logique pour que les temps de configurations viennent du database pour dynamiquement les loader.
 
     deleteGame(): void {
-        // eslint-disable-next-line no-underscore-dangle
         this.gameCardService.deleteGame(this.gameCardInformation._id).subscribe();
         this.gameDeleted.emit();
+    }
+
+    startGame(): void {
+        this.gameCardService.playGame(this.gameCardInformation._id).subscribe();
     }
 }
