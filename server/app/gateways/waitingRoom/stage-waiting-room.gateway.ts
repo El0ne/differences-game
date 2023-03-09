@@ -10,10 +10,10 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
     @WebSocketServer() private server: Server;
     gameHosts: Map<string, string> = new Map<string, string>();
 
-    constructor(private readonly logger: Logger) {}
+    constructor(private readonly logger: Logger) {} // TODO remove logger when tested
 
     @SubscribeMessage(WaitingRoomEvents.ScanForHost)
-    searchForHosts(@ConnectedSocket() socket: Socket, @MessageBody() stagesIds: string[]): void {
+    scanForHosts(@ConnectedSocket() socket: Socket, @MessageBody() stagesIds: string[]): void {
         this.clearRooms(socket);
         socket.join(stagesIds);
         for (const stageId of stagesIds) {
@@ -85,7 +85,7 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
         }
     }
 
-    clearRooms(socket: Socket): void {
+    private clearRooms(socket: Socket): void {
         // TODO will have to change if the socket uses any other room in the project
         for (const room of socket.rooms) {
             socket.leave(room);
