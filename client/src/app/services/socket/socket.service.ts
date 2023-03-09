@@ -15,7 +15,7 @@ export class SocketService {
     }
 
     connect() {
-        this.sio = io(environment.serverUrl, { transports: ['websocket'], upgrade: false });
+        this.sio = io(environment.serverSocket, { transports: ['websocket'], upgrade: false });
     }
 
     disconnect() {
