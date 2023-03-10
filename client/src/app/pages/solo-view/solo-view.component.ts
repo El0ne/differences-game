@@ -55,6 +55,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     @HostListener('window:beforeunload')
     beforeUnloadHandler() {
+        console.log('first');
         // TODO => fix to only endGamewhen game deleted (cuz we immediately recreate it after)
         // Causes problem otherwise cuz we could potentially delete the difference array when there are still people playing
         this.gameCardInfoService.endGame(this.currentGameId).subscribe();
