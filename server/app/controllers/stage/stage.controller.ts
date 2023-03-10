@@ -167,4 +167,14 @@ export class StageController {
             res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @Delete('/image/:imageName')
+    async deleteImage(@Param() param, @Res() res: Response): Promise<void> {
+        try {
+            this.imageManagerService.deleteImage(param.imageName);
+            res.status(HttpStatus.NO_CONTENT).send([]);
+        } catch (err) {
+            res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

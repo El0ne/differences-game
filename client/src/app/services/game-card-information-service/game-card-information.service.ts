@@ -53,4 +53,8 @@ export class GameCardInformationService {
     playGame(gameId: string): Observable<void> {
         return this.http.put<void>(`${STAGE}/start-game`, { gameId });
     }
+
+    deleteImage(image: string): Observable<void> {
+        return this.http.delete<void>(`${STAGE}/image/${image}`);
+    }
 }

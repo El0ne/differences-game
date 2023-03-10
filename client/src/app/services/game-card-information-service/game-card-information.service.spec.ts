@@ -77,4 +77,11 @@ describe('GameCardInformationService', () => {
         service.deleteGame('gameID');
         expect(deleteSpy).toHaveBeenCalled();
     });
+
+    it('getGameCardInfo should call get on httpManager', () => {
+        const deleteSpy = spyOn(service.http, 'delete');
+
+        service.deleteImage('');
+        expect(deleteSpy).toHaveBeenCalled();
+    });
 });
