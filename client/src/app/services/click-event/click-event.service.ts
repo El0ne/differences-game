@@ -18,4 +18,8 @@ export class ClickEventService {
     getDifferences(stageId: string): Observable<number[][]> {
         return this.http.get<number[][]>(`${CLICK}/${stageId}`);
     }
+
+    deleteDifferences(id: string): Observable<void> {
+        return this.http.delete<void>(`${CLICK}/${id}`);
+    }
 }
