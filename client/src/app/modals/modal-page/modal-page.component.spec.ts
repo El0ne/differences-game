@@ -1,8 +1,10 @@
+/* eslint-disable no-underscore-dangle */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GAMES } from '@app/mock/game-cards';
+import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { of } from 'rxjs';
@@ -13,6 +15,7 @@ describe('ModalPageComponent', () => {
     let component: ModalPageComponent;
     let fixture: ComponentFixture<ModalPageComponent>;
     let gameCardService: GameCardInformationService;
+    let clickService: ClickEventService;
     let dialogRefSpyObject: MatDialogRef<ModalPageComponent>;
 
     beforeEach(async () => {
@@ -33,6 +36,7 @@ describe('ModalPageComponent', () => {
                 { provide: MAT_DIALOG_DATA, useValue: {} },
                 { provide: MatDialogRef, useValue: {} },
                 GameCardInformationService,
+                ClickEventService,
             ],
         }).compileComponents();
 
@@ -42,6 +46,7 @@ describe('ModalPageComponent', () => {
         component.matDialogRef = dialogRefSpyObject;
         fixture.detectChanges();
         gameCardService = TestBed.inject(GameCardInformationService);
+        clickService = TestBed.inject(ClickEventService);
     });
 
     it('should close the dialog on destroy', () => {
@@ -62,9 +67,10 @@ describe('ModalPageComponent', () => {
         expect(redirectionMock).toHaveBeenCalledWith('/config');
     });
 
-    it('deleteImages should call redirection', () => {
+    it('drop game should call redirection', () => {
         const redirectionMock = spyOn(component, 'redirection');
         const serviceDeleteImageMock = spyOn(gameCardService, 'deleteImage').and.returnValue(of());
+        const deleteDifferencesMock = spyOn(clickService, 'deleteDifferences').and.returnValue(of());
 
         component.data = {
             image: 'string',
@@ -72,13 +78,13 @@ describe('ModalPageComponent', () => {
             difficulty: 'e',
             gameInfo: getFakeGameCardDTO(),
         };
-        component.deleteImages();
+        component.dropGame();
 
+        expect(deleteDifferencesMock).toHaveBeenCalledOnceWith(component.data.gameInfo._id);
         expect(serviceDeleteImageMock).toHaveBeenCalledTimes(2);
         expect(serviceDeleteImageMock).toHaveBeenCalledWith(component.data.gameInfo.baseImage);
         expect(serviceDeleteImageMock).toHaveBeenCalledWith(component.data.gameInfo.differenceImage);
-        expect(redirectionMock).toHaveBeenCalledTimes(1);
-        expect(redirectionMock).toHaveBeenCalledWith('/creatingGame');
+        expect(redirectionMock).toHaveBeenCalledOnceWith('/creatingGame');
     });
 
     it('should close the dialog and move to the configuration page when user decides to create game', () => {
