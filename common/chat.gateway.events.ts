@@ -15,6 +15,8 @@ export enum ChatEvents {
     MassMessage = 'massMessage',
     Hello = 'hello',
     Clock = 'clock',
+    Difference = 'Difference',
+    Win = 'Win',
 }
 
 export interface RoomManagement {

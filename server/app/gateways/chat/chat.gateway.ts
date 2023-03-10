@@ -1,4 +1,5 @@
 import { AbandonGame, ChatEvents, MultiplayerRequestInformation, Room, RoomEvent, RoomManagement } from '@common/chat.gateway.events';
+import { differenceInformation } from '@common/difference-information';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -46,6 +47,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         socket.emit(ChatEvents.WaitingRoom);
     }
 
+    @SubscribeMessage(ChatEvents.Difference)
+    difference(socket: Socket, data: differenceInformation) {
+        if (socket.rooms.has(data.room)) {
+            this.server.to(data.room).emit(ChatEvents.Difference, { differenceInformation: data, socket: socket.id });
+        }
+    }
+
     @SubscribeMessage(ChatEvents.Event)
     event(socket: Socket, data: RoomEvent): void {
         if (socket.rooms.has(data.room)) {
@@ -58,6 +66,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             }
 
             this.server.to(data.room).emit(ChatEvents.RoomMessage, { socketId: socket.id, message: dateFormatted, event: true });
+        }
+    }
+
+    @SubscribeMessage(ChatEvents.Win)
+    win(socket: Socket, room: string): void {
+        if (socket.rooms.has(room)) {
+            this.server.to(room).emit(ChatEvents.Win, socket.id);
         }
     }
 

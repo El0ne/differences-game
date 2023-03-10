@@ -1,7 +1,11 @@
 <div class="win neon modal-page">
-    <div class="text">
+    <div *ngIf="win" class="text">
         <p>Vous Avez Gagné!</p>
         <p>Bravo!</p>
+    </div>
+    <div *ngIf="!win" class="text">
+        <p>Vous Avez Perdu...</p>
+        <p>:(</p>
     </div>
     <button class="normal-button" (click)="confirm()">Continuer</button>
 </div>

@@ -23,7 +23,7 @@
                 [original]="'original'"
                 [gameCardId]="this.currentGameId"
                 [imagePath]="this.gameCardInfo.originalImageName"
-                (differenceDetected)="emitHandler($event)"
+                (differenceDetected)="differenceHandler($event)"
                 (mistake)="handleMistake()"
                 *ngIf="this.gameCardInfo"
             ></app-click-event>
@@ -108,7 +108,7 @@
                 [original]="'different'"
                 [gameCardId]="this.currentGameId"
                 [imagePath]="this.gameCardInfo.differenceImageName"
-                (differenceDetected)="emitHandler($event)"
+                (differenceDetected)="differenceHandler($event)"
                 (mistake)="handleMistake()"
                 *ngIf="this.gameCardInfo"
             ></app-click-event>
