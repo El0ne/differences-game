@@ -53,10 +53,10 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private router: Router,
     ) {}
 
+    // TODO: Remove when we replace with sockets later
     @HostListener('window:beforeunload')
     beforeUnloadHandler() {
-        console.log('first');
-        // TODO => fix to only endGamewhen game deleted (cuz we immediately recreate it after)
+        // // TODO => fix to only endGamewhen game deleted (cuz we immediately recreate it after)
         // Causes problem otherwise cuz we could potentially delete the difference array when there are still people playing
         this.gameCardInfoService.endGame(this.currentGameId).subscribe();
     }
@@ -77,6 +77,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.showTime();
         });
 
+        // TODO: Remove when we replace with sockets later
         this.routerSubscription = this.router.events.subscribe((event) => {
             if (event instanceof NavigationStart) {
                 this.gameCardInfoService.endGame(this.currentGameId).subscribe();
