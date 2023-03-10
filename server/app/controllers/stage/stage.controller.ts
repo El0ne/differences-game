@@ -52,12 +52,13 @@ export class StageController {
         private gameManagerService: GameManagerService,
     ) {}
 
-    // TODO create a type for id
+    // TODO: Remove when we replace with sockets later
     @Put('/end-game')
     endGame(@Body() id) {
         this.gameManagerService.endGame(id.gameId);
     }
 
+    // TODO: Remove when we replace with sockets later
     @Put('/start-game')
     startGame(@Body() id) {
         this.gameManagerService.addGame(id.gameId);
@@ -92,6 +93,17 @@ export class StageController {
         }
     }
 
+    @Delete('/:gameCardId')
+    async deleteGame(@Param() param, @Res() res: Response): Promise<void> {
+        try {
+            await this.gameCardService.deleteGameCard(param.gameCardId);
+            await this.gameManagerService.deleteGame(param.gameCardId);
+            res.status(HttpStatus.NO_CONTENT);
+        } catch {
+            throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @Post('/')
     async createGame(@Body() game: GameCardDto, @Res() res: Response): Promise<void> {
         try {
@@ -101,17 +113,6 @@ export class StageController {
                 res.status(HttpStatus.CREATED).send(newGame);
             } else res.sendStatus(HttpStatus.BAD_REQUEST);
         } catch (err) {
-            throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @Delete('/:gameCardId')
-    async deleteGame(@Param() param, @Res() res: Response): Promise<void> {
-        try {
-            await this.gameCardService.deleteGameCard(param.gameCardId);
-            this.gameManagerService.deleteGame(param.gameCardId);
-            res.status(HttpStatus.NO_CONTENT);
-        } catch {
             throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
