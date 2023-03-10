@@ -18,7 +18,9 @@ describe('SocketService', () => {
     it('delete should delete the listener of the sio', () => {
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         service.connect();
-        service.sio.on('testEvent', () => {});
+        service.sio.on('testEvent', () => {
+            return;
+        });
         service.delete('testEvent');
         expect(service.sio.hasListeners('testEvent')).toBeFalsy();
     });
