@@ -44,12 +44,12 @@ export class GameCardInformationService {
         return this.http.delete<void>(`${STAGE}/${gameId}`);
     }
 
-    // TODO check if PUT should return something.
+    // TODO: Remove when we replace with sockets later
     endGame(gameId: string): Observable<void> {
         return this.http.put<void>(`${STAGE}/end-game`, { gameId });
     }
 
-    // TODO check with team if its better to add only one endpoint and pass boolean instead
+    // TODO: Remove when we replace with sockets later
     playGame(gameId: string): Observable<void> {
         return this.http.put<void>(`${STAGE}/start-game`, { gameId });
     }
