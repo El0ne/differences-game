@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -84,5 +85,14 @@ describe('WaitingRoomComponent', () => {
         component.declineOpponent('opponentId');
         expect(component.clientsInWaitingRoom.has('opponentId')).toBeFalsy();
         expect(socketServiceSpy.send).toHaveBeenCalledWith(WaitingRoomEvents.DeclineOpponent, 'opponentId');
+    });
+
+    it('a requestMatch event should add the opponent to the map', () => {
+        spyOn(component.clientsInWaitingRoom, 'set').and.callThrough();
+        socketServiceSpy.listen = (event: string, callback: any) => {
+            callback({ playerName: 'testName', playerSocketId: 'playerId' } as PlayerInformations);
+        };
+        component.ngOnInit();
+        expect(component.clientsInWaitingRoom.set).toHaveBeenCalledWith('playerId', 'testName');
     });
 });
