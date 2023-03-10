@@ -49,7 +49,7 @@ export class GameCreationPageComponent implements OnInit {
         this.gameTitle = title;
     }
 
-    openModal() {
+    openModal(): void {
         const dialogRef = this.matDialog.open(ModalPageComponent, {
             disableClose: true,
             data: {
