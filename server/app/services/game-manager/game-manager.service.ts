@@ -1,3 +1,4 @@
+import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { Injectable } from '@nestjs/common';
 
 interface Test {
@@ -9,7 +10,7 @@ export class GameManagerService {
     gamePlayedInformation: Map<string, Test> = new Map();
     // map <id, {nbParties: number , deleted: boolean}>
 
-    // constructor() {}
+    constructor(private differenceClickService: DifferenceClickService) {}
 
     createGame(id: string): void {
         console.log('create game');
@@ -20,17 +21,20 @@ export class GameManagerService {
         console.log('this.gamePlayedInformation', this.gamePlayedInformation);
     }
 
-    endGame(id: string): void {
+    async endGame(id: string): Promise<void> {
         // console.log('Game ended:', id);
         const currentTest = this.gamePlayedInformation.get(id);
-        if (currentTest.numberOfGames === 1 && currentTest.deleted) {
-            this.gamePlayedInformation.delete(id);
-            console.log('service to delete differences');
+        if (currentTest) {
+            if (currentTest.numberOfGames === 1 && currentTest.deleted) {
+                this.gamePlayedInformation.delete(id);
+                console.log('service to delete differences');
+                await this.differenceClickService.deleteDifferences(id);
 
-            // service to delete difference
-        } else {
-            currentTest.numberOfGames -= 1;
-            this.gamePlayedInformation.set(id, currentTest);
+                // service to delete difference
+            } else {
+                currentTest.numberOfGames -= 1;
+                this.gamePlayedInformation.set(id, currentTest);
+            }
         }
         console.log('this.gamePlayedInformation', this.gamePlayedInformation);
     }
@@ -48,14 +52,14 @@ export class GameManagerService {
         console.log('map ', this.gamePlayedInformation);
     }
 
-    deleteGame(id: string): void {
+    async deleteGame(id: string): Promise<void> {
         console.log('delete game');
         const currentTest = this.gamePlayedInformation.get(id);
         currentTest.deleted = true;
         this.gamePlayedInformation.set(id, currentTest);
         if (currentTest.numberOfGames === 0) {
             console.log('service to delete differences');
-            // service to delete difference
+            await this.differenceClickService.deleteDifferences(id);
         }
     }
 }

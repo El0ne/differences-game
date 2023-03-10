@@ -1,6 +1,5 @@
 /* eslint-disable no-underscore-dangle */
 import { GameCard, GameCardDocument } from '@app/schemas/game-cards.schemas';
-import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { Injectable } from '@nestjs/common';
@@ -10,11 +9,7 @@ import { Model } from 'mongoose';
 
 @Injectable()
 export class GameCardService {
-    constructor(
-        @InjectModel(GameCard.name) private gameCardModel: Model<GameCardDocument>,
-        private differenceClickService: DifferenceClickService,
-        private imageManagerService: ImageManagerService,
-    ) {}
+    constructor(@InjectModel(GameCard.name) private gameCardModel: Model<GameCardDocument>, private imageManagerService: ImageManagerService) {}
 
     async getAllGameCards(): Promise<GameCard[]> {
         return await this.gameCardModel.find({});
@@ -45,7 +40,6 @@ export class GameCardService {
         const deletedGameCard = await this.gameCardModel.findByIdAndDelete(new ObjectId(id));
         await this.imageManagerService.deleteImage(deletedGameCard.originalImageName);
         await this.imageManagerService.deleteImage(deletedGameCard.differenceImageName);
-        // await this.differenceClickService.deleteDifferences(deletedGameCard._id);
     }
 
     generateGameCard(game: GameCardDto): GameCard {
