@@ -86,21 +86,10 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     activateCheatMode(event: KeyboardEvent): void {
         if (event.key === 't') {
-            let differences: number[] = [];
-
             this.left.toggleCheatMode = !this.left.toggleCheatMode;
             this.right.toggleCheatMode = !this.right.toggleCheatMode;
             this.left.clickEventService.getDifferences(this.currentGameId).subscribe((data) => {
-                for (const differenceNo of this.foundDifferenceService.foundDifferences) {
-                    data[differenceNo] = [];
-                }
-
-                for (const difference of data) {
-                    if (difference.length !== 0) {
-                        differences = differences.concat(difference);
-                    }
-                }
-                if (this.left.toggleCheatMode) this.handleFlash(differences);
+                if (this.left.toggleCheatMode) this.handleFlash(this.foundDifferenceService.findPixelsFromDifference(data));
             });
         }
     }

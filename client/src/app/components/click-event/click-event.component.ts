@@ -1,6 +1,7 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
+import { PixelModificationService } from '@app/services/pixel-modification/pixel-modification.service';
 import { STAGE } from '@app/services/server-routes';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { differenceInformation } from '@common/difference-information';
@@ -32,7 +33,11 @@ export class ClickEventComponent implements OnInit {
     foundDifferences: number[];
     toggleCheatMode: boolean = false;
 
-    constructor(public clickEventService: ClickEventService, public foundDifferenceService: FoundDifferenceService) {}
+    constructor(
+        public clickEventService: ClickEventService,
+        public foundDifferenceService: FoundDifferenceService,
+        private pixelModService: PixelModificationService,
+    ) {}
 
     async ngOnInit() {
         this.timeout = false;
@@ -76,59 +81,34 @@ export class ClickEventComponent implements OnInit {
         });
     }
 
-    turnDifferenceYellow(originalContext: CanvasRenderingContext2D, differences: number[]) {
-        for (const pixel of differences) {
-            const pos: number[] = this.positionToPixel(pixel);
-            originalContext.fillStyle = '#FFD700';
-            originalContext.fillRect(pos[0], pos[1], 1, 1);
-        }
-    }
-
-    turnOffYellow(originalContext: CanvasRenderingContext2D, differences: number[]) {
-        for (const pixel of differences) {
-            const pos: number[] = this.positionToPixel(pixel);
-            originalContext.clearRect(pos[0], pos[1], 1, 1);
-        }
-    }
-
     async delay(ms: number) {
         return new Promise((res) => setTimeout(res, ms));
     }
 
     async clearEffect() {
         const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-        await this.turnOffYellow(originalContext, this.foundDifferenceService.foundDifferences);
+        await this.pixelModService.turnOffYellow(originalContext, this.foundDifferenceService.foundDifferences);
     }
 
     async differenceEffect(currentDifferences: number[]): Promise<void> {
         if (!this.endGame) {
             const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
 
-            this.turnDifferenceYellow(originalContext, currentDifferences);
+            this.pixelModService.turnDifferenceYellow(originalContext, currentDifferences);
             await this.delay(FAST_WAIT_TIME_MS);
-            this.turnOffYellow(originalContext, currentDifferences);
+            this.pixelModService.turnOffYellow(originalContext, currentDifferences);
             await this.delay(FAST_WAIT_TIME_MS);
-            this.turnDifferenceYellow(originalContext, currentDifferences);
+            this.pixelModService.turnDifferenceYellow(originalContext, currentDifferences);
             await this.delay(FAST_WAIT_TIME_MS);
-            this.turnOffYellow(originalContext, currentDifferences);
+            this.pixelModService.turnOffYellow(originalContext, currentDifferences);
             await this.delay(FAST_WAIT_TIME_MS);
 
             if (this.toggleCheatMode) {
                 this.differenceEffect(currentDifferences);
-            }
-            this.emitSound(false);
-        }
-    }
-
-    positionToPixel(toTransform: number): number[] {
-        let yCounter = 0;
-        while (toTransform >= WIDTH) {
-            toTransform -= WIDTH;
-            if (toTransform >= 0) {
-                yCounter += 1;
+            } else {
+                this.emitSound(false);
             }
         }
-        return [toTransform, yCounter];
     }
 
     emitSound(isErrorSound: boolean): void {
@@ -143,15 +123,8 @@ export class ClickEventComponent implements OnInit {
             this.emitSound(true);
             this.timeout = true;
             const rect = this.modification.nativeElement.getBoundingClientRect();
-            const x = Math.floor(e.clientX - rect.left);
-            const y = Math.floor(e.clientY - rect.top);
             const context = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-            context.font = '30pt Arial';
-            context.fillStyle = 'red';
-            context.textAlign = 'center';
-            const error = 'Error';
-            context.fillText(error, x, y);
-
+            this.pixelModService.errorMessage(e, rect, context);
             setTimeout(() => {
                 context.clearRect(0, 0, WIDTH, HEIGHT);
                 this.timeout = false;
@@ -164,7 +137,7 @@ export class ClickEventComponent implements OnInit {
         const colorArray = [];
 
         for (const position of differenceArray) {
-            const pos = this.positionToPixel(position);
+            const pos = this.pixelModService.positionToPixel(position);
             const pixel = context.getImageData(pos[0], pos[1], 1, 1);
             colorArray.push(pixel);
         }
@@ -176,7 +149,7 @@ export class ClickEventComponent implements OnInit {
         for (let i = 0; i < positionArray.length; i++) {
             const diffPixel = `rgba(${colorArray[i].data[0]},${colorArray[i].data[1]},${colorArray[i].data[2]},${colorArray[i].data[3]})`;
             context.fillStyle = diffPixel;
-            const posInPixels = this.positionToPixel(positionArray[i]);
+            const posInPixels = this.pixelModService.positionToPixel(positionArray[i]);
             context.fillRect(posInPixels[0], posInPixels[1], 1, 1);
         }
     }
