@@ -21,9 +21,9 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
     // raison: besoin de tous les parametres
     // eslint-disable-next-line max-params
     constructor(
-        public dialogRef: MatDialogRef<WaitingRoomComponent>,
-        public router: Router,
-        public socket: SocketService,
+        private dialogRef: MatDialogRef<WaitingRoomComponent>,
+        private router: Router,
+        private socket: SocketService,
         @Inject(MAT_DIALOG_DATA) data: WaitingRoomDataPassing,
     ) {
         this.waitingRoomInfo = data;
