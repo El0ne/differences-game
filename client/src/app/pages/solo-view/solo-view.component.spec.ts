@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, discardPeriodicTasks, fakeAsync, TestBed } from '@angular/core/testing';
+import { ComponentFixture, discardPeriodicTasks, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
@@ -216,14 +218,45 @@ describe('SoloViewComponent', () => {
         expect(component.right.toggleCheatMode).toBeFalse();
     });
 
-    it('resetDifferences should call activateCheatMode', () => {
+    it('resetDifferences should call activateCheatMode', fakeAsync(() => {
         component.left.toggleCheatMode = true;
         component.right.toggleCheatMode = true;
         const mockKeyEvent: KeyboardEvent = new KeyboardEvent('keydown', { key: 't' });
         const activateCheatModeSpy = spyOn(component, 'activateCheatMode');
 
         component.resetDifferences(mockKeyEvent);
+        tick(MAX_EFFECT_TIME);
         expect(activateCheatModeSpy).toHaveBeenCalled();
+    }));
+
+    it('should call handleFlash when activateCheatMode is called', () => {
+        const mockData = [[1, 2, 3], [4, 5], [6], [], [7, 8, 9]];
+        spyOn(component.left.clickEventService, 'getDifferences').and.returnValue(of(mockData));
+        const flashSpy = spyOn(component, 'handleFlash');
+
+        const keyboardEvent = new KeyboardEvent('keydown', { key: 't' });
+
+        component.foundDifferenceService.foundDifferences = [];
+        component.left.toggleCheatMode = false;
+        component.right.toggleCheatMode = false;
+
+        component.activateCheatMode(keyboardEvent);
+        expect(flashSpy).toHaveBeenCalled();
+    });
+
+    it('activateCheatMode should be called with an array that contains all the differences', () => {
+        const mockData = [[1, 2, 3], [4, 5], [6], [], [7, 8, 9]];
+        spyOn(component.left.clickEventService, 'getDifferences').and.returnValue(of(mockData));
+        const flashSpy = spyOn(component, 'handleFlash');
+
+        const keyboardEvent = new KeyboardEvent('keydown', { key: 't' });
+
+        component.foundDifferenceService.foundDifferences = [];
+        component.left.toggleCheatMode = false;
+        component.right.toggleCheatMode = false;
+
+        component.activateCheatMode(keyboardEvent);
+        expect(flashSpy).toHaveBeenCalledWith([1, 2, 3, 4, 5, 6, 7, 8, 9]);
     });
 });
 

@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
-import { FAST_WAIT_TIME_MS } from '@app/components/click-event/click-event-constant';
+import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
@@ -81,7 +81,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.right.toggleCheatMode = !this.right.toggleCheatMode;
         setTimeout(() => {
             this.activateCheatMode(event);
-        }, FAST_WAIT_TIME_MS);
+        }, MAX_EFFECT_TIME);
     }
 
     activateCheatMode(event: KeyboardEvent): void {

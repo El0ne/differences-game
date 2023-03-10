@@ -116,7 +116,7 @@ export class ClickEventComponent implements OnInit {
             if (this.toggleCheatMode) {
                 this.differenceEffect(currentDifferences);
             }
-            // this.emitSound(false);
+            this.emitSound(false);
         }
     }
 
