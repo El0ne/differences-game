@@ -51,7 +51,6 @@ export class GameCardInformationService {
 
     // TODO check with team if its better to add only one endpoint and pass boolean instead
     playGame(gameId: string): Observable<void> {
-        console.log('http call');
         return this.http.put<void>(`${STAGE}/start-game`, { gameId });
     }
 }
