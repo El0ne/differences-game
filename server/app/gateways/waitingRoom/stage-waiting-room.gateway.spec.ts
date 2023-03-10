@@ -10,6 +10,7 @@ describe('StageWaitingRoomGatewayGateway', () => {
     let logger: SinonStubbedInstance<Logger>;
     let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
+    const lookedStages = ['stage1', 'stage2', 'stage3', 'stage4'];
 
     beforeEach(async () => {
         logger = createStubInstance(Logger);
@@ -17,6 +18,7 @@ describe('StageWaitingRoomGatewayGateway', () => {
         socket = createStubInstance<Socket>(Socket);
         socket.data = {};
         Object.defineProperty(socket, 'id', { value: '123' });
+        Object.defineProperty(server, 'sockets', { value: { sockets: new Map<string, Socket>() } });
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 StageWaitingRoomGateway,
@@ -39,7 +41,6 @@ describe('StageWaitingRoomGatewayGateway', () => {
     });
 
     it('scanForHosts should emit a gameCreated for each of the stages where the is a host', () => {
-        const lookedStages = ['stage1', 'stage2', 'stage3', 'stage4'];
         gateway.scanForHosts(socket, lookedStages);
         expect(socket.emit.calledWith(WaitingRoomEvents.GameCreated, 'stage1')).toBeTruthy();
         expect(socket.emit.calledWith(WaitingRoomEvents.GameCreated, 'stage4')).toBeTruthy();
@@ -97,14 +98,20 @@ describe('StageWaitingRoomGatewayGateway', () => {
     });
 
     // TODO test
-    it('accept opponent should', () => {
+    it('accept opponent should set the 2 players in the same room, send a matchAccepted to the opponent and a matchConfirmed its socket', () => {
+        const opponentSocket = createStubInstance<Socket>(Socket);
+        Object.defineProperty(opponentSocket, 'id', { value: 'opponentId' });
+        stub(opponentSocket, 'rooms').value(new Set(['stage1', 'opponentId']));
+        server.sockets.sockets.set('opponentId', opponentSocket);
+        socket.data.stageInHosting = 'stage1';
+
         socket.to.returns({
-            emit: (event: string) => {
-                expect(event).toEqual(WaitingRoomEvents.RequestMatch);
-            },
+            // eslint-disable-next-line @typescript-eslint/no-empty-function, no-unused-vars
+            emit: (event: string) => {},
         } as BroadcastOperator<unknown, unknown>);
-        gateway.acceptOpponent(socket, { playerName: 'host1', playerSocketId: '123' });
-        expect(socket.to.calledWith('host1')).toBeTruthy();
+        gateway.acceptOpponent(socket, { playerName: 'host1', playerSocketId: 'opponentId' });
+        expect(socket.to.calledWith('stage1')).toBeTruthy();
+        expect(socket.emit.calledWith(WaitingRoomEvents.MatchConfirmed, 'randomRoomId'));
     });
 
     it('declineOpponent should send a matchRefusedEvent to the opponent', () => {
