@@ -13,8 +13,9 @@ import { GameCardSelectionComponent } from './game-card-selection.component';
 describe('GameCardSelectionComponent', () => {
     let component: GameCardSelectionComponent;
     let fixture: ComponentFixture<GameCardSelectionComponent>;
-    const gameCardServiceSpyObj = jasmine.createSpyObj('GameCardInformationService', ['deleteGame']);
+    const gameCardServiceSpyObj = jasmine.createSpyObj('GameCardInformationService', ['deleteGame', 'playGame']);
     gameCardServiceSpyObj.deleteGame.and.returnValue(of());
+    gameCardServiceSpyObj.playGame.and.returnValue(of());
     let gameCardServiceSpy: GameCardInformationService;
 
     beforeEach(async () => {
@@ -42,5 +43,11 @@ describe('GameCardSelectionComponent', () => {
         component.deleteGame();
         expect(gameCardServiceSpy.deleteGame).toHaveBeenCalledWith(component.gameCardInformation._id);
         expect(gameDeletedSpy).toHaveBeenCalled();
+    });
+
+    it('startGame should call gameCardService.playGame', () => {
+        component.gameCardInformation = GAMES[0];
+        component.startGame();
+        expect(gameCardServiceSpy.playGame).toHaveBeenCalledWith(component.gameCardInformation._id);
     });
 });
