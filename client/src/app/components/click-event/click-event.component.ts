@@ -55,9 +55,7 @@ export class ClickEventComponent implements OnInit {
 
     getCoordInImage(e: MouseEvent): number[] {
         const rect = this.modification.nativeElement.getBoundingClientRect();
-        const x = Math.max(Math.floor(e.clientX - rect.left), 0);
-        const y = Math.max(Math.floor(e.clientY - rect.top), 0);
-        return new Array(x, y);
+        return this.pixelModService.getCoordInImage(e, rect);
     }
 
     isDifferent(e: MouseEvent) {
@@ -134,23 +132,11 @@ export class ClickEventComponent implements OnInit {
 
     sendDifferencePixels(differenceArray: number[]): ImageData[] {
         const context = this.picture.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-        const colorArray = [];
-
-        for (const position of differenceArray) {
-            const pos = this.pixelModService.positionToPixel(position);
-            const pixel = context.getImageData(pos[0], pos[1], 1, 1);
-            colorArray.push(pixel);
-        }
-        return colorArray;
+        return this.pixelModService.getColorFromDifference(context, differenceArray);
     }
 
     receiveDifferencePixels(colorArray: ImageData[], positionArray: number[]): void {
         const context = this.picture.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-        for (let i = 0; i < positionArray.length; i++) {
-            const diffPixel = `rgba(${colorArray[i].data[0]},${colorArray[i].data[1]},${colorArray[i].data[2]},${colorArray[i].data[3]})`;
-            context.fillStyle = diffPixel;
-            const posInPixels = this.pixelModService.positionToPixel(positionArray[i]);
-            context.fillRect(posInPixels[0], posInPixels[1], 1, 1);
-        }
+        this.pixelModService.paintColorFromDifference(colorArray, positionArray, context);
     }
 }

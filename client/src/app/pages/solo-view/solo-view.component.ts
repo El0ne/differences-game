@@ -27,9 +27,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     @ViewChild('right')
     right: ClickEventComponent;
     showErrorMessage: boolean = false;
-    showNameErrorMessage: boolean = false;
     showTextBox: boolean = false;
-    showWinMessage: boolean = false;
     showNavBar: boolean = true;
     playerName: string;
     messages: string[] = [];
@@ -105,7 +103,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     finishGame(): void {
         this.left.endGame = true;
         this.right.endGame = true;
-        this.showWinMessage = true;
         this.showNavBar = false;
 
         this.dialog.open(GameWinModalComponent, { disableClose: true });
