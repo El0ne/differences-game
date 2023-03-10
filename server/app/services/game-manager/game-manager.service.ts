@@ -11,11 +11,22 @@ export class GameManagerService {
 
     // constructor() {}
 
-    endGame(id: string) {
-        console.log('Game ended:', id);
+    createGame(id: string): void {
+        console.log('create game');
+        this.gamePlayedInformation.set(id, {
+            numberOfGames: 0,
+            deleted: false,
+        });
+        console.log('this.gamePlayedInformation', this.gamePlayedInformation);
+    }
+
+    endGame(id: string): void {
+        // console.log('Game ended:', id);
         const currentTest = this.gamePlayedInformation.get(id);
         if (currentTest.numberOfGames === 1 && currentTest.deleted) {
             this.gamePlayedInformation.delete(id);
+            console.log('service to delete differences');
+
             // service to delete difference
         } else {
             currentTest.numberOfGames -= 1;
@@ -24,29 +35,26 @@ export class GameManagerService {
         console.log('this.gamePlayedInformation', this.gamePlayedInformation);
     }
 
-    addGame(id: string) {
-        console.log('Game started:', id);
+    addGame(id: string): void {
+        // console.log('Game started:', id);
 
         const currentTest = this.gamePlayedInformation.get(id);
-        console.log('currentTest', currentTest);
+        // console.log('currentTest', currentTest);
         if (currentTest) {
             currentTest.numberOfGames += 1;
-            console.log('currentTest.numberOfGames', currentTest.numberOfGames);
+            // console.log('currentTest.numberOfGames', currentTest.numberOfGames);
             this.gamePlayedInformation.set(id, currentTest);
-        } else {
-            this.gamePlayedInformation.set(id, {
-                numberOfGames: 1,
-                deleted: false,
-            });
         }
         console.log('map ', this.gamePlayedInformation);
     }
 
-    deleteGame(id: string) {
+    deleteGame(id: string): void {
+        console.log('delete game');
         const currentTest = this.gamePlayedInformation.get(id);
         currentTest.deleted = true;
         this.gamePlayedInformation.set(id, currentTest);
         if (currentTest.numberOfGames === 0) {
+            console.log('service to delete differences');
             // service to delete difference
         }
     }

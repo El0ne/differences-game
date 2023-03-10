@@ -19,7 +19,6 @@ export class DifferenceClickService {
         return await this.differenceModel.find({});
     }
 
-    // TODO type the return value of funcion
     async createDifferenceArray(differencesArray: number[][]): Promise<string> {
         const newDifferenceArray: Differences = {
             differences: differencesArray,

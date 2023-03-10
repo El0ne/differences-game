@@ -1,3 +1,5 @@
+/* eslint-disable no-underscore-dangle */
+// using _id property causes linting warning
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
 import { GameCardService } from '@app/services/game-card/game-card.service';
@@ -97,6 +99,7 @@ export class StageController {
         try {
             if (Object.keys(game).length) {
                 const newGame = await this.gameCardService.createGameCard(game);
+                this.gameManagerService.createGame(game._id);
                 res.status(HttpStatus.CREATED).send(newGame);
             } else res.sendStatus(HttpStatus.BAD_REQUEST);
         } catch (err) {
@@ -108,6 +111,7 @@ export class StageController {
     async deleteGame(@Param() param, @Res() res: Response): Promise<void> {
         try {
             await this.gameCardService.deleteGameCard(param.gameCardId);
+            this.gameManagerService.deleteGame(param.gameCardId);
             res.status(HttpStatus.NO_CONTENT);
         } catch {
             throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
