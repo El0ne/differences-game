@@ -49,12 +49,14 @@ export class GameCreationPageComponent implements OnInit {
         this.gameTitle = title;
     }
 
-    openModal() {
+    openModal(): void {
         const dialogRef = this.matDialog.open(ModalPageComponent, {
+            disableClose: true,
             data: {
                 image: this.image,
                 difference: this.differenceNumber,
                 difficulty: this.difficulty,
+                gameInfo: this.createdGameInfo,
             },
         });
 
@@ -156,8 +158,8 @@ export class GameCreationPageComponent implements OnInit {
                     this.difficulty = data.gameDifficulty;
                     this.differenceNumber = data.gameDifferenceNumber;
                     this.image = `${STAGE}/image/difference-image.bmp`;
-                    this.gameCardService.createGame(this.createdGameInfo).subscribe();
                     this.openModal();
+                    this.isDisabled = false;
                 } else {
                     this.isDisabled = false;
                     alert("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");

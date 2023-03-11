@@ -6,7 +6,7 @@ import { ImageManagerService } from '@app/services/image-manager/image-manager.s
 import { GameCardDto } from '@common/game-card.dto';
 import { ImageUploadDto } from '@common/image-upload.dto';
 import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { diskStorage } from 'multer';
@@ -122,6 +122,16 @@ export class StageController {
         try {
             const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);
             res.status(HttpStatus.OK).sendFile(imagePath);
+        } catch (err) {
+            res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Delete('/image/:imageName')
+    async deleteImage(@Param() param, @Res() res: Response): Promise<void> {
+        try {
+            this.imageManagerService.deleteImage(param.imageName);
+            res.status(HttpStatus.NO_CONTENT).send([]);
         } catch (err) {
             res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         }
