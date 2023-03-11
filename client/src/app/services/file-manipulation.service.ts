@@ -1,10 +1,33 @@
 import { Injectable } from '@angular/core';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 
+interface FileInformation {
+    originalFile: File | null;
+    differenceFile: File | null;
+    originalCanvas: HTMLCanvasElement;
+    differenceCanvas: HTMLCanvasElement;
+}
+
 @Injectable({
     providedIn: 'root',
 })
 export class FileManipulationService {
+    originalFile: File | null;
+    differentFile: File | null;
+    originalCanvas: HTMLCanvasElement;
+    differenceCanvas: HTMLCanvasElement;
+
+    updateAttributes(fileInformation: FileInformation): void {
+        this.originalFile = fileInformation.originalFile;
+        this.differentFile = fileInformation.differenceFile;
+        this.originalCanvas = fileInformation.originalCanvas;
+        this.differenceCanvas = fileInformation.differenceCanvas;
+    }
+
+    updateFiles(): (File | null)[] {
+        return [this.originalFile, this.differentFile];
+    }
+
     clearFile(canvas: HTMLCanvasElement, id: string, file: File | null): void {
         // we just want to set the file to null
         // eslint-disable-next-line no-unused-vars
@@ -18,20 +41,6 @@ export class FileManipulationService {
     }
 
     async uploadImage(file: File, target: HTMLInputElement, canvas: HTMLCanvasElement): Promise<File | null> {
-        // console.log('target', target);
-        // let updatedFile: File | null = null;
-        // const reader = new FileReader();
-        // reader.readAsDataURL(file);
-        // reader.onload = () => {
-        //     const img = new Image();
-        //     img.src = reader.result as string;
-        //     img.onload = () => {
-        //         updatedFile = this.drawToCanvas(canvas, target, img);
-        //         console.log('rwger', updatedFile);
-        //     };
-        // };
-        // console.log('updatedFile', updatedFile);
-        // return updatedFile;
         return new Promise((resolve) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -55,45 +64,25 @@ export class FileManipulationService {
         return target.files[0];
     }
 
-    // async fileValidation(event: Event): Promise<void> {
-    //     const target = event.target as HTMLInputElement;
-    //     const file: File = (target.files as FileList)[0];
-    //     if (file !== undefined && file.size === IMAGE_DIMENSIONS.size && file.type === 'image/bmp') {
-    //         await this.uploadImage(file, target);
-    //     } else {
-    //         alert('wrong size or file type please choose again');
-    //         target.value = '';
-    //     }
-    // }
+    async fileValidation(event: Event): Promise<void> {
+        const target = event.target as HTMLInputElement;
+        const file: File = (target.files as FileList)[0];
+        if (file !== undefined && file.size === IMAGE_DIMENSIONS.size && file.type === 'image/bmp') {
+            await this.uploadImages(file, target);
+        } else {
+            alert('wrong size or file type please choose again');
+            target.value = '';
+        }
+    }
 
-    // async uploadImage(file: File, target: HTMLInputElement): Promise<void> {
-    //     const ogContext = this.myOgCanvas.nativeElement.getContext('2d');
-    //     const diffContext = this.myDiffCanvas.nativeElement.getContext('2d');
-    //     const reader = new FileReader();
-    //     reader.readAsDataURL(file);
-
-    //     reader.onload = () => {
-    //         const img = new Image();
-    //         img.src = reader.result as string;
-    //         img.onload = () => {
-    //             if (!target.files?.length) {
-    //                 return;
-    //             }
-    //             if (target.id === this.originalId) {
-    //                 if (ogContext) ogContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-    //                 this.originalFile = target.files[0];
-    //             } else if (target.id === this.differentId) {
-    //                 if (diffContext) diffContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-    //                 this.differentFile = target.files[0];
-    //             } else {
-    //                 if (ogContext && diffContext) {
-    //                     ogContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-    //                     diffContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-    //                     this.originalFile = target.files[0];
-    //                     this.differentFile = target.files[0];
-    //                 }
-    //             }
-    //         };
-    //     };
-    // }
+    async uploadImages(file: File, target: HTMLInputElement): Promise<void> {
+        if (target.id === 'upload-original') {
+            this.originalFile = await this.uploadImage(file, target, this.originalCanvas);
+        } else if (target.id === 'upload-different') {
+            this.differentFile = await this.uploadImage(file, target, this.differenceCanvas);
+        } else {
+            this.originalFile = await this.uploadImage(file, target, this.originalCanvas);
+            this.differentFile = await this.uploadImage(file, target, this.differenceCanvas);
+        }
+    }
 }

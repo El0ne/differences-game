@@ -6,7 +6,6 @@ import { FileManipulationService } from '@app/services/file-manipulation.service
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { STAGE } from '@app/services/server-routes';
 import { GameCardDto } from '@common/game-card.dto';
-import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { GC_PATHS } from './game-creation-constants';
 
@@ -52,6 +51,16 @@ export class GameCreationPageComponent implements OnInit {
 
     ngOnInit(): void {
         this.display$ = this.modal.asObservable();
+        setTimeout(
+            () =>
+                this.fileManipulationService.updateAttributes({
+                    originalFile: this.originalFile,
+                    differenceFile: this.differentFile,
+                    originalCanvas: this.originalCanvas.nativeElement,
+                    differenceCanvas: this.differenceCanvas.nativeElement,
+                }),
+            50,
+        );
     }
 
     getTitle(title: string): void {
@@ -80,35 +89,26 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     async fileValidation(event: Event): Promise<void> {
-        // this.fileManipulationService.fileValidation(event);
-        const target = event.target as HTMLInputElement;
-        const file: File = (target.files as FileList)[0];
-        if (file !== undefined && file.size === IMAGE_DIMENSIONS.size && file.type === 'image/bmp') {
-            await this.uploadImages(file, target);
-        } else {
-            alert('wrong size or file type please choose again');
-            target.value = '';
-        }
+        this.fileManipulationService.fileValidation(event);
+        // const target = event.target as HTMLInputElement;
+        // const file: File = (target.files as FileList)[0];
+        // if (file !== undefined && file.size === IMAGE_DIMENSIONS.size && file.type === 'image/bmp') {
+        //     await this.uploadImages(file, target);
+        // } else {
+        //     alert('wrong size or file type please choose again');
+        //     target.value = '';
+        // }
     }
 
-    async uploadImages(file: File, target: HTMLInputElement): Promise<void> {
-        if (target.id === this.originalId) {
-            this.originalFile = await this.fileManipulationService.uploadImage(file, target, this.originalCanvas.nativeElement);
-        } else if (target.id === this.differentId) {
-            this.differentFile = await this.fileManipulationService.uploadImage(file, target, this.differenceCanvas.nativeElement);
-        } else {
-            this.originalFile = await this.fileManipulationService.uploadImage(file, target, this.originalCanvas.nativeElement);
-            this.differentFile = await this.fileManipulationService.uploadImage(file, target, this.differenceCanvas.nativeElement);
-        }
-    }
-
-    // drawToCanvas(canvas: HTMLCanvasElement, target: HTMLInputElement, img: HTMLImageElement): File | null {
-    //     const context = canvas.getContext('2d');
-    //     if (!target.files?.length) {
-    //         return null;
+    // async uploadImages(file: File, target: HTMLInputElement): Promise<void> {
+    //     if (target.id === this.originalId) {
+    //         this.originalFile = await this.fileManipulationService.uploadImage(file, target, this.originalCanvas.nativeElement);
+    //     } else if (target.id === this.differentId) {
+    //         this.differentFile = await this.fileManipulationService.uploadImage(file, target, this.differenceCanvas.nativeElement);
+    //     } else {
+    //         this.originalFile = await this.fileManipulationService.uploadImage(file, target, this.originalCanvas.nativeElement);
+    //         this.differentFile = await this.fileManipulationService.uploadImage(file, target, this.differenceCanvas.nativeElement);
     //     }
-    //     if (context) context.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-    //     return target.files[0];
     // }
 
     saveVerification(): boolean {
@@ -126,6 +126,9 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     async save(): Promise<void> {
+        const updatedFiles = this.fileManipulationService.updateFiles();
+        this.originalFile = updatedFiles[0];
+        this.differentFile = updatedFiles[1];
         if (this.saveVerification() && this.originalFile && this.differentFile) {
             this.isDisabled = true;
             this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
