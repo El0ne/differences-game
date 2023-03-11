@@ -116,12 +116,8 @@ export class GameCreationPageComponent implements OnInit {
 
     drawImage(canvas: HTMLCanvasElement, file: File | null, target: HTMLInputElement, img: HTMLImageElement) {
         const context = canvas.getContext('2d');
-
-        if (!target.files?.length || !context) {
-            return;
-        }
-        file = target.files[0];
-        context.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+        if (target.files) file = target.files[0];
+        if (context) context.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
     }
 
     saveVerification(): boolean {
