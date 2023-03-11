@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 
 interface MapGameInfo {
     numberOfGames: number;
-    deleted: boolean;
+    isDeleted: boolean;
 }
 @Injectable()
 export class GameManagerService {
@@ -15,15 +15,15 @@ export class GameManagerService {
     createGame(id: string): void {
         this.gamePlayedInformation.set(id, {
             numberOfGames: 0,
-            deleted: false,
+            isDeleted: false,
         });
-        console.log('this.gamePlayedInformation', this.gamePlayedInformation);
+        // console.log('this.gamePlayedInformation', this.gamePlayedInformation);
     }
 
     async endGame(id: string): Promise<void> {
         const currentMapGameInfo = this.gamePlayedInformation.get(id);
         if (currentMapGameInfo) {
-            if (currentMapGameInfo.numberOfGames === 1 && currentMapGameInfo.deleted) {
+            if (currentMapGameInfo.numberOfGames === 1 && currentMapGameInfo.isDeleted) {
                 this.gamePlayedInformation.delete(id);
                 await this.differenceClickService.deleteDifferences(id);
             } else {
@@ -31,7 +31,7 @@ export class GameManagerService {
                 this.gamePlayedInformation.set(id, currentMapGameInfo);
             }
         }
-        console.log('this.gamePlayedInformation', this.gamePlayedInformation);
+        // console.log('this.gamePlayedInformation', this.gamePlayedInformation);
     }
 
     addGame(id: string): void {
@@ -40,19 +40,19 @@ export class GameManagerService {
             currentMapGameInfo.numberOfGames += 1;
             this.gamePlayedInformation.set(id, currentMapGameInfo);
         }
-        console.log('map ', this.gamePlayedInformation);
+        // console.log('map ', this.gamePlayedInformation);
     }
 
     async deleteGame(id: string): Promise<void> {
-        console.log('delete game');
+        // console.log('delete game');
         const currentMapGameInfo = this.gamePlayedInformation.get(id);
         if (currentMapGameInfo.numberOfGames === 0) {
             this.gamePlayedInformation.delete(id);
             await this.differenceClickService.deleteDifferences(id);
         } else {
-            currentMapGameInfo.deleted = true;
+            currentMapGameInfo.isDeleted = true;
             this.gamePlayedInformation.set(id, currentMapGameInfo);
         }
-        console.log('map ', this.gamePlayedInformation);
+        // console.log('map ', this.gamePlayedInformation);
     }
 }
