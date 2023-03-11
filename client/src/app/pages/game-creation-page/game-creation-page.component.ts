@@ -89,27 +89,8 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     async fileValidation(event: Event): Promise<void> {
-        this.fileManipulationService.fileValidation(event);
-        // const target = event.target as HTMLInputElement;
-        // const file: File = (target.files as FileList)[0];
-        // if (file !== undefined && file.size === IMAGE_DIMENSIONS.size && file.type === 'image/bmp') {
-        //     await this.uploadImages(file, target);
-        // } else {
-        //     alert('wrong size or file type please choose again');
-        //     target.value = '';
-        // }
+        await this.fileManipulationService.fileValidation(event);
     }
-
-    // async uploadImages(file: File, target: HTMLInputElement): Promise<void> {
-    //     if (target.id === this.originalId) {
-    //         this.originalFile = await this.fileManipulationService.uploadImage(file, target, this.originalCanvas.nativeElement);
-    //     } else if (target.id === this.differentId) {
-    //         this.differentFile = await this.fileManipulationService.uploadImage(file, target, this.differenceCanvas.nativeElement);
-    //     } else {
-    //         this.originalFile = await this.fileManipulationService.uploadImage(file, target, this.originalCanvas.nativeElement);
-    //         this.differentFile = await this.fileManipulationService.uploadImage(file, target, this.differenceCanvas.nativeElement);
-    //     }
-    // }
 
     saveVerification(): boolean {
         if (this.gameTitle === '' && this.originalFile === null && this.differentFile === null) {
