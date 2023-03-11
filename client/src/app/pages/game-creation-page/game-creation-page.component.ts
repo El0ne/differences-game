@@ -2,6 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
+import { FileManipulationService } from '@app/services/file-manipulation.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { STAGE } from '@app/services/server-routes';
 import { GameCardDto } from '@common/game-card.dto';
@@ -15,8 +16,14 @@ import { GC_PATHS } from './game-creation-constants';
     styleUrls: ['./game-creation-page.component.scss'],
 })
 export class GameCreationPageComponent implements OnInit {
-    @ViewChild('canvas1') myOgCanvas: ElementRef;
-    @ViewChild('canvas2') myDiffCanvas: ElementRef;
+    @ViewChild('canvas1') originalCanvas: ElementRef;
+    @ViewChild('canvas2') differenceCanvas: ElementRef;
+
+    originalFile: File | null = null;
+    differentFile: File | null = null;
+
+    originalId: string = 'upload-original';
+    differentId: string = 'upload-different';
 
     modal: BehaviorSubject<'open' | 'close'> = new BehaviorSubject<'open' | 'close'>('close');
 
@@ -25,12 +32,7 @@ export class GameCreationPageComponent implements OnInit {
     readonly paths = GC_PATHS;
 
     gameTitle: string = '';
-    originalFile: File | null = null;
-    differentFile: File | null = null;
     radius: number = 3;
-
-    originalId: string = 'upload-original';
-    differentId: string = 'upload-different';
 
     isDisabled = false;
     image: string = '';
@@ -39,7 +41,14 @@ export class GameCreationPageComponent implements OnInit {
 
     createdGameInfo: GameCardDto;
 
-    constructor(public gameCardService: GameCardInformationService, private matDialog: MatDialog, public router: Router) {}
+    // we need more than 3 services/router/dialog in this file
+    // eslint-disable-next-line max-params
+    constructor(
+        public gameCardService: GameCardInformationService,
+        private matDialog: MatDialog,
+        public router: Router,
+        private fileManipulationService: FileManipulationService,
+    ) {}
 
     ngOnInit(): void {
         this.display$ = this.modal.asObservable();
@@ -67,39 +76,24 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     clearFile(canvas: HTMLCanvasElement, id: string, file: File | null): void {
-        file = null;
-        const context = canvas.getContext('2d');
-        const input = document.getElementById(id) as HTMLInputElement;
-        const bothInput = document.getElementById('upload-both') as HTMLInputElement;
-        input.value = '';
-        bothInput.value = '';
-        if (context) context.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+        this.fileManipulationService.clearFile(canvas, id, file);
     }
 
-    // clearFirstFile(canvas: HTMLCanvasElement, id: string): void {
-    //     this.originalFile = null;
-    //     this.clearSingleFile(canvas, id);
-    // }
-
-    // clearSecondFile(canvas: HTMLCanvasElement, id: string): void {
-    //     this.differentFile = null;
-    //     this.clearSingleFile(canvas, id);
-    // }
-
-    fileValidation(e: Event): void {
-        const target = e.target as HTMLInputElement;
+    async fileValidation(event: Event): Promise<void> {
+        // this.fileManipulationService.fileValidation(event);
+        const target = event.target as HTMLInputElement;
         const file: File = (target.files as FileList)[0];
         if (file !== undefined && file.size === IMAGE_DIMENSIONS.size && file.type === 'image/bmp') {
-            this.uploadImage(file, target);
+            await this.uploadImage(file, target);
         } else {
             alert('wrong size or file type please choose again');
-            target.value = ''; // we ended up really needing it lol
+            target.value = '';
         }
     }
 
     async uploadImage(file: File, target: HTMLInputElement): Promise<void> {
-        const ogContext = this.myOgCanvas.nativeElement.getContext('2d');
-        const diffContext = this.myDiffCanvas.nativeElement.getContext('2d');
+        const originalContext = this.originalCanvas.nativeElement.getContext('2d');
+        const differenceContext = this.differenceCanvas.nativeElement.getContext('2d');
         const reader = new FileReader();
         reader.readAsDataURL(file);
 
@@ -111,15 +105,15 @@ export class GameCreationPageComponent implements OnInit {
                     return;
                 }
                 if (target.id === this.originalId) {
-                    if (ogContext) ogContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+                    if (originalContext) originalContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
                     this.originalFile = target.files[0];
                 } else if (target.id === this.differentId) {
-                    if (diffContext) diffContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+                    if (differenceContext) differenceContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
                     this.differentFile = target.files[0];
                 } else {
-                    if (ogContext && diffContext) {
-                        ogContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-                        diffContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+                    if (originalContext && differenceContext) {
+                        originalContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+                        differenceContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
                         this.originalFile = target.files[0];
                         this.differentFile = target.files[0];
                     }
