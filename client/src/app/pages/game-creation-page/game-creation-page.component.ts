@@ -84,39 +84,23 @@ export class GameCreationPageComponent implements OnInit {
         const target = event.target as HTMLInputElement;
         const file: File = (target.files as FileList)[0];
         if (file !== undefined && file.size === IMAGE_DIMENSIONS.size && file.type === 'image/bmp') {
-            const updateFiles = await this.fileManipulationService.uploadImage(
-                file,
-                target,
-                this.originalCanvas.nativeElement,
-                this.differenceCanvas.nativeElement,
-            );
-            this.originalFile = updateFiles[0];
-            this.differentFile = updateFiles[1];
+            await this.uploadImages(file, target);
         } else {
             alert('wrong size or file type please choose again');
             target.value = '';
         }
     }
 
-    // async uploadImage(file: File, target: HTMLInputElement): Promise<void> {
-    //     const reader = new FileReader();
-    //     reader.readAsDataURL(file);
-
-    //     reader.onload = () => {
-    //         const img = new Image();
-    //         img.src = reader.result as string;
-    //         img.onload = () => {
-    //             if (target.id === this.originalId) {
-    //                 this.originalFile = this.drawToCanvas(this.originalCanvas.nativeElement, target, img);
-    //             } else if (target.id === this.differentId) {
-    //                 this.differentFile = this.drawToCanvas(this.differenceCanvas.nativeElement, target, img);
-    //             } else {
-    //                 this.originalFile = this.drawToCanvas(this.originalCanvas.nativeElement, target, img);
-    //                 this.differentFile = this.drawToCanvas(this.differenceCanvas.nativeElement, target, img);
-    //             }
-    //         };
-    //     };
-    // }
+    async uploadImages(file: File, target: HTMLInputElement): Promise<void> {
+        if (target.id === this.originalId) {
+            this.originalFile = await this.fileManipulationService.uploadImage(file, target, this.originalCanvas.nativeElement);
+        } else if (target.id === this.differentId) {
+            this.differentFile = await this.fileManipulationService.uploadImage(file, target, this.differenceCanvas.nativeElement);
+        } else {
+            this.originalFile = await this.fileManipulationService.uploadImage(file, target, this.originalCanvas.nativeElement);
+            this.differentFile = await this.fileManipulationService.uploadImage(file, target, this.differenceCanvas.nativeElement);
+        }
+    }
 
     // drawToCanvas(canvas: HTMLCanvasElement, target: HTMLInputElement, img: HTMLImageElement): File | null {
     //     const context = canvas.getContext('2d');

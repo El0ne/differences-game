@@ -5,8 +5,6 @@ import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
     providedIn: 'root',
 })
 export class FileManipulationService {
-    constructor() {}
-
     clearFile(canvas: HTMLCanvasElement, id: string, file: File | null): void {
         // we just want to set the file to null
         // eslint-disable-next-line no-unused-vars
@@ -19,26 +17,33 @@ export class FileManipulationService {
         if (context) context.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
     }
 
-    async uploadImage(file: File, target: HTMLInputElement, originalCanvas: HTMLCanvasElement, differenceCanvas: HTMLCanvasElement) {
-        let originalFile = null;
-        let differenceFile = null;
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => {
-            const img = new Image();
-            img.src = reader.result as string;
-            img.onload = () => {
-                if (target.id === 'upload-original') {
-                    originalFile = this.drawToCanvas(originalCanvas, target, img);
-                } else if (target.id === 'upload-different') {
-                    differenceFile = this.drawToCanvas(differenceCanvas, target, img);
-                } else {
-                    originalFile = this.drawToCanvas(originalCanvas, target, img);
-                    differenceFile = this.drawToCanvas(differenceCanvas, target, img);
-                }
+    async uploadImage(file: File, target: HTMLInputElement, canvas: HTMLCanvasElement): Promise<File | null> {
+        // console.log('target', target);
+        // let updatedFile: File | null = null;
+        // const reader = new FileReader();
+        // reader.readAsDataURL(file);
+        // reader.onload = () => {
+        //     const img = new Image();
+        //     img.src = reader.result as string;
+        //     img.onload = () => {
+        //         updatedFile = this.drawToCanvas(canvas, target, img);
+        //         console.log('rwger', updatedFile);
+        //     };
+        // };
+        // console.log('updatedFile', updatedFile);
+        // return updatedFile;
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                const img = new Image();
+                img.src = reader.result as string;
+                img.onload = () => {
+                    const updatedFile = this.drawToCanvas(canvas, target, img);
+                    resolve(updatedFile);
+                };
             };
-        };
-        return [originalFile, differenceFile];
+        });
     }
 
     drawToCanvas(canvas: HTMLCanvasElement, target: HTMLInputElement, img: HTMLImageElement): File | null {
