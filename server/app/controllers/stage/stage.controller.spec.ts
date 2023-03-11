@@ -38,7 +38,7 @@ describe('StageController', () => {
     let getGameCardByIdStub;
     let gameCardService: GameCardService;
     let imageManagerService: ImageManagerService;
-    let gameManagerService: GameManagerService;
+    // let gameManagerService: GameManagerService;
 
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
@@ -74,7 +74,7 @@ describe('StageController', () => {
         controller = module.get<StageController>(StageController);
         gameCardService = module.get<GameCardService>(GameCardService);
         imageManagerService = module.get<ImageManagerService>(ImageManagerService);
-        gameManagerService = module.get<GameManagerService>(GameManagerService);
+        // gameManagerService = module.get<GameManagerService>(GameManagerService);
         connection = await module.get(getConnectionToken());
         getGameCardStub = stub(gameCardService, 'getGameCards');
         getGameCardsNumberStub = stub(gameCardService, 'getGameCardsNumber');
