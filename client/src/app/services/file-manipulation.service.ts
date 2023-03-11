@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 
-interface FileInformation {
+export interface FileInformation {
     originalFile: File | null;
     differenceFile: File | null;
     originalCanvas: HTMLCanvasElement;
@@ -13,19 +13,19 @@ interface FileInformation {
 })
 export class FileManipulationService {
     originalFile: File | null;
-    differentFile: File | null;
+    differenceFile: File | null;
     originalCanvas: HTMLCanvasElement;
     differenceCanvas: HTMLCanvasElement;
 
     updateAttributes(fileInformation: FileInformation): void {
         this.originalFile = fileInformation.originalFile;
-        this.differentFile = fileInformation.differenceFile;
+        this.differenceFile = fileInformation.differenceFile;
         this.originalCanvas = fileInformation.originalCanvas;
         this.differenceCanvas = fileInformation.differenceCanvas;
     }
 
     updateFiles(): (File | null)[] {
-        return [this.originalFile, this.differentFile];
+        return [this.originalFile, this.differenceFile];
     }
 
     clearFile(canvas: HTMLCanvasElement, id: string, file: File | null): void {
@@ -55,10 +55,10 @@ export class FileManipulationService {
         if (target.id === 'upload-original') {
             this.originalFile = await this.uploadImage(file, target, this.originalCanvas);
         } else if (target.id === 'upload-different') {
-            this.differentFile = await this.uploadImage(file, target, this.differenceCanvas);
+            this.differenceFile = await this.uploadImage(file, target, this.differenceCanvas);
         } else {
             this.originalFile = await this.uploadImage(file, target, this.originalCanvas);
-            this.differentFile = await this.uploadImage(file, target, this.differenceCanvas);
+            this.differenceFile = await this.uploadImage(file, target, this.differenceCanvas);
         }
     }
 
