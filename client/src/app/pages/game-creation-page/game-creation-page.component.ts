@@ -84,41 +84,48 @@ export class GameCreationPageComponent implements OnInit {
         const target = event.target as HTMLInputElement;
         const file: File = (target.files as FileList)[0];
         if (file !== undefined && file.size === IMAGE_DIMENSIONS.size && file.type === 'image/bmp') {
-            await this.uploadImage(file, target);
+            const updateFiles = await this.fileManipulationService.uploadImage(
+                file,
+                target,
+                this.originalCanvas.nativeElement,
+                this.differenceCanvas.nativeElement,
+            );
+            this.originalFile = updateFiles[0];
+            this.differentFile = updateFiles[1];
         } else {
             alert('wrong size or file type please choose again');
             target.value = '';
         }
     }
 
-    async uploadImage(file: File, target: HTMLInputElement): Promise<void> {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
+    // async uploadImage(file: File, target: HTMLInputElement): Promise<void> {
+    //     const reader = new FileReader();
+    //     reader.readAsDataURL(file);
 
-        reader.onload = () => {
-            const img = new Image();
-            img.src = reader.result as string;
-            img.onload = () => {
-                if (target.id === this.originalId) {
-                    this.originalFile = this.drawImage(this.originalCanvas.nativeElement, target, img);
-                } else if (target.id === this.differentId) {
-                    this.differentFile = this.drawImage(this.differenceCanvas.nativeElement, target, img);
-                } else {
-                    this.originalFile = this.drawImage(this.originalCanvas.nativeElement, target, img);
-                    this.differentFile = this.drawImage(this.differenceCanvas.nativeElement, target, img);
-                }
-            };
-        };
-    }
+    //     reader.onload = () => {
+    //         const img = new Image();
+    //         img.src = reader.result as string;
+    //         img.onload = () => {
+    //             if (target.id === this.originalId) {
+    //                 this.originalFile = this.drawToCanvas(this.originalCanvas.nativeElement, target, img);
+    //             } else if (target.id === this.differentId) {
+    //                 this.differentFile = this.drawToCanvas(this.differenceCanvas.nativeElement, target, img);
+    //             } else {
+    //                 this.originalFile = this.drawToCanvas(this.originalCanvas.nativeElement, target, img);
+    //                 this.differentFile = this.drawToCanvas(this.differenceCanvas.nativeElement, target, img);
+    //             }
+    //         };
+    //     };
+    // }
 
-    drawImage(canvas: HTMLCanvasElement, target: HTMLInputElement, img: HTMLImageElement): File | null {
-        const context = canvas.getContext('2d');
-        if (!target.files?.length) {
-            return null;
-        }
-        if (context) context.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-        return target.files[0];
-    }
+    // drawToCanvas(canvas: HTMLCanvasElement, target: HTMLInputElement, img: HTMLImageElement): File | null {
+    //     const context = canvas.getContext('2d');
+    //     if (!target.files?.length) {
+    //         return null;
+    //     }
+    //     if (context) context.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+    //     return target.files[0];
+    // }
 
     saveVerification(): boolean {
         if (this.gameTitle === '' && this.originalFile === null && this.differentFile === null) {
