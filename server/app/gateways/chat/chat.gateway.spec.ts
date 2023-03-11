@@ -54,12 +54,12 @@ describe('ChatGateway', () => {
         const error = 'Votre message ne respecte pas le bon format. Veuillez entrer un nouveau message';
         gateway.validate(socket, validWordCase.word);
         expect(
-            socket.emit.calledWith(ChatEvents.WordValidated, { validated: validWordCase.isValid, originalMessage: validWordCase.word }),
+            socket.emit.calledWith(ChatEvents.WordValidated, { isValidated: validWordCase.isValid, originalMessage: validWordCase.word }),
         ).toBeTruthy();
         gateway.validate(socket, invalidWordCase.word);
-        expect(socket.emit.calledWith(ChatEvents.WordValidated, { validated: invalidWordCase.isValid, originalMessage: error })).toBeTruthy();
+        expect(socket.emit.calledWith(ChatEvents.WordValidated, { isValidated: invalidWordCase.isValid, originalMessage: error })).toBeTruthy();
         gateway.validate(socket, emptyStringTestCase);
-        expect(socket.emit.calledWith(ChatEvents.WordValidated, { validated: false, originalMessage: error })).toBeTruthy();
+        expect(socket.emit.calledWith(ChatEvents.WordValidated, { isValidated: false, originalMessage: error })).toBeTruthy();
     });
 
     it('broadcastAll() should send a mass message to the server', () => {
