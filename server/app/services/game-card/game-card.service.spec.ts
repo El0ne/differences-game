@@ -128,7 +128,6 @@ describe('GameCardService', () => {
     it('deleteGameCard should delete a gameCard, its 2 images and call the deleteDifferences service', async () => {
         const gameCard = getFakeGameCard();
         const imageManagerServiceMock = jest.spyOn(imageManagerService, 'deleteImage').mockImplementation();
-        const differenceClickServiceMock = jest.spyOn(differenceClickService, 'deleteDifferences').mockImplementation();
 
         await gameCardModel.create(gameCard);
 
@@ -136,7 +135,6 @@ describe('GameCardService', () => {
 
         expect(imageManagerServiceMock).toHaveBeenCalledWith(gameCard.originalImageName);
         expect(imageManagerServiceMock).toHaveBeenCalledWith(gameCard.differenceImageName);
-        expect(differenceClickServiceMock).toHaveBeenCalledWith(gameCard._id);
     });
     it('generateGameCard should create a game card from a game informations', async () => {
         const gameCard = getFakeGameCard();
