@@ -4,7 +4,7 @@ import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/materia
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SocketService } from '@app/services/socket/socket.service';
-import { PlayerInformations, WaitingRoomEvents } from '@common/waiting-room-socket-communication';
+import { AcceptationInformation, PlayerInformations, WaitingRoomEvents } from '@common/waiting-room-socket-communication';
 import { WaitingRoomComponent, WaitingRoomDataPassing } from './waiting-room.component';
 
 describe('WaitingRoomComponent', () => {
@@ -102,5 +102,35 @@ describe('WaitingRoomComponent', () => {
         };
         component.ngOnInit();
         expect(component.clientsInWaitingRoom.has('opponentId')).toBeFalsy();
+    });
+
+    it('Match confirmed should redirect the host to the game', () => {
+        spyOn(component, 'navigateTo1v1').and.callThrough();
+        socketServiceSpy.listen = (event: string, callback: any) => {
+            callback('opponentId');
+        };
+        component.ngOnInit();
+        expect(component.navigateTo1v1).toHaveBeenCalled();
+    });
+
+    it('matchAccepted event should add the gameHost to the map and redirect to the game', () => {
+        spyOn(component, 'navigateTo1v1').and.callThrough();
+        component.clientsInWaitingRoom.set('opponentId', 'nom');
+        component.waitingRoomInfo.isHost = false;
+        socketServiceSpy.listen = (event: string, callback: any) => {
+            callback({ playerName: 'hostName', playerSocketId: 'hostId', roomId: 'roomId' } as AcceptationInformation);
+        };
+        component.ngOnInit();
+        expect(socketServiceSpy.names.get('hostId')).toEqual('hostName');
+        expect(component.navigateTo1v1).toHaveBeenCalled();
+    });
+
+    it('matchRefused event should alert the player and close the dialog', () => {
+        component.waitingRoomInfo.isHost = false;
+        socketServiceSpy.listen = (event: string, callback: any) => {
+            callback('refused reason');
+        };
+        component.ngOnInit();
+        expect(matDialogSpy.close).toHaveBeenCalled();
     });
 });
