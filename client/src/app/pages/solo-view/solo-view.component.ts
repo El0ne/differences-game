@@ -56,7 +56,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private dialog: MatDialog,
         private router: Router,
-        public chat: SocketService,
+        public socketService: SocketService,
     ) {}
 
     ngOnInit(): void {
@@ -74,29 +74,29 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
         const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true, data: { game: gameId, isMultiplayer: this.is1v1 } });
         dialogRef.afterClosed().subscribe(() => {
-            this.player = this.chat.names[0];
+            this.player = this.socketService.names[0];
             if (this.is1v1) {
-                this.opponent = this.chat.names[1];
+                this.opponent = this.socketService.names[1];
             } else this.opponent = '';
-            this.currentRoom = this.chat.gameRoom;
+            this.currentRoom = this.socketService.gameRoom;
             this.showTime();
             this.configureSocketReactions();
         });
     }
 
     configureSocketReactions(): void {
-        this.chat.listen<Validation>(ChatEvents.WordValidated, (validation: Validation) => {
+        this.socketService.listen<Validation>(ChatEvents.WordValidated, (validation: Validation) => {
             if (validation.isValidated) {
-                this.chat.send<RoomManagement>(ChatEvents.RoomMessage, { room: this.currentRoom, message: validation.originalMessage });
+                this.socketService.send<RoomManagement>(ChatEvents.RoomMessage, { room: this.currentRoom, message: validation.originalMessage });
             } else {
-                this.messages.push({ socketId: this.chat.socketId, message: validation.originalMessage, isEvent: true });
+                this.messages.push({ socketId: this.socketService.socketId, message: validation.originalMessage, isEvent: true });
             }
         });
-        this.chat.listen<RoomMessage>(ChatEvents.RoomMessage, (data: RoomMessage) => {
+        this.socketService.listen<RoomMessage>(ChatEvents.RoomMessage, (data: RoomMessage) => {
             this.messages.push(data);
         });
-        this.chat.listen<RoomMessage>(ChatEvents.Abandon, (message: RoomMessage) => {
-            if (!(message.socketId === this.chat.socketId)) {
+        this.socketService.listen<RoomMessage>(ChatEvents.Abandon, (message: RoomMessage) => {
+            if (!(message.socketId === this.socketService.socketId)) {
                 this.finishGame();
             }
             this.opponent = '';
@@ -107,7 +107,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         this.timerService.stopTimer();
         this.foundDifferenceService.clearDifferenceFound();
-        this.chat.disconnect();
+        this.socketService.disconnect();
     }
 
     showTime(): void {
@@ -137,7 +137,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     addDifferenceDetected(differenceIndex: number): void {
         this.foundDifferenceService.addDifferenceFound(differenceIndex);
-        this.chat.send<RoomEvent>(ChatEvents.Event, { room: this.currentRoom, isMultiplayer: this.is1v1, event: 'Différence trouvée' });
+        this.socketService.send<RoomEvent>(ChatEvents.Event, { room: this.currentRoom, isMultiplayer: this.is1v1, event: 'Différence trouvée' });
     }
 
     openInfoModal(): void {
@@ -154,7 +154,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     sendMessage(): void {
-        this.chat.send<string>(ChatEvents.Validate, this.messageContent);
+        this.socketService.send<string>(ChatEvents.Validate, this.messageContent);
         this.messageContent = '';
     }
 
@@ -164,11 +164,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     handleMistake(): void {
-        this.chat.send<RoomEvent>(ChatEvents.Event, { room: this.currentRoom, isMultiplayer: this.is1v1, event: 'Erreur' });
+        this.socketService.send<RoomEvent>(ChatEvents.Event, { room: this.currentRoom, isMultiplayer: this.is1v1, event: 'Erreur' });
     }
 
     hint(): void {
-        this.chat.send<string>(ChatEvents.Hint, this.currentRoom);
+        this.socketService.send<string>(ChatEvents.Hint, this.currentRoom);
     }
     handleFlash(currentDifferences: number[]): void {
         this.left.differenceEffect(currentDifferences);
