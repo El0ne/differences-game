@@ -98,7 +98,7 @@ describe('ChatGateway', () => {
                 expect(data.message.includes('par')).toBe(true);
             },
         } as any);
-        gateway.event(socket, { room: TEST_ROOM_ID, event: 'Error', multiplayer: true });
+        gateway.event(socket, { room: TEST_ROOM_ID, event: 'Error', isMultiplayer: true });
     });
 
     it('event() should emit RoomMessage and return a string containing event without par', () => {
@@ -110,7 +110,7 @@ describe('ChatGateway', () => {
                 expect(data.message.includes('par')).toBe(false);
             },
         } as any);
-        gateway.event(socket, { room: TEST_ROOM_ID, event: 'Différence', multiplayer: false });
+        gateway.event(socket, { room: TEST_ROOM_ID, event: 'Différence', isMultiplayer: false });
     });
 
     it('abandon should emit a abandon event and include player name in the alert message', () => {

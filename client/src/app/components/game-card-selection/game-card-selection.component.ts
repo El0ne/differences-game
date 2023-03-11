@@ -1,4 +1,5 @@
 /* eslint-disable no-underscore-dangle */
+/* Required to allow for mongoDB unique _id to be reused in our database */
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { HostWaitingRoomComponent } from '@app/modals/host-waiting-room/host-waiting-room.component';
@@ -19,11 +20,11 @@ export class GameCardSelectionComponent implements OnInit {
     createGameButton: boolean = true;
 
     constructor(public socket: SocketService, public dialog: MatDialog) {}
-    ngOnInit() {
+    ngOnInit(): void {
         this.image = `${STAGE}/image/${this.gameCardInformation.originalImageName}`;
     }
 
-    hostOrJoinGame() {
+    hostOrJoinGame(): void {
         if (this.createGameButton) {
             this.socket.send(WaitingRoomEvents.HostGame, this.gameCardInformation._id);
             const dialogRef = this.dialog.open(HostWaitingRoomComponent, { disableClose: true });
@@ -37,8 +38,4 @@ export class GameCardSelectionComponent implements OnInit {
             });
         }
     }
-
-    // TODO: ajouter la logique pour que le reset des temps et le delete se fait pour le sprint 2
-
-    // TODO: Ajouter la logique pour que les temps de configurations viennent du database pour dynamiquement les loader.
 }

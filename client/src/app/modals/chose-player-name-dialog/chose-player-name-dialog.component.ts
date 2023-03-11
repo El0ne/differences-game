@@ -21,11 +21,7 @@ export class ChosePlayerNameDialogComponent {
         this.configureSocketReactions();
     }
 
-    get socketId() {
-        return this.chat.sio.id ? this.chat.sio.id : '';
-    }
-
-    configureSocketReactions() {
+    configureSocketReactions(): void {
         this.chat.listen('PlayerWaiting', (data: PlayersInformation) => {
             this.awaitingPlayer = false;
             if (this.chat.names[0] === data.player) {
@@ -37,7 +33,7 @@ export class ChosePlayerNameDialogComponent {
             this.dialogRef.close();
         });
         this.chat.listen('WaitingRoom', () => {
-            this.chat.send('joinRoom', this.socketId);
+            this.chat.send('joinRoom', this.chat.socketId);
             this.awaitingPlayer = true;
         });
     }
@@ -45,13 +41,13 @@ export class ChosePlayerNameDialogComponent {
     validateName(): void {
         const testName = this.playerName;
         if (testName.replace(/\s/g, '') !== '') {
-            if (this.conditions.multiplayer) {
+            if (this.conditions.isMultiplayer) {
                 this.chat.names[0] = this.playerName;
                 this.chat.send('roomCheck', { game: this.conditions.game, name: this.playerName });
             } else {
                 this.chat.names[0] = this.playerName;
-                this.chat.send('joinRoom', this.socketId);
-                this.chat.gameRoom = this.socketId;
+                this.chat.send('joinRoom', this.chat.socketId);
+                this.chat.gameRoom = this.chat.socketId;
                 this.dialogRef.close();
             }
         } else {

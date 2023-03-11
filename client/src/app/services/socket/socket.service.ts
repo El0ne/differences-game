@@ -14,15 +14,15 @@ export class SocketService {
         return this.sio.id ? this.sio.id : '';
     }
 
-    connect() {
+    connect(): void {
         this.sio = io(environment.serverSocket, { transports: ['websocket'], upgrade: false });
     }
 
-    disconnect() {
+    disconnect(): void {
         this.sio.disconnect();
     }
 
-    liveSocket() {
+    liveSocket(): boolean {
         return this.sio && this.sio.connected;
     }
     listen<T>(eventName: string, action: (data: T) => void): void {

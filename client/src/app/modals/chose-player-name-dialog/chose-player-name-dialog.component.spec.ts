@@ -10,7 +10,7 @@ describe('ChosePlayerNameDialogComponent', () => {
     let component: ChosePlayerNameDialogComponent;
     let fixture: ComponentFixture<ChosePlayerNameDialogComponent>;
     let matDialogSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
-    const data: GameConditions = { game: 'game', multiplayer: true };
+    const data: GameConditions = { game: 'game', isMultiplayer: true };
 
     beforeEach(async () => {
         matDialogSpy = jasmine.createSpyObj('MatDialogRef<ChosePlayerNameDialogComponent>', ['close']);

@@ -52,8 +52,8 @@ describe('SoloViewComponent', () => {
         chatSocketServiceMock.listen = (event: string, callback: any) => {
             switch (event) {
                 case 'wordValidated': {
-                    callback({ validated: true, originalMessage: 'Test message' });
-                    callback({ validated: false, originalMessage: 'Error message' });
+                    callback({ isValidated: true, originalMessage: 'Test message' });
+                    callback({ isValidated: false, originalMessage: 'Error message' });
                     break;
                 }
                 case 'roomMessage': {
@@ -133,7 +133,7 @@ describe('SoloViewComponent', () => {
         component.currentRoom = 'room';
         const sendSpy = spyOn(chatSocketServiceMock, 'send').and.callThrough();
         component.handleMistake();
-        expect(sendSpy).toHaveBeenCalledWith('event', { room: component.currentRoom, multiplayer: true, event: 'Erreur' });
+        expect(sendSpy).toHaveBeenCalledWith('event', { room: component.currentRoom, isMultiplayer: true, event: 'Erreur' });
     });
 
     it('hint should send a hint event to socket server with the room information', () => {

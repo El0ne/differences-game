@@ -86,10 +86,10 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     configureSocketReactions(): void {
         this.chat.listen<Validation>(ChatEvents.WordValidated, (validation: Validation) => {
-            if (validation.validated) {
+            if (validation.isValidated) {
                 this.chat.send<RoomManagement>(ChatEvents.RoomMessage, { room: this.currentRoom, message: validation.originalMessage });
             } else {
-                this.messages.push({ socketId: this.chat.socketId, message: validation.originalMessage, event: true });
+                this.messages.push({ socketId: this.chat.socketId, message: validation.originalMessage, isEvent: true });
             }
         });
         this.chat.listen<RoomMessage>(ChatEvents.RoomMessage, (data: RoomMessage) => {
@@ -137,7 +137,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     addDifferenceDetected(differenceIndex: number): void {
         this.foundDifferenceService.addDifferenceFound(differenceIndex);
-        this.chat.send('event', { room: this.currentRoom, multiplayer: this.is1v1, event: 'Différence trouvée' });
+        this.chat.send<RoomEvent>(ChatEvents.Event, { room: this.currentRoom, isMultiplayer: this.is1v1, event: 'Différence trouvée' });
     }
 
     openInfoModal(): void {
@@ -164,7 +164,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     handleMistake(): void {
-        this.chat.send<RoomEvent>(ChatEvents.Event, { room: this.currentRoom, multiplayer: this.is1v1, event: 'Erreur' });
+        this.chat.send<RoomEvent>(ChatEvents.Event, { room: this.currentRoom, isMultiplayer: this.is1v1, event: 'Erreur' });
     }
 
     hint(): void {
