@@ -72,7 +72,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             });
         }
 
-        const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true, data: { game: gameId, multiplayer: this.is1v1 } });
+        const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true, data: { game: gameId, isMultiplayer: this.is1v1 } });
         dialogRef.afterClosed().subscribe(() => {
             this.player = this.chat.names[0];
             if (this.is1v1) {
@@ -154,7 +154,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     sendMessage(): void {
-        this.chat.send('validate', this.messageContent);
+        this.chat.send<string>(ChatEvents.Validate, this.messageContent);
         this.messageContent = '';
     }
 

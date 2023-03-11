@@ -21,10 +21,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage(ChatEvents.Validate)
     validate(socket: Socket, message: string): void {
         if (message && message.length < MESSAGE_MAX_LENGTH) {
-            socket.emit(ChatEvents.WordValidated, { validated: true, originalMessage: message });
+            socket.emit(ChatEvents.WordValidated, { isValidated: true, originalMessage: message });
         } else {
             const error = 'Votre message ne respecte pas le bon format. Veuillez entrer un nouveau message';
-            socket.emit(ChatEvents.WordValidated, { validated: false, originalMessage: error });
+            socket.emit(ChatEvents.WordValidated, { isValidated: false, originalMessage: error });
         }
     }
 
