@@ -107,8 +107,8 @@ export class StageController {
                     };
                     res.status(HttpStatus.CREATED).send(data);
                 } else {
-                    this.imageManagerService.deleteImage(files.baseImage[0].path);
-                    this.imageManagerService.deleteImage(files.differenceImage[0].path);
+                    this.imageManagerService.deleteImage(files.baseImage[0].filename);
+                    this.imageManagerService.deleteImage(files.differenceImage[0].filename);
                     res.status(HttpStatus.OK).send([]);
                 }
             } else res.sendStatus(HttpStatus.BAD_REQUEST);
