@@ -99,25 +99,25 @@ export class GameCreationPageComponent implements OnInit {
             const img = new Image();
             img.src = reader.result as string;
             img.onload = () => {
-                if (!target.files?.length) {
-                    return;
-                }
                 if (target.id === this.originalId) {
-                    this.drawImage(this.originalCanvas.nativeElement, this.originalFile, target, img);
+                    this.originalFile = this.drawImage(this.originalCanvas.nativeElement, target, img);
                 } else if (target.id === this.differentId) {
-                    this.drawImage(this.differenceCanvas.nativeElement, this.differentFile, target, img);
+                    this.differentFile = this.drawImage(this.differenceCanvas.nativeElement, target, img);
                 } else {
-                    this.drawImage(this.originalCanvas.nativeElement, this.originalFile, target, img);
-                    this.drawImage(this.differenceCanvas.nativeElement, this.differentFile, target, img);
+                    this.originalFile = this.drawImage(this.originalCanvas.nativeElement, target, img);
+                    this.differentFile = this.drawImage(this.differenceCanvas.nativeElement, target, img);
                 }
             };
         };
     }
 
-    drawImage(canvas: HTMLCanvasElement, file: File | null, target: HTMLInputElement, img: HTMLImageElement) {
+    drawImage(canvas: HTMLCanvasElement, target: HTMLInputElement, img: HTMLImageElement): File | null {
         const context = canvas.getContext('2d');
-        if (target.files) file = target.files[0];
+        if (!target.files?.length) {
+            return null;
+        }
         if (context) context.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+        return target.files[0];
     }
 
     saveVerification(): boolean {
