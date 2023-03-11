@@ -39,7 +39,7 @@ describe('SoloViewComponent', () => {
         mockService.getGameCardInfoFromId = () => {
             return of(SERVICE_MOCK_GAME_CARD);
         };
-        chatSocketServiceMock = jasmine.createSpyObj('SocketService', ['connect', 'disconnect', 'liveSocket', 'listen', 'send']);
+        chatSocketServiceMock = jasmine.createSpyObj('SocketService', ['connect', 'disconnect', 'liveSocket', 'listen', 'send'], ['socketId']);
         chatSocketServiceMock.sio = jasmine.createSpyObj('Socket', ['on', 'emit', 'disconnect']);
         chatSocketServiceMock.names = ['player', 'opponent'];
         chatSocketServiceMock.gameRoom = 'game';
@@ -118,7 +118,7 @@ describe('SoloViewComponent', () => {
     it('ConfigureSocketReactions should configure sockets correctly & react properly according to event', () => {
         const listenSpy = spyOn(chatSocketServiceMock, 'listen').and.callThrough();
         const sendSpy = spyOn(chatSocketServiceMock, 'send').and.callThrough();
-        const finishGameSpy = spyOn(component, 'finishGame');
+        const finishGameSpy = spyOn(component, 'winGame');
         chatSocketServiceMock.sio.id = 'mockSocket';
         component.configureSocketReactions();
         expect(listenSpy).toHaveBeenCalledTimes(3);
@@ -153,24 +153,26 @@ describe('SoloViewComponent', () => {
 
     it('should increment counter when increment counter is called', () => {
         component.currentScorePlayer1 = 0;
-        component.incrementScore();
+        Object.defineProperty(chatSocketServiceMock, 'socketId', { value: 'mockSocket' });
+        component.incrementScore('mockSocket');
         const answer = 1;
 
         expect(component.currentScorePlayer1).toEqual(answer);
     });
 
     it('finishGame should have been called if number of errors is equal to the current score in incrementScore', () => {
-        const finishGameSpy = spyOn(component, 'finishGame');
+        const winGameSpy = spyOn(component, 'winGame');
+        chatSocketServiceMock.sio.id = 'test';
         component.currentScorePlayer1 = 1;
-        component.numberOfDifferences = 2;
-        component.incrementScore();
-        expect(finishGameSpy).toHaveBeenCalled();
+        component.numberOfDifferences = 3;
+        component.incrementScore('test');
+        expect(winGameSpy).toHaveBeenCalled();
     });
 
     it('finishGame should set showNavBar to false and showWinScreen to true', () => {
         component.showNavBar = true;
         component.showWinMessage = false;
-        component.finishGame();
+        component.winGame();
         expect(component.showNavBar).toBeFalse();
         expect(component.showWinMessage).toBeTrue();
     });
@@ -234,11 +236,15 @@ describe('SoloViewComponent', () => {
         const paintPixelSpy = spyOn(component, 'paintPixel');
         const incrementSpy = spyOn(component, 'incrementScore');
         const addDiffSpy = spyOn(component, 'addDifferenceDetected');
+        spyOn(component.left, 'emitSound').and.callFake(() => {
+            return;
+        });
         component.differenceHandler(MOCK_INFORMATION);
         expect(handleFlashSpy).toHaveBeenCalled();
         expect(paintPixelSpy).toHaveBeenCalled();
         expect(incrementSpy).toHaveBeenCalled();
         expect(addDiffSpy).toHaveBeenCalled();
+        expect(component.left.emitSound).toHaveBeenCalled();
     });
 });
 
