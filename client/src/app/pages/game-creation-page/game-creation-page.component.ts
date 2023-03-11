@@ -92,8 +92,6 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     async uploadImage(file: File, target: HTMLInputElement): Promise<void> {
-        const originalContext = this.originalCanvas.nativeElement.getContext('2d');
-        const differenceContext = this.differenceCanvas.nativeElement.getContext('2d');
         const reader = new FileReader();
         reader.readAsDataURL(file);
 
@@ -105,21 +103,25 @@ export class GameCreationPageComponent implements OnInit {
                     return;
                 }
                 if (target.id === this.originalId) {
-                    if (originalContext) originalContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-                    this.originalFile = target.files[0];
+                    this.drawImage(this.originalCanvas.nativeElement, this.originalFile, target, img);
                 } else if (target.id === this.differentId) {
-                    if (differenceContext) differenceContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-                    this.differentFile = target.files[0];
+                    this.drawImage(this.differenceCanvas.nativeElement, this.differentFile, target, img);
                 } else {
-                    if (originalContext && differenceContext) {
-                        originalContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-                        differenceContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-                        this.originalFile = target.files[0];
-                        this.differentFile = target.files[0];
-                    }
+                    this.drawImage(this.originalCanvas.nativeElement, this.originalFile, target, img);
+                    this.drawImage(this.differenceCanvas.nativeElement, this.differentFile, target, img);
                 }
             };
         };
+    }
+
+    drawImage(canvas: HTMLCanvasElement, file: File | null, target: HTMLInputElement, img: HTMLImageElement) {
+        const context = canvas.getContext('2d');
+
+        if (!target.files?.length || !context) {
+            return;
+        }
+        file = target.files[0];
+        context.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
     }
 
     saveVerification(): boolean {
