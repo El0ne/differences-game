@@ -234,7 +234,7 @@ describe('SoloViewComponent', () => {
         const paintPixelSpy = spyOn(component, 'paintPixel');
         const incrementSpy = spyOn(component, 'incrementScore');
         const addDiffSpy = spyOn(component, 'addDifferenceDetected');
-        component.emitHandler(MOCK_INFORMATION);
+        component.differenceHandler(MOCK_INFORMATION);
         expect(handleFlashSpy).toHaveBeenCalled();
         expect(paintPixelSpy).toHaveBeenCalled();
         expect(incrementSpy).toHaveBeenCalled();

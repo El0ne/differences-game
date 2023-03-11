@@ -31,7 +31,9 @@
         <div class="game-options">
             <div id="double-score" *ngIf="is1v1">
                 <div class="score">
-                    <div class="playerName">{{ player }}</div>
+                    <div class="player-name-container">
+                        <div class="playerName">{{ player }}</div>
+                    </div>
                     <!-- référence : https://codepen.io/Vivekp1118/pen/YzLOOVG -->
                     <div class="container neon-border">
                         <div class="row">
@@ -43,7 +45,9 @@
                     </div>
                 </div>
                 <div class="score">
-                    <div class="playerName">{{ opponent }}</div>
+                    <div class="player-name-container">
+                        <div class="playerName">{{ opponent }}</div>
+                    </div>
                     <!-- référence : https://codepen.io/Vivekp1118/pen/YzLOOVG -->
                     <div class="container neon-border">
                         <div class="row">

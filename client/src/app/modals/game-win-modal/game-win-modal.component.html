@@ -1,11 +1,11 @@
 <div class="win neon modal-page">
-    <div *ngIf="win" class="text">
+    <div *ngIf="data.isSolo" class="text">
         <p>Vous Avez Gagné!</p>
         <p>Bravo!</p>
     </div>
-    <div *ngIf="!win" class="text">
-        <p>Vous Avez Perdu...</p>
-        <p>:(</p>
+    <div *ngIf="!data.isSolo" class="text">
+        <p>{{ data.winner }} est le vainceur!</p>
+        <p>Bien joué!</p>
     </div>
     <button class="normal-button" (click)="confirm()">Continuer</button>
 </div>

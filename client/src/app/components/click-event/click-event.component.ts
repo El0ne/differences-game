@@ -93,7 +93,6 @@ export class ClickEventComponent implements OnInit {
     async differenceEffect(currentDifferences: number[]): Promise<void> {
         if (!this.endGame) {
             const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-            this.emitSound(false);
             for (let i = 0; i < FLASH_AMOUNT; i++) {
                 this.turnDifferenceYellow(originalContext, currentDifferences);
                 await this.delay(FAST_WAIT_TIME_MS);

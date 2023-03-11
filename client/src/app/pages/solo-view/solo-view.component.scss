@@ -269,4 +269,11 @@ app-click-event {
     text-align: center;
     padding-bottom: 5%;
     color: white;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.player-name-container {
+    width: 19em;
 }

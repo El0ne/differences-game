@@ -107,9 +107,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         });
         this.chat.listen<string>(ChatEvents.Win, (socket: string) => {
             if (this.chat.socketId === socket) {
-                this.winGame();
+                this.winGame(this.player);
             } else {
-                this.loseGame();
+                this.winGame(this.opponent);
             }
         });
     }
@@ -128,20 +128,13 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         return this.convertService.convert(time);
     }
 
-    winGame(): void {
+    winGame(winner?: string): void {
         this.left.endGame = true;
         this.right.endGame = true;
         this.showWinMessage = true;
         this.showNavBar = false;
-        this.dialog.open(GameWinModalComponent, { disableClose: true, data: true });
-    }
-
-    loseGame(): void {
-        this.left.endGame = true;
-        this.right.endGame = true;
-        this.showWinMessage = true;
-        this.showNavBar = false;
-        this.dialog.open(GameWinModalComponent, { disableClose: true, data: false });
+        if (this.is1v1) this.dialog.open(GameWinModalComponent, { disableClose: true, data: { isSolo: false, winner } });
+        else this.dialog.open(GameWinModalComponent, { disableClose: true, data: { isSolo: true } });
     }
 
     incrementScore(socket: string): void {
@@ -198,6 +191,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             const difference: playerDifference = { differenceInformation: information, socket: this.chat.socketId };
             this.effectHandler(difference);
         }
+        this.left.emitSound(false);
         this.chat.send<RoomEvent>(ChatEvents.Event, { room: this.currentRoom, multiplayer: this.is1v1, event: 'Différence trouvée' });
     }
 
@@ -212,7 +206,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     endGameVerification(): void {
         if (this.is1v1) {
             const endGameVerification = this.numberOfDifferences / 2;
-            if (this.currentScorePlayer1 > endGameVerification) {
+            if (this.currentScorePlayer1 >= endGameVerification) {
                 this.chat.send<string>(ChatEvents.Win, this.currentRoom);
             }
         } else {

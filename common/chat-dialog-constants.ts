@@ -8,3 +8,8 @@ export interface PlayersInformation {
     room: string;
     adversary?: string;
 }
+
+export interface EndGame {
+    winner: string;
+    isSolo: boolean;
+}
