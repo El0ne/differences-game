@@ -88,11 +88,19 @@ describe('WaitingRoomComponent', () => {
     });
 
     it('a requestMatch event should add the opponent to the map', () => {
-        spyOn(component.clientsInWaitingRoom, 'set').and.callThrough();
         socketServiceSpy.listen = (event: string, callback: any) => {
-            callback({ playerName: 'testName', playerSocketId: 'playerId' } as PlayerInformations);
+            callback({ playerName: 'testName', playerSocketId: 'opponentId' } as PlayerInformations);
         };
         component.ngOnInit();
-        expect(component.clientsInWaitingRoom.set).toHaveBeenCalledWith('playerId', 'testName');
+        expect(component.clientsInWaitingRoom.get('opponentId')).toEqual('testName');
+    });
+
+    it('a unrequestMatch event should remove opponent to the map', () => {
+        component.clientsInWaitingRoom.set('opponentId', 'nom');
+        socketServiceSpy.listen = (event: string, callback: any) => {
+            callback('opponentId');
+        };
+        component.ngOnInit();
+        expect(component.clientsInWaitingRoom.has('opponentId')).toBeFalsy();
     });
 });
