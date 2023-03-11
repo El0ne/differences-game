@@ -44,6 +44,7 @@ import { PixelRadiusService } from './services/pixel-radius/pixel-radius.service
         PixelPositionService,
         ImageDimensionsService,
         ImageManagerService,
+        ChatGateway,
     ],
 })
 export class AppModule {}

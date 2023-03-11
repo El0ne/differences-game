@@ -1,0 +1,14 @@
+<div>
+    <button (click)="dialogRef.close()">Annuler</button>
+    <div *ngIf="clientsInWaitingRoom.size === 0;else opponents">
+        Waiting For Opponents
+    </div>
+</div>
+
+<ng-template #opponents>
+    <div *ngFor="let opponentId of clientsInWaitingRoom.keys()">
+        NOM : {{clientsInWaitingRoom.get(opponentId)}}
+        <button (click)="acceptOpponent(opponentId)" class="normal-button">Accept</button>
+        <button (click)="declineOpponent(opponentId)" class="normal-button">Decline</button>
+    </div>
+</ng-template>

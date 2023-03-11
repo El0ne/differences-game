@@ -1,14 +1,18 @@
 :host {
     --basic-border: #00e6f6;
-    --error-message-color: rgb(196, 97, 97);
-}
-
-.icon {
-    color: #000000;
+    --message: #0019f6;
+    --player2: #6b6b6b;
+    --error-message-color: rgb(177, 32, 32);
 }
 
 body {
     background: linear-gradient(black, #7a04eb, #bd04eb);
+}
+
+.option-buttons {
+    width: 13rem;
+    height: 4rem;
+    margin-top: 1rem;
 }
 
 .nav-bar {
@@ -46,16 +50,14 @@ body {
 .text-area {
     position: relative;
     border-style: solid;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     background-color: white;
     height: 80%;
     width: 90%;
     margin-bottom: 5px;
     overflow-y: auto;
     overflow-x: hidden;
+    overflow-wrap: break-word;
+    scroll-behavior: auto;
 }
 
 .answer-area {
@@ -72,19 +74,24 @@ body {
 }
 
 .message {
-    background-color: var(--basic-border);
-    border-radius: 5px;
-    margin: 5px;
+    border-radius: 10px;
+    padding: 6px;
+    margin: 4px;
+    font-size: x-large;
+    color: white;
+    line-height: 1.1;
 }
 
-.error-message {
+.error {
     background-color: var(--error-message-color);
-    border-radius: 5px;
-    margin: 5px;
 }
 
-.error-message:hover {
-    cursor: pointer;
+.player1 {
+    background-color: var(--message);
+}
+
+.player2 {
+    background-color: var(--player2);
 }
 
 .send-button {
@@ -93,17 +100,6 @@ body {
     box-shadow: 0 0 7px var(--basic-border), 0 0 20px var(--basic-border), 0 0 10px var(--basic-border);
     border: solid 2px var(--basic-border);
     display: flex;
-}
-
-.send-button:hover {
-    background-color: var(--send-hover);
-    cursor: pointer;
-}
-
-.option-buttons {
-    width: 13rem;
-    height: 4rem;
-    margin-top: 1rem;
 }
 
 .flex-game {
@@ -128,10 +124,6 @@ body {
     padding: 0.4em;
 }
 
-.image-container:hover {
-    border: 0.3rem solid #fff;
-}
-
 app-click-event {
     border-style: solid;
     border-color: rgba(255, 255, 255, 0);
@@ -147,12 +139,25 @@ app-click-event {
     align-items: center;
     width: 29rem;
     height: 100%;
+    margin-bottom: 10.75%;
+}
+#double-score {
+    display: flex;
+    flex-direction: row;
+    gap: 5%;
 }
 
-#score {
+.score {
     margin-top: 1.5rem;
     align-self: center;
-    padding: 2%;
+    padding-top: 2%;
+    padding-bottom: 2%;
+}
+
+#timer {
+    align-self: center;
+    padding-top: 3%;
+    padding-bottom: 3%;
 }
 
 .timer-box {
@@ -186,12 +191,18 @@ app-click-event {
     letter-spacing: 1px;
 }
 
-#differences {
-    border-style: solid;
-    border-color: var(--basic-border);
-    width: 640px;
-    height: 480px;
-    float: right;
+.hint-button {
+    position: absolute;
+    bottom: -1%;
+    right: 10px;
+    justify-content: center;
+    margin: 1rem;
+}
+.hint {
+    transform: scale(1.5);
+    border-style: hidden;
+    align-self: end;
+    background-color: rgba(255, 255, 255, 0);
 }
 
 // référence : https://codepen.io/Vivekp1118/pen/YzLOOVG
@@ -218,16 +229,7 @@ app-click-event {
     align-items: center;
     flex-direction: column;
 }
-.col-heading h1 {
-    font-family: 'Verdana';
-    font-style: normal;
-    font-weight: 700;
-    font-size: 40px;
-    line-height: 36px;
-    text-align: center;
 
-    letter-spacing: 0.05em;
-}
 .col-display {
     width: 155px;
     height: 120px;
@@ -256,4 +258,15 @@ app-click-event {
         gap: 10px;
         max-height: 100%;
     }
+}
+
+.playerName {
+    font-family: 'Verdana';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 40px;
+    line-height: 36px;
+    text-align: center;
+    padding-bottom: 5%;
+    color: white;
 }

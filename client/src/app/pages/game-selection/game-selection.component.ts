@@ -1,7 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+/* eslint-disable no-underscore-dangle */
+import { Component, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { Router } from '@angular/router';
+import { GameCardSelectionComponent } from '@app/components/game-card-selection/game-card-selection.component';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { SocketService } from '@app/services/socket/socket.service';
 import { GameCardInformation } from '@common/game-card';
+import { WaitingRoomEvents } from '@common/waiting-room-socket-communication';
 import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
 
 @Component({
@@ -10,15 +14,34 @@ import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
     styleUrls: ['./game-selection.component.scss'],
 })
 export class GameSelectionComponent implements OnInit {
+    @ViewChildren('stages') private stages: QueryList<GameCardSelectionComponent>;
     gameCardInformations: GameCardInformation[] = [];
     numberOfGameInformations = 0;
     index: number = 0;
     isConfig: boolean | null;
 
-    constructor(public gameCardService: GameCardInformationService, public router: Router) {}
+    constructor(public gameCardService: GameCardInformationService, public router: Router, public socket: SocketService) {}
 
     ngOnInit(): void {
         this.isConfig = this.router.url === '/config';
+        this.socket.connect();
+
+        this.socket.listen(WaitingRoomEvents.GameCreated, (stageId: string) => {
+            this.stages.forEach((gameCardSelection: GameCardSelectionComponent) => {
+                if (gameCardSelection.gameCardInformation._id === stageId) {
+                    gameCardSelection.createGameButton = false;
+                }
+            });
+        });
+
+        this.socket.listen(WaitingRoomEvents.GameDeleted, (stageId: string) => {
+            this.stages.forEach((gameCardSelection: GameCardSelectionComponent) => {
+                if (gameCardSelection.gameCardInformation._id === stageId) {
+                    gameCardSelection.createGameButton = true;
+                }
+            });
+        });
+
         this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
             this.numberOfGameInformations = data;
             this.selectGameCards();
@@ -29,6 +52,11 @@ export class GameSelectionComponent implements OnInit {
         const endIndex = Math.min(this.numberOfGameInformations, this.index + GAME_CARDS_TO_DISPLAY) - 1;
         this.gameCardService.getGameCardsInformations(this.index, endIndex).subscribe((data) => {
             this.gameCardInformations = data;
+
+            this.socket.send(
+                WaitingRoomEvents.ScanForHost,
+                this.gameCardInformations.map((gameCardInfo: GameCardInformation) => gameCardInfo._id),
+            );
         });
     }
 

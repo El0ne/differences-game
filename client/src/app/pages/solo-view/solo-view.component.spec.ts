@@ -1,20 +1,23 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, discardPeriodicTasks, fakeAsync, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { ActivatedRoute, convertToParamMap } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
+import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { SocketService } from '@app/services/socket/socket.service';
 import { differenceInformation } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
 import { of } from 'rxjs';
-import { MESSAGES_LENGTH } from './solo-view-constants';
 import { SoloViewComponent } from './solo-view.component';
 
 describe('SoloViewComponent', () => {
@@ -22,18 +25,54 @@ describe('SoloViewComponent', () => {
     let fixture: ComponentFixture<SoloViewComponent>;
     let modalSpy: MatDialog;
     let afterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
+    let mockService: GameCardInformationService;
+    let chatSocketServiceMock: SocketService;
+    let foundDifferenceServiceSpy: FoundDifferenceService;
 
-    let mockGameCardInfo: GameCardInformationService;
+    const mockActivatedRoute = { snapshot: { paramMap: { get: () => '234' } } };
+    const mockRouter = { url: '1v1/234' };
 
     beforeEach(async () => {
-        mockGameCardInfo = jasmine.createSpyObj('gameCardInformationService', ['getGameCardInfoFromId']);
-        mockGameCardInfo.getGameCardInfoFromId = () => {
-            return of(FAKE_GAME_CARD);
+        foundDifferenceServiceSpy = jasmine.createSpyObj('FoundDifferenceService', ['addDifferenceFound', 'clearDifferenceFound']);
+
+        mockService = jasmine.createSpyObj('GameCardInformationService', ['getGameCardInfoFromId']);
+        mockService.getGameCardInfoFromId = () => {
+            return of(SERVICE_MOCK_GAME_CARD);
+        };
+        chatSocketServiceMock = jasmine.createSpyObj('SocketService', ['connect', 'disconnect', 'liveSocket', 'listen', 'send']);
+        chatSocketServiceMock.sio = jasmine.createSpyObj('Socket', ['on', 'emit', 'disconnect']);
+        chatSocketServiceMock.names = ['player', 'opponent'];
+        chatSocketServiceMock.gameRoom = 'game';
+
+        chatSocketServiceMock.send = (event: string, data?: any) => {
+            if (data) chatSocketServiceMock.sio.emit(event, data);
+            return;
+        };
+
+        chatSocketServiceMock.listen = (event: string, callback: any) => {
+            switch (event) {
+                case 'wordValidated': {
+                    callback({ isValidated: true, originalMessage: 'Test message' });
+                    callback({ isValidated: false, originalMessage: 'Error message' });
+                    break;
+                }
+                case 'roomMessage': {
+                    callback({ socketId: 'test', message: 'Test message' });
+                    break;
+                }
+                case 'abandon': {
+                    callback({ socketId: 'abandon', message: 'abandon' });
+                }
+                // No default
+            }
         };
 
         modalSpy = jasmine.createSpyObj('MatDialog', ['open']);
         afterClosedSpy = jasmine.createSpyObj('MatDialogRef<ChosePlayerNameDialogComponent>', ['afterClosed']);
-        afterClosedSpy.afterClosed = () => of('test');
+        afterClosedSpy.afterClosed = () => {
+            return of();
+        };
+
         modalSpy.open = () => afterClosedSpy;
 
         await TestBed.configureTestingModule({
@@ -41,14 +80,18 @@ describe('SoloViewComponent', () => {
             imports: [FormsModule, HttpClientTestingModule, RouterTestingModule, MatIconModule, MatDialogModule],
             providers: [
                 { provide: ClickEventService },
-                { provide: ActivatedRoute, useValue: { snapshot: { paramMap: convertToParamMap({ stageId: '1' }) } } },
-                { provide: GameCardInformationService, useValue: mockGameCardInfo },
                 { provide: MatDialog, useValue: modalSpy },
+                { provide: ActivatedRoute, useValue: mockActivatedRoute },
+                { provide: Router, useValue: mockRouter },
+                { provide: GameCardInformationService, useValue: mockService },
+                { provide: SocketService, useValue: chatSocketServiceMock },
+                { provide: FoundDifferenceService, useValue: foundDifferenceServiceSpy },
             ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(SoloViewComponent);
         component = fixture.componentInstance;
+        component.messages = [];
         fixture.detectChanges();
     });
 
@@ -56,68 +99,69 @@ describe('SoloViewComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('showErrorMessage attribute should be turned to true if toggleErrorMessage is called and showErrorMessage is false', () => {
-        component.showErrorMessage = false;
-        component.toggleErrorMessage();
-        expect(component.showErrorMessage).toBeTrue();
+    it('should set the current gameCard id according to value in route and request gameCard as well as game player information', () => {
+        spyOn(modalSpy, 'open').and.returnValue({ afterClosed: () => of(true) } as MatDialogRef<ChosePlayerNameDialogComponent>);
+        const showTimeSpy = spyOn(component, 'showTime');
+        const configureSocketReactionsSpy = spyOn(component, 'configureSocketReactions');
+        component.ngOnInit();
+        expect(component.currentGameId).toEqual('234');
+        expect(component.is1v1).toBe(true);
+        expect(component.gameCardInfo).toBe(SERVICE_MOCK_GAME_CARD);
+        expect(component.numberOfDifferences).toEqual(SERVICE_MOCK_GAME_CARD.differenceNumber);
+        expect(component.player).toEqual('player');
+        expect(component.opponent).toEqual('opponent');
+        expect(component.currentRoom).toEqual('game');
+        expect(showTimeSpy).toHaveBeenCalled();
+        expect(configureSocketReactionsSpy).toHaveBeenCalled();
     });
 
-    it('showErrorMessage attribute should not be turned to false if toggleErrorMessage is called and showErrorMessage is true', () => {
-        component.showErrorMessage = true;
-        component.toggleErrorMessage();
-        expect(component.showErrorMessage).toBeTrue();
+    it('ConfigureSocketReactions should configure sockets correctly & react properly according to event', () => {
+        const listenSpy = spyOn(chatSocketServiceMock, 'listen').and.callThrough();
+        const sendSpy = spyOn(chatSocketServiceMock, 'send').and.callThrough();
+        const finishGameSpy = spyOn(component, 'finishGame');
+        chatSocketServiceMock.sio.id = 'mockSocket';
+        component.configureSocketReactions();
+        expect(listenSpy).toHaveBeenCalledTimes(3);
+        expect(component.messages.length).toEqual(3);
+        expect(sendSpy).toHaveBeenCalled();
+        expect(component.messages[component.messages.length - 2].socketId).toEqual('test');
+        expect(component.messages[component.messages.length - 1].socketId).toEqual('abandon');
+        expect(finishGameSpy).toHaveBeenCalled();
     });
 
-    it('showErrorMessage attribute should be turned to false if untoggleErrorMessage is called', () => {
-        component.showErrorMessage = true;
-        component.untoggleErrorMessage();
-        expect(component.showTextBox).toBeFalse();
+    it('handleMistake should send an event called event to socket server with extra information', () => {
+        component.currentRoom = 'room';
+        const sendSpy = spyOn(chatSocketServiceMock, 'send').and.callThrough();
+        component.handleMistake();
+        expect(sendSpy).toHaveBeenCalledWith('event', { room: component.currentRoom, isMultiplayer: true, event: 'Erreur' });
     });
 
-    it('sendMessage should add message if message is fine', () => {
+    it('hint should send a hint event to socket server with the room information', () => {
+        component.currentRoom = 'room';
+        const sendSpy = spyOn(chatSocketServiceMock, 'send').and.callThrough();
+        component.hint();
+        expect(sendSpy).toHaveBeenCalledWith('hint', component.currentRoom);
+    });
+
+    it('sendMessage should validate message on the server', () => {
+        const sendSpy = spyOn(chatSocketServiceMock, 'send').and.callThrough();
         component.messageContent = 'test message';
         component.sendMessage();
-        expect(component.messages).toContain('test message');
-    });
-
-    it('sendMessage should call toggleErrorMessage if message is empty', () => {
-        const toggleErrorMessageSpy = spyOn(component, 'toggleErrorMessage');
-
-        component.messageContent = '';
-        component.sendMessage();
-        expect(toggleErrorMessageSpy).toHaveBeenCalled();
-    });
-
-    it('sendMessage should call toggleErrorMessage if message is too long', () => {
-        const toggleErrorMessageSpy = spyOn(component, 'toggleErrorMessage');
-
-        const longString = new Array(MESSAGES_LENGTH.maxLength + 2).join('a');
-
-        component.messageContent = longString;
-        component.sendMessage();
-        expect(toggleErrorMessageSpy).toHaveBeenCalled();
-    });
-
-    it('sendMessage should call untoggleErrorMessage if errorMessage is too true', () => {
-        const untoggleErrorMessageSpy = spyOn(component, 'untoggleErrorMessage');
-        component.showErrorMessage = true;
-        component.messageContent = 'test message';
-
-        component.sendMessage();
-        expect(untoggleErrorMessageSpy).toHaveBeenCalled();
+        expect(sendSpy).toHaveBeenCalledWith('validate', 'test message');
+        expect(component.messageContent).toBe('');
     });
 
     it('should increment counter when increment counter is called', () => {
-        component.currentScore = 0;
+        component.currentScorePlayer1 = 0;
         component.incrementScore();
         const answer = 1;
 
-        expect(component.currentScore).toEqual(answer);
+        expect(component.currentScorePlayer1).toEqual(answer);
     });
 
     it('finishGame should have been called if number of errors is equal to the current score in incrementScore', () => {
         const finishGameSpy = spyOn(component, 'finishGame');
-        component.currentScore = 1;
+        component.currentScorePlayer1 = 1;
         component.numberOfDifferences = 2;
         component.incrementScore();
         expect(finishGameSpy).toHaveBeenCalled();
@@ -131,10 +175,6 @@ describe('SoloViewComponent', () => {
         expect(component.showWinMessage).toBeTrue();
     });
 
-    it('the playerName should be initialized after the modal is closed', () => {
-        expect(component.playerName).toBe('test');
-    });
-
     it('showTime should call startTimer of service', () => {
         const startTimerSpy = spyOn(component.timerService, 'startTimer');
 
@@ -144,11 +184,9 @@ describe('SoloViewComponent', () => {
     });
 
     it('addDifferenceDetected should call addDifferenceFound of service', () => {
-        const addDiffSpy = spyOn(component.foundDifferenceService, 'addDifferenceFound');
-
         component.addDifferenceDetected(1);
 
-        expect(addDiffSpy).toHaveBeenCalled();
+        expect(foundDifferenceServiceSpy.addDifferenceFound).toHaveBeenCalled();
     });
 
     it('should open the game info modal with the correct data', () => {
@@ -165,7 +203,10 @@ describe('SoloViewComponent', () => {
     it('should open the quit game modal with disableClose set to true', () => {
         const spy = spyOn(modalSpy, 'open').and.callThrough();
         component.quitGame();
-        expect(spy).toHaveBeenCalledWith(QuitGameModalComponent, { disableClose: true });
+        expect(spy).toHaveBeenCalledWith(QuitGameModalComponent, {
+            disableClose: true,
+            data: { player: component.player, room: component.currentRoom },
+        });
     });
 
     it('paintPixel should call sendPixels and receivePixels properly', () => {
@@ -187,12 +228,6 @@ describe('SoloViewComponent', () => {
         expect(leftCanvasSpy).toHaveBeenCalled();
         expect(rightCanvasSpy).toHaveBeenCalled();
     });
-    it('ngOnInit() should set gameCard information if found in database', fakeAsync(() => {
-        component.ngOnInit();
-        expect(component.gameCardInfo).toEqual(FAKE_GAME_CARD);
-        expect(component.numberOfDifferences).toEqual(FAKE_GAME_CARD.differenceNumber);
-        discardPeriodicTasks();
-    }));
 
     it('emit handler should call all the correct handlers', () => {
         const handleFlashSpy = spyOn(component, 'handleFlash');
@@ -212,11 +247,11 @@ const MOCK_INFORMATION: differenceInformation = {
     differencesPosition: 2,
 };
 
-const FAKE_GAME_CARD: GameCardInformation = {
+const SERVICE_MOCK_GAME_CARD: GameCardInformation = {
     _id: '0',
-    name: 'game.name',
+    name: 'game',
     difficulty: 'Facile',
-    differenceNumber: 6,
+    differenceNumber: 7,
     originalImageName: 'game.baseImage',
     differenceImageName: 'game.differenceImage',
     soloTimes: [
