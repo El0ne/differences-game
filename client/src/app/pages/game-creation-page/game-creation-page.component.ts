@@ -66,7 +66,8 @@ export class GameCreationPageComponent implements OnInit {
         });
     }
 
-    clearSingleFile(canvas: HTMLCanvasElement, id: string): void {
+    clearFile(canvas: HTMLCanvasElement, id: string, file: File | null): void {
+        file = null;
         const context = canvas.getContext('2d');
         const input = document.getElementById(id) as HTMLInputElement;
         const bothInput = document.getElementById('upload-both') as HTMLInputElement;
@@ -75,15 +76,15 @@ export class GameCreationPageComponent implements OnInit {
         if (context) context.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
     }
 
-    clearFirstFile(canvas: HTMLCanvasElement, id: string): void {
-        this.originalFile = null;
-        this.clearSingleFile(canvas, id);
-    }
+    // clearFirstFile(canvas: HTMLCanvasElement, id: string): void {
+    //     this.originalFile = null;
+    //     this.clearSingleFile(canvas, id);
+    // }
 
-    clearSecondFile(canvas: HTMLCanvasElement, id: string): void {
-        this.differentFile = null;
-        this.clearSingleFile(canvas, id);
-    }
+    // clearSecondFile(canvas: HTMLCanvasElement, id: string): void {
+    //     this.differentFile = null;
+    //     this.clearSingleFile(canvas, id);
+    // }
 
     fileValidation(e: Event): void {
         const target = e.target as HTMLInputElement;
