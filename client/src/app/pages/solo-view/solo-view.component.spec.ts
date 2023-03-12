@@ -47,6 +47,7 @@ describe('SoloViewComponent', () => {
                 { provide: GameCardInformationService, useValue: mockGameCardInfo },
                 { provide: MatDialog, useValue: modalSpy },
             ],
+            teardown: { destroyAfterEach: false },
         }).compileComponents();
 
         fixture = TestBed.createComponent(SoloViewComponent);
@@ -123,14 +124,6 @@ describe('SoloViewComponent', () => {
         component.numberOfDifferences = 2;
         component.incrementScore();
         expect(finishGameSpy).toHaveBeenCalled();
-    });
-
-    it('finishGame should set showNavBar to false and showWinScreen to true', () => {
-        component.showNavBar = true;
-        component.showWinMessage = false;
-        component.finishGame();
-        expect(component.showNavBar).toBeFalse();
-        expect(component.showWinMessage).toBeTrue();
     });
 
     it('the playerName should be initialized after the modal is closed', () => {
@@ -257,6 +250,18 @@ describe('SoloViewComponent', () => {
 
         component.activateCheatMode(keyboardEvent);
         expect(flashSpy).toHaveBeenCalledWith([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    });
+
+    it('finishGame should set endgame to true, and showNavBar to false', () => {
+        component.left.endGame = false;
+        component.right.endGame = false;
+        component.showNavBar = true;
+
+        component.finishGame();
+
+        expect(component.left.endGame).toBeTrue();
+        expect(component.right.endGame).toBeTrue();
+        expect(component.showNavBar).toBeFalse();
     });
 });
 

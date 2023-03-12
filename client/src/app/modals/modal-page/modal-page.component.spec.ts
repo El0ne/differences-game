@@ -28,6 +28,7 @@ describe('ModalPageComponent', () => {
                 { provide: MAT_DIALOG_DATA, useValue: {} },
                 { provide: MatDialogRef, useValue: {} },
             ],
+            teardown: { destroyAfterEach: false },
         }).compileComponents();
 
         fixture = TestBed.createComponent(ModalPageComponent);

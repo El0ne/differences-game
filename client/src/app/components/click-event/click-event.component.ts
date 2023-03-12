@@ -36,7 +36,7 @@ export class ClickEventComponent implements OnInit {
     constructor(
         public clickEventService: ClickEventService,
         public foundDifferenceService: FoundDifferenceService,
-        private pixelModService: PixelModificationService,
+        public pixelModService: PixelModificationService,
     ) {}
 
     async ngOnInit() {
