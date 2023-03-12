@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { ChatEvents } from '@common/chat.gateway.events';
+import { playerDifference } from '@common/difference-information';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, match, SinonStubbedInstance, stub } from 'sinon';
@@ -17,6 +18,7 @@ describe('ChatGateway', () => {
         logger = createStubInstance(Logger);
         socket = createStubInstance<Socket>(Socket);
         server = createStubInstance<Server>(Server);
+        Object.defineProperty(socket, 'id', { value: 'id' });
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 ChatGateway,
@@ -70,6 +72,43 @@ describe('ChatGateway', () => {
     it('joinRoom() should join the socket room', () => {
         gateway.joinRoom(socket, TEST_ROOM_ID);
         expect(socket.join.calledOnce).toBeTruthy();
+    });
+
+    it('difference() should emit to room a difference Event when room exists', () => {
+        stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
+        server.to.returns({
+            emit: (event: string, data: playerDifference) => {
+                expect(event).toEqual(ChatEvents.Difference);
+                expect(data.differenceInformation).toEqual({ differencesPosition: 3, lastDifferences: [0, 1, 2], room: TEST_ROOM_ID });
+                expect(data.socket).toEqual(socket.id);
+            },
+        } as any);
+
+        gateway.difference(socket, { differencesPosition: 3, lastDifferences: [0, 1, 2], room: TEST_ROOM_ID });
+    });
+
+    it('difference() should not emit when room does not exists', () => {
+        stub(socket, 'rooms').value(new Set());
+        gateway.difference(socket, { differencesPosition: 3, lastDifferences: [0, 1, 2], room: TEST_ROOM_ID });
+        expect(server.to.called).toBeFalsy();
+    });
+
+    it('win() should emit to room a win Event when room exists', () => {
+        stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
+        server.to.returns({
+            emit: (event: string, data: string) => {
+                expect(event).toEqual(ChatEvents.Win);
+                expect(data).toEqual(socket.id);
+            },
+        } as any);
+
+        gateway.win(socket, TEST_ROOM_ID);
+    });
+
+    it('win() should not emit when room does not exists', () => {
+        stub(socket, 'rooms').value(new Set());
+        gateway.win(socket, TEST_ROOM_ID);
+        expect(server.to.called).toBeFalsy();
     });
 
     it('roomMessage() should not send message if socket not in the room', () => {
