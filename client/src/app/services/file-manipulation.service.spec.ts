@@ -127,13 +127,6 @@ describe('FileManipulationService', () => {
             expect(updatedFile).toBe(file);
         });
 
-        // const spy = jasmine.createSpyObj('service', ['drawToCanvas']);
-        const spyon = spyOn(service, 'drawToCanvas' as never);
-
-        const image = new Image();
-        service['drawToCanvas'](canvas, input, image);
-
-        expect(spyon).toHaveBeenCalled();
         readerSpy.onload();
         tick();
     }));
