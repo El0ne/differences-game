@@ -14,7 +14,7 @@ import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
     styleUrls: ['./game-selection.component.scss'],
 })
 export class GameSelectionComponent implements OnInit {
-    @ViewChildren('stages') private stages: QueryList<GameCardSelectionComponent>;
+    @ViewChildren('stages') stages: QueryList<GameCardSelectionComponent>;
     gameCardInformations: GameCardInformation[] = [];
     numberOfGameInformations = 0;
     index: number = 0;
@@ -27,19 +27,11 @@ export class GameSelectionComponent implements OnInit {
         this.socket.connect();
 
         this.socket.listen(WaitingRoomEvents.GameCreated, (stageId: string) => {
-            this.stages.forEach((gameCardSelection: GameCardSelectionComponent) => {
-                if (gameCardSelection.gameCardInformation._id === stageId) {
-                    gameCardSelection.createGameButton = false;
-                }
-            });
+            this.setGameCardCreateOrJoin(false, stageId);
         });
 
         this.socket.listen(WaitingRoomEvents.GameDeleted, (stageId: string) => {
-            this.stages.forEach((gameCardSelection: GameCardSelectionComponent) => {
-                if (gameCardSelection.gameCardInformation._id === stageId) {
-                    gameCardSelection.createGameButton = true;
-                }
-            });
+            this.setGameCardCreateOrJoin(true, stageId);
         });
 
         this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
@@ -80,5 +72,13 @@ export class GameSelectionComponent implements OnInit {
 
     isShowingLastCard(): boolean {
         return this.index + GAME_CARDS_TO_DISPLAY >= this.numberOfGameInformations;
+    }
+
+    setGameCardCreateOrJoin(isCreate: boolean, stageId: string) {
+        this.stages.forEach((gameCardSelection: GameCardSelectionComponent) => {
+            if (gameCardSelection.gameCardInformation._id === stageId) {
+                gameCardSelection.createGameButton = isCreate;
+            }
+        });
     }
 }
