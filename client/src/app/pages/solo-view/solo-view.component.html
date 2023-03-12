@@ -16,16 +16,18 @@
     </div>
 
     <div class="flex-game">
-        <app-click-event
-            #left
-            [id]="1"
-            [original]="'original'"
-            [gameCardId]="this.currentGameId"
-            [imagePath]="this.gameCardInfo.originalImageName"
-            (handler)="emitHandler($event)"
-            (cheatModeHandler)="resetDifferences($event)"
-            *ngIf="this.gameCardInfo"
-        ></app-click-event>
+        <div class="image-container neon-border">
+            <app-click-event
+                #left
+                [id]="1"
+                [original]="'original'"
+                [gameCardId]="this.currentGameId"
+                [imagePath]="this.gameCardInfo.originalImageName"
+                (handler)="emitHandler($event)"
+                (cheatModeHandler)="resetDifferences($event)"
+                *ngIf="this.gameCardInfo"
+            ></app-click-event>
+        </div>
         <div class="game-options">
             <div class="timer-box">
                 <div class="display">
@@ -60,16 +62,18 @@
                 </div>
             </div>
         </div>
-        <app-click-event
-            #right
-            [id]="2"
-            [original]="'different'"
-            [gameCardId]="this.currentGameId"
-            [imagePath]="this.gameCardInfo.differenceImageName"
-            (handler)="emitHandler($event)"
-            (cheatModeHandler)="resetDifferences($event)"
-            *ngIf="this.gameCardInfo"
-        ></app-click-event>
+        <div class="image-container neon-border">
+            <app-click-event
+                #right
+                [id]="2"
+                [original]="'different'"
+                [gameCardId]="this.currentGameId"
+                [imagePath]="this.gameCardInfo.differenceImageName"
+                (handler)="emitHandler($event)"
+                (cheatModeHandler)="resetDifferences($event)"
+                *ngIf="this.gameCardInfo"
+            ></app-click-event>
+        </div>
         <div class="hint-button">
             <button class="hint" type="button">
                 <mat-icon class="hint-button">search</mat-icon>

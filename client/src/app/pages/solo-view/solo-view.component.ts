@@ -38,7 +38,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     currentGameId: string;
     endGame: Subject<void> = new Subject<void>();
     gameCardInfo: GameCardInformation;
-    boundActivateCheatMode = this.activateCheatMode.bind(this);
+    boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
 
     // eslint-disable-next-line max-params
     constructor(

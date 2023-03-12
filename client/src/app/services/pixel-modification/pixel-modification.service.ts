@@ -8,7 +8,7 @@ export class PixelModificationService {
     getCoordInImage(e: MouseEvent, rect: DOMRect): number[] {
         const x = Math.max(Math.floor(e.clientX - rect.left), 0);
         const y = Math.max(Math.floor(e.clientY - rect.top), 0);
-        return new Array(x, y);
+        return [x, y];
     }
 
     positionToPixel(toTransform: number): number[] {

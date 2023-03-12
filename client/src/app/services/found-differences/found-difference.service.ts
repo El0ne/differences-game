@@ -21,8 +21,8 @@ export class FoundDifferenceService {
 
     findPixelsFromDifference(differencePixels: number[][]): number[] {
         this.differencesToFind = [];
-        for (const differenceNo of this.foundDifferences) {
-            differencePixels[differenceNo] = [];
+        for (const differenceNumber of this.foundDifferences) {
+            differencePixels[differenceNumber] = [];
         }
 
         for (const difference of differencePixels) {

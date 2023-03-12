@@ -36,7 +36,7 @@ export class ClickEventComponent implements OnInit {
     constructor(
         public clickEventService: ClickEventService,
         public foundDifferenceService: FoundDifferenceService,
-        public pixelModService: PixelModificationService,
+        public pixelModificationService: PixelModificationService,
     ) {}
 
     async ngOnInit() {
@@ -55,7 +55,7 @@ export class ClickEventComponent implements OnInit {
 
     getCoordInImage(e: MouseEvent): number[] {
         const rect = this.modification.nativeElement.getBoundingClientRect();
-        return this.pixelModService.getCoordInImage(e, rect);
+        return this.pixelModificationService.getCoordInImage(e, rect);
     }
 
     isDifferent(e: MouseEvent) {
@@ -85,20 +85,20 @@ export class ClickEventComponent implements OnInit {
 
     async clearEffect() {
         const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-        await this.pixelModService.turnOffYellow(originalContext, this.foundDifferenceService.foundDifferences);
+        await this.pixelModificationService.turnOffYellow(originalContext, this.foundDifferenceService.foundDifferences);
     }
 
     async differenceEffect(currentDifferences: number[]): Promise<void> {
         if (!this.endGame) {
             const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
 
-            this.pixelModService.turnDifferenceYellow(originalContext, currentDifferences);
+            this.pixelModificationService.turnDifferenceYellow(originalContext, currentDifferences);
             await this.delay(FAST_WAIT_TIME_MS);
-            this.pixelModService.turnOffYellow(originalContext, currentDifferences);
+            this.pixelModificationService.turnOffYellow(originalContext, currentDifferences);
             await this.delay(FAST_WAIT_TIME_MS);
-            this.pixelModService.turnDifferenceYellow(originalContext, currentDifferences);
+            this.pixelModificationService.turnDifferenceYellow(originalContext, currentDifferences);
             await this.delay(FAST_WAIT_TIME_MS);
-            this.pixelModService.turnOffYellow(originalContext, currentDifferences);
+            this.pixelModificationService.turnOffYellow(originalContext, currentDifferences);
             await this.delay(FAST_WAIT_TIME_MS);
 
             if (this.toggleCheatMode) {
@@ -122,7 +122,7 @@ export class ClickEventComponent implements OnInit {
             this.timeout = true;
             const rect = this.modification.nativeElement.getBoundingClientRect();
             const context = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-            this.pixelModService.errorMessage(e, rect, context);
+            this.pixelModificationService.errorMessage(e, rect, context);
             setTimeout(() => {
                 context.clearRect(0, 0, WIDTH, HEIGHT);
                 this.timeout = false;
@@ -132,11 +132,11 @@ export class ClickEventComponent implements OnInit {
 
     sendDifferencePixels(differenceArray: number[]): ImageData[] {
         const context = this.picture.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-        return this.pixelModService.getColorFromDifference(context, differenceArray);
+        return this.pixelModificationService.getColorFromDifference(context, differenceArray);
     }
 
     receiveDifferencePixels(colorArray: ImageData[], positionArray: number[]): void {
         const context = this.picture.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-        this.pixelModService.paintColorFromDifference(colorArray, positionArray, context);
+        this.pixelModificationService.paintColorFromDifference(colorArray, positionArray, context);
     }
 }
