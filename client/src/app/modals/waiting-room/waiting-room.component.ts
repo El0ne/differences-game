@@ -45,6 +45,7 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
         } else {
             this.socket.listen<AcceptationInformation>(WaitingRoomEvents.MatchAccepted, (acceptationInfo: AcceptationInformation) => {
                 this.socket.names.set(acceptationInfo.playerSocketId, acceptationInfo.playerName);
+                this.socket.opponentSocket = acceptationInfo.playerSocketId;
                 this.navigateTo1v1(acceptationInfo.roomId);
             });
 
@@ -79,6 +80,7 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
             playerSocketId: opponentId,
             playerName: this.socket.names.get(this.socket.socketId) as string,
         });
+        this.socket.opponentSocket = opponentId;
         this.socket.names.set(opponentId, this.clientsInWaitingRoom.get(opponentId) as string);
     }
     declineOpponent(opponentId: string): void {
