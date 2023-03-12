@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { Component, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameCardSelectionComponent } from '@app/components/game-card-selection/game-card-selection.component';
@@ -27,7 +28,7 @@ export class GameSelectionComponent implements OnInit {
 
         this.socket.listen(WaitingRoomEvents.GameCreated, (stageId: string) => {
             this.stages.forEach((gameCardSelection: GameCardSelectionComponent) => {
-                if (gameCardSelection.gameCardInformation.id === stageId) {
+                if (gameCardSelection.gameCardInformation._id === stageId) {
                     gameCardSelection.createGameButton = false;
                 }
             });
@@ -35,7 +36,7 @@ export class GameSelectionComponent implements OnInit {
 
         this.socket.listen(WaitingRoomEvents.GameDeleted, (stageId: string) => {
             this.stages.forEach((gameCardSelection: GameCardSelectionComponent) => {
-                if (gameCardSelection.gameCardInformation.id === stageId) {
+                if (gameCardSelection.gameCardInformation._id === stageId) {
                     gameCardSelection.createGameButton = true;
                 }
             });
@@ -48,13 +49,13 @@ export class GameSelectionComponent implements OnInit {
     }
 
     selectGameCards(): void {
-        const endIndex = Math.min(this.numberOfGameInformations, this.index + GAME_CARDS_TO_DISPLAY);
+        const endIndex = Math.min(this.numberOfGameInformations, this.index + GAME_CARDS_TO_DISPLAY) - 1;
         this.gameCardService.getGameCardsInformations(this.index, endIndex).subscribe((data) => {
             this.gameCardInformations = data;
 
             this.socket.send(
                 WaitingRoomEvents.ScanForHost,
-                this.gameCardInformations.map((gameCardInfo: GameCardInformation) => gameCardInfo.id),
+                this.gameCardInformations.map((gameCardInfo: GameCardInformation) => gameCardInfo._id),
             );
         });
     }

@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -47,7 +48,7 @@ describe('GameCardSelectionComponent', () => {
         modalSpy.open = () => choseNameAfterClosedSpy;
         const routerSpy = spyOn(TestBed.inject(Router), 'navigate');
         component.selectPlayerName(true);
-        expect(routerSpy).toHaveBeenCalledWith(['/soloview/' + component.gameCardInformation.id]);
+        expect(routerSpy).toHaveBeenCalledWith(['/soloview/' + component.gameCardInformation._id]);
     });
 
     it('selectPlayerName should call hostOrJoinGame if in multiplayer', () => {

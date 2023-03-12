@@ -10,20 +10,20 @@ export class SocketService {
     names: Map<string, string> = new Map<string, string>();
     gameRoom: string;
 
-    get socketId() {
+    get socketId(): string {
         return this.sio.id ? this.sio.id : '';
     }
 
-    connect() {
-        this.sio = io(environment.serverUrl, { transports: ['websocket'], upgrade: false });
+    connect(): void {
+        this.sio = io(environment.serverSocket, { transports: ['websocket'], upgrade: false });
     }
 
-    disconnect() {
+    disconnect(): void {
         this.sio.disconnect();
         this.names.clear();
     }
 
-    liveSocket() {
+    liveSocket(): boolean {
         return this.sio && this.sio.connected;
     }
     listen<T>(eventName: string, action: (data: T) => void): void {

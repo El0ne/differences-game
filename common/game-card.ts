@@ -1,7 +1,7 @@
 import { RankingBoard } from './ranking-board';
 
 export class GameCardInformation {
-    id: string;
+    _id: string;
     name: string;
     difficulty: string;
     differenceNumber: number;

@@ -1,42 +1,40 @@
+import { Differences, DifferencesDocument } from '@app/schemas/differences.schemas';
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
-import { DifferencesObject } from '@common/differences-object';
 import { Injectable } from '@nestjs/common';
-import * as fs from 'fs';
-import * as path from 'path';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+
 @Injectable()
 export class DifferenceClickService {
-    jsonPath = path.join(process.cwd(), 'app/dataBase/differences.json');
-    constructor(private differenceCounterService: DifferencesCounterService, private imageDimensionsService: ImageDimensionsService) {}
+    constructor(
+        @InjectModel(Differences.name) private differenceModel: Model<DifferencesDocument>,
+        private differenceCounterService: DifferencesCounterService,
+        private imageDimensionsService: ImageDimensionsService,
+    ) {}
 
-    getAllDifferenceArrays(): DifferencesObject[] {
-        const content = fs.readFileSync(this.jsonPath, 'utf8');
-        return JSON.parse(content).differenceObjects;
+    async getAllDifferenceArrays(): Promise<Differences[]> {
+        return await this.differenceModel.find({});
     }
-    createDifferenceArray(gameId: string, differencesArray: number[][]): DifferencesObject {
-        const allDifferenceArrays = this.getAllDifferenceArrays();
-        const newDifferenceArray: DifferencesObject = {
-            id: gameId,
+
+    // TODO type the return value of funcion
+    async createDifferenceArray(differencesArray: number[][]): Promise<string> {
+        const newDifferenceArray: Differences = {
             differences: differencesArray,
         };
-        allDifferenceArrays.push(newDifferenceArray);
-        fs.writeFileSync(this.jsonPath, JSON.stringify({ differenceObjects: allDifferenceArrays }));
-        return newDifferenceArray;
+        const differences = new this.differenceModel(newDifferenceArray);
+        // eslint-disable-next-line no-underscore-dangle
+        return (await differences.save())._id;
     }
 
-    getDifferenceArrayFromStageID(stageId: string): number[][] {
-        const content = fs.readFileSync(this.jsonPath, 'utf8');
-        for (const differenceObject of JSON.parse(content).differenceObjects) {
-            if (differenceObject.id === stageId) {
-                return differenceObject.differences;
-            }
-        }
-        return [];
+    async getDifferenceArrayFromStageID(_id: string): Promise<number[][]> {
+        const differenceArray = await this.differenceModel.findById(_id);
+        return differenceArray ? differenceArray.differences : [];
     }
 
-    validateDifferencePositions(clickPositionX: number, clickPositionY: number, stageId: string): ClickDifferenceVerification {
-        const differences = this.getDifferenceArrayFromStageID(stageId);
+    async validateDifferencePositions(clickPositionX: number, clickPositionY: number, _id: string): Promise<ClickDifferenceVerification> {
+        const differences = await this.getDifferenceArrayFromStageID(_id);
         const x = Number(clickPositionX);
         const y = Number(clickPositionY);
         const posToCheck = y * this.imageDimensionsService.getWidth() + x;

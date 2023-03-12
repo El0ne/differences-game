@@ -1,3 +1,5 @@
+/* eslint-disable no-underscore-dangle */
+/* Required to allow for mongoDB unique _id to be reused in our database */
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -22,32 +24,29 @@ export class GameCardSelectionComponent implements OnInit {
     playerName: string = 'Player';
 
     constructor(public socket: SocketService, public dialog: MatDialog, public router: Router) {}
-    ngOnInit() {
+    ngOnInit(): void {
         this.image = `${STAGE}/image/${this.gameCardInformation.originalImageName}`;
     }
 
-    hostOrJoinGame() {
+    hostOrJoinGame(): void {
         if (this.createGameButton) {
-            this.socket.send<string>(WaitingRoomEvents.HostGame, this.gameCardInformation.id);
+            this.socket.send<string>(WaitingRoomEvents.HostGame, this.gameCardInformation._id);
         } else {
             this.socket.send<JoinHostInWaitingRequest>(WaitingRoomEvents.JoinHost, {
-                stageId: this.gameCardInformation.id,
+                stageId: this.gameCardInformation._id,
                 playerName: this.socket.names.get(this.socket.socketId) as string,
             });
         }
-        const data: WaitingRoomDataPassing = { stageId: this.gameCardInformation.id, isHost: this.createGameButton };
+        const data: WaitingRoomDataPassing = { stageId: this.gameCardInformation._id, isHost: this.createGameButton };
         this.dialog.open(WaitingRoomComponent, { disableClose: true, data });
     }
 
-    selectPlayerName(isSoloGame: boolean) {
+    selectPlayerName(isSoloGame: boolean): void {
         const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true });
         dialogRef.afterClosed().subscribe(() => {
             if (isSoloGame) {
-                this.router.navigate(['/soloview/' + this.gameCardInformation.id]);
+                this.router.navigate(['/soloview/' + this.gameCardInformation._id]);
             } else this.hostOrJoinGame();
         });
     }
-    // TODO: ajouter la logique pour que le reset des temps et le delete se fait pour le sprint 2
-
-    // TODO: Ajouter la logique pour que les temps de configurations viennent du database pour dynamiquement les loader.
 }
