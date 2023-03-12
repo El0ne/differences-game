@@ -55,7 +55,7 @@ describe('FileManipulationService', () => {
         expect(updatedFiles).toEqual([service.originalFile, service.differenceFile]);
     });
 
-    it('should clear the single file', () => {
+    it('clearFile should clear the single file', () => {
         const id = 'upload-original';
         input.id = id;
         document.body.appendChild(input);
@@ -73,7 +73,7 @@ describe('FileManipulationService', () => {
         expect(bothInput.value).toEqual('');
     });
 
-    it('should validate the file', async () => {
+    it('fileValidation should validate the file', async () => {
         const uploadImageMock = spyOn(service, 'uploadImages' as never);
         const file = new File([new ArrayBuffer(IMAGE_DIMENSIONS.size)], 'testImage.bmp', { type: 'image/bmp' });
         document.body.appendChild(input);
@@ -84,7 +84,7 @@ describe('FileManipulationService', () => {
         expect(uploadImageMock).toHaveBeenCalled();
     });
 
-    it('should send an alert if picture is the wrong size', () => {
+    it('fileValidation should send an alert if picture is the wrong size', () => {
         spyOn(window, 'alert');
 
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
@@ -101,7 +101,7 @@ describe('FileManipulationService', () => {
         expect(input.value).toBe('');
     });
 
-    it('should send an alert if picture is the wrong type', () => {
+    it('fileValidation should send an alert if picture is the wrong type', () => {
         spyOn(window, 'alert');
 
         const file = new File([new ArrayBuffer(IMAGE_DIMENSIONS.size)], 'testImage.jpg', { type: 'image/jpg' });
@@ -116,7 +116,7 @@ describe('FileManipulationService', () => {
         expect(input.value).toBe('');
     });
 
-    it('should upload the image and return a file', fakeAsync(async () => {
+    it('uploadImage should upload the image and return a file', fakeAsync(async () => {
         const file = new File([new ArrayBuffer(IMAGE_DIMENSIONS.size)], 'testImage.bmp', { type: 'image/bmp' });
 
         const readerSpy = jasmine.createSpyObj('FileReader', ['readAsDataURL']);
