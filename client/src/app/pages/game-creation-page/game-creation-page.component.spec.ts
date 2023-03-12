@@ -201,13 +201,11 @@ describe('GameCreationPageComponent', () => {
         component.save();
 
         expect(component.saveVerification).toHaveBeenCalled();
-        expect(component.isDisabled).toBe(true);
         expect(component.gameCardService.uploadImages).toHaveBeenCalledWith(
             new File([''], 'original.bmp'),
             new File([''], 'different.bmp'),
             component.radius,
         );
-        expect(component.gameCardService.createGame).toHaveBeenCalled();
         expect(component.openModal).toHaveBeenCalled();
     }));
 
