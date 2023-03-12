@@ -1,5 +1,5 @@
 import { ElementRef } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 
 import { FileInformation, FileManipulationService } from './file-manipulation.service';
@@ -7,6 +7,7 @@ import { FileInformation, FileManipulationService } from './file-manipulation.se
 describe('FileManipulationService', () => {
     let service: FileManipulationService;
     let canvas: HTMLCanvasElement;
+    let input: HTMLInputElement;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
@@ -14,6 +15,12 @@ describe('FileManipulationService', () => {
         canvas = document.createElement('canvas');
         canvas.width = IMAGE_DIMENSIONS.width;
         canvas.height = IMAGE_DIMENSIONS.height;
+
+        const inputElementRef: ElementRef = {
+            nativeElement: document.createElement('input'),
+        };
+        input = inputElementRef.nativeElement;
+        input.type = 'file';
     });
 
     it('should be created', () => {
@@ -50,7 +57,6 @@ describe('FileManipulationService', () => {
 
     it('should clear the single file', () => {
         const id = 'upload-original';
-        const input = document.createElement('input');
         input.id = id;
         document.body.appendChild(input);
         const bothInput = document.createElement('input');
@@ -70,11 +76,6 @@ describe('FileManipulationService', () => {
     it('should validate the file', async () => {
         const uploadImageMock = spyOn(service, 'uploadImages' as never);
         const file = new File([new ArrayBuffer(IMAGE_DIMENSIONS.size)], 'testImage.bmp', { type: 'image/bmp' });
-        const inputElementRef: ElementRef = {
-            nativeElement: document.createElement('input'),
-        };
-        const input: HTMLInputElement = inputElementRef.nativeElement;
-        input.type = 'file';
         document.body.appendChild(input);
         const event = new Event('change');
         Object.defineProperty(event, 'target', { value: { files: [file] } });
@@ -83,36 +84,57 @@ describe('FileManipulationService', () => {
         expect(uploadImageMock).toHaveBeenCalled();
     });
 
-    //     it('should send an alert if picture is the wrong size', () => {
-    //         spyOn(window, 'alert');
+    it('should send an alert if picture is the wrong size', () => {
+        spyOn(window, 'alert');
 
-    //         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    //         const file = new File([new ArrayBuffer(123456)], 'testImage.bmp', { type: 'image/bmp' });
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        const file = new File([new ArrayBuffer(123456)], 'testImage.bmp', { type: 'image/bmp' });
 
-    //         const input = fixture.debugElement.query(By.css('input[type="file"]')).nativeElement as HTMLInputElement;
-    //         const event = new Event('change');
-    //         Object.defineProperty(event, 'target', { value: { files: [file] } });
-    //         input.dispatchEvent(event);
+        const event = new Event('change');
 
-    //         component.fileValidation(event);
+        Object.defineProperty(event, 'target', { value: { files: [file] } });
+        input.dispatchEvent(event);
 
-    //         expect(window.alert).toHaveBeenCalledWith('wrong size or file type please choose again');
-    //         expect(input.value).toBe('');
-    //     });
+        service.fileValidation(event);
 
-    //     it('should send an alert if picture is the wrong type', () => {
-    //         spyOn(window, 'alert');
+        expect(window.alert).toHaveBeenCalledWith('wrong size or file type please choose again');
+        expect(input.value).toBe('');
+    });
 
-    //         const file = new File([new ArrayBuffer(IMAGE_DIMENSIONS.size)], 'testImage.jpg', { type: 'image/jpg' });
+    it('should send an alert if picture is the wrong type', () => {
+        spyOn(window, 'alert');
 
-    //         const input = fixture.debugElement.query(By.css('input[type="file"]')).nativeElement as HTMLInputElement;
-    //         const event = new Event('change');
-    //         Object.defineProperty(event, 'target', { value: { files: [file] } });
-    //         input.dispatchEvent(event);
+        const file = new File([new ArrayBuffer(IMAGE_DIMENSIONS.size)], 'testImage.jpg', { type: 'image/jpg' });
 
-    //         component.fileValidation(event);
+        const event = new Event('change');
+        Object.defineProperty(event, 'target', { value: { files: [file] } });
+        input.dispatchEvent(event);
 
-    //         expect(window.alert).toHaveBeenCalledWith('wrong size or file type please choose again');
-    //         expect(input.value).toBe('');
-    //     });
+        service.fileValidation(event);
+
+        expect(window.alert).toHaveBeenCalledWith('wrong size or file type please choose again');
+        expect(input.value).toBe('');
+    });
+
+    it('should upload the image and return a file', fakeAsync(async () => {
+        const file = new File([new ArrayBuffer(IMAGE_DIMENSIONS.size)], 'testImage.bmp', { type: 'image/bmp' });
+
+        const readerSpy = jasmine.createSpyObj('FileReader', ['readAsDataURL']);
+
+        spyOn(window, 'FileReader' as never).and.returnValue(readerSpy as never);
+
+        service['uploadImage'](file, input, canvas).then((updatedFile) => {
+            expect(updatedFile).toBe(file);
+        });
+
+        // const spy = jasmine.createSpyObj('service', ['drawToCanvas']);
+        const spyon = spyOn(service, 'drawToCanvas' as never);
+
+        const image = new Image();
+        service['drawToCanvas'](canvas, input, image);
+
+        expect(spyon).toHaveBeenCalled();
+        readerSpy.onload();
+        tick();
+    }));
 });
