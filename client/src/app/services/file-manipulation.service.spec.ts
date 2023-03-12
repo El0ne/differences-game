@@ -1,3 +1,4 @@
+import { ElementRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 
@@ -21,15 +22,20 @@ describe('FileManipulationService', () => {
 
     it('updateAttributes should set the service attributes', () => {
         const fileInformation: FileInformation = {
-            originalFile: null,
-            differenceFile: null,
-            originalCanvas: new HTMLCanvasElement(),
-            differenceCanvas: new HTMLCanvasElement(),
+            originalFile: new File([], 'new-original.bmp'),
+            differenceFile: new File([], 'new-difference.bmp'),
+            originalCanvas: document.createElement('canvas'),
+            differenceCanvas: document.createElement('canvas'),
         };
 
+        service.originalFile = new File([], 'original.jpg');
+        service.differenceFile = new File([], 'difference.jpg');
+        service.originalCanvas = document.createElement('canvas');
+        service.differenceCanvas = document.createElement('canvas');
+
         service.updateAttributes(fileInformation);
-        expect(service.originalFile).toEqual(fileInformation.originalFile);
-        expect(service.differenceFile).toEqual(fileInformation.differenceFile);
+        expect(service.originalFile).toBe(fileInformation.originalFile as File);
+        expect(service.differenceFile).toEqual(fileInformation.differenceFile as File);
         expect(service.originalCanvas).toEqual(fileInformation.originalCanvas);
         expect(service.differenceCanvas).toEqual(fileInformation.differenceCanvas);
     });
@@ -60,4 +66,53 @@ describe('FileManipulationService', () => {
         expect(input.value).toEqual('');
         expect(bothInput.value).toEqual('');
     });
+
+    it('should validate the file', async () => {
+        const uploadImageMock = spyOn(service, 'uploadImages' as never);
+        const file = new File([new ArrayBuffer(IMAGE_DIMENSIONS.size)], 'testImage.bmp', { type: 'image/bmp' });
+        const inputElementRef: ElementRef = {
+            nativeElement: document.createElement('input'),
+        };
+        const input: HTMLInputElement = inputElementRef.nativeElement;
+        input.type = 'file';
+        document.body.appendChild(input);
+        const event = new Event('change');
+        Object.defineProperty(event, 'target', { value: { files: [file] } });
+        input.dispatchEvent(event);
+        service.fileValidation(event);
+        expect(uploadImageMock).toHaveBeenCalled();
+    });
+
+    //     it('should send an alert if picture is the wrong size', () => {
+    //         spyOn(window, 'alert');
+
+    //         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    //         const file = new File([new ArrayBuffer(123456)], 'testImage.bmp', { type: 'image/bmp' });
+
+    //         const input = fixture.debugElement.query(By.css('input[type="file"]')).nativeElement as HTMLInputElement;
+    //         const event = new Event('change');
+    //         Object.defineProperty(event, 'target', { value: { files: [file] } });
+    //         input.dispatchEvent(event);
+
+    //         component.fileValidation(event);
+
+    //         expect(window.alert).toHaveBeenCalledWith('wrong size or file type please choose again');
+    //         expect(input.value).toBe('');
+    //     });
+
+    //     it('should send an alert if picture is the wrong type', () => {
+    //         spyOn(window, 'alert');
+
+    //         const file = new File([new ArrayBuffer(IMAGE_DIMENSIONS.size)], 'testImage.jpg', { type: 'image/jpg' });
+
+    //         const input = fixture.debugElement.query(By.css('input[type="file"]')).nativeElement as HTMLInputElement;
+    //         const event = new Event('change');
+    //         Object.defineProperty(event, 'target', { value: { files: [file] } });
+    //         input.dispatchEvent(event);
+
+    //         component.fileValidation(event);
+
+    //         expect(window.alert).toHaveBeenCalledWith('wrong size or file type please choose again');
+    //         expect(input.value).toBe('');
+    //     });
 });
