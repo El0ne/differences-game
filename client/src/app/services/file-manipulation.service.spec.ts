@@ -130,4 +130,21 @@ describe('FileManipulationService', () => {
         readerSpy.onload();
         tick();
     }));
+
+    it('drawCanvas should return null if target has no files', () => {
+        const target = document.createElement('input');
+        const image = document.createElement('img');
+        const result = service['drawToCanvas'](canvas, target, image);
+        expect(result).toBeNull();
+    });
+
+    it('drawCanvas should draw image to canvas', () => {
+        const file = new File([new ArrayBuffer(IMAGE_DIMENSIONS.size)], 'testImage.bmp', { type: 'image/bmp' });
+        const target = document.createElement('input');
+        const image = document.createElement('img');
+
+        spyOnProperty(target, 'files', 'get').and.returnValue([file]);
+        const returnValue = service['drawToCanvas'](canvas, target, image);
+        expect(returnValue).toEqual(file);
+    });
 });
