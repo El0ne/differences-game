@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { EndGame } from '@common/chat-dialog-constants';
 
 import { GameWinModalComponent } from './game-win-modal.component';
 
@@ -10,6 +11,7 @@ describe('GameWinModalComponent', () => {
     let fixture: ComponentFixture<GameWinModalComponent>;
     let matDialogRefMock: MatDialogRef<GameWinModalComponent>;
     let routerMock: Router;
+    const data: EndGame = { isSolo: true, winner: 'winner' };
 
     beforeEach(async () => {
         matDialogRefMock = jasmine.createSpyObj('MatDialogRef', ['close']);
@@ -19,6 +21,7 @@ describe('GameWinModalComponent', () => {
             providers: [
                 { provide: MatDialogRef, useValue: matDialogRefMock },
                 { provide: Router, useValue: routerMock },
+                { provide: MAT_DIALOG_DATA, useValue: data },
             ],
         }).compileComponents();
 

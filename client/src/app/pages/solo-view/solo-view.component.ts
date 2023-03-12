@@ -131,7 +131,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     winGame(winner?: string): void {
         this.left.endGame = true;
         this.right.endGame = true;
-        this.showWinMessage = true;
         this.showNavBar = false;
         if (this.is1v1) this.dialog.open(GameWinModalComponent, { disableClose: true, data: { isSolo: false, winner } });
         else this.dialog.open(GameWinModalComponent, { disableClose: true, data: { isSolo: true } });
