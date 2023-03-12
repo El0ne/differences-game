@@ -116,6 +116,18 @@ describe('FileManipulationService', () => {
         expect(input.value).toBe('');
     });
 
+    it('uploadImages should upload to original canvas if target-id is upload-original', fakeAsync(async () => {
+        const file = new File([new ArrayBuffer(IMAGE_DIMENSIONS.size)], 'testImage.bmp', { type: 'image/jpg' });
+        input.id = 'upload-original';
+
+        spyOn(service, 'uploadImage' as never).and.returnValue(Promise.resolve() as never);
+        await service['uploadImages'](file, input);
+
+        expect(service['uploadImage']).toHaveBeenCalledWith(file, input, service.originalCanvas);
+        expect(service.originalFile).toBe(file);
+        expect(service.differenceFile).toBeNull();
+    }));
+
     it('uploadImage should upload the image and return a file', fakeAsync(async () => {
         const file = new File([new ArrayBuffer(IMAGE_DIMENSIONS.size)], 'testImage.bmp', { type: 'image/bmp' });
 
@@ -132,19 +144,17 @@ describe('FileManipulationService', () => {
     }));
 
     it('drawCanvas should return null if target has no files', () => {
-        const target = document.createElement('input');
         const image = document.createElement('img');
-        const result = service['drawToCanvas'](canvas, target, image);
+        const result = service['drawToCanvas'](canvas, input, image);
         expect(result).toBeNull();
     });
 
     it('drawCanvas should draw image to canvas', () => {
         const file = new File([new ArrayBuffer(IMAGE_DIMENSIONS.size)], 'testImage.bmp', { type: 'image/bmp' });
-        const target = document.createElement('input');
         const image = document.createElement('img');
 
-        spyOnProperty(target, 'files', 'get').and.returnValue([file]);
-        const returnValue = service['drawToCanvas'](canvas, target, image);
+        spyOnProperty(input, 'files', 'get').and.returnValue([file]);
+        const returnValue = service['drawToCanvas'](canvas, input, image);
         expect(returnValue).toEqual(file);
     });
 });
