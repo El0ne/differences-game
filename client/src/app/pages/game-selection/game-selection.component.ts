@@ -20,7 +20,7 @@ export class GameSelectionComponent implements OnInit {
     index: number = 0;
     isConfig: boolean | null;
 
-    constructor(public gameCardService: GameCardInformationService, public router: Router, public socket: SocketService) {}
+    constructor(public gameCardService: GameCardInformationService, public router: Router, private socket: SocketService) {}
 
     ngOnInit(): void {
         this.isConfig = this.router.url === '/config';
@@ -75,10 +75,8 @@ export class GameSelectionComponent implements OnInit {
     }
 
     setGameCardCreateOrJoin(isCreate: boolean, stageId: string) {
-        this.stages.forEach((gameCardSelection: GameCardSelectionComponent) => {
-            if (gameCardSelection.gameCardInformation._id === stageId) {
-                gameCardSelection.createGameButton = isCreate;
-            }
-        });
+        for (const gameCardSelection of this.stages) {
+            if (gameCardSelection.gameCardInformation._id === stageId) gameCardSelection.createGameButton = isCreate;
+        }
     }
 }

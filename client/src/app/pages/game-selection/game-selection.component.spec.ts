@@ -145,7 +145,7 @@ describe('GameSelectionComponent', () => {
     it('setGameCardCreateOrJoin should find the right gameCard to change his createGame button', () => {
         component.gameCardInformations = GAMES;
         component.setGameCardCreateOrJoin(false, '123');
-        expect(component.stages.get(1)?.createGameButton).toBeFalsy();
+        expect(component.stages.get(0)?.createGameButton).toBeFalsy();
     });
 
     it('selectGameCards() should put the end Index at 3 more than index unless there is less than 4 other gameCards to show', () => {
