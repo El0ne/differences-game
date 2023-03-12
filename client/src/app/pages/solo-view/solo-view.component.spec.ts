@@ -5,6 +5,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
@@ -42,12 +43,56 @@ describe('SoloViewComponent', () => {
         chatSocketServiceMock.names = new Map<string, string>();
         chatSocketServiceMock.names.set('playerId', 'player').set('opponentId', 'opponent');
         chatSocketServiceMock.gameRoom = 'game';
+        chatSocketServiceMock.opponentSocket = 'opponentId';
+
+        modalSpy = jasmine.createSpyObj('MatDialog', ['open']);
 
         chatSocketServiceMock.send = (event: string, data?: any) => {
             if (data) chatSocketServiceMock.sio.emit(event, data);
             return;
         };
 
+        await TestBed.configureTestingModule({
+            declarations: [SoloViewComponent, ClickEventComponent],
+            imports: [FormsModule, HttpClientTestingModule, RouterTestingModule, MatIconModule, MatDialogModule, BrowserAnimationsModule],
+            providers: [
+                { provide: ClickEventService },
+                { provide: ActivatedRoute, useValue: mockActivatedRoute },
+                { provide: Router, useValue: mockRouter },
+                { provide: GameCardInformationService, useValue: mockService },
+                { provide: SocketService, useValue: chatSocketServiceMock },
+                { provide: FoundDifferenceService, useValue: foundDifferenceServiceSpy },
+                { provide: MatDialog, useValue: modalSpy },
+            ],
+        }).compileComponents();
+
+        fixture = TestBed.createComponent(SoloViewComponent);
+        component = fixture.componentInstance;
+        component.messages = [];
+        fixture.detectChanges();
+    });
+
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
+
+    it('should set the current gameCard id according to value in route and request gameCard as well as game player information', () => {
+        const showTimeSpy = spyOn(component, 'showTime');
+        const configureSocketReactionsSpy = spyOn(component, 'configureSocketReactions');
+        Object.defineProperty(chatSocketServiceMock, 'socketId', { value: 'playerId' });
+        component.ngOnInit();
+        expect(component.currentGameId).toEqual('234');
+        expect(component.is1v1).toBe(true);
+        expect(component.gameCardInfo).toBe(SERVICE_MOCK_GAME_CARD);
+        expect(component.numberOfDifferences).toEqual(SERVICE_MOCK_GAME_CARD.differenceNumber);
+        expect(component.player).toEqual('player');
+        expect(component.opponent).toEqual('opponent');
+        expect(component.currentRoom).toEqual('game');
+        expect(showTimeSpy).toHaveBeenCalled();
+        expect(configureSocketReactionsSpy).toHaveBeenCalled();
+    });
+
+    it('ConfigureSocketReactions should configure sockets correctly & react properly according to event', () => {
         chatSocketServiceMock.listen = (event: string, callback: any) => {
             switch (event) {
                 case 'wordValidated': {
@@ -65,46 +110,6 @@ describe('SoloViewComponent', () => {
                 // No default
             }
         };
-
-        await TestBed.configureTestingModule({
-            declarations: [SoloViewComponent, ClickEventComponent],
-            imports: [FormsModule, HttpClientTestingModule, RouterTestingModule, MatIconModule, MatDialogModule],
-            providers: [
-                { provide: ClickEventService },
-                { provide: ActivatedRoute, useValue: mockActivatedRoute },
-                { provide: Router, useValue: mockRouter },
-                { provide: GameCardInformationService, useValue: mockService },
-                { provide: SocketService, useValue: chatSocketServiceMock },
-                { provide: FoundDifferenceService, useValue: foundDifferenceServiceSpy },
-            ],
-        }).compileComponents();
-
-        fixture = TestBed.createComponent(SoloViewComponent);
-        component = fixture.componentInstance;
-        component.messages = [];
-        fixture.detectChanges();
-    });
-
-    it('should create', () => {
-        expect(component).toBeTruthy();
-    });
-
-    it('should set the current gameCard id according to value in route and request gameCard as well as game player information', () => {
-        const showTimeSpy = spyOn(component, 'showTime');
-        const configureSocketReactionsSpy = spyOn(component, 'configureSocketReactions');
-        component.ngOnInit();
-        expect(component.currentGameId).toEqual('234');
-        expect(component.is1v1).toBe(true);
-        expect(component.gameCardInfo).toBe(SERVICE_MOCK_GAME_CARD);
-        expect(component.numberOfDifferences).toEqual(SERVICE_MOCK_GAME_CARD.differenceNumber);
-        expect(component.player).toEqual('player');
-        expect(component.opponent).toEqual('opponent');
-        expect(component.currentRoom).toEqual('game');
-        expect(showTimeSpy).toHaveBeenCalled();
-        expect(configureSocketReactionsSpy).toHaveBeenCalled();
-    });
-
-    it('ConfigureSocketReactions should configure sockets correctly & react properly according to event', () => {
         const listenSpy = spyOn(chatSocketServiceMock, 'listen').and.callThrough();
         const sendSpy = spyOn(chatSocketServiceMock, 'send').and.callThrough();
         const finishGameSpy = spyOn(component, 'finishGame');
@@ -179,9 +184,8 @@ describe('SoloViewComponent', () => {
     });
 
     it('should open the game info modal with the correct data', () => {
-        const spy = spyOn(modalSpy, 'open').and.callThrough();
         component.openInfoModal();
-        expect(spy).toHaveBeenCalledWith(GameInfoModalComponent, {
+        expect(modalSpy.open).toHaveBeenCalledWith(GameInfoModalComponent, {
             data: {
                 gameCardInfo: component.gameCardInfo,
                 numberOfDifferences: component.numberOfDifferences,
@@ -190,9 +194,8 @@ describe('SoloViewComponent', () => {
     });
 
     it('should open the quit game modal with disableClose set to true', () => {
-        const spy = spyOn(modalSpy, 'open').and.callThrough();
         component.quitGame();
-        expect(spy).toHaveBeenCalledWith(QuitGameModalComponent, {
+        expect(modalSpy.open).toHaveBeenCalledWith(QuitGameModalComponent, {
             disableClose: true,
             data: { player: component.player, room: component.currentRoom },
         });

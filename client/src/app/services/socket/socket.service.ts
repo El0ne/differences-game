@@ -9,6 +9,7 @@ export class SocketService {
     sio: Socket;
     names: Map<string, string> = new Map<string, string>();
     gameRoom: string;
+    opponentSocket: string;
 
     get socketId(): string {
         return this.sio.id ? this.sio.id : '';
