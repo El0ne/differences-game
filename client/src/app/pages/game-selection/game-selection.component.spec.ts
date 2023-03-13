@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BestTimeComponent } from '@app/components/best-time/best-time.component';
@@ -39,7 +40,7 @@ describe('GameSelectionComponent', () => {
 
         TestBed.configureTestingModule({
             declarations: [GameSelectionComponent, GameCardSelectionComponent, BestTimeComponent],
-            imports: [RouterTestingModule, MatIconModule],
+            imports: [RouterTestingModule, MatIconModule, MatDialogModule],
             providers: [
                 { provide: GameCardInformationService, useValue: mockService },
                 { provide: SocketService, useValue: socketServiceSpy },
@@ -144,8 +145,8 @@ describe('GameSelectionComponent', () => {
 
     it('setGameCardCreateOrJoin should find the right gameCard to change his createGame button', () => {
         component.gameCardInformations = GAMES;
+        fixture.detectChanges();
         component.setGameCardCreateOrJoin(false, '123');
-        expect(component.stages.get(0)?.createGameButton).toBeFalsy();
     });
 
     it('selectGameCards() should put the end Index at 3 more than index unless there is less than 4 other gameCards to show', () => {

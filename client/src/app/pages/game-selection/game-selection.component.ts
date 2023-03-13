@@ -76,7 +76,10 @@ export class GameSelectionComponent implements OnInit {
 
     setGameCardCreateOrJoin(isCreate: boolean, stageId: string) {
         for (const gameCardSelection of this.stages) {
-            if (gameCardSelection.gameCardInformation._id === stageId) gameCardSelection.createGameButton = isCreate;
+            if (gameCardSelection.gameCardInformation._id === stageId) {
+                gameCardSelection.createGameButton = isCreate;
+                break;
+            }
         }
     }
 }

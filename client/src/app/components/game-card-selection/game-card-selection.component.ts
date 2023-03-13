@@ -23,18 +23,18 @@ export class GameCardSelectionComponent implements OnInit {
 
     playerName: string = 'Player';
 
-    constructor(public socket: SocketService, public dialog: MatDialog, public router: Router) {}
+    constructor(private socketService: SocketService, public dialog: MatDialog, public router: Router) {}
     ngOnInit(): void {
         this.image = `${STAGE}/image/${this.gameCardInformation.originalImageName}`;
     }
 
     hostOrJoinGame(): void {
         if (this.createGameButton) {
-            this.socket.send<string>(WaitingRoomEvents.HostGame, this.gameCardInformation._id);
+            this.socketService.send<string>(WaitingRoomEvents.HostGame, this.gameCardInformation._id);
         } else {
-            this.socket.send<JoinHostInWaitingRequest>(WaitingRoomEvents.JoinHost, {
+            this.socketService.send<JoinHostInWaitingRequest>(WaitingRoomEvents.JoinHost, {
                 stageId: this.gameCardInformation._id,
-                playerName: this.socket.names.get(this.socket.socketId) as string,
+                playerName: this.socketService.names.get(this.socketService.socketId) as string,
             });
         }
         const data: WaitingRoomDataPassing = { stageId: this.gameCardInformation._id, isHost: this.createGameButton };

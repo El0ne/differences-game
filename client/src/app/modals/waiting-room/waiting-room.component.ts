@@ -18,7 +18,7 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
     clientsInWaitingRoom: Map<string, string> = new Map<string, string>();
     waitingRoomInfo: WaitingRoomDataPassing;
 
-    // raison: besoin de tous les parametres
+    // raison: need all parameters
     // eslint-disable-next-line max-params
     constructor(
         private dialogRef: MatDialogRef<WaitingRoomComponent>,
