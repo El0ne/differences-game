@@ -147,7 +147,7 @@ describe('GameSelectionComponent', () => {
         component.gameCardInformations = GAMES;
         fixture.detectChanges();
         component.setGameCardCreateOrJoin(false, '123');
-        expect(component.stages.get(0)?.createGameButton === false);
+        expect(component.stages.get(0)?.createGameButton).toBeFalsy();
     });
 
     it('selectGameCards() should put the end Index at 3 more than index unless there is less than 4 other gameCards to show', () => {

@@ -10,7 +10,6 @@ import { GameConditions } from '@common/chat-dialog-constants';
 })
 export class ChosePlayerNameDialogComponent {
     showNameErrorMessage: boolean = false;
-    awaitingPlayer: boolean = false;
     playerName: string = '';
     constructor(
         private dialogRef: MatDialogRef<ChosePlayerNameDialogComponent>,

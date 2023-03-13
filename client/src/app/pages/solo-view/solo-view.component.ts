@@ -13,7 +13,7 @@ import { SocketService } from '@app/services/socket/socket.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { RoomMessage, Validation } from '@common/chat-gateway-constants';
 import { ChatEvents, RoomEvent, RoomManagement } from '@common/chat.gateway.events';
-import { differenceInformation, playerDifference } from '@common/difference-information';
+import { DifferenceInformation, MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
 import { Subject } from 'rxjs';
 
@@ -59,8 +59,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit(): void {
-        this.player = 'Player';
-        this.opponent = 'Player 2';
         const gameId = this.route.snapshot.paramMap.get('stageId');
         this.is1v1 = this.router.url.includes('1v1');
         if (gameId) {
@@ -96,7 +94,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.opponent = '';
             this.messages.push(message);
         });
-        this.socketService.listen<playerDifference>(ChatEvents.Difference, (data: playerDifference) => {
+        this.socketService.listen<PlayerDifference>(ChatEvents.Difference, (data: PlayerDifference) => {
             this.effectHandler(data);
         });
         this.socketService.listen<string>(ChatEvents.Win, (socket: string) => {
@@ -206,25 +204,33 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.left.differenceEffect(currentDifferences);
         this.right.differenceEffect(currentDifferences);
     }
-    differenceHandler(information: differenceInformation): void {
+    differenceHandler(information: DifferenceInformation): void {
         if (this.is1v1) {
-            information.room = this.currentRoom;
-            this.socketService.send<differenceInformation>(ChatEvents.Difference, information);
+            const multiplayerInformation: MultiplayerDifferenceInformation = {
+                room: this.currentRoom,
+                differencesPosition: information.differencesPosition,
+                lastDifferences: information.lastDifferences,
+            };
+            this.socketService.send<DifferenceInformation>(ChatEvents.Difference, multiplayerInformation);
         } else {
-            const difference: playerDifference = { differenceInformation: information, socket: this.socketService.socketId };
+            const difference: PlayerDifference = {
+                differencesPosition: information.differencesPosition,
+                lastDifferences: information.lastDifferences,
+                socket: this.socketService.socketId,
+            };
             this.effectHandler(difference);
         }
         this.left.emitSound(false);
         this.socketService.send<RoomEvent>(ChatEvents.Event, { room: this.currentRoom, isMultiplayer: this.is1v1, event: 'Différence trouvée' });
     }
 
-    effectHandler(information: playerDifference): void {
+    effectHandler(information: PlayerDifference): void {
         if (!this.left.toggleCheatMode) {
-            this.handleFlash(information.differenceInformation.lastDifferences);
+            this.handleFlash(information.lastDifferences);
         }
-        this.paintPixel(information.differenceInformation.lastDifferences);
+        this.paintPixel(information.lastDifferences);
         this.incrementScore(information.socket);
-        this.addDifferenceDetected(information.differenceInformation.differencesPosition);
+        this.addDifferenceDetected(information.differencesPosition);
         this.endGameVerification();
     }
 

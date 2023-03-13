@@ -4,7 +4,7 @@ import { FoundDifferenceService } from '@app/services/found-differences/found-di
 import { PixelModificationService } from '@app/services/pixel-modification/pixel-modification.service';
 import { STAGE } from '@app/services/server-routes';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
-import { differenceInformation } from '@common/difference-information';
+import { DifferenceInformation } from '@common/difference-information';
 import { Observable } from 'rxjs';
 import { FAST_WAIT_TIME_MS, HEIGHT, WAIT_TIME_MS, WIDTH } from './click-event-constant';
 
@@ -20,7 +20,7 @@ export class ClickEventComponent implements OnInit {
     @Input() original: string;
     @Input() gameCardId: string;
     @Input() imagePath: string;
-    @Output() differenceDetected: EventEmitter<differenceInformation> = new EventEmitter<differenceInformation>();
+    @Output() differenceDetected: EventEmitter<DifferenceInformation> = new EventEmitter<DifferenceInformation>();
     @Output() mistake: EventEmitter<void> = new EventEmitter<void>();
     @Output() cheatModeHandler: EventEmitter<KeyboardEvent> = new EventEmitter<KeyboardEvent>();
     @ViewChild('picture', { static: true })

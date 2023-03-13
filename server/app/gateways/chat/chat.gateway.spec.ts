@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { ChatEvents } from '@common/chat.gateway.events';
-import { playerDifference } from '@common/difference-information';
+import { PlayerDifference } from '@common/difference-information';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, match, SinonStubbedInstance, stub } from 'sinon';
@@ -39,11 +39,6 @@ describe('ChatGateway', () => {
         expect(gateway).toBeDefined();
     });
 
-    it('received message should be logged', () => {
-        gateway.message(socket, 'X');
-        expect(logger.log.called).toBeTruthy();
-    });
-
     it('validate() message should take account word length', () => {
         const validWordCase = { word: 'xxxx', isValid: true };
         const invalidWordCase = {
@@ -64,23 +59,12 @@ describe('ChatGateway', () => {
         expect(socket.emit.calledWith(ChatEvents.WordValidated, { isValidated: false, originalMessage: error })).toBeTruthy();
     });
 
-    it('broadcastAll() should send a mass message to the server', () => {
-        gateway.broadcastAll(socket, 'X');
-        expect(server.emit.calledWith(ChatEvents.MassMessage, match.any)).toBeTruthy();
-    });
-
-    it('joinRoom() should join the socket room', () => {
-        gateway.joinRoom(socket, TEST_ROOM_ID);
-        expect(socket.join.calledOnce).toBeTruthy();
-    });
-
     it('difference() should emit to room a difference Event when room exists', () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
-            emit: (event: string, data: playerDifference) => {
+            emit: (event: string, data: PlayerDifference) => {
                 expect(event).toEqual(ChatEvents.Difference);
-                expect(data.differenceInformation).toEqual({ differencesPosition: 3, lastDifferences: [0, 1, 2], room: TEST_ROOM_ID });
-                expect(data.socket).toEqual(socket.id);
+                expect(data).toEqual({ differencesPosition: 3, lastDifferences: [0, 1, 2], socket: socket.id });
             },
         } as any);
 

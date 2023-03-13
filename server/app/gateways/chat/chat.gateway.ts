@@ -1,5 +1,5 @@
 import { AbandonGame, ChatEvents, Room, RoomEvent, RoomManagement } from '@common/chat.gateway.events';
-import { differenceInformation } from '@common/difference-information';
+import { MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -14,11 +14,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     constructor(private readonly logger: Logger) {}
 
-    @SubscribeMessage(ChatEvents.Message)
-    message(_: Socket, message: string): void {
-        this.logger.log(`Message reçu : ${message}`);
-    }
-
     @SubscribeMessage(ChatEvents.Validate)
     validate(socket: Socket, message: string): void {
         if (message && message.length < MESSAGE_MAX_LENGTH) {
@@ -30,9 +25,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     @SubscribeMessage(ChatEvents.Difference)
-    difference(socket: Socket, data: differenceInformation) {
+    difference(socket: Socket, data: MultiplayerDifferenceInformation) {
         if (socket.rooms.has(data.room)) {
-            this.server.to(data.room).emit(ChatEvents.Difference, { differenceInformation: data, socket: socket.id });
+            const differenceInformation: PlayerDifference = {
+                differencesPosition: data.differencesPosition,
+                lastDifferences: data.lastDifferences,
+                socket: socket.id,
+            };
+            this.server.to(data.room).emit(ChatEvents.Difference, differenceInformation);
         }
     }
 
@@ -73,16 +73,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             const dateFormatted = `${date} - Indice utilisé.`;
             this.server.to(room).emit(ChatEvents.RoomMessage, { socketId: 'event', message: dateFormatted, isEvent: true });
         }
-    }
-
-    @SubscribeMessage(ChatEvents.BroadcastAll)
-    broadcastAll(socket: Socket, message: string): void {
-        this.server.emit(ChatEvents.MassMessage, `${socket.id} : ${message}`);
-    }
-
-    @SubscribeMessage(ChatEvents.JoinRoom)
-    joinRoom(socket: Socket, room: string): void {
-        socket.join(room);
     }
 
     @SubscribeMessage(ChatEvents.RoomMessage)

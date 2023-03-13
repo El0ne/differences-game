@@ -1,10 +1,12 @@
-export interface differenceInformation {
+export interface DifferenceInformation {
     differencesPosition: number;
     lastDifferences: number[];
-    room?: string;
 }
 
-export interface playerDifference {
-    differenceInformation: differenceInformation;
+export interface MultiplayerDifferenceInformation extends DifferenceInformation {
+    room: string;
+}
+
+export interface PlayerDifference extends DifferenceInformation {
     socket: string;
 }

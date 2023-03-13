@@ -21,7 +21,7 @@ import { FoundDifferenceService } from '@app/services/found-differences/found-di
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { ChatEvents } from '@common/chat.gateway.events';
-import { differenceInformation, playerDifference } from '@common/difference-information';
+import { DifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
 import { of } from 'rxjs';
 import { SoloViewComponent } from './solo-view.component';
@@ -130,7 +130,7 @@ describe('SoloViewComponent', () => {
                     break;
                 }
                 case ChatEvents.Difference: {
-                    callback({ differenceInformation: { differencesPosition: 3, lastDifferences: [0, 1, 2] }, socketId: 'test' });
+                    callback({ lastDifferences: [0, 1, 2, 3], differencesPosition: 2, socketId: 'test' });
                     break;
                 }
                 case ChatEvents.Win: {
@@ -251,10 +251,10 @@ describe('SoloViewComponent', () => {
         const addDiffSpy = spyOn(component, 'addDifferenceDetected');
         const endGameVerifSpy = spyOn(component, 'endGameVerification');
         component.effectHandler(MOCK_PLAYER_DIFFERENCES);
-        expect(handleFlashSpy).toHaveBeenCalledWith(MOCK_PLAYER_DIFFERENCES.differenceInformation.lastDifferences);
-        expect(paintPixelSpy).toHaveBeenCalledWith(MOCK_PLAYER_DIFFERENCES.differenceInformation.lastDifferences);
+        expect(handleFlashSpy).toHaveBeenCalledWith(MOCK_PLAYER_DIFFERENCES.lastDifferences);
+        expect(paintPixelSpy).toHaveBeenCalledWith(MOCK_PLAYER_DIFFERENCES.lastDifferences);
         expect(incrementSpy).toHaveBeenCalledWith(MOCK_PLAYER_DIFFERENCES.socket);
-        expect(addDiffSpy).toHaveBeenCalledWith(MOCK_PLAYER_DIFFERENCES.differenceInformation.differencesPosition);
+        expect(addDiffSpy).toHaveBeenCalledWith(MOCK_PLAYER_DIFFERENCES.differencesPosition);
         expect(endGameVerifSpy).toHaveBeenCalled();
     });
 
@@ -265,7 +265,11 @@ describe('SoloViewComponent', () => {
         });
         const sendSpy = spyOn(chatSocketServiceMock, 'send').and.callThrough();
         component.differenceHandler(MOCK_INFORMATION);
-        expect(sendSpy).toHaveBeenCalledWith(ChatEvents.Difference, MOCK_INFORMATION);
+        expect(sendSpy).toHaveBeenCalledWith(ChatEvents.Difference, {
+            room: component.currentRoom,
+            lastDifferences: [0, 1, 2, 3],
+            differencesPosition: 2,
+        });
         expect(sendSpy).toHaveBeenCalledWith(ChatEvents.Event, { room: component.currentRoom, isMultiplayer: true, event: 'Différence trouvée' });
         expect(component.left.emitSound).toHaveBeenCalledWith(false);
     });
@@ -282,7 +286,7 @@ describe('SoloViewComponent', () => {
         component.differenceHandler(MOCK_INFORMATION);
         expect(sendSpy).toHaveBeenCalledWith(ChatEvents.Event, { room: component.currentRoom, isMultiplayer: false, event: 'Différence trouvée' });
         expect(component.left.emitSound).toHaveBeenCalledWith(false);
-        const information: playerDifference = { differenceInformation: MOCK_INFORMATION, socket: chatSocketServiceMock.socketId };
+        const information: PlayerDifference = { lastDifferences: [0, 1, 2, 3], differencesPosition: 2, socket: chatSocketServiceMock.socketId };
         expect(component.effectHandler).toHaveBeenCalledWith(information);
     });
 
@@ -385,13 +389,14 @@ describe('SoloViewComponent', () => {
     });
 });
 
-const MOCK_INFORMATION: differenceInformation = {
+const MOCK_INFORMATION: DifferenceInformation = {
     lastDifferences: [0, 1, 2, 3],
     differencesPosition: 2,
 };
 
-const MOCK_PLAYER_DIFFERENCES: playerDifference = {
-    differenceInformation: MOCK_INFORMATION,
+const MOCK_PLAYER_DIFFERENCES: PlayerDifference = {
+    lastDifferences: [0, 1, 2, 3],
+    differencesPosition: 2,
     socket: 'test',
 };
 
