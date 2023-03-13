@@ -34,8 +34,8 @@ export class ClickEventComponent implements OnInit {
     toggleCheatMode: boolean = false;
 
     constructor(
-        public clickEventService: ClickEventService,
-        public foundDifferenceService: FoundDifferenceService,
+        private clickEventService: ClickEventService,
+        private foundDifferenceService: FoundDifferenceService,
         public pixelModificationService: PixelModificationService,
     ) {}
 
@@ -51,6 +51,10 @@ export class ClickEventComponent implements OnInit {
             const context = this.picture.nativeElement.getContext('2d') as CanvasRenderingContext2D;
             context.drawImage(image, 0, 0);
         };
+    }
+
+    getDifferencesFromService(id: string): Observable<number[][]> {
+        return this.clickEventService.getDifferences(id);
     }
 
     getCoordInImage(mouseEvent: MouseEvent): number[] {

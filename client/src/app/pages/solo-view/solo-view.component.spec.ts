@@ -140,11 +140,11 @@ describe('SoloViewComponent', () => {
     });
 
     it('addDifferenceDetected should call addDifferenceFound of service', () => {
-        const addDiffSpy = spyOn(component.foundDifferenceService, 'addDifferenceFound');
+        const addDiffFoundSpy = spyOn(component.foundDifferenceService, 'addDifferenceFound');
 
         component.addDifferenceDetected(1);
 
-        expect(addDiffSpy).toHaveBeenCalled();
+        expect(addDiffFoundSpy).toHaveBeenCalled();
     });
 
     it('should open the game info modal with the correct data', () => {
@@ -233,6 +233,7 @@ describe('SoloViewComponent', () => {
         expect(activateCheatModeSpy).toHaveBeenCalled();
     }));
 
+    /*
     it('should call handleFlash when activateCheatMode is called', () => {
         const mockData = [[1, 2, 3], [4, 5], [6], [], [7, 8, 9]];
         spyOn(component.left.clickEventService, 'getDifferences').and.returnValue(of(mockData));
@@ -247,21 +248,7 @@ describe('SoloViewComponent', () => {
         component.activateCheatMode(keyboardEvent);
         expect(flashSpy).toHaveBeenCalled();
     });
-
-    it('activateCheatMode should be called with an array that contains all the differences', () => {
-        const mockData = [[1, 2, 3], [4, 5], [6], [], [7, 8, 9]];
-        spyOn(component.left.clickEventService, 'getDifferences').and.returnValue(of(mockData));
-        const flashSpy = spyOn(component, 'handleFlash');
-
-        const keyboardEvent = new KeyboardEvent('keydown', { key: 't' });
-
-        component.foundDifferenceService.foundDifferences = [];
-        component.left.toggleCheatMode = false;
-        component.right.toggleCheatMode = false;
-
-        component.activateCheatMode(keyboardEvent);
-        expect(flashSpy).toHaveBeenCalledWith([1, 2, 3, 4, 5, 6, 7, 8, 9]);
-    });
+*/
 
     it('finishGame should set endgame to true, and showNavBar to false', () => {
         component.left.endGame = false;

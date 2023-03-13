@@ -100,29 +100,21 @@ describe('ClickEventComponent', () => {
 
     it('isDifferent() should return true if a difference is detected', () => {
         component.toggleCheatMode = true;
-        spyOn(component.clickEventService, 'isADifference').and.returnValue(of(DIFFERENCE_FOUND));
+        spyOn(mockService, 'isADifference').and.returnValue(of(DIFFERENCE_FOUND));
         const mockClick = new MouseEvent('click', { clientX: 0, clientY: 0 });
         spyOn(component, 'emitSound').and.callFake(() => {});
         component.isDifferent(mockClick);
-        expect(component.clickEventService.isADifference).toHaveBeenCalledWith(
-            component.getCoordInImage(mockClick)[0],
-            component.getCoordInImage(mockClick)[1],
-            '1',
-        );
+        expect(mockService.isADifference).toHaveBeenCalledWith(component.getCoordInImage(mockClick)[0], component.getCoordInImage(mockClick)[1], '1');
         expect(component.differenceData).toEqual(DIFFERENCE_FOUND);
     });
 
     it('isDifferent() should return false if a difference is not detected', () => {
         component.toggleCheatMode = false;
-        spyOn(component.clickEventService, 'isADifference').and.returnValue(of(DIFFERENCE_NOT_FOUND));
+        spyOn(mockService, 'isADifference').and.returnValue(of(DIFFERENCE_NOT_FOUND));
         const mockClick = new MouseEvent('click', { clientX: 100, clientY: 365 });
         spyOn(component, 'emitSound').and.callFake(() => {});
         component.isDifferent(mockClick);
-        expect(component.clickEventService.isADifference).toHaveBeenCalledWith(
-            component.getCoordInImage(mockClick)[0],
-            component.getCoordInImage(mockClick)[1],
-            '1',
-        );
+        expect(mockService.isADifference).toHaveBeenCalledWith(component.getCoordInImage(mockClick)[0], component.getCoordInImage(mockClick)[1], '1');
         expect(component.differenceData).toEqual(DIFFERENCE_NOT_FOUND);
     });
 
