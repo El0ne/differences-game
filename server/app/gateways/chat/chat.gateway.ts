@@ -1,4 +1,4 @@
-import { AbandonGame, ChatEvents, MultiplayerRequestInformation, Room, RoomEvent, RoomManagement } from '@common/chat.gateway.events';
+import { AbandonGame, ChatEvents, Room, RoomEvent, RoomManagement } from '@common/chat.gateway.events';
 import { differenceInformation } from '@common/difference-information';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -27,24 +27,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             const error = 'Votre message ne respecte pas le bon format. Veuillez entrer un nouveau message';
             socket.emit(ChatEvents.WordValidated, { isValidated: false, originalMessage: error });
         }
-    }
-
-    // temporary function in order to test chat functionality.
-    // it will be removed when time for integration (no use to test in this scenario)
-    @SubscribeMessage(ChatEvents.RoomCheck)
-    check(socket: Socket, data: MultiplayerRequestInformation): void {
-        for (const room of this.waitingRoom) {
-            if (room.gameId === data.game) {
-                socket.join(room.roomId);
-                const index = this.waitingRoom.indexOf(room);
-                this.waitingRoom.splice(index, 1);
-                this.logger.log(room.awaitingPlayer, data.name);
-                this.server.to(room.roomId).emit(ChatEvents.PlayerWaiting, { room: room.roomId, adversary: room.awaitingPlayer, player: data.name });
-                return;
-            }
-        }
-        this.waitingRoom.push({ roomId: socket.id, gameId: data.game, awaitingPlayer: data.name });
-        socket.emit(ChatEvents.WaitingRoom);
     }
 
     @SubscribeMessage(ChatEvents.Difference)

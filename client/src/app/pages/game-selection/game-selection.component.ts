@@ -34,12 +34,12 @@ export class GameSelectionComponent implements OnInit {
             this.socket.listen(WaitingRoomEvents.GameDeleted, (stageId: string) => {
                 this.setGameCardCreateOrJoin(true, stageId);
             });
-
-            this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
-                this.numberOfGameInformations = data;
-                this.selectGameCards();
-            });
         }
+        this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
+            this.numberOfGameInformations = data;
+            this.selectGameCards();
+            console.log(this.stages);
+        });
     }
 
     selectGameCards(): void {

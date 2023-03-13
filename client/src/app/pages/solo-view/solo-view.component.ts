@@ -139,7 +139,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     addDifferenceDetected(differenceIndex: number): void {
         this.foundDifferenceService.addDifferenceFound(differenceIndex);
-        this.socketService.send<RoomEvent>(ChatEvents.Event, { room: this.currentRoom, isMultiplayer: this.is1v1, event: 'Différence trouvée' });
     }
 
     openInfoModal(): void {
