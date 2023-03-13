@@ -49,7 +49,7 @@
             <div class="middle-container">
                 <div class="tools-container neon-border">
                     <div class="row-tools">
-                        <button><mat-icon class="btn-image">undo</mat-icon></button>
+                        <button (click)="undo()"><mat-icon class="btn-image">undo</mat-icon></button>
                         <button (click)="toggleButton('rectangle')" [style.backgroundColor]="isRectEnabled ? '#ffa012' : '#ff124f'">
                             <mat-icon class="btn-image">rectangle</mat-icon>
                         </button>
@@ -153,7 +153,7 @@
                 </div>
                 <div class="upload-delete">
                     <button id="reset-different" (click)="clearSecondFile(this.myDiffCanvas.nativeElement, 'upload-different')">X</button>
-                    <label for="upload-original">
+                    <label for="upload-different">
                         Choisir une image de 640*480 de format bmp
                         <input type="file" id="upload-different" class="photo-upload" (change)="fileValidation($event)" accept="image/bmp" />
                     </label>
