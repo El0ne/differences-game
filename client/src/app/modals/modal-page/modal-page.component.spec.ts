@@ -34,6 +34,7 @@ describe('ModalPageComponent', () => {
                 { provide: MatDialogRef, useValue: {} },
                 GameCardInformationService,
             ],
+            teardown: { destroyAfterEach: false },
         }).compileComponents();
 
         dialogRefSpyObject = jasmine.createSpyObj({ afterClosed: of({}), close: null });

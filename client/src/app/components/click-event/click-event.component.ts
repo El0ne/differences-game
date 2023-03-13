@@ -1,6 +1,7 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
+import { PixelModificationService } from '@app/services/pixel-modification/pixel-modification.service';
 import { STAGE } from '@app/services/server-routes';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { differenceInformation } from '@common/difference-information';
@@ -20,6 +21,7 @@ export class ClickEventComponent implements OnInit {
     @Input() gameCardId: string;
     @Input() imagePath: string;
     @Output() handler: EventEmitter<differenceInformation> = new EventEmitter<differenceInformation>();
+    @Output() cheatModeHandler: EventEmitter<KeyboardEvent> = new EventEmitter<KeyboardEvent>();
     @ViewChild('picture', { static: true })
     picture: ElementRef<HTMLCanvasElement>;
     @ViewChild('modification', { static: true })
@@ -29,10 +31,15 @@ export class ClickEventComponent implements OnInit {
     differenceData: ClickDifferenceVerification;
     endGame: boolean;
     foundDifferences: number[];
+    toggleCheatMode: boolean = false;
 
-    constructor(public clickEventService: ClickEventService, public foundDifferenceService: FoundDifferenceService) {}
+    constructor(
+        public clickEventService: ClickEventService,
+        public foundDifferenceService: FoundDifferenceService,
+        public pixelModificationService: PixelModificationService,
+    ) {}
 
-    async ngOnInit() {
+    async ngOnInit(): Promise<void> {
         this.timeout = false;
         this.endGame = false;
         this.foundDifferences = [];
@@ -46,73 +53,60 @@ export class ClickEventComponent implements OnInit {
         };
     }
 
-    getCoordInImage(e: MouseEvent): number[] {
+    getCoordInImage(mouseEvent: MouseEvent): number[] {
         const rect = this.modification.nativeElement.getBoundingClientRect();
-        const x = Math.max(Math.floor(e.clientX - rect.left), 0);
-        const y = Math.max(Math.floor(e.clientY - rect.top), 0);
-        return new Array(x, y);
+        return this.pixelModificationService.getCoordInImage(mouseEvent, rect);
     }
 
-    isDifferent(e: MouseEvent) {
-        this.clickEventService.isADifference(this.getCoordInImage(e)[0], this.getCoordInImage(e)[1], this.gameCardId).subscribe((data) => {
-            this.differenceData = data;
-            if (
-                this.differenceData.isADifference &&
-                !this.foundDifferenceService.foundDifferences.includes(this.differenceData.differencesPosition)
-            ) {
-                this.handler.emit({
-                    differencesPosition: this.differenceData.differencesPosition,
-                    lastDifferences: this.differenceData.differenceArray,
-                });
-            } else {
-                this.displayError(e);
-            }
-        });
+    isDifferent(mouseEvent: MouseEvent): void {
+        this.clickEventService
+            .isADifference(this.getCoordInImage(mouseEvent)[0], this.getCoordInImage(mouseEvent)[1], this.gameCardId)
+            .subscribe((data) => {
+                this.differenceData = data;
+                if (
+                    this.differenceData.isADifference &&
+                    !this.foundDifferenceService.foundDifferences.includes(this.differenceData.differencesPosition)
+                ) {
+                    this.handler.emit({
+                        differencesPosition: this.differenceData.differencesPosition,
+                        lastDifferences: this.differenceData.differenceArray,
+                    });
+                    if (this.toggleCheatMode) {
+                        const keyEvent: KeyboardEvent = new KeyboardEvent('keydown', { key: 't' });
+                        this.cheatModeHandler.emit(keyEvent);
+                    }
+                } else {
+                    this.displayError(mouseEvent);
+                }
+            });
     }
 
-    turnDifferenceYellow(originalContext: CanvasRenderingContext2D, differences: number[]) {
-        for (const pixel of differences) {
-            const pos: number[] = this.positionToPixel(pixel);
-            originalContext.fillStyle = '#FFD700';
-            originalContext.fillRect(pos[0], pos[1], 1, 1);
-        }
-    }
-
-    turnOffYellow(originalContext: CanvasRenderingContext2D, differences: number[]) {
-        for (const pixel of differences) {
-            const pos: number[] = this.positionToPixel(pixel);
-            originalContext.clearRect(pos[0], pos[1], 1, 1);
-        }
-    }
-
-    async delay(ms: number) {
+    async delay(ms: number): Promise<void> {
         return new Promise((res) => setTimeout(res, ms));
+    }
+
+    async clearEffect(): Promise<void> {
+        const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
+        await this.pixelModificationService.turnOffYellow(originalContext, this.foundDifferenceService.foundDifferences);
     }
 
     async differenceEffect(currentDifferences: number[]): Promise<void> {
         if (!this.endGame) {
             const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-            this.emitSound(false);
-            this.turnDifferenceYellow(originalContext, currentDifferences);
-            await this.delay(FAST_WAIT_TIME_MS);
-            this.turnOffYellow(originalContext, currentDifferences);
-            await this.delay(FAST_WAIT_TIME_MS);
-            this.turnDifferenceYellow(originalContext, currentDifferences);
-            await this.delay(FAST_WAIT_TIME_MS);
-            this.turnOffYellow(originalContext, currentDifferences);
-            await this.delay(FAST_WAIT_TIME_MS);
-        }
-    }
 
-    positionToPixel(toTransform: number): number[] {
-        let yCounter = 0;
-        while (toTransform >= WIDTH) {
-            toTransform -= WIDTH;
-            if (toTransform >= 0) {
-                yCounter += 1;
+            for (let i = 0; i < 2; i++) {
+                this.pixelModificationService.turnDifferenceYellow(originalContext, currentDifferences);
+                await this.delay(FAST_WAIT_TIME_MS);
+                this.pixelModificationService.turnOffYellow(originalContext, currentDifferences);
+                await this.delay(FAST_WAIT_TIME_MS);
+            }
+
+            if (this.toggleCheatMode) {
+                this.differenceEffect(currentDifferences);
+            } else {
+                this.emitSound(false);
             }
         }
-        return [toTransform, yCounter];
     }
 
     emitSound(isErrorSound: boolean): void {
@@ -122,20 +116,13 @@ export class ClickEventComponent implements OnInit {
         sound.play();
     }
 
-    displayError(e: MouseEvent): void {
+    displayError(mouseEvent: MouseEvent): void {
         if (!this.timeout && !this.endGame) {
             this.emitSound(true);
             this.timeout = true;
             const rect = this.modification.nativeElement.getBoundingClientRect();
-            const x = Math.floor(e.clientX - rect.left);
-            const y = Math.floor(e.clientY - rect.top);
             const context = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-            context.font = '30pt Arial';
-            context.fillStyle = 'red';
-            context.textAlign = 'center';
-            const error = 'Error';
-            context.fillText(error, x, y);
-
+            this.pixelModificationService.errorMessage(mouseEvent, rect, context);
             setTimeout(() => {
                 context.clearRect(0, 0, WIDTH, HEIGHT);
                 this.timeout = false;
@@ -145,23 +132,11 @@ export class ClickEventComponent implements OnInit {
 
     sendDifferencePixels(differenceArray: number[]): ImageData[] {
         const context = this.picture.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-        const colorArray = [];
-
-        for (const position of differenceArray) {
-            const pos = this.positionToPixel(position);
-            const pixel = context.getImageData(pos[0], pos[1], 1, 1);
-            colorArray.push(pixel);
-        }
-        return colorArray;
+        return this.pixelModificationService.getColorFromDifference(context, differenceArray);
     }
 
     receiveDifferencePixels(colorArray: ImageData[], positionArray: number[]): void {
         const context = this.picture.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-        for (let i = 0; i < positionArray.length; i++) {
-            const diffPixel = `rgba(${colorArray[i].data[0]},${colorArray[i].data[1]},${colorArray[i].data[2]},${colorArray[i].data[3]})`;
-            context.fillStyle = diffPixel;
-            const posInPixels = this.positionToPixel(positionArray[i]);
-            context.fillRect(posInPixels[0], posInPixels[1], 1, 1);
-        }
+        this.pixelModificationService.paintColorFromDifference(colorArray, positionArray, context);
     }
 }

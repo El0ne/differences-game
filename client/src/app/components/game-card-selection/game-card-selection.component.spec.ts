@@ -14,6 +14,7 @@ describe('GameCardSelectionComponent', () => {
         await TestBed.configureTestingModule({
             declarations: [GameCardSelectionComponent, BestTimeComponent],
             imports: [MatIconModule, RouterTestingModule],
+            teardown: { destroyAfterEach: false },
         }).compileComponents();
 
         fixture = TestBed.createComponent(GameCardSelectionComponent);

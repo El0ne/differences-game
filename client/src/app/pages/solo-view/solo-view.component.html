@@ -24,6 +24,7 @@
                 [gameCardId]="this.currentGameId"
                 [imagePath]="this.gameCardInfo.originalImageName"
                 (handler)="emitHandler($event)"
+                (cheatModeHandler)="resetDifferences($event)"
                 *ngIf="this.gameCardInfo"
             ></app-click-event>
         </div>
@@ -56,7 +57,14 @@
                     </div>
                 </div>
                 <div class="answer-area">
-                    <input type="text" class="input-field" placeholder="Entrez votre message" [(ngModel)]="messageContent" />
+                    <input
+                        type="text"
+                        class="input-field"
+                        placeholder="Entrez votre message"
+                        [(ngModel)]="messageContent"
+                        (click)="removeCheatMode()"
+                        (blur)="addCheatMode()"
+                    />
                     <button class="send-button" (click)="sendMessage()"></button>
                 </div>
             </div>
@@ -69,8 +77,14 @@
                 [gameCardId]="this.currentGameId"
                 [imagePath]="this.gameCardInfo.differenceImageName"
                 (handler)="emitHandler($event)"
+                (cheatModeHandler)="resetDifferences($event)"
                 *ngIf="this.gameCardInfo"
             ></app-click-event>
+        </div>
+        <div class="hint-button">
+            <button class="hint" type="button">
+                <mat-icon class="hint-button">search</mat-icon>
+            </button>
         </div>
     </div>
 </body>

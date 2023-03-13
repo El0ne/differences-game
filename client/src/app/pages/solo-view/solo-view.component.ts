@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
+import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
@@ -26,20 +27,18 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     @ViewChild('right')
     right: ClickEventComponent;
     showErrorMessage: boolean = false;
-    showNameErrorMessage: boolean = false;
     showTextBox: boolean = false;
-    showWinMessage: boolean = false;
     showNavBar: boolean = true;
     playerName: string;
     messages: string[] = [];
     messageContent: string = '';
-    differenceArray: number[][];
     currentScore: number = 0;
     numberOfDifferences: number;
     currentTime: number;
     currentGameId: string;
     endGame: Subject<void> = new Subject<void>();
     gameCardInfo: GameCardInformation;
+    boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
 
     // eslint-disable-next-line max-params
     constructor(
@@ -65,12 +64,43 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         dialogRef.afterClosed().subscribe((result: string) => {
             this.playerName = result;
             this.showTime();
+            this.addCheatMode();
         });
     }
 
     ngOnDestroy(): void {
         this.timerService.stopTimer();
         this.foundDifferenceService.clearDifferenceFound();
+        this.removeCheatMode();
+    }
+
+    invertDifferences(): void {
+        this.left.toggleCheatMode = !this.left.toggleCheatMode;
+        this.right.toggleCheatMode = !this.right.toggleCheatMode;
+    }
+
+    removeCheatMode(): void {
+        document.removeEventListener('keydown', this.boundActivateCheatMode);
+    }
+
+    addCheatMode(): void {
+        document.addEventListener('keydown', this.boundActivateCheatMode);
+    }
+
+    resetDifferences(event: KeyboardEvent): void {
+        this.invertDifferences();
+        setTimeout(() => {
+            this.activateCheatMode(event);
+        }, MAX_EFFECT_TIME);
+    }
+
+    activateCheatMode(event: KeyboardEvent): void {
+        if (event.key === 't') {
+            this.invertDifferences();
+            this.left.clickEventService.getDifferences(this.currentGameId).subscribe((data) => {
+                if (this.left.toggleCheatMode) this.handleFlash(this.foundDifferenceService.findPixelsFromDifference(data));
+            });
+        }
     }
 
     showTime(): void {
@@ -84,7 +114,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     finishGame(): void {
         this.left.endGame = true;
         this.right.endGame = true;
-        this.showWinMessage = true;
         this.showNavBar = false;
 
         this.dialog.open(GameWinModalComponent, { disableClose: true });
@@ -147,8 +176,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.left.differenceEffect(currentDifferences);
         this.right.differenceEffect(currentDifferences);
     }
+
     emitHandler(information: differenceInformation): void {
-        this.handleFlash(information.lastDifferences);
+        if (!this.left.toggleCheatMode) {
+            this.handleFlash(information.lastDifferences);
+        }
         this.paintPixel(information.lastDifferences);
         this.incrementScore();
         this.addDifferenceDetected(information.differencesPosition);
