@@ -2,7 +2,8 @@
     <div class="info">
         <p class="title">Entrez votre nom</p>
     </div>
-    <input type="text" class="name-field" placeholder="Entrez votre nom" [(ngModel)]="playerName" cdkFocusInitial (keyup.enter)="validateName()" />
+    <input type="text" class="name-field" placeholder="Entrez votre nom" [(ngModel)]="playerName" cdkFocusInitial
+        (keyup.enter)="validateName()" />
     <p class="title" *ngIf="showNameErrorMessage">Nom invalide</p>
     <p class="title" *ngIf="awaitingPlayer">En attente d'un autre joueur</p>
     <button class="option-buttons win-button" id="info-quit" type="button" (click)="validateName()">

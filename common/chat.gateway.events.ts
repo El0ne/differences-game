@@ -38,7 +38,7 @@ export interface MultiplayerRequestInformation {
 export interface RoomEvent {
     room: string;
     event: string;
-    multiplayer: boolean;
+    isMultiplayer: boolean;
 }
 
 export interface AbandonGame {

@@ -56,12 +56,12 @@ describe('ChatGateway', () => {
         const error = 'Votre message ne respecte pas le bon format. Veuillez entrer un nouveau message';
         gateway.validate(socket, validWordCase.word);
         expect(
-            socket.emit.calledWith(ChatEvents.WordValidated, { validated: validWordCase.isValid, originalMessage: validWordCase.word }),
+            socket.emit.calledWith(ChatEvents.WordValidated, { isValidated: validWordCase.isValid, originalMessage: validWordCase.word }),
         ).toBeTruthy();
         gateway.validate(socket, invalidWordCase.word);
-        expect(socket.emit.calledWith(ChatEvents.WordValidated, { validated: invalidWordCase.isValid, originalMessage: error })).toBeTruthy();
+        expect(socket.emit.calledWith(ChatEvents.WordValidated, { isValidated: invalidWordCase.isValid, originalMessage: error })).toBeTruthy();
         gateway.validate(socket, emptyStringTestCase);
-        expect(socket.emit.calledWith(ChatEvents.WordValidated, { validated: false, originalMessage: error })).toBeTruthy();
+        expect(socket.emit.calledWith(ChatEvents.WordValidated, { isValidated: false, originalMessage: error })).toBeTruthy();
     });
 
     it('broadcastAll() should send a mass message to the server', () => {
@@ -137,7 +137,7 @@ describe('ChatGateway', () => {
                 expect(data.message.includes('par')).toBe(true);
             },
         } as any);
-        gateway.event(socket, { room: TEST_ROOM_ID, event: 'Error', multiplayer: true });
+        gateway.event(socket, { room: TEST_ROOM_ID, event: 'Error', isMultiplayer: true });
     });
 
     it('event() should emit RoomMessage and return a string containing event without par', () => {
@@ -149,7 +149,7 @@ describe('ChatGateway', () => {
                 expect(data.message.includes('par')).toBe(false);
             },
         } as any);
-        gateway.event(socket, { room: TEST_ROOM_ID, event: 'Différence', multiplayer: false });
+        gateway.event(socket, { room: TEST_ROOM_ID, event: 'Différence', isMultiplayer: false });
     });
 
     it('abandon should emit a abandon event and include player name in the alert message', () => {

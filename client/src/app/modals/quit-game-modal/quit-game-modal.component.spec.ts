@@ -11,7 +11,7 @@ describe('QuitGameModalComponent', () => {
     let matDialogRefMock: MatDialogRef<QuitGameModalComponent>;
     let routerMock: Router;
     let mockChatService: SocketService;
-    const data = { player: 'Jasper', room: 'testRoom' };
+    const data = { player: 'player', room: 'testRoom' };
 
     beforeEach(async () => {
         matDialogRefMock = jasmine.createSpyObj('MatDialogRef', ['close']);
@@ -52,7 +52,7 @@ describe('QuitGameModalComponent', () => {
         component.confirm();
         expect(matDialogRefMock.close).toHaveBeenCalled();
         expect(routerMock.navigate).toHaveBeenCalledWith(['/stage-selection']);
-        expect(sendSpy).toHaveBeenCalledWith('abandon', { name: 'Jasper', room: 'testRoom' });
+        expect(sendSpy).toHaveBeenCalledWith('abandon', { name: 'player', room: 'testRoom' });
     });
 
     it('should close modal if close', () => {

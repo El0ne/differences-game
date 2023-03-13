@@ -1,6 +1,6 @@
 export interface GameConditions {
     game: string;
-    multiplayer: boolean;
+    isMultiplayer: boolean;
 }
 
 export interface PlayersInformation {

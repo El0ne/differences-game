@@ -14,9 +14,9 @@ import { GameCardSelectionComponent } from './components/game-card-selection/gam
 import { ChosePlayerNameDialogComponent } from './modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { GameInfoModalComponent } from './modals/game-info-modal/game-info-modal.component';
 import { GameWinModalComponent } from './modals/game-win-modal/game-win-modal.component';
-import { HostWaitingRoomComponent } from './modals/host-waiting-room/host-waiting-room.component';
 import { ModalPageComponent } from './modals/modal-page/modal-page.component';
 import { QuitGameModalComponent } from './modals/quit-game-modal/quit-game-modal.component';
+import { WaitingRoomComponent } from './modals/waiting-room/waiting-room.component';
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 import { GameSelectionComponent } from './pages/game-selection/game-selection.component';
 import { HomePageComponent } from './pages/home-page/home-page.component';
@@ -40,10 +40,10 @@ import { SoloViewComponent } from './pages/solo-view/solo-view.component';
         ClickEventComponent,
         GameCreationPageComponent,
         ChosePlayerNameDialogComponent,
+        WaitingRoomComponent,
         GameInfoModalComponent,
         QuitGameModalComponent,
         GameWinModalComponent,
-        HostWaitingRoomComponent,
     ],
     entryComponents: [ModalPageComponent],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, MatIconModule],

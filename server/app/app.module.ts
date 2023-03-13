@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GameClickController } from './controllers/game-click/game-click.controller';
 import { StageController } from './controllers/stage/stage.controller';
+import { StageWaitingRoomGateway } from './gateways/waitingRoom/stage-waiting-room.gateway';
 import { DifferenceClickService } from './services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from './services/difference-detection/difference-detection.service';
 import { DifferencesCounterService } from './services/differences-counter/differences-counter.service';
@@ -34,6 +35,7 @@ import { PixelRadiusService } from './services/pixel-radius/pixel-radius.service
     controllers: [GameClickController, StageController],
     providers: [
         ChatGateway,
+        StageWaitingRoomGateway,
         Logger,
         GameCardService,
         GameDifficultyService,
