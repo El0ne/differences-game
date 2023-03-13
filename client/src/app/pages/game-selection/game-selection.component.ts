@@ -24,17 +24,20 @@ export class GameSelectionComponent implements OnInit {
 
     ngOnInit(): void {
         this.isConfig = this.router.url === '/config';
+        this.socket.connect();
         if (!this.isConfig) {
-            this.socket.connect();
-
-            this.socket.listen(WaitingRoomEvents.GameCreated, (stageId: string) => {
+            this.socket.listen(WaitingRoomEvents.MatchCreated, (stageId: string) => {
                 this.setGameCardCreateOrJoin(false, stageId);
             });
 
-            this.socket.listen(WaitingRoomEvents.GameDeleted, (stageId: string) => {
+            this.socket.listen(WaitingRoomEvents.MatchDeleted, (stageId: string) => {
                 this.setGameCardCreateOrJoin(true, stageId);
             });
         }
+        // this.socket.listen(WaitingRoomEvents.GameDeleted, (stageId: string) => {
+        //     this.setGameCardCreateOrJoin(true, stageId);
+        // });
+
         this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
             this.numberOfGameInformations = data;
             this.selectGameCards();

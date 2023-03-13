@@ -48,12 +48,11 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
                 this.socket.opponentSocket = acceptationInfo.playerSocketId;
                 this.navigateTo1v1(acceptationInfo.roomId);
             });
-
-            this.socket.listen(WaitingRoomEvents.MatchRefused, (refusedReason: string) => {
-                alert(refusedReason);
-                this.dialogRef.close();
-            });
         }
+        this.socket.listen(WaitingRoomEvents.MatchRefused, (refusedReason: string) => {
+            alert(refusedReason);
+            this.dialogRef.close();
+        });
     }
 
     navigateTo1v1(gameRoom: string) {

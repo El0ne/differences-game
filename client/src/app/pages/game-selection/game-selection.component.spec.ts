@@ -125,18 +125,18 @@ describe('GameSelectionComponent', () => {
         expect(component.isShowingLastCard()).toBeTruthy();
     });
 
-    it('GameCreated event should call setGameCardCreateOrJoin with isCreate at false', () => {
+    it('MatchCreated event should call setGameCardCreateOrJoin with isCreate at false', () => {
         socketServiceSpy.listen = (event: string, callback: any) => {
-            if (event === WaitingRoomEvents.GameCreated) callback('stageId');
+            if (event === WaitingRoomEvents.MatchCreated) callback('stageId');
         };
         spyOn(component, 'setGameCardCreateOrJoin').and.returnValue();
         component.ngOnInit();
         expect(component.setGameCardCreateOrJoin).toHaveBeenCalledWith(false, 'stageId');
     });
 
-    it('GameDeleted event should call setGameCardCreateOrJoin with isCreate at true', () => {
+    it('MatchDeleted event should call setGameCardCreateOrJoin with isCreate at true', () => {
         socketServiceSpy.listen = (event: string, callback: any) => {
-            if (event === WaitingRoomEvents.GameDeleted) callback('stageId');
+            if (event === WaitingRoomEvents.MatchDeleted) callback('stageId');
         };
         spyOn(component, 'setGameCardCreateOrJoin').and.returnValue();
         component.ngOnInit();
@@ -147,6 +147,7 @@ describe('GameSelectionComponent', () => {
         component.gameCardInformations = GAMES;
         fixture.detectChanges();
         component.setGameCardCreateOrJoin(false, '123');
+        expect(component.stages.get(0)?.createGameButton === false);
     });
 
     it('selectGameCards() should put the end Index at 3 more than index unless there is less than 4 other gameCards to show', () => {

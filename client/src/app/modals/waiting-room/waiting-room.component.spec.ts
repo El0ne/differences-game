@@ -127,14 +127,19 @@ describe('WaitingRoomComponent', () => {
     });
 
     it('matchRefused event should alert the player and close the dialog', () => {
-        component.waitingRoomInfo.isHost = false;
         spyOn(window, 'alert').and.callFake(() => {
             return;
         });
         socketServiceSpy.listen = (event: string, callback: any) => {
             if (event === WaitingRoomEvents.MatchRefused) callback('refused reason');
         };
+        component.waitingRoomInfo.isHost = false;
         component.ngOnInit();
         expect(matDialogSpy.close).toHaveBeenCalled();
+        expect(window.alert).toHaveBeenCalledWith('refused reason');
+        component.waitingRoomInfo.isHost = true;
+        component.ngOnInit();
+        expect(matDialogSpy.close).toHaveBeenCalled();
+        expect(window.alert).toHaveBeenCalledWith('refused reason');
     });
 });
