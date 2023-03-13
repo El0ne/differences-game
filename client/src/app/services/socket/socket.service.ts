@@ -7,8 +7,9 @@ import { environment } from 'src/environments/environment';
 })
 export class SocketService {
     sio: Socket;
-    names: string[] = [];
+    names: Map<string, string> = new Map<string, string>();
     gameRoom: string;
+    opponentSocket: string;
 
     get socketId(): string {
         return this.sio.id ? this.sio.id : '';
@@ -20,6 +21,7 @@ export class SocketService {
 
     disconnect(): void {
         this.sio.disconnect();
+        this.names.clear();
     }
 
     liveSocket(): boolean {
@@ -27,6 +29,9 @@ export class SocketService {
     }
     listen<T>(eventName: string, action: (data: T) => void): void {
         this.sio.on(eventName, action);
+    }
+    delete(eventName: string): void {
+        this.sio.off(eventName);
     }
 
     send<T>(eventName: string, data?: T): void {

@@ -5,7 +5,8 @@
             <img [src]="this.image" class="photo" />
         </div>
         <div class="column">
-            <div class="difficulty-container" [ngClass]="gameCardInformation.difficulty === 'Difficile' ? 'difficult' : 'easy'">
+            <div class="difficulty-container"
+                [ngClass]="gameCardInformation.difficulty === 'Difficile' ? 'difficult' : 'easy'">
                 <p id="difficulty">
                     {{ gameCardInformation.difficulty }}
                 </p>
@@ -38,8 +39,8 @@
         <button class="normal-button option-button">Réinitialiser</button>
     </div>
     <div class="row" *ngIf="!isConfig">
-        <button class="normal-button play" [routerLink]="'/soloview/' + gameCardInformation._id">Jouer</button>
-        <!-- temporary while awaiting for logic to implement the waiting room-->
-        <button class="normal-button create" [routerLink]="'/1v1/' + gameCardInformation._id">Joindre</button>
+        <button class="normal-button play" (click)="selectPlayerName(true)">Jouer</button>
+        <button class="normal-button create" (click)="selectPlayerName(false)">{{ createGameButton ? 'Créer' : 'Joindre'
+            }}</button>
     </div>
 </div>

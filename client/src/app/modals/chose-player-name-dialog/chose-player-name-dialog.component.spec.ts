@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { SocketService } from '@app/services/socket/socket.service';
 import { GameConditions } from '@common/chat-dialog-constants';
 
 import { ChosePlayerNameDialogComponent } from './chose-player-name-dialog.component';
@@ -10,18 +11,23 @@ describe('ChosePlayerNameDialogComponent', () => {
     let component: ChosePlayerNameDialogComponent;
     let fixture: ComponentFixture<ChosePlayerNameDialogComponent>;
     let matDialogSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
+    let socketServiceSpy: SocketService;
     const data: GameConditions = { game: 'game', isMultiplayer: true };
 
     beforeEach(async () => {
         matDialogSpy = jasmine.createSpyObj('MatDialogRef<ChosePlayerNameDialogComponent>', ['close']);
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        matDialogSpy.close = () => {};
+        socketServiceSpy = jasmine.createSpyObj('SocketService', ['names'], ['socketId']);
+        socketServiceSpy.names = new Map<string, string>();
 
         await TestBed.configureTestingModule({
             declarations: [ChosePlayerNameDialogComponent],
             imports: [MatDialogModule, MatIconModule, FormsModule],
             providers: [
                 { provide: MatDialogRef, useValue: matDialogSpy },
+                {
+                    provide: SocketService,
+                    useValue: socketServiceSpy,
+                },
                 { provide: MAT_DIALOG_DATA, useValue: data },
             ],
         }).compileComponents();
@@ -43,7 +49,10 @@ describe('ChosePlayerNameDialogComponent', () => {
 
     it('validateName should turn nameErrorMessage to false if message is fine', () => {
         component.playerName = 'good name';
+        const namesMapSpy = spyOn(socketServiceSpy.names, 'set').and.callThrough();
+        Object.defineProperty(socketServiceSpy, 'socketId', { value: '123' });
         component.validateName();
         expect(component.showNameErrorMessage).toBeFalsy();
+        expect(namesMapSpy).toHaveBeenCalledWith('123', 'good name');
     });
 });

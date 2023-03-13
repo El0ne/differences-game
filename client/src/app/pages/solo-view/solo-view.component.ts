@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
-import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
 import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal.component';
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
@@ -71,17 +70,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.numberOfDifferences = this.gameCardInfo.differenceNumber;
             });
         }
-
-        const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true, data: { game: gameId, isMultiplayer: this.is1v1 } });
-        dialogRef.afterClosed().subscribe(() => {
-            this.player = this.socketService.names[0];
-            if (this.is1v1) {
-                this.opponent = this.socketService.names[1];
-            } else this.opponent = '';
-            this.currentRoom = this.socketService.gameRoom;
-            this.showTime();
-            this.configureSocketReactions();
-        });
+        this.player = this.socketService.names.get(this.socketService.socketId) as string;
+        this.opponent = this.socketService.names.get(this.socketService.opponentSocket) as string;
+        this.currentRoom = this.socketService.gameRoom;
+        this.showTime();
+        this.configureSocketReactions();
     }
 
     configureSocketReactions(): void {

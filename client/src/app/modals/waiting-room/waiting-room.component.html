@@ -1,0 +1,20 @@
+<div>
+    <button (click)="handleCancel()">Annuler</button>
+    <div *ngIf="waitingRoomInfo.isHost;else clientView">
+        <div *ngIf="clientsInWaitingRoom.size === 0;else opponents">
+            En attente d'opposants
+        </div>
+    </div>
+</div>
+
+<ng-template #opponents>
+    <div *ngFor="let opponentId of clientsInWaitingRoom.keys()" class="opponents-container">
+        NOM : {{clientsInWaitingRoom.get(opponentId)}}
+        <button (click)="acceptOpponent(opponentId)" class="normal-button">Accept</button>
+        <button (click)="declineOpponent(opponentId)" class="normal-button">Decline</button>
+    </div>
+</ng-template>
+
+<ng-template #clientView>
+    En attente de la confirmation de l'hôte
+</ng-template>
