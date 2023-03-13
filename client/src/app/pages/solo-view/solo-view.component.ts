@@ -42,7 +42,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     // eslint-disable-next-line max-params
     constructor(
-        public timerService: TimerSoloService,
+        private timerService: TimerSoloService,
         private convertService: SecondToMinuteService,
         private gameCardInfoService: GameCardInformationService,
         public foundDifferenceService: FoundDifferenceService,
@@ -107,8 +107,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.timerService.startTimer();
     }
 
-    timesConvertion(time: number): string {
-        return this.convertService.convert(time);
+    timesConvertion(): string {
+        return this.convertService.convert(this.timerService.currentTime);
     }
 
     finishGame(): void {

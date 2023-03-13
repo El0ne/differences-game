@@ -13,6 +13,7 @@ import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-mo
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { differenceInformation } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
 import { of } from 'rxjs';
@@ -24,10 +25,11 @@ describe('SoloViewComponent', () => {
     let fixture: ComponentFixture<SoloViewComponent>;
     let modalSpy: MatDialog;
     let afterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
-
+    let timerServiceMock: TimerSoloService;
     let mockGameCardInfo: GameCardInformationService;
 
     beforeEach(async () => {
+        timerServiceMock = jasmine.createSpyObj('TimerService', ['startTimer']);
         mockGameCardInfo = jasmine.createSpyObj('gameCardInformationService', ['getGameCardInfoFromId']);
         mockGameCardInfo.getGameCardInfoFromId = () => {
             return of(FAKE_GAME_CARD);
@@ -46,6 +48,7 @@ describe('SoloViewComponent', () => {
                 { provide: ActivatedRoute, useValue: { snapshot: { paramMap: convertToParamMap({ stageId: '1' }) } } },
                 { provide: GameCardInformationService, useValue: mockGameCardInfo },
                 { provide: MatDialog, useValue: modalSpy },
+                { provide: TimerSoloService, useValue: timerServiceMock },
             ],
             teardown: { destroyAfterEach: false },
         }).compileComponents();
@@ -131,11 +134,9 @@ describe('SoloViewComponent', () => {
     });
 
     it('showTime should call startTimer of service', () => {
-        const startTimerSpy = spyOn(component.timerService, 'startTimer');
-
         component.showTime();
 
-        expect(startTimerSpy).toHaveBeenCalled();
+        expect(timerServiceMock.startTimer).toHaveBeenCalled();
     });
 
     it('addDifferenceDetected should call addDifferenceFound of service', () => {
