@@ -21,9 +21,7 @@ export class GameCardSelectionComponent implements OnInit {
     image: string = '';
     createGameButton: boolean = true;
 
-    playerName: string = 'Player';
-
-    constructor(private socketService: SocketService, public dialog: MatDialog, public router: Router) {}
+    constructor(private socketService: SocketService, private dialog: MatDialog, private router: Router) {}
     ngOnInit(): void {
         this.image = `${STAGE}/image/${this.gameCardInformation.originalImageName}`;
     }
