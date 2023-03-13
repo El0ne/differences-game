@@ -42,17 +42,17 @@ describe('StageWaitingRoomGatewayGateway', () => {
 
     it('scanForHosts should emit a gameCreated for each of the stages where the is a host', () => {
         gateway.scanForHosts(socket, lookedStages);
-        expect(socket.emit.calledWith(WaitingRoomEvents.GameCreated, 'stage1')).toBeTruthy();
-        expect(socket.emit.calledWith(WaitingRoomEvents.GameCreated, 'stage4')).toBeTruthy();
-        expect(socket.emit.calledWith(WaitingRoomEvents.GameCreated, 'stage2')).toBeFalsy();
-        expect(socket.emit.calledWith(WaitingRoomEvents.GameCreated, 'stage5')).toBeFalsy();
+        expect(socket.emit.calledWith(WaitingRoomEvents.MatchCreated, 'stage1')).toBeTruthy();
+        expect(socket.emit.calledWith(WaitingRoomEvents.MatchCreated, 'stage4')).toBeTruthy();
+        expect(socket.emit.calledWith(WaitingRoomEvents.MatchCreated, 'stage2')).toBeFalsy();
+        expect(socket.emit.calledWith(WaitingRoomEvents.MatchCreated, 'stage5')).toBeFalsy();
         expect(socket.join.calledWith(lookedStages)).toBeTruthy();
     });
 
     it('hostGame should put the socket in the gameHosts and send a gameCreated to the the stageRoom', () => {
         socket.to.returns({
             emit: (event: string) => {
-                expect(event).toEqual(WaitingRoomEvents.GameCreated);
+                expect(event).toEqual(WaitingRoomEvents.MatchCreated);
             },
         } as BroadcastOperator<unknown, unknown>);
         gateway.hostGame(socket, 'stage1');

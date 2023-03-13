@@ -15,7 +15,7 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
         socket.join(stagesIds);
         for (const stageId of stagesIds) {
             if (this.gameHosts.has(stageId)) {
-                socket.emit(WaitingRoomEvents.GameCreated, stageId);
+                socket.emit(WaitingRoomEvents.MatchCreated, stageId);
             }
         }
     }
@@ -24,14 +24,14 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
     hostGame(@ConnectedSocket() socket: Socket, @MessageBody() stageId: string): void {
         this.gameHosts.set(stageId, socket.id);
         socket.data.stageInHosting = stageId;
-        socket.to(stageId).emit(WaitingRoomEvents.GameCreated, stageId);
+        socket.to(stageId).emit(WaitingRoomEvents.MatchCreated, stageId);
     }
 
     @SubscribeMessage(WaitingRoomEvents.UnhostGame)
     unhostGame(@ConnectedSocket() socket: Socket): void {
         this.gameHosts.delete(socket.data.stageInHosting);
         socket.to(socket.data.stageInHosting).emit(WaitingRoomEvents.MatchRefused, "la partie n'a plus d'hôte");
-        socket.to(socket.data.stageInHosting).emit(WaitingRoomEvents.GameDeleted, socket.data.stageInHosting);
+        socket.to(socket.data.stageInHosting).emit(WaitingRoomEvents.MatchDeleted, socket.data.stageInHosting);
         socket.data.stageInHosting = undefined;
     }
 
@@ -59,7 +59,7 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
         socket.to(acceptation.playerSocketId).emit(WaitingRoomEvents.MatchAccepted, acceptationInfo);
         socket.emit(WaitingRoomEvents.MatchConfirmed, roomId);
         socket.to(socket.data.stageInHosting).emit(WaitingRoomEvents.MatchRefused, "l'hôte a trouvé un autre adversaire");
-        socket.to(socket.data.stageInHosting).emit(WaitingRoomEvents.GameDeleted, socket.data.stageInHosting);
+        socket.to(socket.data.stageInHosting).emit(WaitingRoomEvents.MatchDeleted, socket.data.stageInHosting);
         this.gameHosts.delete(socket.data.stageInHosting);
     }
 
