@@ -38,7 +38,7 @@
         <button class="normal-button option-button">Réinitialiser</button>
     </div>
     <div class="row" *ngIf="!isConfig">
-        <button class="normal-button play" (click)="selectPlayerName(true)">Jouer</button>
-        <button class="normal-button create" (click)="selectPlayerName(false)">{{ createGameButton ? 'Créer' : 'Joindre' }}</button>
+        <button class="normal-button option-button" (click)="selectPlayerName(true)">Jouer</button>
+        <button class="normal-button option-button" (click)="selectPlayerName(false)">{{ createGameButton ? 'Créer' : 'Joindre' }}</button>
     </div>
 </div>
