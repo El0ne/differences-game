@@ -42,6 +42,7 @@ describe('GameCardSelectionComponent', () => {
                     useValue: socketServiceSpy,
                 },
             ],
+            teardown: { destroyAfterEach: false },
         }).compileComponents();
 
         fixture = TestBed.createComponent(GameCardSelectionComponent);

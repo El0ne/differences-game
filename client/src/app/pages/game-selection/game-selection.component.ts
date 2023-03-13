@@ -38,7 +38,6 @@ export class GameSelectionComponent implements OnInit {
         this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
             this.numberOfGameInformations = data;
             this.selectGameCards();
-            console.log(this.stages);
         });
     }
 

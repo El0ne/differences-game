@@ -1,13 +1,17 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+// CallBack function can be of any type and angular does not like it
+/* eslint-disable max-lines */
+// testing requires much more space and modules than allowed lines
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
 import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal.component';
@@ -34,7 +38,21 @@ describe('SoloViewComponent', () => {
     const mockRouter = { url: '1v1/234' };
 
     beforeEach(async () => {
-        foundDifferenceServiceSpy = jasmine.createSpyObj('FoundDifferenceService', ['addDifferenceFound', 'clearDifferenceFound']);
+        foundDifferenceServiceSpy = jasmine.createSpyObj('FoundDifferenceService', [
+            'addDifferenceFound',
+            'clearDifferenceFound',
+            'findPixelsFromDifference',
+        ]);
+
+        foundDifferenceServiceSpy.findPixelsFromDifference = (data: number[][]) => {
+            const returnArray: number[] = [];
+            for (const array of data) {
+                for (const number of array) {
+                    returnArray.push(number);
+                }
+            }
+            return returnArray;
+        };
 
         mockService = jasmine.createSpyObj('GameCardInformationService', ['getGameCardInfoFromId']);
         mockService.getGameCardInfoFromId = () => {
@@ -49,7 +67,7 @@ describe('SoloViewComponent', () => {
 
         modalSpy = jasmine.createSpyObj('MatDialog', ['open']);
 
-        chatSocketServiceMock.send = (event: string, data?: any) => {
+        chatSocketServiceMock.send = (event: string, data?: unknown) => {
             if (data) chatSocketServiceMock.sio.emit(event, data);
             return;
         };
@@ -66,6 +84,7 @@ describe('SoloViewComponent', () => {
                 { provide: FoundDifferenceService, useValue: foundDifferenceServiceSpy },
                 { provide: MatDialog, useValue: modalSpy },
             ],
+            teardown: { destroyAfterEach: false },
         }).compileComponents();
 
         fixture = TestBed.createComponent(SoloViewComponent);
@@ -303,6 +322,66 @@ describe('SoloViewComponent', () => {
         expect(component.showNavBar).toBeFalse();
         expect(component.left.endGame).toBeTrue();
         expect(component.right.endGame).toBeTrue();
+    });
+
+    it('invertDifferences should invert the toggleCheatMode attribute from left and right', () => {
+        component.left.toggleCheatMode = true;
+        component.right.toggleCheatMode = true;
+
+        component.invertDifferences();
+
+        expect(component.left.toggleCheatMode).toBeFalse();
+        expect(component.right.toggleCheatMode).toBeFalse();
+    });
+
+    it('invertDifferences should invert the toggleCheatMode attribute from left and right', () => {
+        component.left.toggleCheatMode = false;
+        component.right.toggleCheatMode = false;
+
+        component.invertDifferences();
+
+        expect(component.left.toggleCheatMode).toBeTrue();
+        expect(component.right.toggleCheatMode).toBeTrue();
+    });
+
+    it('resetDifferences should call activateCheatMode', fakeAsync(() => {
+        component.left.toggleCheatMode = true;
+        component.right.toggleCheatMode = true;
+        const mockKeyEvent: KeyboardEvent = new KeyboardEvent('keydown', { key: 't' });
+        const activateCheatModeSpy = spyOn(component, 'activateCheatMode');
+
+        component.resetDifferences(mockKeyEvent);
+        tick(MAX_EFFECT_TIME);
+        expect(activateCheatModeSpy).toHaveBeenCalled();
+    }));
+
+    it('should call handleFlash when activateCheatMode is called', () => {
+        const mockData = [[1, 2, 3], [4, 5], [6], [], [7, 8, 9]];
+        spyOn(component.left.clickEventService, 'getDifferences').and.returnValue(of(mockData));
+        const flashSpy = spyOn(component, 'handleFlash');
+
+        const keyboardEvent = new KeyboardEvent('keydown', { key: 't' });
+
+        foundDifferenceServiceSpy.foundDifferences = [];
+        component.left.toggleCheatMode = false;
+        component.right.toggleCheatMode = false;
+
+        component.activateCheatMode(keyboardEvent);
+        expect(flashSpy).toHaveBeenCalled();
+    });
+
+    it('activateCheatMode should be called with an array that contains all the differences', () => {
+        const mockData = [[1, 2, 3], [4, 5], [6], [], [7, 8, 9]];
+        spyOn(component.left.clickEventService, 'getDifferences').and.returnValue(of(mockData));
+        const flashSpy = spyOn(component, 'handleFlash');
+        const keyboardEvent = new KeyboardEvent('keydown', { key: 't' });
+
+        foundDifferenceServiceSpy.foundDifferences = [];
+        component.left.toggleCheatMode = false;
+        component.right.toggleCheatMode = false;
+
+        component.activateCheatMode(keyboardEvent);
+        expect(flashSpy).toHaveBeenCalledWith([1, 2, 3, 4, 5, 6, 7, 8, 9]);
     });
 });
 

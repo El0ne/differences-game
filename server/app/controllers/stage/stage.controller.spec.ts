@@ -35,6 +35,7 @@ describe('StageController', () => {
     let getGameCardsNumberStub;
     let getGameCardByIdStub;
     let gameCardService: GameCardService;
+    let imageManagerService: ImageManagerService;
 
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
@@ -68,6 +69,7 @@ describe('StageController', () => {
         httpServer = app.getHttpServer();
         controller = module.get<StageController>(StageController);
         gameCardService = module.get<GameCardService>(GameCardService);
+        imageManagerService = module.get<ImageManagerService>(ImageManagerService);
         connection = await module.get(getConnectionToken());
         getGameCardStub = stub(gameCardService, 'getGameCards');
         getGameCardsNumberStub = stub(gameCardService, 'getGameCardsNumber');
@@ -197,6 +199,31 @@ describe('StageController', () => {
             if (err) throw err;
         });
     });
+
+    it('deleteImage() should call imageManagerService.deleteImage() with the image name as a parameter', async () => {
+        const image = new Jimp(1, 1, 'white', (err) => {
+            if (err) throw err;
+        });
+
+        image.write('assets/images/test.bmp');
+        jest.spyOn(imageManagerService, 'deleteImage');
+
+        const response = await request(httpServer).delete('/stage/image/test.bmp');
+
+        expect(response.status).toBe(HttpStatus.NO_CONTENT);
+        expect(imageManagerService.deleteImage).toHaveBeenCalledWith('test.bmp');
+    });
+
+    it('deleteImage() should return 500 if the request is invalid', async () => {
+        jest.spyOn(imageManagerService, 'deleteImage').mockImplementationOnce(() => {
+            throw new Error();
+        });
+        const wrongImage = 'wrong_image.bmp';
+        const response = await request(httpServer).delete(`/stage/image/${wrongImage}`);
+
+        expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+        expect(imageManagerService.deleteImage).toHaveBeenCalledWith(wrongImage);
+    });
 });
 
 const FAKE_GAME_INFO: GameCardDto = {
@@ -208,6 +235,7 @@ const FAKE_GAME_INFO: GameCardDto = {
     radius: 3,
     differenceNumber: 6,
 };
+
 const FAKE_GAME_CARD: GameCard = {
     _id: new ObjectId('00000000773db8b853265f32'),
     name: 'game.name',
