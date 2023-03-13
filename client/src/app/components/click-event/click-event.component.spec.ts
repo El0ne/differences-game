@@ -207,7 +207,7 @@ describe('ClickEventComponent', () => {
 
     it('clearEffect should get context and call turnOffYellow', () => {
         const getContextSpy = spyOn(component.modification.nativeElement, 'getContext');
-        const turnOffYellowSpy = spyOn(component.pixelModService, 'turnOffYellow');
+        const turnOffYellowSpy = spyOn(component.pixelModificationService, 'turnOffYellow');
 
         component.clearEffect();
 
@@ -216,8 +216,8 @@ describe('ClickEventComponent', () => {
     });
 
     it('differenceEffect() should flash yellow 2 times', async () => {
-        const turnYellowSpy = spyOn(component.pixelModService, 'turnDifferenceYellow');
-        const turnOffYellowSpy = spyOn(component.pixelModService, 'turnOffYellow');
+        const turnYellowSpy = spyOn(component.pixelModificationService, 'turnDifferenceYellow');
+        const turnOffYellowSpy = spyOn(component.pixelModificationService, 'turnOffYellow');
         spyOn(component, 'delay').and.callThrough();
         spyOn(component, 'emitSound').and.callFake(() => {});
         await component.differenceEffect([0]);
@@ -226,7 +226,6 @@ describe('ClickEventComponent', () => {
         expect(turnOffYellowSpy).toHaveBeenCalledTimes(2);
     });
 
-    // Line 105 isn't covered and I don't know why
     it('differenceEffect() should call differenceEffect if toggleCheatMode is true', async () => {
         component.toggleCheatMode = true;
         const differenceEffectSpy = spyOn(component, 'differenceEffect');

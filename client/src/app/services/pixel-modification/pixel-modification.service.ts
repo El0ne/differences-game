@@ -5,9 +5,9 @@ import { WIDTH } from '@app/components/click-event/click-event-constant';
     providedIn: 'root',
 })
 export class PixelModificationService {
-    getCoordInImage(e: MouseEvent, rect: DOMRect): number[] {
-        const x = Math.max(Math.floor(e.clientX - rect.left), 0);
-        const y = Math.max(Math.floor(e.clientY - rect.top), 0);
+    getCoordInImage(mouseEvent: MouseEvent, rect: DOMRect): number[] {
+        const x = Math.max(Math.floor(mouseEvent.clientX - rect.left), 0);
+        const y = Math.max(Math.floor(mouseEvent.clientY - rect.top), 0);
         return [x, y];
     }
 
@@ -22,18 +22,18 @@ export class PixelModificationService {
         return [toTransform, yCounter];
     }
 
-    turnDifferenceYellow(originalContext: CanvasRenderingContext2D, differences: number[]): void {
+    turnDifferenceYellow(context: CanvasRenderingContext2D, differences: number[]): void {
         for (const pixel of differences) {
             const pos: number[] = this.positionToPixel(pixel);
-            originalContext.fillStyle = '#FFD700';
-            originalContext.fillRect(pos[0], pos[1], 1, 1);
+            context.fillStyle = '#FFD700';
+            context.fillRect(pos[0], pos[1], 1, 1);
         }
     }
 
-    turnOffYellow(originalContext: CanvasRenderingContext2D, differences: number[]): void {
+    turnOffYellow(context: CanvasRenderingContext2D, differences: number[]): void {
         for (const pixel of differences) {
             const pos: number[] = this.positionToPixel(pixel);
-            originalContext.clearRect(pos[0], pos[1], 1, 1);
+            context.clearRect(pos[0], pos[1], 1, 1);
         }
     }
 

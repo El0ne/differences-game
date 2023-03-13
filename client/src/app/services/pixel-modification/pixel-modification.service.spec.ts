@@ -34,7 +34,6 @@ describe('PixelModificationService', () => {
         expect(canvasContext.fillStyle).toEqual('#ffd700');
     });
 
-    // TODO: Revoir ce test, il fait aucun sens, mais je sais pas comment clearRect fonctionne.
     it('turnOffYellow should turn pixel differences not yellow', () => {
         const clearRectSpy = spyOn(canvasContext, 'clearRect');
 
@@ -77,6 +76,6 @@ describe('PixelModificationService', () => {
         expect(fillRectSpy.calls.argsFor(0)).toEqual([0, 0, 1, 1]);
         expect(fillRectSpy.calls.argsFor(1)).toEqual([2, 0, 1, 1]);
 
-        expect(canvasContext.fillStyle).toEqual('#00ffff'); // Hex value of new ImageData(new Uint8ClampedArray([0, 255, 255, 255]), 1, 1),
+        expect(canvasContext.fillStyle).toEqual('#00ffff');
     });
 });

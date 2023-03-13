@@ -201,14 +201,24 @@ describe('SoloViewComponent', () => {
         expect(addDiffSpy).toHaveBeenCalled();
     });
 
-    it('resetDifferences should invert the toggleCheatMode attribute from left and right', () => {
+    it('invertDifferences should invert the toggleCheatMode attribute from left and right', () => {
         component.left.toggleCheatMode = true;
         component.right.toggleCheatMode = true;
-        const mockKeyEvent: KeyboardEvent = new KeyboardEvent('keydown', { key: 't' });
 
-        component.resetDifferences(mockKeyEvent);
+        component.invertDifferences();
+
         expect(component.left.toggleCheatMode).toBeFalse();
         expect(component.right.toggleCheatMode).toBeFalse();
+    });
+
+    it('invertDifferences should invert the toggleCheatMode attribute from left and right', () => {
+        component.left.toggleCheatMode = false;
+        component.right.toggleCheatMode = false;
+
+        component.invertDifferences();
+
+        expect(component.left.toggleCheatMode).toBeTrue();
+        expect(component.right.toggleCheatMode).toBeTrue();
     });
 
     it('resetDifferences should call activateCheatMode', fakeAsync(() => {

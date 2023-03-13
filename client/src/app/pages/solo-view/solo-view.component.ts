@@ -74,9 +74,13 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         document.removeEventListener('keydown', this.boundActivateCheatMode);
     }
 
-    resetDifferences(event: KeyboardEvent): void {
+    invertDifferences(): void {
         this.left.toggleCheatMode = !this.left.toggleCheatMode;
         this.right.toggleCheatMode = !this.right.toggleCheatMode;
+    }
+
+    resetDifferences(event: KeyboardEvent): void {
+        this.invertDifferences();
         setTimeout(() => {
             this.activateCheatMode(event);
         }, MAX_EFFECT_TIME);
@@ -84,8 +88,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     activateCheatMode(event: KeyboardEvent): void {
         if (event.key === 't') {
-            this.left.toggleCheatMode = !this.left.toggleCheatMode;
-            this.right.toggleCheatMode = !this.right.toggleCheatMode;
+            this.invertDifferences();
             this.left.clickEventService.getDifferences(this.currentGameId).subscribe((data) => {
                 if (this.left.toggleCheatMode) this.handleFlash(this.foundDifferenceService.findPixelsFromDifference(data));
             });
