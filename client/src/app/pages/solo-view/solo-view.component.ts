@@ -64,19 +64,27 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         dialogRef.afterClosed().subscribe((result: string) => {
             this.playerName = result;
             this.showTime();
-            document.addEventListener('keydown', this.boundActivateCheatMode);
+            this.addCheatMode();
         });
     }
 
     ngOnDestroy(): void {
         this.timerService.stopTimer();
         this.foundDifferenceService.clearDifferenceFound();
-        document.removeEventListener('keydown', this.boundActivateCheatMode);
+        this.removeCheatMode();
     }
 
     invertDifferences(): void {
         this.left.toggleCheatMode = !this.left.toggleCheatMode;
         this.right.toggleCheatMode = !this.right.toggleCheatMode;
+    }
+
+    removeCheatMode(): void {
+        document.removeEventListener('keydown', this.boundActivateCheatMode);
+    }
+
+    addCheatMode(): void {
+        document.addEventListener('keydown', this.boundActivateCheatMode);
     }
 
     resetDifferences(event: KeyboardEvent): void {

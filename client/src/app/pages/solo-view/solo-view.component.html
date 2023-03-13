@@ -57,7 +57,14 @@
                     </div>
                 </div>
                 <div class="answer-area">
-                    <input type="text" class="input-field" placeholder="Entrez votre message" [(ngModel)]="messageContent" />
+                    <input
+                        type="text"
+                        class="input-field"
+                        placeholder="Entrez votre message"
+                        [(ngModel)]="messageContent"
+                        (click)="removeCheatMode()"
+                        (blur)="addCheatMode()"
+                    />
                     <button class="send-button" (click)="sendMessage()"></button>
                 </div>
             </div>
