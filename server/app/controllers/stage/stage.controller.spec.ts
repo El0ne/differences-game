@@ -39,6 +39,8 @@ describe('StageController', () => {
     let gameCardService: GameCardService;
     let imageManagerService: ImageManagerService;
     // let gameManagerService: GameManagerService;
+    let compareImageStub;
+    let differenceDetectionService: DifferenceDetectionService;
 
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
@@ -74,11 +76,13 @@ describe('StageController', () => {
         controller = module.get<StageController>(StageController);
         gameCardService = module.get<GameCardService>(GameCardService);
         imageManagerService = module.get<ImageManagerService>(ImageManagerService);
+        differenceDetectionService = module.get<DifferenceDetectionService>(DifferenceDetectionService);
         // gameManagerService = module.get<GameManagerService>(GameManagerService);
         connection = await module.get(getConnectionToken());
         getGameCardStub = stub(gameCardService, 'getGameCards');
         getGameCardsNumberStub = stub(gameCardService, 'getGameCardsNumber');
         getGameCardByIdStub = stub(gameCardService, 'getGameCardById');
+        compareImageStub = stub(differenceDetectionService, 'compareImages');
     });
 
     afterEach((done) => {
@@ -182,15 +186,12 @@ describe('StageController', () => {
     });
 
     it('uploadImages() should return 400 if we pass an empty body as a parameter', async () => {
-        const response = await request(httpServer)
-            .post('/stage/image/3')
-            .attach('baseImage', Buffer.from(''))
-            .attach('differenceImage', Buffer.from(''));
+        const response = await request(httpServer).post('/stage/image/3').attach('file', Buffer.from('')).attach('file', Buffer.from(''));
         expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
 
     it('uploadImages() should return 500 if there is an error', async () => {
-        const response = await request(httpServer).post('/stage/image/3');
+        const response = await request(httpServer).post('/stage/image/3'); // .attach('file', Buffer.from('')).attach('file', Buffer.from(''));
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 

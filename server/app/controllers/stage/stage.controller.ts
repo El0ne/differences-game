@@ -121,9 +121,9 @@ export class StageController {
     @Post('/image/:radius')
     @UseInterceptors(FileFieldsInterceptor([{ name: 'file', maxCount: 2 }], { storage }))
     async uploadImages(@UploadedFiles() files: ImageUploadDto, @Param() param, @Res() res: Response): Promise<void> {
-        const fileArray: ImageDto[] = files.file;
         try {
             if (Object.keys(files).length) {
+                const fileArray: ImageDto[] = files.file;
                 const differencesArray = await this.differenceService.compareImages(fileArray[0].path, fileArray[1].path, param.radius);
                 if (this.gameDifficultyService.isGameValid(differencesArray)) {
                     const differenceObjectId = await this.differenceClickService.createDifferenceArray(differencesArray);

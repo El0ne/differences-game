@@ -114,7 +114,7 @@ describe('GameManagerService', () => {
 
     it('deleteGame should set the isDeleted property of the game to true if someone is playing it', async () => {
         service.createGame(id);
-        await service.addGame(id);
+        service.addGame(id);
 
         // Mock created after first function calls because set is called in them
         const mapSetMock = jest.spyOn(service.gamePlayedInformation, 'set');
