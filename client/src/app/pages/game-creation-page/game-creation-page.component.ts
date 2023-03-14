@@ -3,7 +3,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
-import { STAGE } from '@app/services/server-routes';
 import { GameCardDto } from '@common/game-card.dto';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -141,30 +140,44 @@ export class GameCreationPageComponent implements OnInit {
         return true;
     }
 
+    createBlob(canvas: HTMLCanvasElement): Blob {
+        const imageData = canvas.toDataURL('image/bmp');
+        const byteString = atob(imageData.split(',')[1]);
+        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const uint8Array = new Uint8Array(arrayBuffer);
+        for (let i = 0; i < byteString.length; i++) {
+            uint8Array[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([uint8Array], { type: 'image/bmp' });
+    }
+
     async save(): Promise<void> {
         if (this.saveVerification() && this.originalFile && this.differentFile) {
             this.isDisabled = true;
-            this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
-                if (data.gameDifferenceNumber) {
-                    this.createdGameInfo = {
-                        _id: data.gameId,
-                        name: this.gameTitle,
-                        difficulty: data.gameDifficulty,
-                        baseImage: data.originalImageName,
-                        differenceImage: data.differenceImageName,
-                        radius: this.radius,
-                        differenceNumber: data.gameDifferenceNumber,
-                    };
-                    this.difficulty = data.gameDifficulty;
-                    this.differenceNumber = data.gameDifferenceNumber;
-                    this.image = `${STAGE}/image/difference-image.bmp`;
-                    this.openModal();
-                    this.isDisabled = false;
-                } else {
-                    this.isDisabled = false;
-                    alert("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
-                }
-            });
+            const originalBlob = this.createBlob(this.myOgCanvas.nativeElement);
+            const differenceBlob = this.createBlob(this.myDiffCanvas.nativeElement);
+            this.gameCardService.uploadImages(originalBlob, differenceBlob, this.radius).subscribe();
+            // (data) => {
+            //     if (data.gameDifferenceNumber) {
+            //         this.createdGameInfo = {
+            //             _id: data.gameId,
+            //             name: this.gameTitle,
+            //             difficulty: data.gameDifficulty,
+            //             baseImage: data.originalImageName,
+            //             differenceImage: data.differenceImageName,
+            //             radius: this.radius,
+            //             differenceNumber: data.gameDifferenceNumber,
+            //         };
+            //         this.difficulty = data.gameDifficulty;
+            //         this.differenceNumber = data.gameDifferenceNumber;
+            //         this.image = `${STAGE}/image/difference-image.bmp`;
+            //         this.openModal();
+            //         this.isDisabled = false;
+            //     } else {
+            //         this.isDisabled = false;
+            //         alert("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
+            //     }
+            // });
         }
     }
 }
