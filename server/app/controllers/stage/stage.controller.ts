@@ -120,7 +120,6 @@ export class StageController {
     @UseInterceptors(FileFieldsInterceptor([{ name: 'file', maxCount: 2 }], { storage }))
     async uploadImages(@UploadedFiles() files, @Param() param, @Res() res: Response): Promise<void> {
         files = files.file;
-        console.log('files', files);
         try {
             if (Object.keys(files).length) {
                 const differencesArray = await this.differenceService.compareImages(files[0].path, files[1].path, param.radius);
