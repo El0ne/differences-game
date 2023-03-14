@@ -39,8 +39,6 @@ describe('StageController', () => {
     let gameCardService: GameCardService;
     let imageManagerService: ImageManagerService;
     // let gameManagerService: GameManagerService;
-    let compareImageStub;
-    let differenceDetectionService: DifferenceDetectionService;
 
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
@@ -76,13 +74,11 @@ describe('StageController', () => {
         controller = module.get<StageController>(StageController);
         gameCardService = module.get<GameCardService>(GameCardService);
         imageManagerService = module.get<ImageManagerService>(ImageManagerService);
-        differenceDetectionService = module.get<DifferenceDetectionService>(DifferenceDetectionService);
         // gameManagerService = module.get<GameManagerService>(GameManagerService);
         connection = await module.get(getConnectionToken());
         getGameCardStub = stub(gameCardService, 'getGameCards');
         getGameCardsNumberStub = stub(gameCardService, 'getGameCardsNumber');
         getGameCardByIdStub = stub(gameCardService, 'getGameCardById');
-        compareImageStub = stub(differenceDetectionService, 'compareImages');
     });
 
     afterEach((done) => {
