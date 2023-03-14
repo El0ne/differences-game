@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { STAGE } from '@app/services/server-routes';
 import { GameCardInformation } from '@common/game-card';
 import { GameCardDto } from '@common/game-card.dto';
+import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -32,12 +33,11 @@ export class GameCardInformationService {
         return this.http.post<GameCardInformation>(STAGE, body, { headers });
     }
 
-    uploadImages(baseImage: Blob, differenceImage: Blob, radius: number) {
+    uploadImages(baseImage: Blob, differenceImage: Blob, radius: number): Observable<ServerGeneratedGameInfo> {
         const formData = new FormData();
         formData.append('file', baseImage, 'image1.bmp');
         formData.append('file', differenceImage, 'image2.bmp');
-        console.log('first');
-        return this.http.post(`${STAGE}/image/${radius}`, formData);
+        return this.http.post<ServerGeneratedGameInfo>(`${STAGE}/image/${radius}`, formData);
     }
 
     deleteGame(gameId: string): Observable<void> {

@@ -31,8 +31,11 @@ export class DifferenceDetectionService {
     }
 
     async compareImages(pathToImage1: string, pathToImage2: string, radius: number): Promise<number[][]> {
+        console.log('in service');
         this.firstImageArray = await this.createArray(pathToImage1);
         this.secondImageArray = await this.createArray(pathToImage2);
+        console.log('this.firstImageArray.length', this.firstImageArray.length);
+        console.log('this.secondImageArray.length', this.secondImageArray.length);
         this.radius = radius;
         this.differenceArray = new Array(this.imageDimensionsService.getNumberOfPixels());
         this.differenceArray.fill(false);

@@ -7,6 +7,7 @@ import { GameDifficultyService } from '@app/services/game-difficulty/game-diffic
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { GameCardDto } from '@common/game-card.dto';
+import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
 import {
     Body,
     Controller,
@@ -117,53 +118,33 @@ export class StageController {
 
     @Post('/image/:radius')
     @UseInterceptors(FileFieldsInterceptor([{ name: 'file', maxCount: 2 }], { storage }))
-    uploadImages(@UploadedFiles() images) {
-        console.log('images', images);
-        return {
-            image1Url: `/uploads/${images[0].filename}`,
-            image2Url: `/uploads/${images[1].filename}`,
-        };
+    async uploadImages(@UploadedFiles() files, @Param() param, @Res() res: Response): Promise<void> {
+        files = files.file;
+        try {
+            if (Object.keys(files).length) {
+                const differencesArray = await this.differenceService.compareImages(files[0].path, files[1].path, param.radius);
+                if (this.gameDifficultyService.isGameValid(differencesArray)) {
+                    const differenceObjectId = await this.differenceClickService.createDifferenceArray(differencesArray);
+                    const difficulty = this.gameDifficultyService.setGameDifficulty(differencesArray);
+
+                    const data: ServerGeneratedGameInfo = {
+                        gameId: differenceObjectId,
+                        originalImageName: files[0].filename,
+                        differenceImageName: files[1].filename,
+                        gameDifficulty: difficulty,
+                        gameDifferenceNumber: differencesArray.length,
+                    };
+                    res.status(HttpStatus.CREATED).send(data);
+                } else {
+                    this.imageManagerService.deleteImage(files[0].filename);
+                    this.imageManagerService.deleteImage(files[1].filename);
+                    res.status(HttpStatus.OK).send([]);
+                }
+            } else res.sendStatus(HttpStatus.BAD_REQUEST);
+        } catch (err) {
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
+        }
     }
-    // @UseInterceptors(
-    //     FileFieldsInterceptor(
-    //         [
-    //             { name: 'baseImage', maxCount: 1 },
-    //             { name: 'differenceImage', maxCount: 1 },
-    //         ],
-    //         { storage },
-    //     ),
-    // )
-    // async uploadImages(@UploadedFiles() files: ImageUploadDto, @Param() param, @Res() res: Response): Promise<void> {
-    //     try {
-    //         if (Object.keys(files).length) {
-    //             const differencesArray = await this.differenceService.compareImages(
-    //                 files.baseImage[0].path,
-    //                 files.differenceImage[0].path,
-    //                 param.radius,
-    //             );
-
-    //             if (this.gameDifficultyService.isGameValid(differencesArray)) {
-    //                 const differenceObjectId = await this.differenceClickService.createDifferenceArray(differencesArray);
-    //                 const difficulty = this.gameDifficultyService.setGameDifficulty(differencesArray);
-
-    //                 const data: ServerGeneratedGameInfo = {
-    //                     gameId: differenceObjectId,
-    //                     originalImageName: files.baseImage[0].filename,
-    //                     differenceImageName: files.differenceImage[0].filename,
-    //                     gameDifficulty: difficulty,
-    //                     gameDifferenceNumber: differencesArray.length,
-    //                 };
-    //                 res.status(HttpStatus.CREATED).send(data);
-    //             } else {
-    //                 this.imageManagerService.deleteImage(files.baseImage[0].filename);
-    //                 this.imageManagerService.deleteImage(files.differenceImage[0].filename);
-    //                 res.status(HttpStatus.OK).send([]);
-    //             }
-    //         } else res.sendStatus(HttpStatus.BAD_REQUEST);
-    //     } catch (err) {
-    //         res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
-    //     }
-    // }
 
     @Get('/image/:imageName')
     async getImage(@Param() param, @Res() res: Response): Promise<void> {
