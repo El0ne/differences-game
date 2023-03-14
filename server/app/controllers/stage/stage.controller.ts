@@ -7,6 +7,8 @@ import { GameDifficultyService } from '@app/services/game-difficulty/game-diffic
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { GameCardDto } from '@common/game-card.dto';
+import { ImageUploadDto } from '@common/image-upload.dto';
+import { ImageDto } from '@common/image.dto';
 import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
 import {
     Body,
@@ -118,26 +120,26 @@ export class StageController {
 
     @Post('/image/:radius')
     @UseInterceptors(FileFieldsInterceptor([{ name: 'file', maxCount: 2 }], { storage }))
-    async uploadImages(@UploadedFiles() files, @Param() param, @Res() res: Response): Promise<void> {
-        files = files.file;
+    async uploadImages(@UploadedFiles() files: ImageUploadDto, @Param() param, @Res() res: Response): Promise<void> {
+        const fileArray: ImageDto[] = files.file;
         try {
             if (Object.keys(files).length) {
-                const differencesArray = await this.differenceService.compareImages(files[0].path, files[1].path, param.radius);
+                const differencesArray = await this.differenceService.compareImages(fileArray[0].path, fileArray[1].path, param.radius);
                 if (this.gameDifficultyService.isGameValid(differencesArray)) {
                     const differenceObjectId = await this.differenceClickService.createDifferenceArray(differencesArray);
                     const difficulty = this.gameDifficultyService.setGameDifficulty(differencesArray);
 
                     const data: ServerGeneratedGameInfo = {
                         gameId: differenceObjectId,
-                        originalImageName: files[0].filename,
-                        differenceImageName: files[1].filename,
+                        originalImageName: fileArray[0].filename,
+                        differenceImageName: fileArray[1].filename,
                         gameDifficulty: difficulty,
                         gameDifferenceNumber: differencesArray.length,
                     };
                     res.status(HttpStatus.CREATED).send(data);
                 } else {
-                    this.imageManagerService.deleteImage(files[0].filename);
-                    this.imageManagerService.deleteImage(files[1].filename);
+                    this.imageManagerService.deleteImage(fileArray[0].filename);
+                    this.imageManagerService.deleteImage(fileArray[1].filename);
                     res.status(HttpStatus.OK).send([]);
                 }
             } else res.sendStatus(HttpStatus.BAD_REQUEST);
