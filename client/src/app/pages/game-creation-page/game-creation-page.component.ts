@@ -65,8 +65,9 @@ export class GameCreationPageComponent {
 
     isInOgCanvas: boolean = false;
 
-    private listener: (e: MouseEvent) => void;
-    private listener2: (e: MouseEvent) => void;
+    private eraseListener: ((e: MouseEvent) => void)[] = [this.startErase.bind(this), this.stopErase.bind(this), this.erasing.bind(this)];
+    private recListener: ((e: MouseEvent) => void)[] = [this.startRec.bind(this), this.stopRec.bind(this), this.paintRectangle.bind(this)];
+    private penListener: ((e: MouseEvent) => void)[] = [this.startPen.bind(this), this.stopPen.bind(this), this.writing.bind(this)];
 
     constructor(public gameCardService: GameCardInformationService, private matDialog: MatDialog, public router: Router) {
         const emptyCanvas = document.createElement('canvas');
@@ -251,6 +252,7 @@ export class GameCreationPageComponent {
         if (ctx1) ctx1.drawImage(this.drawingCanvas2, 0, 0);
         if (ctx2) ctx2.clearRect(0, 0, this.drawingCanvas2.width, this.drawingCanvas2.height);
         // this.savePixels();
+        this.pushCanvas(this.drawingCanvas1);
     }
 
     paintRectangle(e: MouseEvent) {
@@ -273,17 +275,17 @@ export class GameCreationPageComponent {
     drawRectangle() {
         console.log('inDrawRectangle', this);
 
-        this.listener = this.startRec.bind(this);
-        this.ogRectCanvas.nativeElement.addEventListener('mousedown', this.listener);
-        this.diffRectCanvas.nativeElement.addEventListener('mousedown', this.listener);
+        // this.recListener = this.startRec.bind(this);
+        this.ogRectCanvas.nativeElement.addEventListener('mousedown', this.recListener[0]);
+        this.diffRectCanvas.nativeElement.addEventListener('mousedown', this.recListener[0]);
 
-        this.listener = this.stopRec.bind(this);
-        this.ogRectCanvas.nativeElement.addEventListener('mouseup', this.listener);
-        this.diffRectCanvas.nativeElement.addEventListener('mouseup', this.listener);
+        // this.recListener = this.stopRec.bind(this);
+        this.ogRectCanvas.nativeElement.addEventListener('mouseup', this.recListener[1]);
+        this.diffRectCanvas.nativeElement.addEventListener('mouseup', this.recListener[1]);
 
-        this.listener = this.paintRectangle.bind(this);
-        this.ogRectCanvas.nativeElement.addEventListener('mousemove', this.listener);
-        this.diffRectCanvas.nativeElement.addEventListener('mousemove', this.listener);
+        // this.recListener = this.paintRectangle.bind(this);
+        this.ogRectCanvas.nativeElement.addEventListener('mousemove', this.recListener[2]);
+        this.diffRectCanvas.nativeElement.addEventListener('mousemove', this.recListener[2]);
     }
 
     startPen(e: MouseEvent) {
@@ -312,15 +314,6 @@ export class GameCreationPageComponent {
         }
         // this.savePixels();
         this.pushCanvas(this.drawingCanvas1);
-
-        // if (ctx1) {
-        //     const imageData = ctx1.getImageData(0, 0, this.drawingCanvas1.width, this.drawingCanvas1.height);
-        //     const hasContent = imageData.data.some((value) => value !== 0);
-
-        //     if (hasContent) {
-        //         this.pushCanvas(this.drawingCanvas1);
-        //     }
-        // }
     }
 
     writing(e: MouseEvent) {
@@ -347,17 +340,17 @@ export class GameCreationPageComponent {
     }
 
     drawPen() {
-        this.listener = this.startPen.bind(this);
-        this.ogDrawnCanvas.nativeElement.addEventListener('mousedown', this.listener);
-        this.diffDrawnCanvas.nativeElement.addEventListener('mousedown', this.listener);
+        // this.penListener = this.startPen.bind(this);
+        this.ogDrawnCanvas.nativeElement.addEventListener('mousedown', this.penListener[0]);
+        this.diffDrawnCanvas.nativeElement.addEventListener('mousedown', this.penListener[0]);
 
-        this.listener = this.stopPen.bind(this);
-        this.ogDrawnCanvas.nativeElement.addEventListener('mouseup', this.listener);
-        this.diffDrawnCanvas.nativeElement.addEventListener('mouseup', this.listener);
+        // this.penListener = this.stopPen.bind(this);
+        this.ogDrawnCanvas.nativeElement.addEventListener('mouseup', this.penListener[1]);
+        this.diffDrawnCanvas.nativeElement.addEventListener('mouseup', this.penListener[1]);
 
-        this.listener = this.writing.bind(this);
-        this.ogDrawnCanvas.nativeElement.addEventListener('mousemove', this.listener);
-        this.diffDrawnCanvas.nativeElement.addEventListener('mousemove', this.listener);
+        // this.penListener = this.writing.bind(this);
+        this.ogDrawnCanvas.nativeElement.addEventListener('mousemove', this.penListener[2]);
+        this.diffDrawnCanvas.nativeElement.addEventListener('mousemove', this.penListener[2]);
     }
 
     startErase(e: MouseEvent) {
@@ -377,6 +370,7 @@ export class GameCreationPageComponent {
 
     stopErase() {
         this.isUserClicking = false;
+        this.pushCanvas(this.drawingCanvas1);
     }
 
     erasing(e: MouseEvent) {
@@ -395,40 +389,40 @@ export class GameCreationPageComponent {
     }
 
     erase() {
-        this.listener2 = this.startErase.bind(this);
-        this.ogDrawnCanvas.nativeElement.addEventListener('mousedown', this.listener2);
-        this.diffDrawnCanvas.nativeElement.addEventListener('mousedown', this.listener2);
+        // this.eraseListener = this.startErase.bind(this);
+        this.ogDrawnCanvas.nativeElement.addEventListener('mousedown', this.eraseListener[0]);
+        this.diffDrawnCanvas.nativeElement.addEventListener('mousedown', this.eraseListener[0]);
 
-        this.listener = this.stopErase.bind(this);
-        this.ogDrawnCanvas.nativeElement.addEventListener('mouseup', this.listener);
-        this.diffDrawnCanvas.nativeElement.addEventListener('mouseup', this.listener);
+        // this.eraseListener = this.stopErase.bind(this);
+        this.ogDrawnCanvas.nativeElement.addEventListener('mouseup', this.eraseListener[1]);
+        this.diffDrawnCanvas.nativeElement.addEventListener('mouseup', this.eraseListener[1]);
 
-        this.listener = this.erasing.bind(this);
-        this.ogDrawnCanvas.nativeElement.addEventListener('mousemove', this.listener);
-        this.diffDrawnCanvas.nativeElement.addEventListener('mousemove', this.listener);
+        // this.eraseListener = this.erasing.bind(this);
+        this.ogDrawnCanvas.nativeElement.addEventListener('mousemove', this.eraseListener[2]);
+        this.diffDrawnCanvas.nativeElement.addEventListener('mousemove', this.eraseListener[2]);
     }
 
     removingListeners() {
-        this.ogRectCanvas.nativeElement.removeEventListener('mousedown', this.listener);
-        this.diffRectCanvas.nativeElement.removeEventListener('mousedown', this.listener);
-        this.ogRectCanvas.nativeElement.removeEventListener('mouseup', this.listener);
-        this.diffRectCanvas.nativeElement.removeEventListener('mouseup', this.listener);
-        this.ogRectCanvas.nativeElement.removeEventListener('mousemove', this.listener);
-        this.diffRectCanvas.nativeElement.removeEventListener('mousemove', this.listener);
+        this.ogRectCanvas.nativeElement.removeEventListener('mousedown', this.recListener[0]);
+        this.diffRectCanvas.nativeElement.removeEventListener('mousedown', this.recListener[0]);
+        this.ogRectCanvas.nativeElement.removeEventListener('mouseup', this.recListener[1]);
+        this.diffRectCanvas.nativeElement.removeEventListener('mouseup', this.recListener[1]);
+        this.ogRectCanvas.nativeElement.removeEventListener('mousemove', this.recListener[2]);
+        this.diffRectCanvas.nativeElement.removeEventListener('mousemove', this.recListener[2]);
 
-        this.ogDrawnCanvas.nativeElement.removeEventListener('mousedown', this.listener);
-        this.diffDrawnCanvas.nativeElement.removeEventListener('mousedown', this.listener);
-        this.ogDrawnCanvas.nativeElement.removeEventListener('mouseup', this.listener);
-        this.diffDrawnCanvas.nativeElement.removeEventListener('mouseup', this.listener);
-        this.ogDrawnCanvas.nativeElement.removeEventListener('mousemove', this.listener);
-        this.diffDrawnCanvas.nativeElement.removeEventListener('mousemove', this.listener);
+        this.ogDrawnCanvas.nativeElement.removeEventListener('mousedown', this.penListener[0]);
+        this.diffDrawnCanvas.nativeElement.removeEventListener('mousedown', this.penListener[0]);
+        this.ogDrawnCanvas.nativeElement.removeEventListener('mouseup', this.penListener[1]);
+        this.diffDrawnCanvas.nativeElement.removeEventListener('mouseup', this.penListener[1]);
+        this.ogDrawnCanvas.nativeElement.removeEventListener('mousemove', this.penListener[2]);
+        this.diffDrawnCanvas.nativeElement.removeEventListener('mousemove', this.penListener[2]);
 
-        this.ogDrawnCanvas.nativeElement.removeEventListener('mousedown', this.listener2);
-        this.diffDrawnCanvas.nativeElement.removeEventListener('mousedown', this.listener2);
-        this.ogDrawnCanvas.nativeElement.removeEventListener('mouseup', this.listener);
-        this.diffDrawnCanvas.nativeElement.removeEventListener('mouseup', this.listener);
-        this.ogDrawnCanvas.nativeElement.removeEventListener('mousemove', this.listener);
-        this.diffDrawnCanvas.nativeElement.removeEventListener('mousemove', this.listener);
+        this.ogDrawnCanvas.nativeElement.removeEventListener('mousedown', this.eraseListener[0]);
+        this.diffDrawnCanvas.nativeElement.removeEventListener('mousedown', this.eraseListener[0]);
+        this.ogDrawnCanvas.nativeElement.removeEventListener('mouseup', this.eraseListener[1]);
+        this.diffDrawnCanvas.nativeElement.removeEventListener('mouseup', this.eraseListener[1]);
+        this.ogDrawnCanvas.nativeElement.removeEventListener('mousemove', this.eraseListener[2]);
+        this.diffDrawnCanvas.nativeElement.removeEventListener('mousemove', this.eraseListener[2]);
     }
 
     changeZindex() {
@@ -515,35 +509,42 @@ export class GameCreationPageComponent {
 
     pushCanvas(canvas: HTMLCanvasElement) {
         this.nbElements++;
-        this.canvasArray.push(canvas.toDataURL());
-        console.log('canvas: ', this.canvasArray);
-        console.log('nb elements : ', this.nbElements);
+        if (this.nbElements < this.canvasArray.length) {
+            this.canvasArray.length = this.nbElements; // added this to make sure that if someone undos then adds new modifications that it won't allow user to undo back to the old saved canvases
+        }
+        const canvasDataURL = canvas.toDataURL();
+
+        this.canvasArray.push(canvasDataURL);
     }
 
     undo() {
         const ctxOgDrawing = this.ogDrawnCanvas.nativeElement.getContext('2d');
         if (this.nbElements > 0) {
-            console.log('enters if');
             this.nbElements--;
-            console.log('nb elements : ', this.nbElements);
             const canvasPic = new Image();
             canvasPic.src = this.canvasArray[this.nbElements];
-            ctxOgDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
             canvasPic.onload = () => {
                 ctxOgDrawing.drawImage(canvasPic, 0, 0);
             };
+            ctxOgDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
         }
     }
 
     redo() {
         const ctxOgDrawing = this.ogDrawnCanvas.nativeElement.getContext('2d');
+        console.log(this.canvasArray.length - 1);
+
         if (this.nbElements < this.canvasArray.length - 1) {
             this.nbElements++;
+            console.log('nb elements : ', this.nbElements);
+            console.log(this.canvasArray[this.nbElements]);
             const canvasPic = new Image();
             canvasPic.src = this.canvasArray[this.nbElements];
+
             canvasPic.onload = () => {
                 ctxOgDrawing.drawImage(canvasPic, 0, 0);
             };
+            ctxOgDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
         }
     }
 
