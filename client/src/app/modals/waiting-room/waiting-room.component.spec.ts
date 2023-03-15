@@ -64,9 +64,9 @@ describe('WaitingRoomComponent', () => {
         expect(socketServiceSpy.send).toHaveBeenCalledWith(WaitingRoomEvents.QuitHost);
     });
 
-    it('navigateTo1v1 should close the dialog and navigate to the right game', () => {
-        component.navigateTo1v1('gameRoom');
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/1v1/123']);
+    it('navigateToMultiplayer should close the dialog and navigate to the right game', () => {
+        component.navigateToMultiplayer('gameRoom');
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/multiplayer/123']);
     });
 
     it('acceptOpponent should send an acceptOpponent event and add the opponent name to the map', () => {
@@ -105,16 +105,16 @@ describe('WaitingRoomComponent', () => {
     });
 
     it('Match confirmed should redirect the host to the game', () => {
-        spyOn(component, 'navigateTo1v1').and.callThrough();
+        spyOn(component, 'navigateToMultiplayer').and.callThrough();
         socketServiceSpy.listen = (event: string, callback: any) => {
             if (event === WaitingRoomEvents.MatchConfirmed) callback('opponentId');
         };
         component.ngOnInit();
-        expect(component.navigateTo1v1).toHaveBeenCalled();
+        expect(component.navigateToMultiplayer).toHaveBeenCalled();
     });
 
     it('matchAccepted event should add the gameHost to the map and redirect to the game', () => {
-        spyOn(component, 'navigateTo1v1').and.callThrough();
+        spyOn(component, 'navigateToMultiplayer').and.callThrough();
         component.clientsInWaitingRoom.set('opponentId', 'nom');
         component.waitingRoomInfo.isHost = false;
         socketServiceSpy.listen = (event: string, callback: any) => {
@@ -123,7 +123,7 @@ describe('WaitingRoomComponent', () => {
         };
         component.ngOnInit();
         expect(socketServiceSpy.names.get('hostId')).toEqual('hostName');
-        expect(component.navigateTo1v1).toHaveBeenCalled();
+        expect(component.navigateToMultiplayer).toHaveBeenCalled();
     });
 
     it('matchRefused event should alert the player and close the dialog', () => {

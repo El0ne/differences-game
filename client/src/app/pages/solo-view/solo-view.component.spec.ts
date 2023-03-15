@@ -35,7 +35,7 @@ describe('SoloViewComponent', () => {
     let modalSpy: MatDialog;
 
     const mockActivatedRoute = { snapshot: { paramMap: { get: () => '234' } } };
-    const mockRouter = { url: '1v1/234' };
+    const mockRouter = { url: 'multiplayer/234' };
 
     beforeEach(async () => {
         foundDifferenceServiceSpy = jasmine.createSpyObj('FoundDifferenceService', [
@@ -103,7 +103,7 @@ describe('SoloViewComponent', () => {
         Object.defineProperty(chatSocketServiceMock, 'socketId', { value: 'playerId' });
         component.ngOnInit();
         expect(component.currentGameId).toEqual('234');
-        expect(component.is1v1).toBe(true);
+        expect(component.isMultiplayer).toBe(true);
         expect(component.gameCardInfo).toBe(SERVICE_MOCK_GAME_CARD);
         expect(component.numberOfDifferences).toEqual(SERVICE_MOCK_GAME_CARD.differenceNumber);
         expect(component.player).toEqual('player');
@@ -138,6 +138,9 @@ describe('SoloViewComponent', () => {
                     callback('wrong');
                     break;
                 }
+                case ChatEvents.Disconnect: {
+                    callback('test');
+                }
                 // No default
             }
         };
@@ -146,14 +149,58 @@ describe('SoloViewComponent', () => {
         const finishGameSpy = spyOn(component, 'winGame');
         Object.defineProperty(chatSocketServiceMock, 'socketId', { value: 'test' });
         component.configureSocketReactions();
-        expect(listenSpy).toHaveBeenCalledTimes(5);
+        expect(listenSpy).toHaveBeenCalledTimes(6);
         expect(component.messages.length).toEqual(3);
         expect(sendSpy).toHaveBeenCalled();
         expect(component.messages[component.messages.length - 2].socketId).toEqual('test');
         expect(component.messages[component.messages.length - 1].socketId).toEqual('abandon');
         expect(finishGameSpy).toHaveBeenCalledWith(component.player);
-        expect(finishGameSpy).toHaveBeenCalledWith('');
-        expect(component.opponent).toBe('');
+        expect(finishGameSpy).toHaveBeenCalledWith('opponent');
+    });
+
+    it('ConfigureSocketReactions should configure sockets correctly & react properly according to event if id is not in callback', () => {
+        chatSocketServiceMock.listen = (event: string, callback: any) => {
+            switch (event) {
+                case ChatEvents.WordValidated: {
+                    callback({ isValidated: true, originalMessage: 'Test message' });
+                    callback({ isValidated: false, originalMessage: 'Error message' });
+                    break;
+                }
+                case ChatEvents.RoomMessage: {
+                    callback({ socketId: 'test', message: 'Test message' });
+                    break;
+                }
+                case ChatEvents.Abandon: {
+                    callback({ socketId: 'abandon', message: 'abandon' });
+                    break;
+                }
+                case ChatEvents.Difference: {
+                    callback({ lastDifferences: [0, 1, 2, 3], differencesPosition: 2, socketId: 'test' });
+                    break;
+                }
+                case ChatEvents.Win: {
+                    callback('test');
+                    callback('wrong');
+                    break;
+                }
+                case ChatEvents.Disconnect: {
+                    callback('test');
+                }
+                // No default
+            }
+        };
+        const listenSpy = spyOn(chatSocketServiceMock, 'listen').and.callThrough();
+        const sendSpy = spyOn(chatSocketServiceMock, 'send').and.callThrough();
+        const finishGameSpy = spyOn(component, 'winGame');
+        Object.defineProperty(chatSocketServiceMock, 'socketId', { value: 'idNotInCallBack' });
+        component.configureSocketReactions();
+        expect(listenSpy).toHaveBeenCalledTimes(6);
+        expect(component.messages.length).toEqual(3);
+        expect(sendSpy).toHaveBeenCalled();
+        expect(component.messages[component.messages.length - 2].socketId).toEqual('test');
+        expect(component.messages[component.messages.length - 1].socketId).toEqual('abandon');
+        expect(finishGameSpy).toHaveBeenCalledWith(component.player);
+        expect(finishGameSpy).toHaveBeenCalledWith('opponent');
     });
 
     it('handleMistake should send an event called event to socket server with extra information', () => {
@@ -179,8 +226,8 @@ describe('SoloViewComponent', () => {
     });
 
     it('should increment counter when increment counter to the correct person depending on socket id in multiplayer', () => {
-        component.currentScorePlayer1 = 0;
-        component.currentScorePlayer2 = 0;
+        component.currentScorePlayer = 0;
+        component.currentScoreOpponent = 0;
         Object.defineProperty(chatSocketServiceMock, 'socketId', { value: 'mockSocket' });
         component.incrementScore('mockSocket');
         Object.defineProperty(chatSocketServiceMock, 'socketId', { value: 'opponent' });
@@ -188,8 +235,8 @@ describe('SoloViewComponent', () => {
 
         const answer = 1;
 
-        expect(component.currentScorePlayer1).toEqual(answer);
-        expect(component.currentScorePlayer2).toEqual(answer);
+        expect(component.currentScorePlayer).toEqual(answer);
+        expect(component.currentScoreOpponent).toEqual(answer);
     });
 
     it('showTime should call startTimer of service', () => {
@@ -258,7 +305,7 @@ describe('SoloViewComponent', () => {
         expect(endGameVerifSpy).toHaveBeenCalled();
     });
 
-    it('difference handler should send event when a difference detected and emitsound in 1v1 mode', () => {
+    it('difference handler should send event when a difference detected and emitsound in multiplayer mode', () => {
         component.currentRoom = 'room';
         spyOn(component.left, 'emitSound').and.callFake((difference: boolean) => {
             return difference;
@@ -275,7 +322,7 @@ describe('SoloViewComponent', () => {
     });
 
     it('difference handler should call the effect handler and send a general event when difference detected', () => {
-        component.is1v1 = false;
+        component.isMultiplayer = false;
         component.currentRoom = 'room';
         Object.defineProperty(chatSocketServiceMock, 'socketId', { value: 'mockSocket' });
         const sendSpy = spyOn(chatSocketServiceMock, 'send').and.callThrough();
@@ -293,7 +340,7 @@ describe('SoloViewComponent', () => {
     it('endGameVerification should verify if currentScore of player is bigger than half \
     of the number of differences in multiplayer and send a win event if so', () => {
         component.numberOfDifferences = 4;
-        component.currentScorePlayer1 = 2;
+        component.currentScorePlayer = 2;
         component.currentRoom = 'win';
         const sendSpy = spyOn(chatSocketServiceMock, 'send').and.callThrough();
         component.endGameVerification();
@@ -301,9 +348,9 @@ describe('SoloViewComponent', () => {
     });
 
     it('endGameVerification should call winGame if currentScore of player is equal to number of differences', () => {
-        component.currentScorePlayer1 = 2;
+        component.currentScorePlayer = 2;
         component.numberOfDifferences = 2;
-        component.is1v1 = false;
+        component.isMultiplayer = false;
         const sendSpy = spyOn(chatSocketServiceMock, 'send').and.callThrough();
         spyOn(component, 'winGame');
         component.endGameVerification();
@@ -320,9 +367,9 @@ describe('SoloViewComponent', () => {
     });
 
     it('winGame should set all end game related boolean and open gameWin modal with false to multiplayer in solo', () => {
-        component.is1v1 = false;
-        component.winGame();
-        expect(modalSpy.open).toHaveBeenCalledWith(GameWinModalComponent, { disableClose: true, data: { isSolo: true } });
+        component.isMultiplayer = false;
+        component.winGame('No Name');
+        expect(modalSpy.open).toHaveBeenCalledWith(GameWinModalComponent, { disableClose: true, data: { isSolo: true, winner: 'No Name' } });
         expect(component.showNavBar).toBeFalse();
         expect(component.left.endGame).toBeTrue();
         expect(component.right.endGame).toBeTrue();

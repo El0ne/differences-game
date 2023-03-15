@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 
 import { PixelModificationService } from './pixel-modification.service';
 
@@ -77,5 +77,25 @@ describe('PixelModificationService', () => {
         expect(fillRectSpy.calls.argsFor(1)).toEqual([2, 0, 1, 1]);
 
         expect(canvasContext.fillStyle).toEqual('#00ffff');
+    });
+
+    it('delay should delay for a given amount of time in ms', fakeAsync(() => {
+        const start = Date.now();
+        service.delay(100).then(() => {
+            const end = Date.now();
+            expect(end - start).toBeCloseTo(100, -1);
+        });
+        tick(100);
+    }));
+
+    it('flashEffect should flash yellow twice', async () => {
+        spyOn(service, 'turnDifferenceYellow').and.callThrough();
+        spyOn(service, 'turnOffYellow').and.callThrough();
+        spyOn(service, 'delay').and.callThrough();
+
+        await service.flashEffect(canvasContext, [0]);
+
+        expect(service.turnDifferenceYellow).toHaveBeenCalledTimes(2);
+        expect(service.turnOffYellow).toHaveBeenCalledTimes(2);
     });
 });

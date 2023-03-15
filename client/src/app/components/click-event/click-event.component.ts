@@ -6,7 +6,7 @@ import { STAGE } from '@app/services/server-routes';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { DifferenceInformation } from '@common/difference-information';
 import { Observable } from 'rxjs';
-import { FAST_WAIT_TIME_MS, HEIGHT, WAIT_TIME_MS, WIDTH } from './click-event-constant';
+import { HEIGHT, WAIT_TIME_MS, WIDTH } from './click-event-constant';
 
 @Component({
     selector: 'app-click-event',
@@ -82,10 +82,6 @@ export class ClickEventComponent implements OnInit {
             });
     }
 
-    async delay(ms: number): Promise<void> {
-        return new Promise((res) => setTimeout(res, ms));
-    }
-
     async clearEffect(): Promise<void> {
         const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         await this.pixelModificationService.turnOffYellow(originalContext, this.foundDifferenceService.foundDifferences);
@@ -94,12 +90,7 @@ export class ClickEventComponent implements OnInit {
     async differenceEffect(currentDifferences: number[]): Promise<void> {
         if (!this.endGame) {
             const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-            for (let i = 0; i < 2; i++) {
-                this.pixelModificationService.turnDifferenceYellow(originalContext, currentDifferences);
-                await this.delay(FAST_WAIT_TIME_MS);
-                this.pixelModificationService.turnOffYellow(originalContext, currentDifferences);
-                await this.delay(FAST_WAIT_TIME_MS);
-            }
+            this.pixelModificationService.flashEffect(originalContext, currentDifferences);
             if (this.toggleCheatMode) {
                 this.differenceEffect(currentDifferences);
             }

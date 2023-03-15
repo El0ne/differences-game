@@ -30,7 +30,7 @@
             ></app-click-event>
         </div>
         <div class="game-options">
-            <div id="double-score" *ngIf="is1v1">
+            <div id="double-score">
                 <div class="score">
                     <div class="player-name-container">
                         <div class="playerName">{{ player }}</div>
@@ -41,11 +41,11 @@
                             <div class="col col-heading neon">
                                 <div class="playerName">SCORE</div>
                             </div>
-                            <div class="col col-display" id="scoreHome">{{ currentScorePlayer1 }}</div>
+                            <div class="col col-display" id="scoreHome">{{ currentScorePlayer }}</div>
                         </div>
                     </div>
                 </div>
-                <div class="score">
+                <div class="score" *ngIf="isMultiplayer">
                     <div class="player-name-container">
                         <div class="playerName">{{ opponent }}</div>
                     </div>
@@ -55,21 +55,8 @@
                             <div class="col col-heading neon">
                                 <div class="playerName">SCORE</div>
                             </div>
-                            <div class="col col-display" id="scoreHome">{{ currentScorePlayer2 }}</div>
+                            <div class="col col-display" id="scoreHome">{{ currentScoreOpponent }}</div>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="score" *ngIf="!is1v1">
-                <div class="playerName">{{ player }}</div>
-                <!-- référence : https://codepen.io/Vivekp1118/pen/YzLOOVG -->
-                <div class="container neon-border">
-                    <div class="row">
-                        <div class="col col-heading neon">
-                            <div class="playerName">SCORE</div>
-                        </div>
-                        <div class="col col-display" id="scoreHome">{{ currentScorePlayer1 }}</div>
                     </div>
                 </div>
             </div>
@@ -88,12 +75,15 @@
                         <div *ngIf="!data.isEvent" [ngClass]="data.socketId === socketService.socketId ? 'player1 message' : 'player2 message'">
                             {{ data.message }}
                         </div>
-                        <div *ngIf="data.isEvent" class="error message">
-                            {{ data.message }} {{ is1v1 && data.socketId === socketService.socketId ? player : opponent }}
+                        <div *ngIf="data.isEvent && !data.isAbandon" class="error message">
+                            {{ data.message }} {{ isMultiplayer && data.socketId === socketService.socketId ? player : opponent }}
+                        </div>
+                        <div *ngIf="data.isEvent && data.isAbandon" class="error message">
+                            {{ data.message }}
                         </div>
                     </div>
                 </div>
-                <div class="answer-area" *ngIf="is1v1">
+                <div class="answer-area" *ngIf="isMultiplayer">
                     <input
                         type="text"
                         (keydown.enter)="sendMessage()"

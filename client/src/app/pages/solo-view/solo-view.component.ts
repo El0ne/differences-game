@@ -27,7 +27,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     left: ClickEventComponent;
     @ViewChild('right')
     right: ClickEventComponent;
-    is1v1: boolean;
+    isMultiplayer: boolean;
     showErrorMessage: boolean = false;
     showTextBox: boolean = false;
     showNavBar: boolean = true;
@@ -36,8 +36,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     messages: RoomMessage[] = [];
     messageContent: string = '';
     differenceArray: number[][];
-    currentScorePlayer1: number = 0;
-    currentScorePlayer2: number = 0;
+    currentScorePlayer: number = 0;
+    currentScoreOpponent: number = 0;
     numberOfDifferences: number;
     currentTime: number;
     currentGameId: string;
@@ -60,7 +60,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         const gameId = this.route.snapshot.paramMap.get('stageId');
-        this.is1v1 = this.router.url.includes('1v1');
+        this.isMultiplayer = this.router.url.includes('multiplayer');
         if (gameId) {
             this.currentGameId = gameId;
             this.gameCardInfoService.getGameCardInfoFromId(this.currentGameId).subscribe((gameCardData) => {
@@ -81,17 +81,14 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             if (validation.isValidated) {
                 this.socketService.send<RoomManagement>(ChatEvents.RoomMessage, { room: this.currentRoom, message: validation.originalMessage });
             } else {
-                this.messages.push({ socketId: this.socketService.socketId, message: validation.originalMessage, isEvent: true });
+                this.messages.push({ socketId: this.socketService.socketId, message: validation.originalMessage, isEvent: true, isAbandon: false });
             }
         });
         this.socketService.listen<RoomMessage>(ChatEvents.RoomMessage, (data: RoomMessage) => {
             this.messages.push(data);
         });
         this.socketService.listen<RoomMessage>(ChatEvents.Abandon, (message: RoomMessage) => {
-            if (!(message.socketId === this.socketService.socketId)) {
-                this.winGame(this.player);
-            }
-            this.opponent = '';
+            this.winGame(this.player);
             this.messages.push(message);
         });
         this.socketService.listen<PlayerDifference>(ChatEvents.Difference, (data: PlayerDifference) => {
@@ -103,6 +100,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             } else {
                 this.winGame(this.opponent);
             }
+        });
+        this.socketService.listen<string>(ChatEvents.Disconnect, (socket: string) => {
+            if (this.socketService.socketId === socket) {
+                this.socketService.send(ChatEvents.Abandon, { name: this.player, room: this.currentRoom });
+            } else this.socketService.send(ChatEvents.Abandon, { name: this.opponent, room: this.currentRoom });
         });
     }
 
@@ -150,19 +152,20 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         return this.convertService.convert(time);
     }
 
-    winGame(winner?: string): void {
+    winGame(winner: string): void {
+        this.timerService.stopTimer();
         this.left.endGame = true;
         this.right.endGame = true;
         this.showNavBar = false;
-        if (this.is1v1) this.dialog.open(GameWinModalComponent, { disableClose: true, data: { isSolo: false, winner } });
-        else this.dialog.open(GameWinModalComponent, { disableClose: true, data: { isSolo: true } });
+        if (this.isMultiplayer) this.dialog.open(GameWinModalComponent, { disableClose: true, data: { isSolo: false, winner } });
+        else this.dialog.open(GameWinModalComponent, { disableClose: true, data: { isSolo: true, winner } });
     }
 
     incrementScore(socket: string): void {
         if (this.socketService.socketId === socket) {
-            this.currentScorePlayer1 += 1;
+            this.currentScorePlayer += 1;
         } else {
-            this.currentScorePlayer2 += 1;
+            this.currentScoreOpponent += 1;
         }
     }
 
@@ -194,7 +197,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     handleMistake(): void {
-        this.socketService.send<RoomEvent>(ChatEvents.Event, { room: this.currentRoom, isMultiplayer: this.is1v1, event: 'Erreur' });
+        this.socketService.send<RoomEvent>(ChatEvents.Event, { room: this.currentRoom, isMultiplayer: this.isMultiplayer, event: 'Erreur' });
     }
 
     hint(): void {
@@ -205,7 +208,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.right.differenceEffect(currentDifferences);
     }
     differenceHandler(information: DifferenceInformation): void {
-        if (this.is1v1) {
+        if (this.isMultiplayer) {
             const multiplayerInformation: MultiplayerDifferenceInformation = {
                 room: this.currentRoom,
                 differencesPosition: information.differencesPosition,
@@ -221,7 +224,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.effectHandler(difference);
         }
         this.left.emitSound(false);
-        this.socketService.send<RoomEvent>(ChatEvents.Event, { room: this.currentRoom, isMultiplayer: this.is1v1, event: 'Différence trouvée' });
+        this.socketService.send<RoomEvent>(ChatEvents.Event, {
+            room: this.currentRoom,
+            isMultiplayer: this.isMultiplayer,
+            event: 'Différence trouvée',
+        });
     }
 
     effectHandler(information: PlayerDifference): void {
@@ -235,14 +242,14 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     endGameVerification(): void {
-        if (this.is1v1) {
+        if (this.isMultiplayer) {
             const endGameVerification = this.numberOfDifferences / 2;
-            if (this.currentScorePlayer1 >= endGameVerification) {
+            if (this.currentScorePlayer >= endGameVerification) {
                 this.socketService.send<string>(ChatEvents.Win, this.currentRoom);
             }
         } else {
-            if (this.currentScorePlayer1 === this.numberOfDifferences) {
-                this.winGame();
+            if (this.currentScorePlayer === this.numberOfDifferences) {
+                this.winGame(this.player);
             }
         }
     }

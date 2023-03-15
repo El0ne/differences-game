@@ -17,6 +17,7 @@ export enum ChatEvents {
     Clock = 'clock',
     Difference = 'Difference',
     Win = 'Win',
+    Disconnect = 'Disconnect',
 }
 
 export interface RoomManagement {

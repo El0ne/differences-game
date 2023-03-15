@@ -168,15 +168,6 @@ describe('ClickEventComponent', () => {
         expect(fillRectSpy).toHaveBeenCalledWith(2, 0, 1, 1);
     });
 
-    it('delay should delay for a given amount of time in ms', fakeAsync(() => {
-        const start = Date.now();
-        component.delay(100).then(() => {
-            const end = Date.now();
-            expect(end - start).toBeCloseTo(100, -1);
-        });
-        tick(100);
-    }));
-
     it('component should draw image on canvas on init', waitForAsync(async () => {
         const imageSpyObj = jasmine.createSpyObj('Image', ['onload']);
         spyOn(window, 'Image').and.returnValue(imageSpyObj);
@@ -215,15 +206,13 @@ describe('ClickEventComponent', () => {
         expect(turnOffYellowSpy).toHaveBeenCalled();
     });
 
-    it('differenceEffect() should flash yellow 2 times', async () => {
-        const turnYellowSpy = spyOn(component.pixelModificationService, 'turnDifferenceYellow');
-        const turnOffYellowSpy = spyOn(component.pixelModificationService, 'turnOffYellow');
-        spyOn(component, 'delay').and.callThrough();
+    it('differenceEffect() should flash yellow ', async () => {
+        const flashEffectSpy = spyOn(component.pixelModificationService, 'flashEffect');
+        spyOn(component.pixelModificationService, 'delay').and.callThrough();
         spyOn(component, 'emitSound').and.callFake(() => {});
         await component.differenceEffect([0]);
 
-        expect(turnYellowSpy).toHaveBeenCalledTimes(2);
-        expect(turnOffYellowSpy).toHaveBeenCalledTimes(2);
+        expect(flashEffectSpy).toHaveBeenCalled();
     });
 
     it('differenceEffect() should call differenceEffect if toggleCheatMode is true', async () => {

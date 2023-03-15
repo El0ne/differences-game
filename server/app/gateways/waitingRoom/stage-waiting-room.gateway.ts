@@ -54,6 +54,8 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
         this.clearRooms(opponentSocket);
         const roomId = randomUUID();
         socket.join(roomId);
+        socket.data.room = roomId;
+        opponentSocket.data.room = roomId;
         opponentSocket.join(roomId);
         const acceptationInfo: AcceptationInformation = { playerName: acceptation.playerName, playerSocketId: socket.id, roomId };
         socket.to(acceptation.playerSocketId).emit(WaitingRoomEvents.MatchAccepted, acceptationInfo);

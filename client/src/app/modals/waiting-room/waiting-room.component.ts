@@ -18,7 +18,7 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
     clientsInWaitingRoom: Map<string, string> = new Map<string, string>();
     waitingRoomInfo: WaitingRoomDataPassing;
 
-    // raison: need all parameters
+    // reason: need all parameters
     // eslint-disable-next-line max-params
     constructor(
         private dialogRef: MatDialogRef<WaitingRoomComponent>,
@@ -40,13 +40,13 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
             });
 
             this.socket.listen(WaitingRoomEvents.MatchConfirmed, (roomId: string) => {
-                this.navigateTo1v1(roomId);
+                this.navigateToMultiplayer(roomId);
             });
         } else {
             this.socket.listen<AcceptationInformation>(WaitingRoomEvents.MatchAccepted, (acceptationInfo: AcceptationInformation) => {
                 this.socket.names.set(acceptationInfo.playerSocketId, acceptationInfo.playerName);
                 this.socket.opponentSocket = acceptationInfo.playerSocketId;
-                this.navigateTo1v1(acceptationInfo.roomId);
+                this.navigateToMultiplayer(acceptationInfo.roomId);
             });
         }
         this.socket.listen(WaitingRoomEvents.MatchRefused, (refusedReason: string) => {
@@ -55,10 +55,10 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
         });
     }
 
-    navigateTo1v1(gameRoom: string) {
+    navigateToMultiplayer(gameRoom: string): void {
         this.socket.gameRoom = gameRoom;
         this.dialogRef.close();
-        this.router.navigate(['/1v1/' + this.waitingRoomInfo.stageId]);
+        this.router.navigate(['/multiplayer/' + this.waitingRoomInfo.stageId]);
     }
 
     ngOnDestroy(): void {

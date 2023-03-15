@@ -55,11 +55,11 @@ describe('GameCardSelectionComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('selectPlayerName should redirect to soloview after opening the modal if in soloGame', () => {
+    it('selectPlayerName should redirect to solo view after opening the modal if in soloGame', () => {
         modalSpy.open = () => choseNameAfterClosedSpy;
         const routerSpy = spyOn(TestBed.inject(Router), 'navigate');
         component.selectPlayerName(true);
-        expect(routerSpy).toHaveBeenCalledWith(['/soloview/' + component.gameCardInformation._id]);
+        expect(routerSpy).toHaveBeenCalledWith(['/solo/' + component.gameCardInformation._id]);
     });
 
     it('selectPlayerName should call hostOrJoinGame if in multiplayer', () => {

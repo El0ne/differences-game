@@ -37,6 +37,6 @@ describe('GameWinModalComponent', () => {
     it('should close the modal page', () => {
         component.confirm();
         expect(matDialogRefMock.close).toHaveBeenCalled();
-        expect(routerMock.navigate).toHaveBeenCalledWith(['/stage-selection']);
+        expect(routerMock.navigate).toHaveBeenCalledWith(['/home']);
     });
 });
