@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
+import { RoomMessage } from '@common/chat-gateway-constants';
 import { ChatEvents } from '@common/chat.gateway.events';
 import { PlayerDifference } from '@common/difference-information';
 import { Logger } from '@nestjs/common';
@@ -137,17 +138,6 @@ describe('ChatGateway', () => {
         gateway.event(socket, { room: TEST_ROOM_ID, event: 'Différence', isMultiplayer: false });
     });
 
-    it('abandon should emit a abandon event and include player name in the alert message', () => {
-        stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
-        server.to.returns({
-            emit: (event: string, data) => {
-                expect(event).toEqual(ChatEvents.Abandon);
-                expect(data.message.includes('Player 1')).toBe(true);
-            },
-        } as any);
-        gateway.abandon(socket, { room: TEST_ROOM_ID, name: 'Player 1' });
-    });
-
     it('hint should emit RoomMessage event and include a socketid called Event', () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
@@ -164,9 +154,10 @@ describe('ChatGateway', () => {
         socket.data.room = TEST_ROOM_ID;
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
-            emit: (event: string, data: string) => {
-                expect(event).toEqual(ChatEvents.Disconnect);
-                expect(data).toEqual('id');
+            emit: (event: string, data: RoomMessage) => {
+                expect(event).toEqual(ChatEvents.Abandon);
+                expect(data.event).toEqual('abandon');
+                expect(data.socketId).toEqual('id');
             },
         } as any);
         gateway.handleDisconnect(socket);

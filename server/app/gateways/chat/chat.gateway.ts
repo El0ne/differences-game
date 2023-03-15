@@ -1,4 +1,5 @@
-import { AbandonGame, ChatEvents, Room, RoomEvent, RoomManagement } from '@common/chat.gateway.events';
+import { RoomMessage } from '@common/chat-gateway-constants';
+import { ChatEvents, Room, RoomEvent, RoomManagement } from '@common/chat.gateway.events';
 import { MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -47,7 +48,9 @@ export class ChatGateway implements OnGatewayDisconnect {
                 dateFormatted = `${date} - ${data.event}.`;
             }
 
-            this.server.to(data.room).emit(ChatEvents.RoomMessage, { socketId: socket.id, message: dateFormatted, event: 'notification' });
+            this.server
+                .to(data.room)
+                .emit(ChatEvents.RoomMessage, { socketId: socket.id, message: dateFormatted, event: 'notification' } as RoomMessage);
         }
     }
 
@@ -58,20 +61,14 @@ export class ChatGateway implements OnGatewayDisconnect {
         }
     }
 
-    @SubscribeMessage(ChatEvents.Abandon)
-    abandon(socket: Socket, data: AbandonGame): void {
-        if (socket.rooms.has(data.room)) {
-            const date = this.dateCreator();
-            const dateFormatted = `${date} - ${data.name} a abandonné la partie.`;
-            this.server.to(data.room).emit(ChatEvents.Abandon, { socketId: socket.id, message: dateFormatted, event: 'abandon' });
-        }
-    }
     @SubscribeMessage(ChatEvents.Hint)
     hint(socket: Socket, room: string): void {
         if (socket.rooms.has(room)) {
             const date = this.dateCreator();
             const dateFormatted = `${date} - Indice utilisé.`;
-            this.server.to(room).emit(ChatEvents.RoomMessage, { socketId: ChatEvents.Event, message: dateFormatted, event: 'notification' });
+            this.server
+                .to(room)
+                .emit(ChatEvents.RoomMessage, { socketId: ChatEvents.Event, message: dateFormatted, event: 'notification' } as RoomMessage);
         }
     }
 
@@ -79,12 +76,17 @@ export class ChatGateway implements OnGatewayDisconnect {
     roomMessage(socket: Socket, message: RoomManagement): void {
         if (socket.rooms.has(message.room)) {
             const transformedMessage = message.message.toString();
-            this.server.to(message.room).emit(ChatEvents.RoomMessage, { socketId: socket.id, message: transformedMessage, event: 'message' });
+            this.server
+                .to(message.room)
+                .emit(ChatEvents.RoomMessage, { socketId: socket.id, message: transformedMessage, event: 'message' } as RoomMessage);
         }
     }
 
     handleDisconnect(socket: Socket): void {
-        this.server.to(socket.data.room).emit(ChatEvents.Disconnect, socket.id);
+        if (socket.data.room)
+            this.server
+                .to(socket.data.room)
+                .emit(ChatEvents.Abandon, { socketId: socket.id, message: this.dateCreator(), event: 'abandon' } as RoomMessage);
     }
 
     dateCreator(): string {

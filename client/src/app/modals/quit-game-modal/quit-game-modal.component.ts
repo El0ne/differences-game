@@ -13,7 +13,7 @@ export class QuitGameModalComponent {
 
     confirm(): void {
         this.matDialogRef.close();
-        this.router.navigate(['/stage-selection']);
+        this.router.navigate(['/home']);
     }
 
     cancel(): void {

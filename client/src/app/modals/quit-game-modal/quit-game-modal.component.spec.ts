@@ -39,7 +39,7 @@ describe('QuitGameModalComponent', () => {
     it('should close modal and route to home page', () => {
         component.confirm();
         expect(matDialogRefMock.close).toHaveBeenCalled();
-        expect(routerMock.navigate).toHaveBeenCalledWith(['/stage-selection']);
+        expect(routerMock.navigate).toHaveBeenCalledWith(['/home']);
     });
 
     it('should close modal if close', () => {

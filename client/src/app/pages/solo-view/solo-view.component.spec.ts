@@ -267,7 +267,6 @@ describe('SoloViewComponent', () => {
         component.quitGame();
         expect(modalSpy.open).toHaveBeenCalledWith(QuitGameModalComponent, {
             disableClose: true,
-            data: { player: component.player, room: component.currentRoom },
         });
     });
 
@@ -359,8 +358,8 @@ describe('SoloViewComponent', () => {
     });
 
     it('winGame should set all end game related boolean and open gameWin modal with true to multiplayer and winner name in multiplayer', () => {
-        component.winGame('winner');
-        expect(modalSpy.open).toHaveBeenCalledWith(GameWinModalComponent, { disableClose: true, data: { isSolo: false, winner: 'winner' } });
+        component.winGame('opponentId');
+        expect(modalSpy.open).toHaveBeenCalledWith(GameWinModalComponent, { disableClose: true, data: { isMultiplayer: true, winner: 'opponent' } });
         expect(component.showNavBar).toBeFalse();
         expect(component.left.endGame).toBeTrue();
         expect(component.right.endGame).toBeTrue();
@@ -368,8 +367,8 @@ describe('SoloViewComponent', () => {
 
     it('winGame should set all end game related boolean and open gameWin modal with false to multiplayer in solo', () => {
         component.isMultiplayer = false;
-        component.winGame('No Name');
-        expect(modalSpy.open).toHaveBeenCalledWith(GameWinModalComponent, { disableClose: true, data: { isSolo: true, winner: 'No Name' } });
+        component.winGame('playerId');
+        expect(modalSpy.open).toHaveBeenCalledWith(GameWinModalComponent, { disableClose: true, data: { isMultiplayer: false, winner: 'player' } });
         expect(component.showNavBar).toBeFalse();
         expect(component.left.endGame).toBeTrue();
         expect(component.right.endGame).toBeTrue();

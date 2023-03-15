@@ -89,7 +89,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.messages.push(data);
         });
         this.socketService.listen<RoomMessage>(ChatEvents.Abandon, (message: RoomMessage) => {
-            this.winGame(this.player);
+            this.winGame(message.socketId);
+            message.message = `${message.message} - ${this.opponent} a abandonné la partie.`;
             this.messages.push(message);
         });
         this.socketService.listen<PlayerDifference>(ChatEvents.Difference, (data: PlayerDifference) => {
@@ -97,11 +98,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         });
         this.socketService.listen<string>(ChatEvents.Win, (socketId: string) => {
             this.winGame(socketId);
-        });
-        this.socketService.listen<string>(ChatEvents.Disconnect, (socket: string) => {
-            if (this.socketService.socketId === socket) {
-                this.socketService.send(ChatEvents.Abandon, { name: this.player, room: this.currentRoom });
-            } else this.socketService.send(ChatEvents.Abandon, { name: this.opponent, room: this.currentRoom });
         });
     }
 
@@ -182,7 +178,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     quitGame(): void {
-        this.dialog.open(QuitGameModalComponent, { disableClose: true, data: { player: this.player, room: this.currentRoom } });
+        this.dialog.open(QuitGameModalComponent, {
+            disableClose: true,
+        });
     }
 
     sendMessage(): void {
@@ -248,7 +246,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             }
         } else {
             if (this.currentScorePlayer === this.numberOfDifferences) {
-                this.winGame(this.player);
+                this.winGame(this.socketService.socketId);
             }
         }
     }

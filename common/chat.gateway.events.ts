@@ -41,8 +41,3 @@ export interface RoomEvent {
     event: string;
     isMultiplayer: boolean;
 }
-
-export interface AbandonGame {
-    room: string;
-    name: string;
-}
