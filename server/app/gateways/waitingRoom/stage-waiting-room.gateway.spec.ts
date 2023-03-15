@@ -104,6 +104,7 @@ describe('StageWaitingRoomGatewayGateway', () => {
         stub(opponentSocket, 'rooms').value(new Set(['stage1', 'opponentId']));
         server.sockets.sockets.set('opponentId', opponentSocket);
         socket.data.stageInHosting = 'stage1';
+        opponentSocket.data = {};
 
         socket.to.returns({
             // eslint-disable-next-line @typescript-eslint/no-empty-function, no-unused-vars

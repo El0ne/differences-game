@@ -18,6 +18,7 @@ describe('ChatGateway', () => {
         logger = createStubInstance(Logger);
         socket = createStubInstance<Socket>(Socket);
         server = createStubInstance<Server>(Server);
+        socket.data = {};
         Object.defineProperty(socket, 'id', { value: 'id' });
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -164,9 +165,16 @@ describe('ChatGateway', () => {
         expect(socket.emit.calledWith(ChatEvents.Hello, match.any)).toBeTruthy();
     });
 
-    it('socket disconnection should be logged', () => {
+    it('socket disconnection should emit a disconnect to rooms', () => {
+        socket.data.room = TEST_ROOM_ID;
+        stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
+        server.to.returns({
+            emit: (event: string, data: string) => {
+                expect(event).toEqual(ChatEvents.Disconnect);
+                expect(data).toEqual('id');
+            },
+        } as any);
         gateway.handleDisconnect(socket);
-        expect(logger.log.calledOnce).toBeTruthy();
     });
 
     it('dateCreator should return current time', () => {
