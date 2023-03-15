@@ -7,7 +7,6 @@ import { GameCardInformationService } from '@app/services/game-card-information-
 import { GameCardDto } from '@common/game-card.dto';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 import { GC_PATHS } from './game-creation-constants';
-
 @Component({
     selector: 'app-game-creation-page',
     templateUrl: './game-creation-page.component.html',
@@ -57,8 +56,11 @@ export class GameCreationPageComponent {
 
     createdGameInfo: GameCardDto;
 
-    canvasArray: string[] = [];
-    nbElements: number = 0;
+    // drawingActions = new Array();
+    // nbElements: number = 0;
+
+    actions = new Array();
+    undoneActions = new Array();
 
     isInOgCanvas: boolean = false;
 
@@ -247,6 +249,7 @@ export class GameCreationPageComponent {
         this.isUserClicking = false;
         if (ctx1) ctx1.drawImage(this.drawingCanvas2, 0, 0);
         if (ctx2) ctx2.clearRect(0, 0, this.drawingCanvas2.width, this.drawingCanvas2.height);
+        this.savePixels();
     }
 
     paintRectangle(e: MouseEvent) {
@@ -282,9 +285,21 @@ export class GameCreationPageComponent {
         this.diffRectCanvas.nativeElement.addEventListener('mousemove', this.listener);
     }
 
-    startPen() {
+    startPen(e: MouseEvent) {
         console.log('starting drawing');
         this.isUserClicking = true;
+        const ctx1 = this.drawingCanvas1.getContext('2d');
+        const canvasRect = this.drawingCanvas1.getBoundingClientRect();
+
+        if (ctx1) {
+            ctx1.lineWidth = this.penSize;
+            ctx1.lineCap = 'round';
+            ctx1.strokeStyle = this.color;
+            ctx1.beginPath();
+            ctx1.arc(e.clientX - canvasRect.left, e.clientY - canvasRect.top, 0, 0, 2 * Math.PI);
+            ctx1.stroke();
+            ctx1.beginPath();
+        }
     }
 
     stopPen() {
@@ -294,11 +309,16 @@ export class GameCreationPageComponent {
             this.isUserClicking = false;
             ctx1.beginPath();
         }
+        this.savePixels();
 
-        // this.nbElements++;
-        // this.canvasArray.push(this.drawingCanvas1.toDataURL());
+        // if (ctx1) {
+        //     const imageData = ctx1.getImageData(0, 0, this.drawingCanvas1.width, this.drawingCanvas1.height);
+        //     const hasContent = imageData.data.some((value) => value !== 0);
 
-        this.pushCanvas(this.drawingCanvas1);
+        //     if (hasContent) {
+        //         this.pushCanvas(this.drawingCanvas1);
+        //     }
+        // }
     }
 
     writing(e: MouseEvent) {
@@ -316,6 +336,11 @@ export class GameCreationPageComponent {
             ctx1.stroke();
             ctx1.beginPath();
             ctx1.moveTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+
+            // this.drawingActions.push({
+            //     position: this.isInOgCanvas,
+            //     data: [e.clientX - e.clientY - canvasRect.top],
+            // });
         }
     }
 
@@ -487,34 +512,69 @@ export class GameCreationPageComponent {
         }
     }
 
-    pushCanvas(canvas: HTMLCanvasElement) {
-        this.nbElements++;
-        if (this.nbElements < this.canvasArray.length) {
-            this.canvasArray.length = this.nbElements;
-        }
+    // pushCanvas(canvas: HTMLCanvasElement) {
+    //     this.nbElements++;
+    //     if (this.nbElements < this.canvasArray.length) {
+    //         this.canvasArray.length = this.nbElements;
+    //     }
+    //     this.canvasArray.push(canvas.toDataURL());
+    // }
 
-        this.canvasArray.push(canvas.toDataURL());
+    // undo() {
+    //     console.log(this.drawingActions);
+    //     // const ctxOgDrawing = this.ogDrawnCanvas.nativeElement.getContext('2d');
+    //     // if (this.nbElements > 0) {
+    //     //     this.nbElements--;
+    //     //     const canvasPic = new Image();
+    //     //     canvasPic.src = this.canvasArray[this.nbElements];
+    //     //     ctxOgDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+    //     //     canvasPic.onload = () => {
+    //     //         ctxOgDrawing.drawImage(canvasPic, 0, 0);
+    //     //     };
+    //     // }
+    // }
+
+    // redo() {
+    //     // const ctxOgDrawing = this.ogDrawnCanvas.nativeElement.getContext('2d');
+    //     // if (this.nbElements < this.canvasArray.length - 1) {
+    //     //     this.nbElements++;
+    //     //     const canvasPic = new Image();
+    //     //     canvasPic.src = this.canvasArray[this.nbElements];
+    //     //     canvasPic.onload = () => {
+    //     //         ctxOgDrawing.drawImage(canvasPic, 0, 0);
+    //     //     };
+    //     // }
+    // }
+
+    savePixels() {
+        const context = this.isInOgCanvas ? this.ogDrawnCanvas.nativeElement.getContext('2d') : this.diffDrawnCanvas.nativeElement.getContext('2d');
+        const imageData = context.getImageData(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+        const isInLeftCanvas = this.isInOgCanvas;
+        this.actions.push({ execute: (ctx: CanvasRenderingContext2D) => ctx.putImageData(imageData, 0, 0), isInLeftCanvas });
+    }
+
+    restoreCanvas() {
+        this.actions.forEach((action) => {
+            const context = action[1] ? this.ogDrawnCanvas.nativeElement.getContext('2d') : this.diffDrawnCanvas.nativeElement.getContext('2d');
+            context.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+            action[0].execute(context);
+        });
     }
 
     undo() {
-        console.log('nb éléments : ', this.nbElements);
-        for (let i = 0; i < this.nbElements; i++) {
-            console.log('canvas#', i, ': ', this.canvasArray[i]);
+        if (this.actions.length > 0) {
+            const action = this.actions.pop();
+            this.undoneActions.push(action);
+            this.restoreCanvas();
         }
+    }
 
-        if (this.nbElements > 0) {
-            const ctxOgDrawing = this.ogDrawnCanvas.nativeElement.getContext('2d');
-            const canvasPic = new Image();
-            this.nbElements--;
-
-            console.log('nb éléments : ', this.nbElements);
-            console.log(this.canvasArray[this.nbElements]);
-
-            ctxOgDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-            canvasPic.src = this.canvasArray[this.nbElements] as string;
-            canvasPic.onload = () => {
-                ctxOgDrawing.drawImage(canvasPic, 0, 0);
-            };
+    redo() {
+        if (this.undoneActions.length > 0) {
+            const action = this.undoneActions.pop();
+            const context = action[1] ? this.ogDrawnCanvas.nativeElement.getContext('2d') : this.diffDrawnCanvas.nativeElement.getContext('2d');
+            action[0].execute(context);
+            this.actions.push(action);
         }
     }
 }
