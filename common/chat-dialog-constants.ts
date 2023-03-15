@@ -11,5 +11,5 @@ export interface PlayersInformation {
 
 export interface EndGame {
     winner: string;
-    isSolo: boolean;
+    isMultiplayer: boolean;
 }

@@ -11,7 +11,7 @@ describe('GameWinModalComponent', () => {
     let fixture: ComponentFixture<GameWinModalComponent>;
     let matDialogRefMock: MatDialogRef<GameWinModalComponent>;
     let routerMock: Router;
-    const data: EndGame = { isSolo: true, winner: 'winner' };
+    const data: EndGame = { isMultiplayer: false, winner: 'winner' };
 
     beforeEach(async () => {
         matDialogRefMock = jasmine.createSpyObj('MatDialogRef', ['close']);

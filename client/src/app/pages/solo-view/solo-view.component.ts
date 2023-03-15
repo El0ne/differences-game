@@ -11,6 +11,7 @@ import { GameCardInformationService } from '@app/services/game-card-information-
 import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
+import { EndGame } from '@common/chat-dialog-constants';
 import { RoomMessage, Validation } from '@common/chat-gateway-constants';
 import { ChatEvents, RoomEvent, RoomManagement } from '@common/chat.gateway.events';
 import { DifferenceInformation, MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
@@ -94,12 +95,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.socketService.listen<PlayerDifference>(ChatEvents.Difference, (data: PlayerDifference) => {
             this.effectHandler(data);
         });
-        this.socketService.listen<string>(ChatEvents.Win, (socket: string) => {
-            if (this.socketService.socketId === socket) {
-                this.winGame(this.player);
-            } else {
-                this.winGame(this.opponent);
-            }
+        this.socketService.listen<string>(ChatEvents.Win, (socketId: string) => {
+            this.winGame(socketId);
         });
         this.socketService.listen<string>(ChatEvents.Disconnect, (socket: string) => {
             if (this.socketService.socketId === socket) {
@@ -152,13 +149,15 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         return this.convertService.convert(time);
     }
 
-    winGame(winner: string): void {
+    winGame(winnerId: string): void {
         this.timerService.stopTimer();
         this.left.endGame = true;
         this.right.endGame = true;
         this.showNavBar = false;
-        if (this.isMultiplayer) this.dialog.open(GameWinModalComponent, { disableClose: true, data: { isSolo: false, winner } });
-        else this.dialog.open(GameWinModalComponent, { disableClose: true, data: { isSolo: true, winner } });
+        this.dialog.open(GameWinModalComponent, {
+            disableClose: true,
+            data: { isMultiplayer: this.isMultiplayer, winner: this.socketService.names.get(winnerId) } as EndGame,
+        });
     }
 
     incrementScore(socket: string): void {
