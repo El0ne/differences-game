@@ -32,7 +32,7 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
         this.gameHosts.delete(socket.data.stageInHosting);
         socket.to(socket.data.stageInHosting).emit(WaitingRoomEvents.MatchRefused, "la partie n'a plus d'hôte");
         socket.to(socket.data.stageInHosting).emit(WaitingRoomEvents.MatchDeleted, socket.data.stageInHosting);
-        socket.data.stageInHosting = undefined;
+        socket.data.stageInHosting = null;
     }
 
     @SubscribeMessage(WaitingRoomEvents.JoinHost)
@@ -45,6 +45,7 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
     @SubscribeMessage(WaitingRoomEvents.QuitHost)
     quitHost(@ConnectedSocket() socket: Socket): void {
         socket.to(this.gameHosts.get(socket.data.stageInWaiting)).emit(WaitingRoomEvents.UnrequestMatch, socket.id);
+        socket.data.stageInWaiting = null;
     }
 
     @SubscribeMessage(WaitingRoomEvents.AcceptOpponent)
@@ -52,17 +53,22 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
         const opponentSocket: Socket = this.server.sockets.sockets.get(acceptation.playerSocketId);
         this.clearRooms(socket);
         this.clearRooms(opponentSocket);
+
         const roomId = randomUUID();
         socket.join(roomId);
         socket.data.room = roomId;
-        opponentSocket.data.room = roomId;
         opponentSocket.join(roomId);
+        opponentSocket.data.room = roomId;
+        this.gameHosts.delete(socket.data.stageInHosting);
+
         const acceptationInfo: AcceptationInformation = { playerName: acceptation.playerName, playerSocketId: socket.id, roomId };
         socket.to(acceptation.playerSocketId).emit(WaitingRoomEvents.MatchAccepted, acceptationInfo);
         socket.emit(WaitingRoomEvents.MatchConfirmed, roomId);
         socket.to(socket.data.stageInHosting).emit(WaitingRoomEvents.MatchRefused, "l'hôte a trouvé un autre adversaire");
         socket.to(socket.data.stageInHosting).emit(WaitingRoomEvents.MatchDeleted, socket.data.stageInHosting);
-        this.gameHosts.delete(socket.data.stageInHosting);
+
+        socket.data.stageInHosting = null;
+        opponentSocket.data.stageInWaiting = null;
     }
 
     @SubscribeMessage(WaitingRoomEvents.DeclineOpponent)

@@ -1,13 +1,13 @@
 import { AbandonGame, ChatEvents, Room, RoomEvent, RoomManagement } from '@common/chat.gateway.events';
 import { MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { Injectable, Logger } from '@nestjs/common';
-import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { MESSAGE_MAX_LENGTH } from './chat.gateway.constants';
 
 @WebSocketGateway({ cors: true })
 @Injectable()
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class ChatGateway implements OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
 
     private waitingRoom: Room[] = [];
@@ -81,10 +81,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             const transformedMessage = message.message.toString();
             this.server.to(message.room).emit(ChatEvents.RoomMessage, { socketId: socket.id, message: transformedMessage, event: 'message' });
         }
-    }
-
-    handleConnection(socket: Socket): void {
-        socket.emit(ChatEvents.Hello, 'Hello World!');
     }
 
     handleDisconnect(socket: Socket): void {

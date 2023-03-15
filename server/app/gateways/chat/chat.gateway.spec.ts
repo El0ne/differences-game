@@ -4,7 +4,7 @@ import { ChatEvents } from '@common/chat.gateway.events';
 import { PlayerDifference } from '@common/difference-information';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { createStubInstance, match, SinonStubbedInstance, stub } from 'sinon';
+import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
 
 describe('ChatGateway', () => {
@@ -158,11 +158,6 @@ describe('ChatGateway', () => {
             },
         } as any);
         gateway.hint(socket, TEST_ROOM_ID);
-    });
-
-    it('hello message should be sent on connection', () => {
-        gateway.handleConnection(socket);
-        expect(socket.emit.calledWith(ChatEvents.Hello, match.any)).toBeTruthy();
     });
 
     it('socket disconnection should emit a disconnect to rooms', () => {
