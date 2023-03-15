@@ -47,7 +47,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 dateFormatted = `${date} - ${data.event}.`;
             }
 
-            this.server.to(data.room).emit(ChatEvents.RoomMessage, { socketId: socket.id, message: dateFormatted, isEvent: true, isAbandon: false });
+            this.server.to(data.room).emit(ChatEvents.RoomMessage, { socketId: socket.id, message: dateFormatted, event: 'notification' });
         }
     }
 
@@ -63,7 +63,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (socket.rooms.has(data.room)) {
             const date = this.dateCreator();
             const dateFormatted = `${date} - ${data.name} a abandonné la partie.`;
-            this.server.to(data.room).emit(ChatEvents.Abandon, { socketId: socket.id, message: dateFormatted, isEvent: true, isAbandon: true });
+            this.server.to(data.room).emit(ChatEvents.Abandon, { socketId: socket.id, message: dateFormatted, event: 'abandon' });
         }
     }
     @SubscribeMessage(ChatEvents.Hint)
@@ -71,9 +71,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (socket.rooms.has(room)) {
             const date = this.dateCreator();
             const dateFormatted = `${date} - Indice utilisé.`;
-            this.server
-                .to(room)
-                .emit(ChatEvents.RoomMessage, { socketId: ChatEvents.Event, message: dateFormatted, isEvent: true, isAbandon: false });
+            this.server.to(room).emit(ChatEvents.RoomMessage, { socketId: ChatEvents.Event, message: dateFormatted, event: 'notification' });
         }
     }
 
@@ -81,9 +79,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     roomMessage(socket: Socket, message: RoomManagement): void {
         if (socket.rooms.has(message.room)) {
             const transformedMessage = message.message.toString();
-            this.server
-                .to(message.room)
-                .emit(ChatEvents.RoomMessage, { socketId: socket.id, message: transformedMessage, isEvent: false, isAbandon: false });
+            this.server.to(message.room).emit(ChatEvents.RoomMessage, { socketId: socket.id, message: transformedMessage, event: 'message' });
         }
     }
 

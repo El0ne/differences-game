@@ -81,7 +81,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             if (validation.isValidated) {
                 this.socketService.send<RoomManagement>(ChatEvents.RoomMessage, { room: this.currentRoom, message: validation.originalMessage });
             } else {
-                this.messages.push({ socketId: this.socketService.socketId, message: validation.originalMessage, isEvent: true, isAbandon: false });
+                this.messages.push({ socketId: this.socketService.socketId, message: validation.originalMessage, event: 'notification' });
             }
         });
         this.socketService.listen<RoomMessage>(ChatEvents.RoomMessage, (data: RoomMessage) => {
