@@ -31,6 +31,7 @@ export class GameCreationPageComponent {
     isPenEnabled: boolean = false;
     isEraserEnabled: boolean = false;
     isDuplicateEnabled: boolean = false;
+    isClearEnabled: boolean = false;
 
     isUserClicking: boolean = false;
     rectInitialPosX: number;
@@ -136,17 +137,11 @@ export class GameCreationPageComponent {
     clearFirstFile(canvas: HTMLCanvasElement, id: string): void {
         this.originalFile = null;
         this.clearSingleFile(canvas, id);
-
-        const drawCtx = this.ogDrawnCanvas.nativeElement.getContext('2d');
-        drawCtx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
     }
 
     clearSecondFile(canvas: HTMLCanvasElement, id: string): void {
         this.differentFile = null;
         this.clearSingleFile(canvas, id);
-
-        const drawCtx = this.diffDrawnCanvas.nativeElement.getContext('2d');
-        drawCtx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
     }
 
     fileValidation(e: Event): void {
@@ -477,6 +472,7 @@ export class GameCreationPageComponent {
                 this.isRectEnabled = false;
                 this.isEraserEnabled = false;
                 this.isDuplicateEnabled = false;
+                this.isClearEnabled = false;
                 this.changeZindex();
                 if (this.isPenEnabled) this.drawPen();
 
@@ -486,6 +482,7 @@ export class GameCreationPageComponent {
                 this.isPenEnabled = false;
                 this.isEraserEnabled = false;
                 this.isDuplicateEnabled = false;
+                this.isClearEnabled = false;
                 this.changeZindex();
                 if (this.isRectEnabled) this.drawRectangle();
 
@@ -495,6 +492,8 @@ export class GameCreationPageComponent {
                 this.isPenEnabled = false;
                 this.isRectEnabled = false;
                 this.isDuplicateEnabled = false;
+                this.isClearEnabled = false;
+
                 this.changeZindex();
                 if (this.isEraserEnabled) this.erase();
                 break;
@@ -503,6 +502,16 @@ export class GameCreationPageComponent {
                 this.isPenEnabled = false;
                 this.isRectEnabled = false;
                 this.isEraserEnabled = false;
+                this.isClearEnabled = false;
+
+                break;
+            case 'clear':
+                this.isClearEnabled = !this.isClearEnabled;
+                this.isPenEnabled = false;
+                this.isRectEnabled = false;
+                this.isEraserEnabled = false;
+                this.isDuplicateEnabled = false;
+
                 break;
         }
     }
@@ -538,6 +547,20 @@ export class GameCreationPageComponent {
             // console.log('left');
             ctxOgDrawing.drawImage(this.diffDrawnCanvas.nativeElement, 0, 0);
         }
+    }
+
+    clearPainting(side: string) {
+        const ctxDiffDrawing = this.diffDrawnCanvas.nativeElement.getContext('2d');
+        const ctxOgDrawing = this.ogDrawnCanvas.nativeElement.getContext('2d');
+        if (side === 'right') {
+            ctxDiffDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+            this.isInOgCanvas = false;
+        } else if (side === 'left') {
+            ctxOgDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+            this.isInOgCanvas = true;
+        }
+
+        this.pushCanvas(this.drawingCanvas1);
     }
 
     // verifyFirstTime(position: string) {
