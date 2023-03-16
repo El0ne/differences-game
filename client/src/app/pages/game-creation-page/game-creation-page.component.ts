@@ -88,13 +88,13 @@ export class GameCreationPageComponent {
     }
 
     consoleStuff() {
-        const right = this.rightCanvasArray;
-        console.log('this.rightCanvasArray', this.rightCanvasArray);
-        console.log('this.rightArrayPointer', right);
-        console.log('this.leftCanvasArray', this.leftCanvasArray);
-        console.log('this.leftArrayPointer', this.leftArrayPointer);
-        console.log('this.actionsArray', this.actionsArray);
-        console.log('this.nbElements', this.nbElements);
+        // const right = this.rightCanvasArray;
+        // console.log('this.rightCanvasArray', this.rightCanvasArray);
+        // console.log('this.rightArrayPointer', right);
+        // console.log('this.leftCanvasArray', this.leftCanvasArray);
+        // console.log('this.leftArrayPointer', this.leftArrayPointer);
+        // console.log('this.actionsArray', this.actionsArray);
+        // console.log('this.nbElements', this.nbElements);
     }
 
     openModal() {
@@ -549,19 +549,17 @@ export class GameCreationPageComponent {
 
         const canvasDataURL = canvas.toDataURL();
         if (this.isInOgCanvas) {
-            console.log('draw left');
             // if (this.isFirstTimeInLeftCanvas) this.verifyFirstTime('left');
             this.actionsArray.push(true);
             this.leftArrayPointer++;
             this.leftCanvasArray.push(canvasDataURL);
         } else {
-            console.log('draw right');
             this.actionsArray.push(false);
             this.rightArrayPointer++;
             this.rightCanvasArray.push(canvasDataURL);
             // if (this.isFirstTimeInRightCanvas) this.verifyFirstTime('right');
         }
-        console.log('push');
+
         this.consoleStuff();
     }
 
@@ -576,6 +574,8 @@ export class GameCreationPageComponent {
             ctx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
             ctx.drawImage(canvasPic, 0, 0);
         };
+        const test = `undo on the left canvas: ${this.actionsArray[this.nbElements]} at index ${pointer}`;
+        console.log(test);
     }
     undo() {
         if (this.nbElements > 0) {
@@ -593,7 +593,6 @@ export class GameCreationPageComponent {
                 }
             }
         }
-        console.log('undo: ');
         this.consoleStuff();
     }
 
@@ -609,20 +608,27 @@ export class GameCreationPageComponent {
             ctx.drawImage(canvasPic, 0, 0);
         };
         ctx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+        const test = `redo on the left canvas: ${this.actionsArray[this.nbElements]} at index ${pointer}`;
+        console.log(test);
     }
 
     redo() {
-        if (this.nbElements < this.actionsArray.length - 1) {
-            this.nbElements++;
+        console.log('this.actionsArray', this.actionsArray);
+        if (this.nbElements < this.actionsArray.length) {
+            console.log('this.nbElements', this.nbElements);
             if (this.actionsArray[this.nbElements]) {
-                this.leftArrayPointer++;
-                this.redoAction(this.leftCanvasArray, this.leftArrayPointer);
+                if (this.leftArrayPointer < this.leftCanvasArray.length - 1) {
+                    this.leftArrayPointer++;
+                    this.redoAction(this.leftCanvasArray, this.leftArrayPointer);
+                }
             } else {
-                this.rightArrayPointer++;
-                this.redoAction(this.rightCanvasArray, this.rightArrayPointer);
+                if (this.rightArrayPointer < this.rightCanvasArray.length - 1) {
+                    this.rightArrayPointer++;
+                    this.redoAction(this.rightCanvasArray, this.rightArrayPointer);
+                }
             }
+            this.nbElements++;
         }
-        console.log('redo');
         this.consoleStuff();
     }
     // savePixels() {
