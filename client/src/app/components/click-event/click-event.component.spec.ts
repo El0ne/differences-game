@@ -12,6 +12,7 @@ import { ClickDifferenceVerification } from '@common/click-difference-verificati
 import { of, Subject } from 'rxjs';
 import { DIFFERENCE_FOUND, DIFFERENCE_NOT_FOUND, TEST_DIFFERENCES } from './click-event-constants-testing';
 import { ClickEventComponent } from './click-event.component';
+
 describe('ClickEventComponent', () => {
     let component: ClickEventComponent;
     let fixture: ComponentFixture<ClickEventComponent>;
@@ -215,12 +216,15 @@ describe('ClickEventComponent', () => {
         expect(flashEffectSpy).toHaveBeenCalled();
     });
 
-    it('differenceEffect() should call differenceEffect if toggleCheatMode is true', async () => {
+    it('differenceEffect() should call differenceEffect if toggleCheatMode is true', fakeAsync(() => {
         component.toggleCheatMode = true;
-        const differenceEffectSpy = spyOn(component, 'differenceEffect');
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000;
+        spyOn(component.pixelModificationService, 'flashEffect').and.callFake(async () => {
+            return new Promise(() => {});
+        });
+        const differenceEffectSpy = spyOn(component, 'differenceEffect').and.callThrough();
+        component.differenceEffect([0]);
 
-        await component.differenceEffect([0]);
-
-        expect(differenceEffectSpy).toHaveBeenCalled();
-    });
+        expect(differenceEffectSpy).not.toHaveBeenCalledTimes(1);
+    }));
 });

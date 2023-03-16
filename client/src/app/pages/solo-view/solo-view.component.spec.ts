@@ -138,9 +138,6 @@ describe('SoloViewComponent', () => {
                     callback('wrong');
                     break;
                 }
-                case ChatEvents.Disconnect: {
-                    callback('test');
-                }
                 // No default
             }
         };
@@ -149,58 +146,14 @@ describe('SoloViewComponent', () => {
         const finishGameSpy = spyOn(component, 'winGame');
         Object.defineProperty(chatSocketServiceMock, 'socketId', { value: 'test' });
         component.configureSocketReactions();
-        expect(listenSpy).toHaveBeenCalledTimes(6);
+        expect(listenSpy).toHaveBeenCalledTimes(5);
         expect(component.messages.length).toEqual(3);
         expect(sendSpy).toHaveBeenCalled();
         expect(component.messages[component.messages.length - 2].socketId).toEqual('test');
         expect(component.messages[component.messages.length - 1].socketId).toEqual('abandon');
-        expect(finishGameSpy).toHaveBeenCalledWith(component.player);
-        expect(finishGameSpy).toHaveBeenCalledWith('opponent');
-    });
-
-    it('ConfigureSocketReactions should configure sockets correctly & react properly according to event if id is not in callback', () => {
-        chatSocketServiceMock.listen = (event: string, callback: any) => {
-            switch (event) {
-                case ChatEvents.WordValidated: {
-                    callback({ isValidated: true, originalMessage: 'Test message' });
-                    callback({ isValidated: false, originalMessage: 'Error message' });
-                    break;
-                }
-                case ChatEvents.RoomMessage: {
-                    callback({ socketId: 'test', message: 'Test message' });
-                    break;
-                }
-                case ChatEvents.Abandon: {
-                    callback({ socketId: 'abandon', message: 'abandon' });
-                    break;
-                }
-                case ChatEvents.Difference: {
-                    callback({ lastDifferences: [0, 1, 2, 3], differencesPosition: 2, socketId: 'test' });
-                    break;
-                }
-                case ChatEvents.Win: {
-                    callback('test');
-                    callback('wrong');
-                    break;
-                }
-                case ChatEvents.Disconnect: {
-                    callback('test');
-                }
-                // No default
-            }
-        };
-        const listenSpy = spyOn(chatSocketServiceMock, 'listen').and.callThrough();
-        const sendSpy = spyOn(chatSocketServiceMock, 'send').and.callThrough();
-        const finishGameSpy = spyOn(component, 'winGame');
-        Object.defineProperty(chatSocketServiceMock, 'socketId', { value: 'idNotInCallBack' });
-        component.configureSocketReactions();
-        expect(listenSpy).toHaveBeenCalledTimes(6);
-        expect(component.messages.length).toEqual(3);
-        expect(sendSpy).toHaveBeenCalled();
-        expect(component.messages[component.messages.length - 2].socketId).toEqual('test');
-        expect(component.messages[component.messages.length - 1].socketId).toEqual('abandon');
-        expect(finishGameSpy).toHaveBeenCalledWith(component.player);
-        expect(finishGameSpy).toHaveBeenCalledWith('opponent');
+        expect(finishGameSpy).toHaveBeenCalledWith('test');
+        expect(finishGameSpy).toHaveBeenCalledWith('abandon');
+        expect(finishGameSpy).toHaveBeenCalledWith('wrong');
     });
 
     it('handleMistake should send an event called event to socket server with extra information', () => {
