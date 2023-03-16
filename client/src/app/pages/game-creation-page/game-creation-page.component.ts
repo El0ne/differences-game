@@ -617,15 +617,11 @@ export class GameCreationPageComponent {
         if (this.nbElements < this.actionsArray.length) {
             console.log('this.nbElements', this.nbElements);
             if (this.actionsArray[this.nbElements]) {
-                if (this.leftArrayPointer < this.leftCanvasArray.length - 1) {
-                    this.leftArrayPointer++;
-                    this.redoAction(this.leftCanvasArray, this.leftArrayPointer);
-                }
+                this.leftArrayPointer++;
+                this.redoAction(this.leftCanvasArray, this.leftArrayPointer);
             } else {
-                if (this.rightArrayPointer < this.rightCanvasArray.length - 1) {
-                    this.rightArrayPointer++;
-                    this.redoAction(this.rightCanvasArray, this.rightArrayPointer);
-                }
+                this.rightArrayPointer++;
+                this.redoAction(this.rightCanvasArray, this.rightArrayPointer);
             }
             this.nbElements++;
         }
