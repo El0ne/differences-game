@@ -582,15 +582,11 @@ export class GameCreationPageComponent {
             this.nbElements--;
 
             if (this.actionsArray[this.nbElements]) {
-                if (this.leftArrayPointer > 0) {
-                    this.leftArrayPointer--;
-                    this.undoAction(this.leftCanvasArray, this.leftArrayPointer);
-                }
+                this.leftArrayPointer--;
+                this.undoAction(this.leftCanvasArray, this.leftArrayPointer);
             } else {
-                if (this.rightArrayPointer > 0) {
-                    this.rightArrayPointer--;
-                    this.undoAction(this.rightCanvasArray, this.rightArrayPointer);
-                }
+                this.rightArrayPointer--;
+                this.undoAction(this.rightCanvasArray, this.rightArrayPointer);
             }
         }
         this.consoleStuff();
