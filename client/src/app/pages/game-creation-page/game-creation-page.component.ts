@@ -292,27 +292,29 @@ export class GameCreationPageComponent {
             ctx2.fillStyle = this.color;
             ctx2.clearRect(0, 0, this.drawingCanvas2.width, this.drawingCanvas2.height); // Clears the previous canvas
 
-            ctx2.fillRect(
-                this.rectInitialPosX,
-                this.rectInitialPosY,
-                e.clientX - canvasRect.left - this.rectInitialPosX,
-                e.clientY - canvasRect.top - this.rectInitialPosY,
-            );
+            const width = e.clientX - canvasRect.left - this.rectInitialPosX;
+            const height = e.clientY - canvasRect.top - this.rectInitialPosY;
+
+            if (e.shiftKey) {
+                const size = Math.min(Math.abs(width), Math.abs(height));
+                const signX = Math.sign(width);
+                const signY = Math.sign(height);
+                ctx2.fillRect(this.rectInitialPosX, this.rectInitialPosY, size * signX, size * signY);
+            } else {
+                ctx2.fillRect(this.rectInitialPosX, this.rectInitialPosY, width, height);
+            }
         }
     }
 
     drawRectangle() {
         console.log('inDrawRectangle', this);
 
-        // this.recListener = this.startRec.bind(this);
         this.ogRectCanvas.nativeElement.addEventListener('mousedown', this.recListener[0]);
         this.diffRectCanvas.nativeElement.addEventListener('mousedown', this.recListener[0]);
 
-        // this.recListener = this.stopRec.bind(this);
         this.ogRectCanvas.nativeElement.addEventListener('mouseup', this.recListener[1]);
         this.diffRectCanvas.nativeElement.addEventListener('mouseup', this.recListener[1]);
 
-        // this.recListener = this.paintRectangle.bind(this);
         this.ogRectCanvas.nativeElement.addEventListener('mousemove', this.recListener[2]);
         this.diffRectCanvas.nativeElement.addEventListener('mousemove', this.recListener[2]);
     }
