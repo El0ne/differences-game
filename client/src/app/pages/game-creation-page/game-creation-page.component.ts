@@ -1,5 +1,5 @@
 /* eslint-disable max-lines */
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
@@ -81,6 +81,18 @@ export class GameCreationPageComponent {
 
         this.leftCanvasArray.push(emptyCanvas.toDataURL());
         this.rightCanvasArray.push(emptyCanvas.toDataURL());
+    }
+
+    @HostListener('document:keydown.control.z', ['$event'])
+    onCtrlZ(event: KeyboardEvent) {
+        event.preventDefault();
+        this.undo();
+    }
+
+    @HostListener('document:keydown.control.shift.z', ['$event'])
+    onCtrlShiftZ(event: KeyboardEvent) {
+        event.preventDefault();
+        this.redo();
     }
 
     getTitle(title: string): void {
@@ -623,37 +635,4 @@ export class GameCreationPageComponent {
         }
         this.consoleStuff();
     }
-    // savePixels() {
-    //     const context = this.ogDrawnCanvas.nativeElement.getContext('2d');
-    //     const imageData = context.getImageData(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-    //     console.log('imageData: ', imageData);
-    //     this.actions.push({ execute: (ctx: CanvasRenderingContext2D) => ctx.putImageData(imageData, 0, 0) });
-    //     console.log('action array: ', this.actions);
-    // }
-
-    // restoreCanvas() {
-    //     this.actions.forEach((action) => {
-    //         const context = this.ogDrawnCanvas.nativeElement.getContext('2d');
-    //         context.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-    //         console.log(action);
-    //         action.execute(context);
-    //     });
-    // }
-
-    // undo() {
-    //     if (this.actions.length > 0) {
-    //         const action = this.actions.pop();
-    //         this.undoneActions.push(action);
-    //         this.restoreCanvas();
-    //     }
-    // }
-
-    // redo() {
-    //     if (this.undoneActions.length > 0) {
-    //         const action = this.undoneActions.pop();
-    //         const context = this.ogDrawnCanvas.nativeElement.getContext('2d');
-    //         action.execute(context);
-    //         this.actions.push(action);
-    //     }
-    // }
 }
