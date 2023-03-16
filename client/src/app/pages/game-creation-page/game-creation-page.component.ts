@@ -56,9 +56,9 @@ export class GameCreationPageComponent {
 
     createdGameInfo: GameCardDto;
 
-    rightCanvasArray: string[];
-    leftCanvasArray: string[];
-    actionsArray: boolean[];
+    rightCanvasArray: string[] = [];
+    leftCanvasArray: string[] = [];
+    actionsArray: boolean[] = [];
     nbElements: number = 0;
     leftArrayPointer: number = 0;
     rightArrayPointer: number = 0;
@@ -85,6 +85,16 @@ export class GameCreationPageComponent {
 
     getTitle(title: string): void {
         this.gameTitle = title;
+    }
+
+    consoleStuff() {
+        const right = this.rightCanvasArray;
+        console.log('this.rightCanvasArray', this.rightCanvasArray);
+        console.log('this.rightArrayPointer', right);
+        console.log('this.leftCanvasArray', this.leftCanvasArray);
+        console.log('this.leftArrayPointer', this.leftArrayPointer);
+        console.log('this.actionsArray', this.actionsArray);
+        console.log('this.nbElements', this.nbElements);
     }
 
     openModal() {
@@ -321,6 +331,8 @@ export class GameCreationPageComponent {
         }
         // this.savePixels();
         this.pushCanvas(this.drawingCanvas1);
+        console.log('finished drawing');
+        this.consoleStuff();
     }
 
     writing(e: MouseEvent) {
@@ -537,16 +549,20 @@ export class GameCreationPageComponent {
 
         const canvasDataURL = canvas.toDataURL();
         if (this.isInOgCanvas) {
+            console.log('draw left');
             // if (this.isFirstTimeInLeftCanvas) this.verifyFirstTime('left');
+            this.actionsArray.push(true);
             this.leftArrayPointer++;
             this.leftCanvasArray.push(canvasDataURL);
         } else {
+            console.log('draw right');
+            this.actionsArray.push(false);
             this.rightArrayPointer++;
             this.rightCanvasArray.push(canvasDataURL);
             // if (this.isFirstTimeInRightCanvas) this.verifyFirstTime('right');
         }
-        console.log('array lenght: ', this.rightCanvasArray.length);
-        console.log('n éléments: ', this.nbElements);
+        console.log('push');
+        this.consoleStuff();
     }
 
     undoAction(array: string[], pointer: number) {
@@ -566,13 +582,19 @@ export class GameCreationPageComponent {
             this.nbElements--;
 
             if (this.actionsArray[this.nbElements]) {
-                this.leftArrayPointer--;
-                this.undoAction(this.leftCanvasArray, this.leftArrayPointer);
+                if (this.leftArrayPointer > 0) {
+                    this.leftArrayPointer--;
+                    this.undoAction(this.leftCanvasArray, this.leftArrayPointer);
+                }
             } else {
-                this.rightArrayPointer--;
-                this.undoAction(this.rightCanvasArray, this.rightArrayPointer);
+                if (this.rightArrayPointer > 0) {
+                    this.rightArrayPointer--;
+                    this.undoAction(this.rightCanvasArray, this.rightArrayPointer);
+                }
             }
         }
+        console.log('undo: ');
+        this.consoleStuff();
     }
 
     redoAction(array: string[], pointer: number) {
@@ -600,6 +622,8 @@ export class GameCreationPageComponent {
                 this.redoAction(this.rightCanvasArray, this.rightArrayPointer);
             }
         }
+        console.log('redo');
+        this.consoleStuff();
     }
     // savePixels() {
     //     const context = this.ogDrawnCanvas.nativeElement.getContext('2d');
