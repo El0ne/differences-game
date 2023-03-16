@@ -4,9 +4,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { PenService } from '@app/services/pen-service.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 import { GC_PATHS } from './game-creation-constants';
+
 @Component({
     selector: 'app-game-creation-page',
     templateUrl: './game-creation-page.component.html',
@@ -67,9 +69,14 @@ export class GameCreationPageComponent {
 
     private eraseListener: ((e: MouseEvent) => void)[] = [this.startErase.bind(this), this.stopErase.bind(this), this.erasing.bind(this)];
     private recListener: ((e: MouseEvent) => void)[] = [this.startRec.bind(this), this.stopRec.bind(this), this.paintRectangle.bind(this)];
-    private penListener: ((e: MouseEvent) => void)[] = [this.startPen.bind(this), this.stopPen.bind(this), this.writing.bind(this)];
+    // private penListener: ((e: MouseEvent) => void)[] = [this.startPen.bind(this), this.stopPen.bind(this), this.writing.bind(this)];
 
-    constructor(public gameCardService: GameCardInformationService, private matDialog: MatDialog, public router: Router) {
+    constructor(
+        public gameCardService: GameCardInformationService,
+        public penService: PenService,
+        private matDialog: MatDialog,
+        public router: Router,
+    ) {
         const emptyCanvas = document.createElement('canvas');
         emptyCanvas.width = 640;
         emptyCanvas.height = 480;
@@ -287,7 +294,7 @@ export class GameCreationPageComponent {
         this.ogRectCanvas.nativeElement.addEventListener('mousemove', this.recListener[2]);
         this.diffRectCanvas.nativeElement.addEventListener('mousemove', this.recListener[2]);
     }
-
+    /*
     startPen(e: MouseEvent) {
         // console.log('starting drawing');
         this.isUserClicking = true;
@@ -352,7 +359,7 @@ export class GameCreationPageComponent {
         this.ogDrawnCanvas.nativeElement.addEventListener('mousemove', this.penListener[2]);
         this.diffDrawnCanvas.nativeElement.addEventListener('mousemove', this.penListener[2]);
     }
-
+*/
     startErase(e: MouseEvent) {
         this.isUserClicking = true;
         const ctx1 = this.drawingCanvas1.getContext('2d');
@@ -401,7 +408,7 @@ export class GameCreationPageComponent {
         this.ogDrawnCanvas.nativeElement.addEventListener('mousemove', this.eraseListener[2]);
         this.diffDrawnCanvas.nativeElement.addEventListener('mousemove', this.eraseListener[2]);
     }
-
+    /*
     removingListeners() {
         this.ogRectCanvas.nativeElement.removeEventListener('mousedown', this.recListener[0]);
         this.diffRectCanvas.nativeElement.removeEventListener('mousedown', this.recListener[0]);
@@ -410,12 +417,12 @@ export class GameCreationPageComponent {
         this.ogRectCanvas.nativeElement.removeEventListener('mousemove', this.recListener[2]);
         this.diffRectCanvas.nativeElement.removeEventListener('mousemove', this.recListener[2]);
 
-        this.ogDrawnCanvas.nativeElement.removeEventListener('mousedown', this.penListener[0]);
-        this.diffDrawnCanvas.nativeElement.removeEventListener('mousedown', this.penListener[0]);
-        this.ogDrawnCanvas.nativeElement.removeEventListener('mouseup', this.penListener[1]);
-        this.diffDrawnCanvas.nativeElement.removeEventListener('mouseup', this.penListener[1]);
-        this.ogDrawnCanvas.nativeElement.removeEventListener('mousemove', this.penListener[2]);
-        this.diffDrawnCanvas.nativeElement.removeEventListener('mousemove', this.penListener[2]);
+        this.ogDrawnCanvas.nativeElement.removeEventListener('mousedown', this.penService.penListener[0]);
+        this.diffDrawnCanvas.nativeElement.removeEventListener('mousedown', this.penService.penListener[0]);
+        this.ogDrawnCanvas.nativeElement.removeEventListener('mouseup', this.penService.penListener[1]);
+        this.diffDrawnCanvas.nativeElement.removeEventListener('mouseup', this.penService.penListener[1]);
+        this.ogDrawnCanvas.nativeElement.removeEventListener('mousemove', this.penService.penListener[2]);
+        this.diffDrawnCanvas.nativeElement.removeEventListener('mousemove', this.penService.penListener[2]);
 
         this.ogDrawnCanvas.nativeElement.removeEventListener('mousedown', this.eraseListener[0]);
         this.diffDrawnCanvas.nativeElement.removeEventListener('mousedown', this.eraseListener[0]);
@@ -424,7 +431,7 @@ export class GameCreationPageComponent {
         this.ogDrawnCanvas.nativeElement.removeEventListener('mousemove', this.eraseListener[2]);
         this.diffDrawnCanvas.nativeElement.removeEventListener('mousemove', this.eraseListener[2]);
     }
-
+*/
     changeZindex() {
         if (this.isRectEnabled) {
             this.canvas2ZIndex = 3;
@@ -436,7 +443,7 @@ export class GameCreationPageComponent {
     }
 
     toggleButton(id: string) {
-        this.removingListeners();
+        this.penService.removingListeners();
 
         switch (id) {
             case 'pen':
@@ -445,7 +452,7 @@ export class GameCreationPageComponent {
                 this.isEraserEnabled = false;
                 this.isDuplicateEnabled = false;
                 this.changeZindex();
-                if (this.isPenEnabled) this.drawPen();
+                if (this.isPenEnabled) this.penService.drawPen();
 
                 break;
             case 'rectangle':
