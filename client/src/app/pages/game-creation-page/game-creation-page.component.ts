@@ -56,9 +56,14 @@ export class GameCreationPageComponent {
 
     createdGameInfo: GameCardDto;
 
-    canvasArray = new Array();
-    drawingActions = new Array();
+    rightCanvasArray: string[];
+    leftCanvasArray: string[];
+    actionsArray: boolean[];
     nbElements: number = 0;
+    leftArrayPointer: number = 0;
+    rightArrayPointer: number = 0;
+    isFirstTimeInRightCanvas: boolean = true;
+    isFirstTimeInLeftCanvas: boolean = true;
 
     // actions = new Array();
     // undoneActions = new Array();
@@ -73,7 +78,9 @@ export class GameCreationPageComponent {
         const emptyCanvas = document.createElement('canvas');
         emptyCanvas.width = 640;
         emptyCanvas.height = 480;
-        this.canvasArray.push(emptyCanvas.toDataURL());
+
+        this.leftCanvasArray.push(emptyCanvas.toDataURL());
+        this.rightCanvasArray.push(emptyCanvas.toDataURL());
     }
 
     getTitle(title: string): void {
@@ -507,47 +514,93 @@ export class GameCreationPageComponent {
         }
     }
 
+    // verifyFirstTime(position: string) {
+    //     const emptyCanvas = document.createElement('canvas');
+    //     emptyCanvas.width = 640;
+    //     emptyCanvas.height = 480;
+    //     if (position === 'right') {
+    //         this.rigthCanvasArray.push({ canvas: emptyCanvas.toDataURL(), isInLeftCanvas: false });
+    //         this.isFirstTimeInRightCanvas = false;
+    //     } else if (position === 'left') {
+    //         this.rigthCanvasArray.push({ canvas: emptyCanvas.toDataURL(), isInLeftCanvas: true });
+    //         this.isFirstTimeInLeftCanvas = false;
+    //     }
+    // }
+
     pushCanvas(canvas: HTMLCanvasElement) {
         this.nbElements++;
-        if (this.nbElements < this.canvasArray.length) {
-            this.canvasArray.length = this.nbElements; // added this to make sure that if someone undos then adds new modifications that it won't allow user to undo back to the old saved canvases
-        }
-        const canvasDataURL = canvas.toDataURL();
+        // if (this.nbElements < this.actionsArray.length) {
+        //     // added this to make sure that if someone undos then adds new modifications
+        //     // that it won't allow user to undo back to the old saved canvases
+        //     this.actionsArray.length = this.nbElements;
+        // }
 
-        this.canvasArray.push(canvasDataURL);
+        const canvasDataURL = canvas.toDataURL();
+        if (this.isInOgCanvas) {
+            // if (this.isFirstTimeInLeftCanvas) this.verifyFirstTime('left');
+            this.leftArrayPointer++;
+            this.leftCanvasArray.push(canvasDataURL);
+        } else {
+            this.rightArrayPointer++;
+            this.rightCanvasArray.push(canvasDataURL);
+            // if (this.isFirstTimeInRightCanvas) this.verifyFirstTime('right');
+        }
+        console.log('array lenght: ', this.rightCanvasArray.length);
+        console.log('n éléments: ', this.nbElements);
     }
 
+    undoAction(array: string[], pointer: number) {
+        const ctx = this.actionsArray[this.nbElements]
+            ? this.ogDrawnCanvas.nativeElement.getContext('2d')
+            : this.diffDrawnCanvas.nativeElement.getContext('2d');
+
+        const canvasPic = new Image();
+        canvasPic.src = array[pointer];
+        canvasPic.onload = () => {
+            ctx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+            ctx.drawImage(canvasPic, 0, 0);
+        };
+    }
     undo() {
-        const ctxOgDrawing = this.ogDrawnCanvas.nativeElement.getContext('2d');
         if (this.nbElements > 0) {
             this.nbElements--;
-            const canvasPic = new Image();
-            canvasPic.src = this.canvasArray[this.nbElements];
-            canvasPic.onload = () => {
-                ctxOgDrawing.drawImage(canvasPic, 0, 0);
-            };
-            ctxOgDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+
+            if (this.actionsArray[this.nbElements]) {
+                this.leftArrayPointer--;
+                this.undoAction(this.leftCanvasArray, this.leftArrayPointer);
+            } else {
+                this.rightArrayPointer--;
+                this.undoAction(this.rightCanvasArray, this.rightArrayPointer);
+            }
         }
+    }
+
+    redoAction(array: string[], pointer: number) {
+        const ctx = this.actionsArray[this.nbElements]
+            ? this.ogDrawnCanvas.nativeElement.getContext('2d')
+            : this.diffDrawnCanvas.nativeElement.getContext('2d');
+
+        const canvasPic = new Image();
+        canvasPic.src = array[pointer];
+
+        canvasPic.onload = () => {
+            ctx.drawImage(canvasPic, 0, 0);
+        };
+        ctx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
     }
 
     redo() {
-        const ctxOgDrawing = this.ogDrawnCanvas.nativeElement.getContext('2d');
-        console.log(this.canvasArray.length - 1);
-
-        if (this.nbElements < this.canvasArray.length - 1) {
+        if (this.nbElements < this.actionsArray.length - 1) {
             this.nbElements++;
-            console.log('nb elements : ', this.nbElements);
-            console.log(this.canvasArray[this.nbElements]);
-            const canvasPic = new Image();
-            canvasPic.src = this.canvasArray[this.nbElements];
-
-            canvasPic.onload = () => {
-                ctxOgDrawing.drawImage(canvasPic, 0, 0);
-            };
-            ctxOgDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+            if (this.actionsArray[this.nbElements]) {
+                this.leftArrayPointer++;
+                this.redoAction(this.leftCanvasArray, this.leftArrayPointer);
+            } else {
+                this.rightArrayPointer++;
+                this.redoAction(this.rightCanvasArray, this.rightArrayPointer);
+            }
         }
     }
-
     // savePixels() {
     //     const context = this.ogDrawnCanvas.nativeElement.getContext('2d');
     //     const imageData = context.getImageData(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
