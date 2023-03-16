@@ -1,16 +1,22 @@
-import { ElementRef, Injectable, ViewChild } from '@angular/core';
+import { ElementRef, Injectable } from '@angular/core';
+import { Attributes } from '@app/pages/game-creation-page/game-creation-page.component';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PenService {
-    @ViewChild('canvas1') myOgCanvas: ElementRef;
-    @ViewChild('canvas2') myDiffCanvas: ElementRef;
+    // @ViewChild('canvas1') myOgCanvas: ElementRef;
+    // @ViewChild('canvas2') myDiffCanvas: ElementRef;
 
-    @ViewChild('drawingCanvas1') ogDrawnCanvas: ElementRef;
-    @ViewChild('drawingCanvas2') diffDrawnCanvas: ElementRef;
-    @ViewChild('drawingCanvas3') diffRectCanvas: ElementRef;
-    @ViewChild('drawingCanvas4') ogRectCanvas: ElementRef;
+    // @ViewChild('drawingCanvas1') ogDrawnCanvas: ElementRef;
+    // @ViewChild('drawingCanvas2') diffDrawnCanvas: ElementRef;
+    // @ViewChild('drawingCanvas3') diffRectCanvas: ElementRef;
+    // @ViewChild('drawingCanvas4') ogRectCanvas: ElementRef;
+
+    ogDrawnCanvas: ElementRef;
+    diffDrawnCanvas: ElementRef;
+    ogRectCanvas: ElementRef;
+    diffRectCanvas: ElementRef;
 
     drawingCanvas1: HTMLCanvasElement;
     drawingCanvas2: HTMLCanvasElement;
@@ -29,6 +35,13 @@ export class PenService {
 
     constructor() {}
 
+    setAttributes(attributes: Attributes) {
+        this.ogDrawnCanvas = attributes.ogDrawnCanvas;
+        this.diffDrawnCanvas = attributes.diffDrawnCanvas;
+        this.ogRectCanvas = attributes.ogRectCanvas;
+        this.diffRectCanvas = attributes.diffDrawnCanvas;
+        console.log(this.ogDrawnCanvas);
+    }
     choseCanvas(e: MouseEvent) {
         if ([this.diffRectCanvas.nativeElement, this.diffDrawnCanvas.nativeElement].includes(e.target)) {
             // console.log('in diff canvas');

@@ -1,5 +1,5 @@
 /* eslint-disable max-lines */
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
@@ -8,13 +8,19 @@ import { PenService } from '@app/services/pen-service.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 import { GC_PATHS } from './game-creation-constants';
+export interface Attributes {
+    ogDrawnCanvas: ElementRef;
+    diffDrawnCanvas: ElementRef;
+    ogRectCanvas: ElementRef;
+    diffRectCanvas: ElementRef;
+}
 
 @Component({
     selector: 'app-game-creation-page',
     templateUrl: './game-creation-page.component.html',
     styleUrls: ['./game-creation-page.component.scss'],
 })
-export class GameCreationPageComponent {
+export class GameCreationPageComponent implements OnInit {
     @ViewChild('canvas1') myOgCanvas: ElementRef;
     @ViewChild('canvas2') myDiffCanvas: ElementRef;
 
@@ -70,7 +76,6 @@ export class GameCreationPageComponent {
     private eraseListener: ((e: MouseEvent) => void)[] = [this.startErase.bind(this), this.stopErase.bind(this), this.erasing.bind(this)];
     private recListener: ((e: MouseEvent) => void)[] = [this.startRec.bind(this), this.stopRec.bind(this), this.paintRectangle.bind(this)];
     // private penListener: ((e: MouseEvent) => void)[] = [this.startPen.bind(this), this.stopPen.bind(this), this.writing.bind(this)];
-
     constructor(
         public gameCardService: GameCardInformationService,
         public penService: PenService,
@@ -81,6 +86,19 @@ export class GameCreationPageComponent {
         emptyCanvas.width = 640;
         emptyCanvas.height = 480;
         this.canvasArray.push(emptyCanvas.toDataURL());
+    }
+
+    ngOnInit(): void {
+        setTimeout(() => {
+            const attributes: Attributes = {
+                ogDrawnCanvas: this.ogDrawnCanvas,
+                diffDrawnCanvas: this.diffDrawnCanvas,
+                ogRectCanvas: this.ogRectCanvas,
+                diffRectCanvas: this.diffRectCanvas,
+            };
+            this.penService.setAttributes(attributes);
+            console.log(this.ogDrawnCanvas);
+        }, 50);
     }
 
     getTitle(title: string): void {
