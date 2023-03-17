@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
 import { CanvasInformations } from '@common/canvas-informations';
+
 @Injectable({
     providedIn: 'root',
 })
