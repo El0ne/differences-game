@@ -74,8 +74,8 @@ export class GameCreationPageComponent implements OnInit {
 
     private eraseListener: ((mouseEvent: MouseEvent) => void)[] = [this.startErase.bind(this), this.stopErase.bind(this), this.erasing.bind(this)];
     private rectangleListener: ((mouseEvent: MouseEvent) => void)[] = [
-        this.startRec.bind(this),
-        this.stopRec.bind(this),
+        this.startDrawingRectangle.bind(this),
+        this.stopDrawingRectangle.bind(this),
         this.paintRectangle.bind(this),
     ];
     private penListener: ((mouseEvent: MouseEvent) => void)[] = [this.startPen.bind(this), this.stopPen.bind(this), this.writing.bind(this)];
@@ -207,7 +207,7 @@ export class GameCreationPageComponent implements OnInit {
         return true;
     }
 
-    mergeCanvas() {
+    mergeCanvas(): void {
         // const diffContext = this.differenceCanvas.nativeElement.getContext('2d');
         // diffContext.drawImage(this.differenceDrawnCanvas.nativeElement, 0, 0);
         // this.drawCtx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height); // just here to verify that merge works well
@@ -265,15 +265,15 @@ export class GameCreationPageComponent implements OnInit {
         }
     }
 
-    startRec(mouseEvent: MouseEvent): void {
-        const canvasRect = this.drawingCanvas2.getBoundingClientRect();
-
+    startDrawingRectangle(mouseEvent: MouseEvent): void {
+        const canvas = this.drawingCanvas2.getBoundingClientRect();
         this.isUserClicking = true;
-        this.rectangleInitialX = mouseEvent.clientX - canvasRect.left;
-        this.rectangleInitialY = mouseEvent.clientY - canvasRect.top;
+
+        this.rectangleInitialX = mouseEvent.clientX - canvas.left;
+        this.rectangleInitialY = mouseEvent.clientY - canvas.top;
     }
 
-    stopRec(): void {
+    stopDrawingRectangle(): void {
         const firstContext = this.drawingCanvas1.getContext('2d');
         const secondContext = this.drawingCanvas2.getContext('2d');
         this.isUserClicking = false;
@@ -287,13 +287,14 @@ export class GameCreationPageComponent implements OnInit {
     paintRectangle(mouseEvent: MouseEvent): void {
         this.choseCanvas(mouseEvent);
         const context = this.drawingCanvas2.getContext('2d');
+
         if (context && this.isUserClicking) {
-            const canvasRectangle = this.drawingCanvas2.getBoundingClientRect();
+            const canvas = this.drawingCanvas2.getBoundingClientRect();
             context.fillStyle = this.selectedColor;
             context.clearRect(0, 0, this.drawingCanvas2.width, this.drawingCanvas2.height);
 
-            const width = mouseEvent.clientX - canvasRectangle.left - this.rectangleInitialX;
-            const height = mouseEvent.clientY - canvasRectangle.top - this.rectangleInitialY;
+            const width = mouseEvent.clientX - canvas.left - this.rectangleInitialX;
+            const height = mouseEvent.clientY - canvas.top - this.rectangleInitialY;
 
             if (mouseEvent.shiftKey) {
                 const size = Math.min(Math.abs(width), Math.abs(height));
@@ -317,20 +318,19 @@ export class GameCreationPageComponent implements OnInit {
         this.differenceRectangleCanvas.nativeElement.addEventListener('mousemove', this.rectangleListener[2]);
     }
 
-    startPen(e: MouseEvent) {
-        // console.log('starting drawing');
+    startPen(mouseEvent: MouseEvent): void {
         this.isUserClicking = true;
-        const ctx1 = this.drawingCanvas1.getContext('2d');
-        const canvasRect = this.drawingCanvas1.getBoundingClientRect();
+        const context = this.drawingCanvas1.getContext('2d');
+        const canvas = this.drawingCanvas1.getBoundingClientRect();
 
-        if (ctx1) {
-            ctx1.lineWidth = this.penSize;
-            ctx1.lineCap = 'round';
-            ctx1.strokeStyle = this.selectedColor;
-            ctx1.beginPath();
-            ctx1.arc(e.clientX - canvasRect.left, e.clientY - canvasRect.top, 0, 0, 2 * Math.PI);
-            ctx1.stroke();
-            ctx1.beginPath();
+        if (context) {
+            context.lineWidth = this.penSize;
+            context.lineCap = 'round';
+            context.strokeStyle = this.selectedColor;
+            context.beginPath();
+            context.arc(mouseEvent.clientX - canvas.left, mouseEvent.clientY - canvas.top, 0, 0, 2 * Math.PI);
+            context.stroke();
+            context.beginPath();
         }
     }
 
