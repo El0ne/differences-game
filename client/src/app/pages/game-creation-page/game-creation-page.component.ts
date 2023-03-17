@@ -27,17 +27,17 @@ export class GameCreationPageComponent {
     canvas1ZIndex: number = 3;
     canvas2ZIndex: number = 2;
 
-    isRectEnabled: boolean = false;
+    isRectangleEnabled: boolean = false;
     isPenEnabled: boolean = false;
     isEraserEnabled: boolean = false;
     isDuplicateEnabled: boolean = false;
     isClearEnabled: boolean = false;
-
     isUserClicking: boolean = false;
-    rectInitialPosX: number;
-    rectInitialPosY: number;
 
-    color: string = '#ff124f';
+    rectangleInitialX: number;
+    rectangleInitialY: number;
+
+    selectedColor: string = '#ff124f';
     penSize: number = 10;
     eraserSize: number = 50;
     readonly paths = GC_PATHS;
@@ -45,13 +45,13 @@ export class GameCreationPageComponent {
     gameTitle: string = '';
     originalFile: File | null = null;
     differentFile: File | null = null;
-    radius: number = 3;
+    differenceRadius: number = 3;
 
     originalId: string = 'upload-original';
     differentId: string = 'upload-different';
 
-    isDisabled = false;
-    image: string = '';
+    isSaveDisabled = false;
+    differenceImage: string = '';
     differenceNumber: number = 0;
     difficulty: string = '';
 
@@ -113,14 +113,14 @@ export class GameCreationPageComponent {
     openModal() {
         const dialogRef = this.matDialog.open(ModalPageComponent, {
             data: {
-                image: this.image,
+                differenceImage: this.differenceImage,
                 difference: this.differenceNumber,
                 difficulty: this.difficulty,
             },
         });
 
         dialogRef.afterClosed().subscribe((result) => {
-            result.image = '';
+            result.differenceImage = '';
             this.router.navigate(['/config']);
         });
     }
@@ -147,7 +147,7 @@ export class GameCreationPageComponent {
     fileValidation(e: Event): void {
         const target = e.target as HTMLInputElement;
         const file: File = (target.files as FileList)[0];
-        if (file !== undefined && file.size === IMAGE_DIMENSIONS.size && file.type === 'image/bmp') {
+        if (file !== undefined && file.size === IMAGE_DIMENSIONS.size && file.type === 'differenceImage/bmp') {
             this.uploadImage(file, target);
         } else {
             alert('wrong size or file type please choose again');
@@ -188,13 +188,13 @@ export class GameCreationPageComponent {
 
     saveVerification(): boolean {
         if (this.gameTitle === '' && this.originalFile === null && this.differentFile === null) {
-            alert('Il manque une image et un titre à votre jeu !');
+            alert('Il manque une differenceImage et un titre à votre jeu !');
             return false;
         } else if (this.gameTitle === '') {
             alert("N'oubliez pas d'ajouter un titre à votre jeu !");
             return false;
         } else if (this.originalFile === null || this.differentFile === null) {
-            alert('Un jeu de différences sans image est pour ainsi dire... intéressant ? Ajoutez une image.');
+            alert('Un jeu de différences sans differenceImage est pour ainsi dire... intéressant ? Ajoutez une differenceImage.');
             return false;
         }
         return true;
@@ -206,13 +206,13 @@ export class GameCreationPageComponent {
         // this.drawCtx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height); // just here to verify that merge works well
         const binaryData = new Uint8Array(
             this.differenceCanvas.nativeElement
-                .toDataURL('image/bmp')
+                .toDataURL('differenceImage/bmp')
                 .split(',')[1]
                 .split('')
                 .map((c: string) => c.charCodeAt(0)),
         );
-        const blob = new Blob([binaryData], { type: 'image/bmp' });
-        this.differentFile = new File([blob], 'mergedImage.bmp', { type: 'image/bmp' });
+        const blob = new Blob([binaryData], { type: 'differenceImage/bmp' });
+        this.differentFile = new File([blob], 'mergedImage.bmp', { type: 'differenceImage/bmp' });
     }
 
     async save(): Promise<void> {
@@ -221,8 +221,8 @@ export class GameCreationPageComponent {
             this.mergeCanvas();
             console.log(this.differentFile);
 
-            this.isDisabled = true;
-            // this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.radius).subscribe((data) => {
+            this.isSaveDisabled = true;
+            // this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.differenceRadius).subscribe((data) => {
             //     if (data.gameDifferenceNumber) {
             //         this.createdGameInfo = {
             //             _id: data.gameId,
@@ -230,16 +230,16 @@ export class GameCreationPageComponent {
             //             difficulty: data.gameDifficulty,
             //             baseImage: data.originalImageName,
             //             differenceImage: data.differenceImageName,
-            //             radius: this.radius,
+            //             differenceRadius: this.differenceRadius,
             //             differenceNumber: data.gameDifferenceNumber,
             //         };
             //         this.difficulty = data.gameDifficulty;
             //         this.differenceNumber = data.gameDifferenceNumber;
-            //         this.image = `${STAGE}/image/difference-image.bmp`;
+            //         this.differenceImage = `${STAGE}/differenceImage/difference-differenceImage.bmp`;
             //         this.gameCardService.createGame(this.createdGameInfo).subscribe();
             //         this.openModal();
             //     } else {
-            //         this.isDisabled = false;
+            //         this.isSaveDisabled = false;
             //         alert("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
             //     }
             // });
@@ -264,8 +264,8 @@ export class GameCreationPageComponent {
         const canvasRect = this.drawingCanvas2.getBoundingClientRect();
 
         this.isUserClicking = true;
-        this.rectInitialPosX = e.clientX - canvasRect.left;
-        this.rectInitialPosY = e.clientY - canvasRect.top;
+        this.rectangleInitialX = e.clientX - canvasRect.left;
+        this.rectangleInitialY = e.clientY - canvasRect.top;
     }
 
     stopRec() {
@@ -284,19 +284,19 @@ export class GameCreationPageComponent {
         const ctx2 = this.drawingCanvas2.getContext('2d');
         if (ctx2 && this.isUserClicking) {
             const canvasRect = this.drawingCanvas2.getBoundingClientRect();
-            ctx2.fillStyle = this.color;
+            ctx2.fillStyle = this.selectedColor;
             ctx2.clearRect(0, 0, this.drawingCanvas2.width, this.drawingCanvas2.height); // Clears the previous canvas
 
-            const width = e.clientX - canvasRect.left - this.rectInitialPosX;
-            const height = e.clientY - canvasRect.top - this.rectInitialPosY;
+            const width = e.clientX - canvasRect.left - this.rectangleInitialX;
+            const height = e.clientY - canvasRect.top - this.rectangleInitialY;
 
             if (e.shiftKey) {
                 const size = Math.min(Math.abs(width), Math.abs(height));
                 const signX = Math.sign(width);
                 const signY = Math.sign(height);
-                ctx2.fillRect(this.rectInitialPosX, this.rectInitialPosY, size * signX, size * signY);
+                ctx2.fillRect(this.rectangleInitialX, this.rectangleInitialY, size * signX, size * signY);
             } else {
-                ctx2.fillRect(this.rectInitialPosX, this.rectInitialPosY, width, height);
+                ctx2.fillRect(this.rectangleInitialX, this.rectangleInitialY, width, height);
             }
         }
     }
@@ -323,7 +323,7 @@ export class GameCreationPageComponent {
         if (ctx1) {
             ctx1.lineWidth = this.penSize;
             ctx1.lineCap = 'round';
-            ctx1.strokeStyle = this.color;
+            ctx1.strokeStyle = this.selectedColor;
             ctx1.beginPath();
             ctx1.arc(e.clientX - canvasRect.left, e.clientY - canvasRect.top, 0, 0, 2 * Math.PI);
             ctx1.stroke();
@@ -353,7 +353,7 @@ export class GameCreationPageComponent {
 
             ctx1.lineWidth = this.penSize;
             ctx1.lineCap = 'round';
-            ctx1.strokeStyle = this.color;
+            ctx1.strokeStyle = this.selectedColor;
 
             ctx1.lineTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
             ctx1.stroke();
@@ -454,7 +454,7 @@ export class GameCreationPageComponent {
     }
 
     changeZindex() {
-        if (this.isRectEnabled) {
+        if (this.isRectangleEnabled) {
             this.canvas2ZIndex = 3;
             this.canvas1ZIndex = 2;
         } else {
@@ -469,7 +469,7 @@ export class GameCreationPageComponent {
         switch (id) {
             case 'pen':
                 this.isPenEnabled = !this.isPenEnabled;
-                this.isRectEnabled = false;
+                this.isRectangleEnabled = false;
                 this.isEraserEnabled = false;
                 this.isDuplicateEnabled = false;
                 this.isClearEnabled = false;
@@ -478,19 +478,19 @@ export class GameCreationPageComponent {
 
                 break;
             case 'rectangle':
-                this.isRectEnabled = !this.isRectEnabled;
+                this.isRectangleEnabled = !this.isRectangleEnabled;
                 this.isPenEnabled = false;
                 this.isEraserEnabled = false;
                 this.isDuplicateEnabled = false;
                 this.isClearEnabled = false;
                 this.changeZindex();
-                if (this.isRectEnabled) this.drawRectangle();
+                if (this.isRectangleEnabled) this.drawRectangle();
 
                 break;
             case 'erase':
                 this.isEraserEnabled = !this.isEraserEnabled;
                 this.isPenEnabled = false;
-                this.isRectEnabled = false;
+                this.isRectangleEnabled = false;
                 this.isDuplicateEnabled = false;
                 this.isClearEnabled = false;
 
@@ -500,7 +500,7 @@ export class GameCreationPageComponent {
             case 'duplicate':
                 this.isDuplicateEnabled = !this.isDuplicateEnabled;
                 this.isPenEnabled = false;
-                this.isRectEnabled = false;
+                this.isRectangleEnabled = false;
                 this.isEraserEnabled = false;
                 this.isClearEnabled = false;
 
@@ -508,7 +508,7 @@ export class GameCreationPageComponent {
             case 'clear':
                 this.isClearEnabled = !this.isClearEnabled;
                 this.isPenEnabled = false;
-                this.isRectEnabled = false;
+                this.isRectangleEnabled = false;
                 this.isEraserEnabled = false;
                 this.isDuplicateEnabled = false;
 

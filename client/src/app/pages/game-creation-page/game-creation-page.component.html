@@ -3,7 +3,7 @@
         <div class="left-header-container">
             <button id="previous" routerLink="/config">Retour</button>
         </div>
-        <button id="save" [disabled]="isDisabled" (click)="save()"><mat-icon class="save-image">save</mat-icon></button>
+        <button id="save" [disabled]="isSaveDisabled" (click)="save()"><mat-icon class="save-image">save</mat-icon></button>
     </div>
     <div id="title-container">
         <div class="line title">____________</div>
@@ -56,7 +56,7 @@
                         <button (click)="toggleButton('pen')" [style.backgroundColor]="isPenEnabled ? '#ffa012' : '#ff124f'">
                             <mat-icon class="btn-image">edit</mat-icon>
                         </button>
-                        <button (click)="toggleButton('rectangle')" [style.backgroundColor]="isRectEnabled ? '#ffa012' : '#ff124f'">
+                        <button (click)="toggleButton('rectangle')" [style.backgroundColor]="isRectangleEnabled ? '#ffa012' : '#ff124f'">
                             <mat-icon class="btn-image">rectangle</mat-icon>
                         </button>
                     </div>
@@ -115,7 +115,7 @@
                         <button (click)="duplicate('right')"><mat-icon class="btn-image">arrow_forward</mat-icon></button>
                     </div>
                     <div class="color-container">
-                        <input type="color" [(ngModel)]="color" id="color-picker" value="#ff124f" />
+                        <input type="color" [(ngModel)]="selectedColor" id="color-picker" value="#ff124f" />
                         <label for="color-picker">Choisir une couleur</label>
                     </div>
                     <div class="diff-range-container">
@@ -123,14 +123,14 @@
                             <input
                                 type="range"
                                 id="radius-range"
-                                [(ngModel)]="radius"
+                                [(ngModel)]="differenceRadius"
                                 min="0"
                                 max="15"
                                 value="3"
                                 step="3"
                                 oninput="this.nextElementSibling.value = this.value"
                             />
-                            <output>{{ radius }}</output>
+                            <output>{{ differenceRadius }}</output>
                         </div>
                         <label for="radius-range">Rayon du détecteur de différence</label>
                     </div>
