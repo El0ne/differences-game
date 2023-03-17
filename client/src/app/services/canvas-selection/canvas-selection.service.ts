@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CanvasInformations } from '@app/shared/models/canvas-informations';
+import { CanvasInformations } from '@common/canvas-informations';
 @Injectable({
     providedIn: 'root',
 })

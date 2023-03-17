@@ -80,7 +80,13 @@ export class GameCreationPageComponent implements OnInit {
     ];
     private penListener: ((mouseEvent: MouseEvent) => void)[] = [this.startPen.bind(this), this.stopPen.bind(this), this.writing.bind(this)];
 
-    constructor(public gameCardService: GameCardInformationService, private matDialog: MatDialog, public router: Router) {}
+    // eslint-disable-next-line max-params
+    constructor(
+        // we need more than 3 Services/Routers/Dialogs
+        public gameCardService: GameCardInformationService,
+        private matDialog: MatDialog,
+        public router: Router,
+    ) {}
 
     @HostListener('document:keydown.control.z', ['$event'])
     onCtrlZ(event: KeyboardEvent) {
