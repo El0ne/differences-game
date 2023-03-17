@@ -40,8 +40,9 @@ export class PenService {
         this.diffDrawnCanvas = attributes.diffDrawnCanvas;
         this.ogRectCanvas = attributes.ogRectCanvas;
         this.diffRectCanvas = attributes.diffDrawnCanvas;
-        console.log(this.ogDrawnCanvas);
+        // console.log(this.ogDrawnCanvas);
     }
+
     choseCanvas(e: MouseEvent) {
         if ([this.diffRectCanvas.nativeElement, this.diffDrawnCanvas.nativeElement].includes(e.target)) {
             // console.log('in diff canvas');

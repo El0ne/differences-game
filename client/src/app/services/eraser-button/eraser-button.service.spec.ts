@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { PenService } from './pen-service.service';
+import { EraserButtonService } from './eraser-button.service';
 
-describe('PenServiceService', () => {
-    let service: PenService;
+describe('EraserButtonService', () => {
+    let service: EraserButtonService;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
-        service = TestBed.inject(PenService);
+        service = TestBed.inject(EraserButtonService);
     });
 
     it('should be created', () => {

@@ -3,6 +3,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
+import { EraserButtonService } from '@app/services/eraser-button/eraser-button.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { PenService } from '@app/services/pen-service.service';
 import { GameCardDto } from '@common/game-card.dto';
@@ -73,12 +74,13 @@ export class GameCreationPageComponent implements OnInit {
 
     isInOgCanvas: boolean = false;
 
-    private eraseListener: ((e: MouseEvent) => void)[] = [this.startErase.bind(this), this.stopErase.bind(this), this.erasing.bind(this)];
+    // private eraseListener: ((e: MouseEvent) => void)[] = [this.startErase.bind(this), this.stopErase.bind(this), this.erasing.bind(this)];
     private recListener: ((e: MouseEvent) => void)[] = [this.startRec.bind(this), this.stopRec.bind(this), this.paintRectangle.bind(this)];
     // private penListener: ((e: MouseEvent) => void)[] = [this.startPen.bind(this), this.stopPen.bind(this), this.writing.bind(this)];
     constructor(
         public gameCardService: GameCardInformationService,
         public penService: PenService,
+        public eraserButtonService: EraserButtonService,
         private matDialog: MatDialog,
         public router: Router,
     ) {
@@ -378,6 +380,8 @@ export class GameCreationPageComponent implements OnInit {
         this.diffDrawnCanvas.nativeElement.addEventListener('mousemove', this.penListener[2]);
     }
 */
+
+    /*
     startErase(e: MouseEvent) {
         this.isUserClicking = true;
         const ctx1 = this.drawingCanvas1.getContext('2d');
@@ -426,6 +430,8 @@ export class GameCreationPageComponent implements OnInit {
         this.ogDrawnCanvas.nativeElement.addEventListener('mousemove', this.eraseListener[2]);
         this.diffDrawnCanvas.nativeElement.addEventListener('mousemove', this.eraseListener[2]);
     }
+*/
+
     /*
     removingListeners() {
         this.ogRectCanvas.nativeElement.removeEventListener('mousedown', this.recListener[0]);
@@ -488,7 +494,7 @@ export class GameCreationPageComponent implements OnInit {
                 this.isRectEnabled = false;
                 this.isDuplicateEnabled = false;
                 this.changeZindex();
-                if (this.isEraserEnabled) this.erase();
+                if (this.isEraserEnabled) this.eraserButtonService.erase();
                 break;
             case 'duplicate':
                 this.isDuplicateEnabled = !this.isDuplicateEnabled;
