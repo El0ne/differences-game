@@ -13,13 +13,13 @@ import { GC_PATHS } from './game-creation-constants';
     styleUrls: ['./game-creation-page.component.scss'],
 })
 export class GameCreationPageComponent {
-    @ViewChild('canvas1') myOgCanvas: ElementRef;
-    @ViewChild('canvas2') myDiffCanvas: ElementRef;
+    @ViewChild('canvas1') originalCanvas: ElementRef;
+    @ViewChild('canvas2') differenceCanvas: ElementRef;
 
-    @ViewChild('drawingCanvas1') ogDrawnCanvas: ElementRef;
-    @ViewChild('drawingCanvas2') diffDrawnCanvas: ElementRef;
-    @ViewChild('drawingCanvas3') diffRectCanvas: ElementRef;
-    @ViewChild('drawingCanvas4') ogRectCanvas: ElementRef;
+    @ViewChild('drawingCanvas1') originalDrawnCanvas: ElementRef;
+    @ViewChild('drawingCanvas2') differenceDrawnCanvas: ElementRef;
+    @ViewChild('drawingCanvas3') differenceRectangleCanvas: ElementRef;
+    @ViewChild('drawingCanvas4') originalRectangleCanvas: ElementRef;
 
     drawingCanvas1: HTMLCanvasElement;
     drawingCanvas2: HTMLCanvasElement;
@@ -156,8 +156,8 @@ export class GameCreationPageComponent {
     }
 
     async uploadImage(file: File, target: HTMLInputElement): Promise<void> {
-        const ogContext = this.myOgCanvas.nativeElement.getContext('2d');
-        const diffContext = this.myDiffCanvas.nativeElement.getContext('2d');
+        const ogContext = this.originalCanvas.nativeElement.getContext('2d');
+        const diffContext = this.differenceCanvas.nativeElement.getContext('2d');
         const reader = new FileReader();
         reader.readAsDataURL(file);
 
@@ -201,11 +201,11 @@ export class GameCreationPageComponent {
     }
 
     mergeCanvas() {
-        // const diffContext = this.myDiffCanvas.nativeElement.getContext('2d');
-        // diffContext.drawImage(this.diffDrawnCanvas.nativeElement, 0, 0);
+        // const diffContext = this.differenceCanvas.nativeElement.getContext('2d');
+        // diffContext.drawImage(this.differenceDrawnCanvas.nativeElement, 0, 0);
         // this.drawCtx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height); // just here to verify that merge works well
         const binaryData = new Uint8Array(
-            this.myDiffCanvas.nativeElement
+            this.differenceCanvas.nativeElement
                 .toDataURL('image/bmp')
                 .split(',')[1]
                 .split('')
@@ -247,16 +247,16 @@ export class GameCreationPageComponent {
     }
 
     choseCanvas(e: MouseEvent) {
-        if ([this.diffRectCanvas.nativeElement, this.diffDrawnCanvas.nativeElement].includes(e.target)) {
+        if ([this.differenceRectangleCanvas.nativeElement, this.differenceDrawnCanvas.nativeElement].includes(e.target)) {
             // console.log('in diff canvas');
             this.isInOgCanvas = false;
-            this.drawingCanvas1 = this.diffDrawnCanvas.nativeElement;
-            this.drawingCanvas2 = this.diffRectCanvas.nativeElement;
-        } else if ([this.ogRectCanvas.nativeElement, this.ogDrawnCanvas.nativeElement].includes(e.target)) {
+            this.drawingCanvas1 = this.differenceDrawnCanvas.nativeElement;
+            this.drawingCanvas2 = this.differenceRectangleCanvas.nativeElement;
+        } else if ([this.originalRectangleCanvas.nativeElement, this.originalDrawnCanvas.nativeElement].includes(e.target)) {
             // console.log('in og canvas');
             this.isInOgCanvas = true;
-            this.drawingCanvas1 = this.ogDrawnCanvas.nativeElement;
-            this.drawingCanvas2 = this.ogRectCanvas.nativeElement;
+            this.drawingCanvas1 = this.originalDrawnCanvas.nativeElement;
+            this.drawingCanvas2 = this.originalRectangleCanvas.nativeElement;
         }
     }
 
@@ -304,14 +304,14 @@ export class GameCreationPageComponent {
     drawRectangle() {
         console.log('inDrawRectangle', this);
 
-        this.ogRectCanvas.nativeElement.addEventListener('mousedown', this.recListener[0]);
-        this.diffRectCanvas.nativeElement.addEventListener('mousedown', this.recListener[0]);
+        this.originalRectangleCanvas.nativeElement.addEventListener('mousedown', this.recListener[0]);
+        this.differenceRectangleCanvas.nativeElement.addEventListener('mousedown', this.recListener[0]);
 
-        this.ogRectCanvas.nativeElement.addEventListener('mouseup', this.recListener[1]);
-        this.diffRectCanvas.nativeElement.addEventListener('mouseup', this.recListener[1]);
+        this.originalRectangleCanvas.nativeElement.addEventListener('mouseup', this.recListener[1]);
+        this.differenceRectangleCanvas.nativeElement.addEventListener('mouseup', this.recListener[1]);
 
-        this.ogRectCanvas.nativeElement.addEventListener('mousemove', this.recListener[2]);
-        this.diffRectCanvas.nativeElement.addEventListener('mousemove', this.recListener[2]);
+        this.originalRectangleCanvas.nativeElement.addEventListener('mousemove', this.recListener[2]);
+        this.differenceRectangleCanvas.nativeElement.addEventListener('mousemove', this.recListener[2]);
     }
 
     startPen(e: MouseEvent) {
@@ -369,16 +369,16 @@ export class GameCreationPageComponent {
 
     drawPen() {
         // this.penListener = this.startPen.bind(this);
-        this.ogDrawnCanvas.nativeElement.addEventListener('mousedown', this.penListener[0]);
-        this.diffDrawnCanvas.nativeElement.addEventListener('mousedown', this.penListener[0]);
+        this.originalDrawnCanvas.nativeElement.addEventListener('mousedown', this.penListener[0]);
+        this.differenceDrawnCanvas.nativeElement.addEventListener('mousedown', this.penListener[0]);
 
         // this.penListener = this.stopPen.bind(this);
-        this.ogDrawnCanvas.nativeElement.addEventListener('mouseup', this.penListener[1]);
-        this.diffDrawnCanvas.nativeElement.addEventListener('mouseup', this.penListener[1]);
+        this.originalDrawnCanvas.nativeElement.addEventListener('mouseup', this.penListener[1]);
+        this.differenceDrawnCanvas.nativeElement.addEventListener('mouseup', this.penListener[1]);
 
         // this.penListener = this.writing.bind(this);
-        this.ogDrawnCanvas.nativeElement.addEventListener('mousemove', this.penListener[2]);
-        this.diffDrawnCanvas.nativeElement.addEventListener('mousemove', this.penListener[2]);
+        this.originalDrawnCanvas.nativeElement.addEventListener('mousemove', this.penListener[2]);
+        this.differenceDrawnCanvas.nativeElement.addEventListener('mousemove', this.penListener[2]);
     }
 
     startErase(e: MouseEvent) {
@@ -418,39 +418,39 @@ export class GameCreationPageComponent {
 
     erase() {
         // this.eraseListener = this.startErase.bind(this);
-        this.ogDrawnCanvas.nativeElement.addEventListener('mousedown', this.eraseListener[0]);
-        this.diffDrawnCanvas.nativeElement.addEventListener('mousedown', this.eraseListener[0]);
+        this.originalDrawnCanvas.nativeElement.addEventListener('mousedown', this.eraseListener[0]);
+        this.differenceDrawnCanvas.nativeElement.addEventListener('mousedown', this.eraseListener[0]);
 
         // this.eraseListener = this.stopErase.bind(this);
-        this.ogDrawnCanvas.nativeElement.addEventListener('mouseup', this.eraseListener[1]);
-        this.diffDrawnCanvas.nativeElement.addEventListener('mouseup', this.eraseListener[1]);
+        this.originalDrawnCanvas.nativeElement.addEventListener('mouseup', this.eraseListener[1]);
+        this.differenceDrawnCanvas.nativeElement.addEventListener('mouseup', this.eraseListener[1]);
 
         // this.eraseListener = this.erasing.bind(this);
-        this.ogDrawnCanvas.nativeElement.addEventListener('mousemove', this.eraseListener[2]);
-        this.diffDrawnCanvas.nativeElement.addEventListener('mousemove', this.eraseListener[2]);
+        this.originalDrawnCanvas.nativeElement.addEventListener('mousemove', this.eraseListener[2]);
+        this.differenceDrawnCanvas.nativeElement.addEventListener('mousemove', this.eraseListener[2]);
     }
 
     removingListeners() {
-        this.ogRectCanvas.nativeElement.removeEventListener('mousedown', this.recListener[0]);
-        this.diffRectCanvas.nativeElement.removeEventListener('mousedown', this.recListener[0]);
-        this.ogRectCanvas.nativeElement.removeEventListener('mouseup', this.recListener[1]);
-        this.diffRectCanvas.nativeElement.removeEventListener('mouseup', this.recListener[1]);
-        this.ogRectCanvas.nativeElement.removeEventListener('mousemove', this.recListener[2]);
-        this.diffRectCanvas.nativeElement.removeEventListener('mousemove', this.recListener[2]);
+        this.originalRectangleCanvas.nativeElement.removeEventListener('mousedown', this.recListener[0]);
+        this.differenceRectangleCanvas.nativeElement.removeEventListener('mousedown', this.recListener[0]);
+        this.originalRectangleCanvas.nativeElement.removeEventListener('mouseup', this.recListener[1]);
+        this.differenceRectangleCanvas.nativeElement.removeEventListener('mouseup', this.recListener[1]);
+        this.originalRectangleCanvas.nativeElement.removeEventListener('mousemove', this.recListener[2]);
+        this.differenceRectangleCanvas.nativeElement.removeEventListener('mousemove', this.recListener[2]);
 
-        this.ogDrawnCanvas.nativeElement.removeEventListener('mousedown', this.penListener[0]);
-        this.diffDrawnCanvas.nativeElement.removeEventListener('mousedown', this.penListener[0]);
-        this.ogDrawnCanvas.nativeElement.removeEventListener('mouseup', this.penListener[1]);
-        this.diffDrawnCanvas.nativeElement.removeEventListener('mouseup', this.penListener[1]);
-        this.ogDrawnCanvas.nativeElement.removeEventListener('mousemove', this.penListener[2]);
-        this.diffDrawnCanvas.nativeElement.removeEventListener('mousemove', this.penListener[2]);
+        this.originalDrawnCanvas.nativeElement.removeEventListener('mousedown', this.penListener[0]);
+        this.differenceDrawnCanvas.nativeElement.removeEventListener('mousedown', this.penListener[0]);
+        this.originalDrawnCanvas.nativeElement.removeEventListener('mouseup', this.penListener[1]);
+        this.differenceDrawnCanvas.nativeElement.removeEventListener('mouseup', this.penListener[1]);
+        this.originalDrawnCanvas.nativeElement.removeEventListener('mousemove', this.penListener[2]);
+        this.differenceDrawnCanvas.nativeElement.removeEventListener('mousemove', this.penListener[2]);
 
-        this.ogDrawnCanvas.nativeElement.removeEventListener('mousedown', this.eraseListener[0]);
-        this.diffDrawnCanvas.nativeElement.removeEventListener('mousedown', this.eraseListener[0]);
-        this.ogDrawnCanvas.nativeElement.removeEventListener('mouseup', this.eraseListener[1]);
-        this.diffDrawnCanvas.nativeElement.removeEventListener('mouseup', this.eraseListener[1]);
-        this.ogDrawnCanvas.nativeElement.removeEventListener('mousemove', this.eraseListener[2]);
-        this.diffDrawnCanvas.nativeElement.removeEventListener('mousemove', this.eraseListener[2]);
+        this.originalDrawnCanvas.nativeElement.removeEventListener('mousedown', this.eraseListener[0]);
+        this.differenceDrawnCanvas.nativeElement.removeEventListener('mousedown', this.eraseListener[0]);
+        this.originalDrawnCanvas.nativeElement.removeEventListener('mouseup', this.eraseListener[1]);
+        this.differenceDrawnCanvas.nativeElement.removeEventListener('mouseup', this.eraseListener[1]);
+        this.originalDrawnCanvas.nativeElement.removeEventListener('mousemove', this.eraseListener[2]);
+        this.differenceDrawnCanvas.nativeElement.removeEventListener('mousemove', this.eraseListener[2]);
     }
 
     changeZindex() {
@@ -517,41 +517,41 @@ export class GameCreationPageComponent {
     }
 
     invert() {
-        const ctxDiffDrawing = this.diffDrawnCanvas.nativeElement.getContext('2d');
-        const ctxOgDrawing = this.ogDrawnCanvas.nativeElement.getContext('2d');
-        const ctxOgRectangle = this.ogRectCanvas.nativeElement.getContext('2d');
+        const ctxDiffDrawing = this.differenceDrawnCanvas.nativeElement.getContext('2d');
+        const ctxOgDrawing = this.originalDrawnCanvas.nativeElement.getContext('2d');
+        const ctxOgRectangle = this.originalRectangleCanvas.nativeElement.getContext('2d');
 
-        if (ctxOgRectangle) ctxOgRectangle.drawImage(this.diffDrawnCanvas.nativeElement, 0, 0);
+        if (ctxOgRectangle) ctxOgRectangle.drawImage(this.differenceDrawnCanvas.nativeElement, 0, 0);
 
         if (ctxDiffDrawing) {
             ctxDiffDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-            ctxDiffDrawing.drawImage(this.ogDrawnCanvas.nativeElement, 0, 0);
+            ctxDiffDrawing.drawImage(this.originalDrawnCanvas.nativeElement, 0, 0);
         }
 
         if (ctxOgDrawing) {
             ctxOgDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-            ctxOgDrawing.drawImage(this.ogRectCanvas.nativeElement, 0, 0);
+            ctxOgDrawing.drawImage(this.originalRectangleCanvas.nativeElement, 0, 0);
         }
 
         if (ctxOgRectangle) ctxOgRectangle.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
     }
 
     duplicate(side: string) {
-        const ctxDiffDrawing = this.diffDrawnCanvas.nativeElement.getContext('2d');
-        const ctxOgDrawing = this.ogDrawnCanvas.nativeElement.getContext('2d');
+        const ctxDiffDrawing = this.differenceDrawnCanvas.nativeElement.getContext('2d');
+        const ctxOgDrawing = this.originalDrawnCanvas.nativeElement.getContext('2d');
 
         if (side === 'right') {
             // console.log('right');
-            ctxDiffDrawing.drawImage(this.ogDrawnCanvas.nativeElement, 0, 0);
+            ctxDiffDrawing.drawImage(this.originalDrawnCanvas.nativeElement, 0, 0);
         } else if (side === 'left') {
             // console.log('left');
-            ctxOgDrawing.drawImage(this.diffDrawnCanvas.nativeElement, 0, 0);
+            ctxOgDrawing.drawImage(this.differenceDrawnCanvas.nativeElement, 0, 0);
         }
     }
 
     clearPainting(side: string) {
-        const ctxDiffDrawing = this.diffDrawnCanvas.nativeElement.getContext('2d');
-        const ctxOgDrawing = this.ogDrawnCanvas.nativeElement.getContext('2d');
+        const ctxDiffDrawing = this.differenceDrawnCanvas.nativeElement.getContext('2d');
+        const ctxOgDrawing = this.originalDrawnCanvas.nativeElement.getContext('2d');
         if (side === 'right') {
             ctxDiffDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
             this.isInOgCanvas = false;
@@ -602,8 +602,8 @@ export class GameCreationPageComponent {
 
     undoAction(array: string[], pointer: number) {
         const ctx = this.actionsArray[this.nbElements]
-            ? this.ogDrawnCanvas.nativeElement.getContext('2d')
-            : this.diffDrawnCanvas.nativeElement.getContext('2d');
+            ? this.originalDrawnCanvas.nativeElement.getContext('2d')
+            : this.differenceDrawnCanvas.nativeElement.getContext('2d');
 
         const canvasPic = new Image();
         canvasPic.src = array[pointer];
@@ -631,8 +631,8 @@ export class GameCreationPageComponent {
 
     redoAction(array: string[], pointer: number) {
         const ctx = this.actionsArray[this.nbElements]
-            ? this.ogDrawnCanvas.nativeElement.getContext('2d')
-            : this.diffDrawnCanvas.nativeElement.getContext('2d');
+            ? this.originalDrawnCanvas.nativeElement.getContext('2d')
+            : this.differenceDrawnCanvas.nativeElement.getContext('2d');
 
         const canvasPic = new Image();
         canvasPic.src = array[pointer];
