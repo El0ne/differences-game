@@ -3,6 +3,7 @@ import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
+import { FileManipulationService } from '@app/services/file-manipulation/file-manipulation.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
@@ -86,6 +87,7 @@ export class GameCreationPageComponent implements OnInit {
         public gameCardService: GameCardInformationService,
         private matDialog: MatDialog,
         public router: Router,
+        private fileManipulationService: FileManipulationService,
     ) {}
 
     @HostListener('document:keydown.control.z', ['$event'])
@@ -107,6 +109,16 @@ export class GameCreationPageComponent implements OnInit {
 
         this.leftCanvasArray.push(emptyCanvas.toDataURL());
         this.rightCanvasArray.push(emptyCanvas.toDataURL());
+        setTimeout(
+            () =>
+                this.fileManipulationService.updateAttributes({
+                    originalFile: this.originalFile,
+                    differenceFile: this.differentFile,
+                    originalCanvas: this.originalCanvas.nativeElement,
+                    differenceCanvas: this.differenceCanvas.nativeElement,
+                }),
+            50,
+        );
     }
 
     getTitle(title: string): void {
@@ -126,88 +138,71 @@ export class GameCreationPageComponent implements OnInit {
     openSaveModal() {
         const dialogRef = this.matDialog.open(ModalPageComponent, {
             data: {
-                differenceImage: this.differenceImage,
+                image: this.differenceImage,
                 difference: this.differenceNumber,
                 difficulty: this.difficulty,
             },
         });
 
         dialogRef.afterClosed().subscribe((result) => {
-            result.differenceImage = '';
+            result.image = '';
             this.router.navigate(['/config']);
         });
     }
 
-    clearSingleFile(canvas: HTMLCanvasElement, id: string): void {
-        const context = canvas.getContext('2d');
-        const input = document.getElementById(id) as HTMLInputElement;
-        const bothInput = document.getElementById('upload-both') as HTMLInputElement;
-        input.value = '';
-        bothInput.value = '';
-        if (context) context.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+    clearFile(canvas: HTMLCanvasElement, id: string, file: File | null): void {
+        this.fileManipulationService.clearFile(canvas, id, file);
     }
 
-    clearFirstFile(canvas: HTMLCanvasElement, id: string): void {
-        this.originalFile = null;
-        this.clearSingleFile(canvas, id);
+    async fileValidation(event: Event): Promise<void> {
+        await this.fileManipulationService.fileValidation(event);
     }
 
-    clearSecondFile(canvas: HTMLCanvasElement, id: string): void {
-        this.differentFile = null;
-        this.clearSingleFile(canvas, id);
-    }
+    // async uploadImage(file: File, target: HTMLInputElement): Promise<void> {
+    //     console.log('upload');
+    //     const ogContext = this.originalCanvas.nativeElement.getContext('2d');
+    //     const diffContext = this.differenceCanvas.nativeElement.getContext('2d');
+    //     const reader = new FileReader();
+    //     reader.readAsDataURL(file);
 
-    fileValidation(e: Event): void {
-        const target = e.target as HTMLInputElement;
-        const file: File = (target.files as FileList)[0];
-        if (file !== undefined && file.size === IMAGE_DIMENSIONS.size && file.type === 'image/bmp') {
-            this.uploadImage(file, target);
-        } else {
-            alert('wrong size or file type please choose again');
-            target.value = ''; // we ended up really needing it lol
-        }
-    }
-
-    async uploadImage(file: File, target: HTMLInputElement): Promise<void> {
-        const ogContext = this.originalCanvas.nativeElement.getContext('2d');
-        const diffContext = this.differenceCanvas.nativeElement.getContext('2d');
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-
-        reader.onload = () => {
-            const img = new Image();
-            img.src = reader.result as string;
-            img.onload = () => {
-                if (!target.files?.length) {
-                    return;
-                }
-                if (target.id === this.originalId) {
-                    if (ogContext) ogContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-                    this.originalFile = target.files[0];
-                } else if (target.id === this.differentId) {
-                    if (diffContext) diffContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-                    this.differentFile = target.files[0];
-                } else {
-                    if (ogContext && diffContext) {
-                        ogContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-                        diffContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-                        this.originalFile = target.files[0];
-                        this.differentFile = target.files[0];
-                    }
-                }
-            };
-        };
-    }
+    //     reader.onload = () => {
+    //         const img = new Image();
+    //         img.src = reader.result as string;
+    //         img.onload = () => {
+    //             if (!target.files?.length) {
+    //                 return;
+    //             }
+    //             if (target.id === this.originalId) {
+    //                 console.log('original');
+    //                 if (ogContext) ogContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+    //                 this.originalFile = target.files[0];
+    //             } else if (target.id === this.differentId) {
+    //                 console.log('difference');
+    //                 if (diffContext) diffContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+    //                 this.differentFile = target.files[0];
+    //             } else {
+    //                 if (ogContext && diffContext) {
+    //                     ogContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+    //                     diffContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+    //                     this.originalFile = target.files[0];
+    //                     this.differentFile = target.files[0];
+    //                 }
+    //             }
+    //         };
+    //     };
+    // }
 
     saveVerification(): boolean {
         if (this.gameTitle === '' && this.originalFile === null && this.differentFile === null) {
-            alert('Il manque une differenceImage et un titre à votre jeu !');
+            alert('Il manque une image et un titre à votre jeu !');
             return false;
         } else if (this.gameTitle === '') {
             alert("N'oubliez pas d'ajouter un titre à votre jeu !");
             return false;
         } else if (this.originalFile === null || this.differentFile === null) {
-            alert('Un jeu de différences sans differenceImage est pour ainsi dire... intéressant ? Ajoutez une differenceImage.');
+            console.log('this.originalFile', this.originalFile);
+            console.log('this.differentFile', this.differentFile);
+            alert('Un jeu de différences sans image est pour ainsi dire... intéressant ? Ajoutez une image.');
             return false;
         }
         return true;
@@ -219,22 +214,21 @@ export class GameCreationPageComponent implements OnInit {
         // this.drawCtx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height); // just here to verify that merge works well
         const binaryData = new Uint8Array(
             this.differenceCanvas.nativeElement
-                .toDataURL('differenceImage/bmp')
+                .toDataURL('image/bmp')
                 .split(',')[1]
                 .split('')
                 .map((c: string) => c.charCodeAt(0)),
         );
-        const blob = new Blob([binaryData], { type: 'differenceImage/bmp' });
-        this.differentFile = new File([blob], 'mergedImage.bmp', { type: 'differenceImage/bmp' });
+        const blob = new Blob([binaryData], { type: 'image/bmp' });
+        this.differentFile = new File([blob], 'mergedImage.bmp', { type: 'image/bmp' });
     }
 
     async save(): Promise<void> {
+        const updatedFiles = this.fileManipulationService.updateFiles();
+        this.originalFile = updatedFiles[0];
+        this.differentFile = updatedFiles[1];
         if (this.saveVerification() && this.originalFile && this.differentFile) {
-            console.log(this.differentFile);
-            this.mergeCanvas();
-            console.log(this.differentFile);
-
-            this.isSaveDisabled = true;
+            // this.isSaveDisabled = true;
             // this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.differenceRadius).subscribe((data) => {
             //     if (data.gameDifferenceNumber) {
             //         this.createdGameInfo = {
@@ -243,19 +237,20 @@ export class GameCreationPageComponent implements OnInit {
             //             difficulty: data.gameDifficulty,
             //             baseImage: data.originalImageName,
             //             differenceImage: data.differenceImageName,
-            //             differenceRadius: this.differenceRadius,
+            //             radius: this.differenceRadius,
             //             differenceNumber: data.gameDifferenceNumber,
             //         };
             //         this.difficulty = data.gameDifficulty;
             //         this.differenceNumber = data.gameDifferenceNumber;
-            //         this.differenceImage = `${STAGE}/differenceImage/difference-differenceImage.bmp`;
-            //         this.gameCardService.createGame(this.createdGameInfo).subscribe();
+            //         this.differenceImage = `${STAGE}/image/difference-image.bmp`;
             //         this.openSaveModal();
+            //         this.isSaveDisabled = false;
             //     } else {
             //         this.isSaveDisabled = false;
             //         alert("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
             //     }
             // });
+            console.log('okok');
         }
     }
 
