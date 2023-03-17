@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { WIDTH } from '@app/components/click-event/click-event-constant';
+import { FAST_WAIT_TIME_MS, WIDTH } from '@app/components/click-event/click-event-constant';
 
 @Injectable({
     providedIn: 'root',
@@ -34,6 +34,19 @@ export class PixelModificationService {
         for (const pixel of differences) {
             const pos: number[] = this.positionToPixel(pixel);
             context.clearRect(pos[0], pos[1], 1, 1);
+        }
+    }
+
+    async delay(ms: number): Promise<void> {
+        return new Promise((res) => setTimeout(res, ms));
+    }
+
+    async flashEffect(context: CanvasRenderingContext2D, differences: number[]): Promise<void> {
+        for (let i = 0; i < 2; i++) {
+            this.turnDifferenceYellow(context, differences);
+            await this.delay(FAST_WAIT_TIME_MS);
+            this.turnOffYellow(context, differences);
+            await this.delay(FAST_WAIT_TIME_MS);
         }
     }
 

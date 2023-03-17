@@ -18,8 +18,8 @@ describe('DifferenceDetectionService', () => {
     let imageWidthStub: Sinon.SinonStub;
     let imageHeightStub: Sinon.SinonStub;
 
-    const TEST_IMAGE_1 = 'app/services/difference-detection/test-image1.bmp';
-    const TEST_IMAGE_2 = 'app/services/difference-detection/test-image2.bmp';
+    const TEST_IMAGE_1 = 'assets/images/test-image1.bmp';
+    const TEST_IMAGE_2 = 'assets/images/test-image2.bmp';
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({

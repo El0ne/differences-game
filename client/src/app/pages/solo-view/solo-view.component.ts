@@ -1,20 +1,22 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
-import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
 import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal.component';
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
+import { SocketService } from '@app/services/socket/socket.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
-import { differenceInformation } from '@common/difference-information';
+import { EndGame } from '@common/chat-dialog-constants';
+import { RoomMessage, Validation } from '@common/chat-gateway-constants';
+import { ChatEvents, RoomEvent, RoomManagement } from '@common/chat.gateway.events';
+import { DifferenceInformation, MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
 import { Subject } from 'rxjs';
-import { MESSAGES_LENGTH } from './solo-view-constants';
 
 @Component({
     selector: 'app-solo-view',
@@ -26,18 +28,23 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     left: ClickEventComponent;
     @ViewChild('right')
     right: ClickEventComponent;
+    isMultiplayer: boolean;
     showErrorMessage: boolean = false;
     showTextBox: boolean = false;
     showNavBar: boolean = true;
-    playerName: string;
-    messages: string[] = [];
+    player: string;
+    opponent: string;
+    messages: RoomMessage[] = [];
     messageContent: string = '';
-    currentScore: number = 0;
+    differenceArray: number[][];
+    currentScorePlayer: number = 0;
+    currentScoreOpponent: number = 0;
     numberOfDifferences: number;
     currentTime: number;
     currentGameId: string;
     endGame: Subject<void> = new Subject<void>();
     gameCardInfo: GameCardInformation;
+    currentRoom: string;
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
 
     // eslint-disable-next-line max-params
@@ -45,13 +52,16 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         public timerService: TimerSoloService,
         private convertService: SecondToMinuteService,
         private gameCardInfoService: GameCardInformationService,
-        public foundDifferenceService: FoundDifferenceService,
+        private foundDifferenceService: FoundDifferenceService,
         private route: ActivatedRoute,
-        public dialog: MatDialog,
+        private dialog: MatDialog,
+        private router: Router,
+        public socketService: SocketService,
     ) {}
 
     ngOnInit(): void {
         const gameId = this.route.snapshot.paramMap.get('stageId');
+        this.isMultiplayer = this.router.url.includes('multiplayer');
         if (gameId) {
             this.currentGameId = gameId;
             this.gameCardInfoService.getGameCardInfoFromId(this.currentGameId).subscribe((gameCardData) => {
@@ -59,18 +69,42 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.numberOfDifferences = this.gameCardInfo.differenceNumber;
             });
         }
+        this.player = this.socketService.names.get(this.socketService.socketId) as string;
+        this.opponent = this.socketService.names.get(this.socketService.opponentSocket) as string;
+        this.currentRoom = this.socketService.gameRoom;
+        this.showTime();
+        this.addCheatMode();
+        this.configureSocketReactions();
+    }
 
-        const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true });
-        dialogRef.afterClosed().subscribe((result: string) => {
-            this.playerName = result;
-            this.showTime();
-            this.addCheatMode();
+    configureSocketReactions(): void {
+        this.socketService.listen<Validation>(ChatEvents.WordValidated, (validation: Validation) => {
+            if (validation.isValidated) {
+                this.socketService.send<RoomManagement>(ChatEvents.RoomMessage, { room: this.currentRoom, message: validation.originalMessage });
+            } else {
+                this.messages.push({ socketId: this.socketService.socketId, message: validation.originalMessage, event: 'notification' });
+            }
+        });
+        this.socketService.listen<RoomMessage>(ChatEvents.RoomMessage, (data: RoomMessage) => {
+            this.messages.push(data);
+        });
+        this.socketService.listen<RoomMessage>(ChatEvents.Abandon, (message: RoomMessage) => {
+            this.winGame(message.socketId);
+            message.message = `${message.message} - ${this.opponent} a abandonné la partie.`;
+            this.messages.push(message);
+        });
+        this.socketService.listen<PlayerDifference>(ChatEvents.Difference, (data: PlayerDifference) => {
+            this.effectHandler(data);
+        });
+        this.socketService.listen<string>(ChatEvents.Win, (socketId: string) => {
+            this.winGame(socketId);
         });
     }
 
     ngOnDestroy(): void {
         this.timerService.stopTimer();
         this.foundDifferenceService.clearDifferenceFound();
+        this.socketService.disconnect();
         this.removeCheatMode();
     }
 
@@ -111,18 +145,24 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         return this.convertService.convert(time);
     }
 
-    finishGame(): void {
-        this.left.endGame = true;
-        this.right.endGame = true;
-        this.showNavBar = false;
-
-        this.dialog.open(GameWinModalComponent, { disableClose: true });
+    winGame(winnerId: string): void {
+        if (!this.left.endGame) {
+            this.timerService.stopTimer();
+            this.left.endGame = true;
+            this.right.endGame = true;
+            this.showNavBar = false;
+            this.dialog.open(GameWinModalComponent, {
+                disableClose: true,
+                data: { isMultiplayer: this.isMultiplayer, winner: this.socketService.names.get(winnerId) } as EndGame,
+            });
+        }
     }
 
-    incrementScore(): void {
-        this.currentScore += 1;
-        if (this.numberOfDifferences === this.currentScore) {
-            this.finishGame();
+    incrementScore(socket: string): void {
+        if (this.socketService.socketId === socket) {
+            this.currentScorePlayer += 1;
+        } else {
+            this.currentScoreOpponent += 1;
         }
     }
 
@@ -130,7 +170,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.foundDifferenceService.addDifferenceFound(differenceIndex);
     }
 
-    openInfoModal() {
+    openInfoModal(): void {
         this.dialog.open(GameInfoModalComponent, {
             data: {
                 gameCardInfo: this.gameCardInfo,
@@ -139,31 +179,14 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         });
     }
 
-    quitGame() {
-        this.dialog.open(QuitGameModalComponent, { disableClose: true });
-    }
-
-    toggleErrorMessage(): void {
-        if (!this.showErrorMessage) {
-            this.showErrorMessage = !this.showErrorMessage;
-        }
-    }
-
-    untoggleErrorMessage(): void {
-        if (this.showErrorMessage) {
-            this.showErrorMessage = !this.showErrorMessage;
-        }
+    quitGame(): void {
+        this.dialog.open(QuitGameModalComponent, {
+            disableClose: true,
+        });
     }
 
     sendMessage(): void {
-        if (this.messageContent.length === MESSAGES_LENGTH.minLength || this.messageContent.length > MESSAGES_LENGTH.maxLength) {
-            this.toggleErrorMessage();
-        } else {
-            if (this.showErrorMessage) {
-                this.untoggleErrorMessage();
-            }
-            this.messages.push(this.messageContent);
-        }
+        this.socketService.send<string>(ChatEvents.Validate, this.messageContent);
         this.messageContent = '';
     }
 
@@ -172,17 +195,61 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.right.receiveDifferencePixels(rgbaValues, array);
     }
 
+    handleMistake(): void {
+        this.socketService.send<RoomEvent>(ChatEvents.Event, { room: this.currentRoom, isMultiplayer: this.isMultiplayer, event: 'Erreur' });
+    }
+
+    hint(): void {
+        this.socketService.send<string>(ChatEvents.Hint, this.currentRoom);
+    }
     handleFlash(currentDifferences: number[]): void {
         this.left.differenceEffect(currentDifferences);
         this.right.differenceEffect(currentDifferences);
     }
+    differenceHandler(information: DifferenceInformation): void {
+        if (this.isMultiplayer) {
+            const multiplayerInformation: MultiplayerDifferenceInformation = {
+                room: this.currentRoom,
+                differencesPosition: information.differencesPosition,
+                lastDifferences: information.lastDifferences,
+            };
+            this.socketService.send<DifferenceInformation>(ChatEvents.Difference, multiplayerInformation);
+        } else {
+            const difference: PlayerDifference = {
+                differencesPosition: information.differencesPosition,
+                lastDifferences: information.lastDifferences,
+                socket: this.socketService.socketId,
+            };
+            this.effectHandler(difference);
+        }
+        this.left.emitSound(false);
+        this.socketService.send<RoomEvent>(ChatEvents.Event, {
+            room: this.currentRoom,
+            isMultiplayer: this.isMultiplayer,
+            event: 'Différence trouvée',
+        });
+    }
 
-    emitHandler(information: differenceInformation): void {
+    effectHandler(information: PlayerDifference): void {
         if (!this.left.toggleCheatMode) {
             this.handleFlash(information.lastDifferences);
         }
         this.paintPixel(information.lastDifferences);
-        this.incrementScore();
+        this.incrementScore(information.socket);
         this.addDifferenceDetected(information.differencesPosition);
+        this.endGameVerification();
+    }
+
+    endGameVerification(): void {
+        if (this.isMultiplayer) {
+            const endGameVerification = this.numberOfDifferences / 2;
+            if (this.currentScorePlayer >= endGameVerification) {
+                this.socketService.send<string>(ChatEvents.Win, this.currentRoom);
+            }
+        } else {
+            if (this.currentScorePlayer === this.numberOfDifferences) {
+                this.winGame(this.socketService.socketId);
+            }
+        }
     }
 }

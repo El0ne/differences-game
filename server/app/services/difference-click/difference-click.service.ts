@@ -1,4 +1,4 @@
-import { Differences, DifferencesDocument } from '@app/schemas/differences.schemas'; // 'schemas/differences.schemas';
+import { Differences, DifferencesDocument } from '@app/schemas/differences.schemas';
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';

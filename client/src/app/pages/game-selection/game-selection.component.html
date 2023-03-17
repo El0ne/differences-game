@@ -16,7 +16,12 @@
                     card: even
                 }"
             >
-                <app-game-card-selection *ngIf="even" [gameCardInformation]="gameCardInformation" [isConfig]="isConfig"></app-game-card-selection>
+                <app-game-card-selection
+                    #stages
+                    *ngIf="even"
+                    [gameCardInformation]="gameCardInformation"
+                    [isConfig]="isConfig"
+                ></app-game-card-selection>
             </div>
         </div>
         <div *ngIf="isConfig" class="game-properties">
@@ -31,7 +36,12 @@
                     card: odd
                 }"
             >
-                <app-game-card-selection *ngIf="odd" [gameCardInformation]="gameCardInformation" [isConfig]="isConfig"></app-game-card-selection>
+                <app-game-card-selection
+                    #stages
+                    *ngIf="odd"
+                    [gameCardInformation]="gameCardInformation"
+                    [isConfig]="isConfig"
+                ></app-game-card-selection>
             </div>
         </div>
     </div>

@@ -4,9 +4,9 @@ import { FoundDifferenceService } from '@app/services/found-differences/found-di
 import { PixelModificationService } from '@app/services/pixel-modification/pixel-modification.service';
 import { STAGE } from '@app/services/server-routes';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
-import { differenceInformation } from '@common/difference-information';
+import { DifferenceInformation } from '@common/difference-information';
 import { Observable } from 'rxjs';
-import { FAST_WAIT_TIME_MS, HEIGHT, WAIT_TIME_MS, WIDTH } from './click-event-constant';
+import { HEIGHT, WAIT_TIME_MS, WIDTH } from './click-event-constant';
 
 @Component({
     selector: 'app-click-event',
@@ -20,7 +20,8 @@ export class ClickEventComponent implements OnInit {
     @Input() original: string;
     @Input() gameCardId: string;
     @Input() imagePath: string;
-    @Output() handler: EventEmitter<differenceInformation> = new EventEmitter<differenceInformation>();
+    @Output() differenceDetected: EventEmitter<DifferenceInformation> = new EventEmitter<DifferenceInformation>();
+    @Output() mistake: EventEmitter<void> = new EventEmitter<void>();
     @Output() cheatModeHandler: EventEmitter<KeyboardEvent> = new EventEmitter<KeyboardEvent>();
     @ViewChild('picture', { static: true })
     picture: ElementRef<HTMLCanvasElement>;
@@ -67,7 +68,7 @@ export class ClickEventComponent implements OnInit {
                     this.differenceData.isADifference &&
                     !this.foundDifferenceService.foundDifferences.includes(this.differenceData.differencesPosition)
                 ) {
-                    this.handler.emit({
+                    this.differenceDetected.emit({
                         differencesPosition: this.differenceData.differencesPosition,
                         lastDifferences: this.differenceData.differenceArray,
                     });
@@ -81,10 +82,6 @@ export class ClickEventComponent implements OnInit {
             });
     }
 
-    async delay(ms: number): Promise<void> {
-        return new Promise((res) => setTimeout(res, ms));
-    }
-
     async clearEffect(): Promise<void> {
         const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         await this.pixelModificationService.turnOffYellow(originalContext, this.foundDifferenceService.foundDifferences);
@@ -93,18 +90,9 @@ export class ClickEventComponent implements OnInit {
     async differenceEffect(currentDifferences: number[]): Promise<void> {
         if (!this.endGame) {
             const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-
-            for (let i = 0; i < 2; i++) {
-                this.pixelModificationService.turnDifferenceYellow(originalContext, currentDifferences);
-                await this.delay(FAST_WAIT_TIME_MS);
-                this.pixelModificationService.turnOffYellow(originalContext, currentDifferences);
-                await this.delay(FAST_WAIT_TIME_MS);
-            }
-
+            this.pixelModificationService.flashEffect(originalContext, currentDifferences);
             if (this.toggleCheatMode) {
                 this.differenceEffect(currentDifferences);
-            } else {
-                this.emitSound(false);
             }
         }
     }
@@ -116,13 +104,14 @@ export class ClickEventComponent implements OnInit {
         sound.play();
     }
 
-    displayError(mouseEvent: MouseEvent): void {
+    displayError(click: MouseEvent): void {
         if (!this.timeout && !this.endGame) {
+            this.mistake.emit();
             this.emitSound(true);
             this.timeout = true;
             const rect = this.modification.nativeElement.getBoundingClientRect();
             const context = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-            this.pixelModificationService.errorMessage(mouseEvent, rect, context);
+            this.pixelModificationService.errorMessage(click, rect, context);
             setTimeout(() => {
                 context.clearRect(0, 0, WIDTH, HEIGHT);
                 this.timeout = false;
