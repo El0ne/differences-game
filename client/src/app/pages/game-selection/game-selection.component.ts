@@ -35,7 +35,6 @@ export class GameSelectionComponent implements OnInit {
             });
         }
         this.socket.listen(WaitingRoomEvents.GameDeleted, () => {
-            console.log('yo');
             this.refreshGameCards();
         });
 

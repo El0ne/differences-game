@@ -1,7 +1,7 @@
 import { RoomMessage } from '@common/chat-gateway-constants';
 import { ChatEvents, Room, RoomEvent, RoomManagement } from '@common/chat.gateway.events';
 import { MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { MESSAGE_MAX_LENGTH } from './chat.gateway.constants';
@@ -12,8 +12,6 @@ export class ChatGateway implements OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
 
     private waitingRoom: Room[] = [];
-
-    constructor(private readonly logger: Logger) {}
 
     @SubscribeMessage(ChatEvents.Validate)
     validate(socket: Socket, message: string): void {

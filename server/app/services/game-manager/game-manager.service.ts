@@ -8,7 +8,6 @@ interface MapGameInfo {
 @Injectable()
 export class GameManagerService {
     gamePlayedInformation: Map<string, MapGameInfo> = new Map();
-    // map <id, {nbParties: number , deleted: boolean}>
 
     constructor(private differenceClickService: DifferenceClickService) {}
 
@@ -23,7 +22,7 @@ export class GameManagerService {
                 this.gamePlayedInformation.delete(stageId);
             }
         }
-        // console.log('this.gamePlayedInformation', this.gamePlayedInformation);
+        console.log('this.gamePlayedInformation', this.gamePlayedInformation);
     }
 
     addGame(stageId: string, numberOfPlayers: number): void {
@@ -36,7 +35,7 @@ export class GameManagerService {
                 isDeleted: false,
             });
         }
-        // console.log('map ', this.gamePlayedInformation);
+        console.log('map ', this.gamePlayedInformation);
     }
 
     async deleteGame(stageId: string): Promise<void> {
@@ -47,6 +46,6 @@ export class GameManagerService {
         } else {
             await this.differenceClickService.deleteDifferences(stageId);
         }
-        // console.log('map ', this.gamePlayedInformation);
+        console.log('map ', this.gamePlayedInformation);
     }
 }

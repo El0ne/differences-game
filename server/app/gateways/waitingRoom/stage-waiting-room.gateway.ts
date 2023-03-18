@@ -62,9 +62,13 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
         const roomId = randomUUID();
         socket.join(roomId);
         socket.data.room = roomId;
+        socket.data.stageId = socket.data.stageInHosting;
         opponentSocket.join(roomId);
         opponentSocket.data.room = roomId;
+        opponentSocket.data.stageId = socket.data.stageInHosting;
         this.gameHosts.delete(socket.data.stageInHosting);
+
+        this.gameManagerService.addGame(socket.data.stageInHosting, 2);
 
         const acceptationInfo: AcceptationInformation = { playerName: acceptation.playerName, playerSocketId: socket.id, roomId };
         socket.to(acceptation.playerSocketId).emit(WaitingRoomEvents.MatchAccepted, acceptationInfo);
@@ -84,7 +88,7 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
     @SubscribeMessage(WaitingRoomEvents.DeleteGame)
     async deleteGame(@ConnectedSocket() socket: Socket, @MessageBody() stageId: string): Promise<void> {
         await this.gameCardService.deleteGameCard(stageId);
-        // await this.gameManagerService.deleteGame(stageId);
+        await this.gameManagerService.deleteGame(stageId);
 
         this.server.to(stageId).emit(WaitingRoomEvents.GameDeleted);
         this.server.to(stageId).emit(WaitingRoomEvents.MatchRefused, "La fiche n'est plus disponible pour jouer");
