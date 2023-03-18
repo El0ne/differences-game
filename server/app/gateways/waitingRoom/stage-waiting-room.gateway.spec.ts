@@ -1,7 +1,6 @@
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { JoinHostInWaitingRequest, PlayerInformations, WaitingRoomEvents } from '@common/waiting-room-socket-communication';
-import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import { BroadcastOperator, Server, Socket } from 'socket.io';
@@ -9,24 +8,26 @@ import { StageWaitingRoomGateway } from './stage-waiting-room.gateway';
 
 describe('StageWaitingRoomGateway', () => {
     let gateway: StageWaitingRoomGateway;
-    let logger: SinonStubbedInstance<Logger>;
     let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
+    let gameCardService: SinonStubbedInstance<GameCardService>;
+    let gameManagerService: SinonStubbedInstance<GameManagerService>;
     const lookedStages = ['stage1', 'stage2', 'stage3', 'stage4'];
+    // const mockGameManagerService = { addGame: jest.fn(), deleteGame: jest.fn() };
 
     beforeEach(async () => {
-        logger = createStubInstance(Logger);
         server = createStubInstance<Server>(Server);
         socket = createStubInstance<Socket>(Socket);
+        gameCardService = createStubInstance<GameCardService>(GameCardService);
+        gameManagerService = createStubInstance<GameManagerService>(GameManagerService);
         socket.data = {};
         Object.defineProperty(socket, 'id', { value: '123' });
         Object.defineProperty(server, 'sockets', { value: { sockets: new Map<string, Socket>() } });
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 StageWaitingRoomGateway,
-                { provide: Logger, useValue: logger },
-                { provide: GameCardService, useValue: {} },
-                { provide: GameManagerService, useValue: {} },
+                { provide: GameCardService, useValue: gameCardService },
+                { provide: GameManagerService, useValue: gameManagerService },
             ],
         }).compile();
 
@@ -130,6 +131,19 @@ describe('StageWaitingRoomGateway', () => {
         } as BroadcastOperator<unknown, unknown>);
         gateway.declineOpponent(socket, 'refusedOpponent');
         expect(socket.to.calledWith('refusedOpponent')).toBeTruthy();
+    });
+
+    it('deleteGame should send a call services to delete game and emit to the stage room', async () => {
+        server.to.returns({
+            // eslint-disable-next-line @typescript-eslint/no-empty-function, no-unused-vars
+            emit: (event: string) => {},
+        } as BroadcastOperator<unknown, unknown>);
+        const deleteGameCardSpy = jest.spyOn(gameCardService, 'deleteGameCard');
+        const deleteGameSpy = jest.spyOn(gameManagerService, 'deleteGame');
+        await gateway.deleteGame('stageId');
+        expect(deleteGameCardSpy).toBeCalledWith('stageId');
+        expect(deleteGameSpy).toBeCalledWith('stageId');
+        expect(server.to.calledWith('stageId')).toBeTruthy();
     });
 
     it('handleDisconnect should call unhostGame or quitHost on the right conditions', () => {
