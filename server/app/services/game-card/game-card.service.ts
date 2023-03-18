@@ -38,8 +38,8 @@ export class GameCardService {
 
     async deleteGameCard(id: string): Promise<void> {
         const deletedGameCard = await this.gameCardModel.findByIdAndDelete(new ObjectId(id));
-        await this.imageManagerService.deleteImage(deletedGameCard.originalImageName);
-        await this.imageManagerService.deleteImage(deletedGameCard.differenceImageName);
+        this.imageManagerService.deleteImage(deletedGameCard.originalImageName);
+        this.imageManagerService.deleteImage(deletedGameCard.differenceImageName);
     }
 
     generateGameCard(game: GameCardDto): GameCard {

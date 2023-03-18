@@ -1,3 +1,5 @@
+import { GameCardService } from '@app/services/game-card/game-card.service';
+import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { JoinHostInWaitingRequest, PlayerInformations, WaitingRoomEvents } from '@common/waiting-room-socket-communication';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -22,10 +24,9 @@ describe('StageWaitingRoomGateway', () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 StageWaitingRoomGateway,
-                {
-                    provide: Logger,
-                    useValue: logger,
-                },
+                { provide: Logger, useValue: logger },
+                { provide: GameCardService, useValue: {} },
+                { provide: GameManagerService, useValue: {} },
             ],
         }).compile();
 

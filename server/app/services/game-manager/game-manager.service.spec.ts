@@ -88,7 +88,7 @@ describe('GameManagerService', () => {
         }
         await service.deleteGame(id);
         await service.endGame(id);
-        expect(service.gamePlayedInformation.get(id).numberOfGames).toBe(gameAmount - 1);
+        expect(service.gamePlayedInformation.get(id).numberOfPlayers).toBe(gameAmount - 1);
     });
 
     it('addGame should increase the amount of game being played if the game exists', async () => {
@@ -98,7 +98,7 @@ describe('GameManagerService', () => {
             service.addGame(id);
         }
         await service.addGame(id);
-        expect(service.gamePlayedInformation.get(id).numberOfGames).toBe(gameAmount + 1);
+        expect(service.gamePlayedInformation.get(id).numberOfPlayers).toBe(gameAmount + 1);
     });
 
     it('deleteGame should delete the game if no one is playing it', async () => {
