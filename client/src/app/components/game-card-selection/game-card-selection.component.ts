@@ -5,7 +5,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { WaitingRoomComponent, WaitingRoomDataPassing } from '@app/modals/waiting-room/waiting-room.component';
-import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { STAGE } from '@app/services/server-routes';
 import { SocketService } from '@app/services/socket/socket.service';
 import { GameCardInformation } from '@common/game-card';
@@ -23,12 +22,7 @@ export class GameCardSelectionComponent implements OnInit {
     image: string = '';
     createGameButton: boolean = true;
 
-    constructor(
-        private socketService: SocketService,
-        private gameCardService: GameCardInformationService,
-        private dialog: MatDialog,
-        private router: Router,
-    ) {}
+    constructor(private socketService: SocketService, private dialog: MatDialog, private router: Router) {}
     ngOnInit(): void {
         this.image = `${STAGE}/image/${this.gameCardInformation.originalImageName}`;
     }
@@ -36,12 +30,7 @@ export class GameCardSelectionComponent implements OnInit {
     // TODO: Ajouter la logique pour que les temps de configurations viennent du database pour dynamiquement les loader.
 
     deleteGame(): void {
-        this.gameCardService.deleteGame(this.gameCardInformation._id).subscribe();
-        this.gameDeleted.emit();
-    }
-
-    startGame(): void {
-        this.gameCardService.playGame(this.gameCardInformation._id).subscribe();
+        this.socketService.send(WaitingRoomEvents.DeleteGame, this.gameCardInformation._id);
     }
 
     hostOrJoinGame(): void {

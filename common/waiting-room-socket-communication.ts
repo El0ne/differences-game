@@ -13,6 +13,7 @@ export enum WaitingRoomEvents {
     MatchAccepted = 'matchAccepted',
     MatchRefused = 'matchRefused',
     MatchConfirmed = 'matchConfirmed',
+    DeleteGame = 'deleteGame',
     GameDeleted = 'gameDeleted',
 }
 

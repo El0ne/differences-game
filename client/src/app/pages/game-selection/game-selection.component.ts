@@ -24,7 +24,6 @@ export class GameSelectionComponent implements OnInit {
 
     ngOnInit(): void {
         this.isConfig = this.router.url === '/config';
-        this.refreshGameCards();
         this.socket.connect();
         if (!this.isConfig) {
             this.socket.listen(WaitingRoomEvents.MatchCreated, (stageId: string) => {
@@ -35,14 +34,12 @@ export class GameSelectionComponent implements OnInit {
                 this.setGameCardCreateOrJoin(true, stageId);
             });
         }
-        // this.socket.listen(WaitingRoomEvents.GameDeleted, (stageId: string) => {
-        //     this.setGameCardCreateOrJoin(true, stageId);
-        // });
-
-        this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
-            this.numberOfGameInformations = data;
-            this.selectGameCards();
+        this.socket.listen(WaitingRoomEvents.GameDeleted, () => {
+            console.log('yo');
+            this.refreshGameCards();
         });
+
+        this.refreshGameCards();
     }
 
     selectGameCards(): void {

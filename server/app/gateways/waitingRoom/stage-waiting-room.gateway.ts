@@ -1,13 +1,18 @@
+import { GameCardService } from '@app/services/game-card/game-card.service';
+import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { AcceptationInformation, JoinHostInWaitingRequest, PlayerInformations, WaitingRoomEvents } from '@common/waiting-room-socket-communication';
 import { Injectable } from '@nestjs/common/decorators';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { randomUUID } from 'crypto';
 import { Server, Socket } from 'socket.io';
+
 @WebSocketGateway()
 @Injectable()
 export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
     gameHosts: Map<string, string> = new Map<string, string>();
+
+    constructor(private gameManagerService: GameManagerService, private gameCardService: GameCardService) {}
 
     @SubscribeMessage(WaitingRoomEvents.ScanForHost)
     scanForHosts(@ConnectedSocket() socket: Socket, @MessageBody() stagesIds: string[]): void {
@@ -74,6 +79,15 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
     @SubscribeMessage(WaitingRoomEvents.DeclineOpponent)
     declineOpponent(@ConnectedSocket() socket: Socket, @MessageBody() opponentId: string): void {
         socket.to(opponentId).emit(WaitingRoomEvents.MatchRefused, "l'hôte ne souhaite pas faire une partie avec vous");
+    }
+
+    @SubscribeMessage(WaitingRoomEvents.DeleteGame)
+    async deleteGame(@ConnectedSocket() socket: Socket, @MessageBody() stageId: string): Promise<void> {
+        await this.gameCardService.deleteGameCard(stageId);
+        // await this.gameManagerService.deleteGame(stageId);
+
+        this.server.to(stageId).emit(WaitingRoomEvents.GameDeleted);
+        this.server.to(stageId).emit(WaitingRoomEvents.MatchRefused, "La fiche n'est plus disponible pour jouer");
     }
 
     handleDisconnect(socket: Socket) {
