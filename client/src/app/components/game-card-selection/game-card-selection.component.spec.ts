@@ -73,16 +73,12 @@ describe('GameCardSelectionComponent', () => {
         expect(gameDeletedSpy).toHaveBeenCalled();
     });
 
-    it('startGame should call gameCardService.playGame', () => {
-        component.gameCardInformation = GAMES[0];
-        component.startGame();
-        expect(gameCardServiceSpy.playGame).toHaveBeenCalledWith(component.gameCardInformation._id);
-    });
     it('selectPlayerName should redirect to solo view after opening the modal if in soloGame', () => {
         modalSpy.open = () => choseNameAfterClosedSpy;
         const routerSpy = spyOn(TestBed.inject(Router), 'navigate');
         component.selectPlayerName(true);
         expect(routerSpy).toHaveBeenCalledWith(['/solo/' + component.gameCardInformation._id]);
+        expect(socketServiceSpy.send).toHaveBeenCalledWith('createSologame', '123');
     });
 
     it('selectPlayerName should call hostOrJoinGame if in multiplayer', () => {
