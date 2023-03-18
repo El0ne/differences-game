@@ -58,20 +58,11 @@ describe('GameManagerService', () => {
         expect(service).toBeDefined();
     });
 
-    it('createGame should add the id to the gamePlayedInformation map', () => {
-        const mapSetMock = jest.spyOn(service.gamePlayedInformation, 'set');
-        const FAKE_MAP_GAME_INFO = { isDeleted: false, numberOfGames: 0 };
-        service.createGame(id);
-        expect(mapSetMock).toBeCalledWith(id, FAKE_MAP_GAME_INFO);
-        expect(mapSetMock).toBeCalledTimes(1);
-    });
-
     it('endGame should call .delete and .deleteDifferences if it is the last game ending and the game has to be deleted', async () => {
         const deleteMock = jest.spyOn(service.gamePlayedInformation, 'delete');
         const deleteDifferencesMock = jest.spyOn(differenceClickService, 'deleteDifferences');
 
-        service.createGame(id);
-        service.addGame(id);
+        service.addGame(id, 1);
         await service.deleteGame(id);
         await service.endGame(id);
         expect(deleteMock).toBeCalledWith(id);
@@ -81,47 +72,31 @@ describe('GameManagerService', () => {
     });
 
     it('endGame should decrease the amount of game being played otherwise', async () => {
-        const gameAmount = 5;
-        service.createGame(id);
-        for (let i = 0; i < gameAmount; i++) {
-            service.addGame(id);
-        }
+        const numberOfPlayer = 5;
+        service.addGame(id, numberOfPlayer);
+
         await service.deleteGame(id);
         await service.endGame(id);
-        expect(service.gamePlayedInformation.get(id).numberOfPlayers).toBe(gameAmount - 1);
+        expect(service.gamePlayedInformation.get(id).numberOfPlayers).toBe(numberOfPlayer - 1);
     });
 
     it('addGame should increase the amount of game being played if the game exists', async () => {
-        const gameAmount = 5;
-        service.createGame(id);
-        for (let i = 0; i < gameAmount; i++) {
-            service.addGame(id);
-        }
-        await service.addGame(id);
-        expect(service.gamePlayedInformation.get(id).numberOfPlayers).toBe(gameAmount + 1);
+        const numberOfPlayer = 5;
+        service.addGame(id, numberOfPlayer);
+        service.addGame(id, 1);
+        expect(service.gamePlayedInformation.get(id).numberOfPlayers).toBe(numberOfPlayer + 1);
     });
 
     it('deleteGame should delete the game if no one is playing it', async () => {
-        const mapDeleteMock = jest.spyOn(service.gamePlayedInformation, 'delete');
         const deleteDifferenceMock = jest.spyOn(differenceClickService, 'deleteDifferences');
-        service.createGame(id);
         await service.deleteGame(id);
-
-        expect(mapDeleteMock).toBeCalledWith(id);
         expect(deleteDifferenceMock).toBeCalledWith(id);
-        expect(mapDeleteMock).toBeCalledTimes(1);
     });
 
     it('deleteGame should set the isDeleted property of the game to true if someone is playing it', async () => {
-        service.createGame(id);
-        await service.addGame(id);
-
-        // Mock created after first function calls because set is called in them
-        const mapSetMock = jest.spyOn(service.gamePlayedInformation, 'set');
-
+        service.addGame(id, 1);
+        expect(service.gamePlayedInformation.get(id).isDeleted).toBe(false);
         await service.deleteGame(id);
-
-        expect(mapSetMock).toBeCalledWith(id, { isDeleted: true, numberOfGames: 1 });
-        expect(mapSetMock).toBeCalledTimes(1);
+        expect(service.gamePlayedInformation.get(id).isDeleted).toBe(true);
     });
 });
