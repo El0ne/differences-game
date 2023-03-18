@@ -48,7 +48,7 @@ describe('GameCardSelectionComponent', () => {
                     provide: SocketService,
                     useValue: socketServiceSpy,
                 },
-            { provide: GameCardInformationService, useValue: gameCardServiceSpyObj }
+                { provide: GameCardInformationService, useValue: gameCardServiceSpyObj },
             ],
             teardown: { destroyAfterEach: false },
         }).compileComponents();
@@ -77,6 +77,7 @@ describe('GameCardSelectionComponent', () => {
         component.gameCardInformation = GAMES[0];
         component.startGame();
         expect(gameCardServiceSpy.playGame).toHaveBeenCalledWith(component.gameCardInformation._id);
+    });
     it('selectPlayerName should redirect to solo view after opening the modal if in soloGame', () => {
         modalSpy.open = () => choseNameAfterClosedSpy;
         const routerSpy = spyOn(TestBed.inject(Router), 'navigate');
