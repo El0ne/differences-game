@@ -50,6 +50,7 @@ describe('WaitingRoomComponent', () => {
         expect(socketServiceSpy.delete).toHaveBeenCalledWith(WaitingRoomEvents.MatchConfirmed);
         component.waitingRoomInfo.isHost = false;
         component.ngOnInit();
+        component.ngOnDestroy();
         expect(socketServiceSpy.delete).toHaveBeenCalledWith(WaitingRoomEvents.MatchAccepted);
         expect(socketServiceSpy.delete).toHaveBeenCalledWith(WaitingRoomEvents.MatchRefused);
     });
