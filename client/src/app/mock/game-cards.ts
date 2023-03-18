@@ -20,7 +20,7 @@ const GAME1: GameCardInformation = {
 };
 
 const GAME2: GameCardInformation = {
-    _id: '123',
+    _id: '345',
     name: 'game2',
     difficulty: 'Difficile',
     differenceNumber: 5,

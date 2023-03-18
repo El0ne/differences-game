@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
 import { QuitGameModalComponent } from './quit-game-modal.component';
@@ -9,6 +9,7 @@ describe('QuitGameModalComponent', () => {
     let fixture: ComponentFixture<QuitGameModalComponent>;
     let matDialogRefMock: MatDialogRef<QuitGameModalComponent>;
     let routerMock: Router;
+    const data = { player: 'player', room: 'testRoom' };
 
     beforeEach(async () => {
         matDialogRefMock = jasmine.createSpyObj('MatDialogRef', ['close']);
@@ -19,6 +20,10 @@ describe('QuitGameModalComponent', () => {
             providers: [
                 { provide: MatDialogRef, useValue: matDialogRefMock },
                 { provide: Router, useValue: routerMock },
+                {
+                    provide: MAT_DIALOG_DATA,
+                    useValue: data,
+                },
             ],
         }).compileComponents();
 
@@ -31,10 +36,10 @@ describe('QuitGameModalComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should close modal and route to stage-selection page', () => {
+    it('should close modal and route to home page', () => {
         component.confirm();
         expect(matDialogRefMock.close).toHaveBeenCalled();
-        expect(routerMock.navigate).toHaveBeenCalledWith(['/stage-selection']);
+        expect(routerMock.navigate).toHaveBeenCalledWith(['/home']);
     });
 
     it('should close modal if close', () => {

@@ -38,6 +38,7 @@ describe('ModalPageComponent', () => {
                 GameCardInformationService,
                 ClickEventService,
             ],
+            teardown: { destroyAfterEach: false },
         }).compileComponents();
 
         dialogRefSpyObject = jasmine.createSpyObj({ afterClosed: of({}), close: null });

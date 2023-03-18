@@ -8,14 +8,15 @@ import { Router } from '@angular/router';
     styleUrls: ['./quit-game-modal.component.scss'],
 })
 export class QuitGameModalComponent {
-    constructor(public matDialogRef: MatDialogRef<QuitGameModalComponent>, public router: Router) {}
+    image: string = '../../../assets/crying-black-guy-meme.gif';
+    constructor(private matDialogRef: MatDialogRef<QuitGameModalComponent>, private router: Router) {}
 
-    confirm() {
+    confirm(): void {
         this.matDialogRef.close();
-        this.router.navigate(['/stage-selection']);
+        this.router.navigate(['/home']);
     }
 
-    cancel() {
+    cancel(): void {
         this.matDialogRef.close();
     }
 }

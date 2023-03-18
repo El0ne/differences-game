@@ -26,4 +26,11 @@ describe('FoundDifferenceService', () => {
         service.clearDifferenceFound();
         expect(service.foundDifferences).toEqual([]);
     });
+
+    it('findPixelsFromDifference should set the already found differences of differencePixels to []', () => {
+        service.foundDifferences = [0];
+        const differences = [[0], [1, 1, 1], [2, 2]];
+        service.findPixelsFromDifference(differences);
+        expect(differences).toEqual([[], [1, 1, 1], [2, 2]]);
+    });
 });

@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
+import { Component, Inject } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { EndGame } from '@common/chat-dialog-constants';
 
 @Component({
     selector: 'app-game-win-modal',
@@ -8,9 +9,9 @@ import { Router } from '@angular/router';
     styleUrls: ['./game-win-modal.component.scss'],
 })
 export class GameWinModalComponent {
-    constructor(public matDialogRef: MatDialogRef<GameWinModalComponent>, public router: Router) {}
+    constructor(private matDialogRef: MatDialogRef<GameWinModalComponent>, private router: Router, @Inject(MAT_DIALOG_DATA) public data: EndGame) {}
 
-    confirm() {
+    confirm(): void {
         this.matDialogRef.close();
         this.router.navigate(['/home']);
     }
