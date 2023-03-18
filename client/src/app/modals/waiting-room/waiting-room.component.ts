@@ -49,6 +49,7 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
                 this.navigateToMultiplayer(acceptationInfo.roomId);
             });
         }
+
         this.socket.listen(WaitingRoomEvents.MatchRefused, (refusedReason: string) => {
             alert(refusedReason);
             this.dialogRef.close();
