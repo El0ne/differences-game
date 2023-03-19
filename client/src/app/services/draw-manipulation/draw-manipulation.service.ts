@@ -32,6 +32,7 @@ export class DrawManipulationService {
         if (originalRectangleContext) originalRectangleContext.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
     }
 
+    // TODO Chahine, change side String with boolean onLeftCanvas
     duplicate(side: string): void {
         const differenceDrawingContext = this.canvasInformations.differenceDrawnCanvas.getContext('2d');
         const originalDrawingContext = this.canvasInformations.originalDrawnCanvas.getContext('2d');
