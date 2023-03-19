@@ -7,13 +7,14 @@ import { CanvasInformations } from '@common/canvas-informations';
 })
 export class DrawingRectangleService {
     canvasInformations: CanvasInformations;
-    constructor(private canvasSelection: CanvasSelectionService) {}
 
     private rectangleListener: ((mouseEvent: MouseEvent) => void)[] = [
         this.startDrawingRectangle.bind(this),
         this.stopDrawingRectangle.bind(this),
         this.paintRectangle.bind(this),
     ];
+
+    constructor(private canvasSelection: CanvasSelectionService) {}
 
     setProperties(information: CanvasInformations) {
         this.canvasInformations = information;

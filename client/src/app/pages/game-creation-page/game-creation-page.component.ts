@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
 import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
+import { DrawManipulationService } from '@app/services/draw-manipulation/draw-manipulation.service';
 import { DrawingRectangleService } from '@app/services/drawing-rectangle/drawing-rectangle.service';
 import { FileManipulationService } from '@app/services/file-manipulation/file-manipulation.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
@@ -95,6 +96,7 @@ export class GameCreationPageComponent implements OnInit {
         private fileManipulationService: FileManipulationService,
         private canvasSelectionService: CanvasSelectionService,
         private drawingRectangleService: DrawingRectangleService,
+        private drawManipulationService: DrawManipulationService,
     ) {}
 
     @HostListener('document:keydown.control.z', ['$event'])
@@ -519,36 +521,40 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     invert() {
-        const ctxDiffDrawing = this.differenceDrawnCanvas.nativeElement.getContext('2d');
-        const ctxOgDrawing = this.originalDrawnCanvas.nativeElement.getContext('2d');
-        const ctxOgRectangle = this.originalRectangleCanvas.nativeElement.getContext('2d');
+        // const ctxDiffDrawing = this.differenceDrawnCanvas.nativeElement.getContext('2d');
+        // const ctxOgDrawing = this.originalDrawnCanvas.nativeElement.getContext('2d');
+        // const ctxOgRectangle = this.originalRectangleCanvas.nativeElement.getContext('2d');
 
-        if (ctxOgRectangle) ctxOgRectangle.drawImage(this.differenceDrawnCanvas.nativeElement, 0, 0);
+        // if (ctxOgRectangle) ctxOgRectangle.drawImage(this.differenceDrawnCanvas.nativeElement, 0, 0);
 
-        if (ctxDiffDrawing) {
-            ctxDiffDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-            ctxDiffDrawing.drawImage(this.originalDrawnCanvas.nativeElement, 0, 0);
-        }
+        // if (ctxDiffDrawing) {
+        //     ctxDiffDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+        //     ctxDiffDrawing.drawImage(this.originalDrawnCanvas.nativeElement, 0, 0);
+        // }
 
-        if (ctxOgDrawing) {
-            ctxOgDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-            ctxOgDrawing.drawImage(this.originalRectangleCanvas.nativeElement, 0, 0);
-        }
+        // if (ctxOgDrawing) {
+        //     ctxOgDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+        //     ctxOgDrawing.drawImage(this.originalRectangleCanvas.nativeElement, 0, 0);
+        // }
 
-        if (ctxOgRectangle) ctxOgRectangle.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+        // if (ctxOgRectangle) ctxOgRectangle.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+        this.drawManipulationService.setProperties(this.canvasInformation);
+        this.drawManipulationService.invert();
     }
 
     duplicate(side: string) {
-        const ctxDiffDrawing = this.differenceDrawnCanvas.nativeElement.getContext('2d');
-        const ctxOgDrawing = this.originalDrawnCanvas.nativeElement.getContext('2d');
+        // const ctxDiffDrawing = this.differenceDrawnCanvas.nativeElement.getContext('2d');
+        // const ctxOgDrawing = this.originalDrawnCanvas.nativeElement.getContext('2d');
 
-        if (side === 'right') {
-            // console.log('right');
-            ctxDiffDrawing.drawImage(this.originalDrawnCanvas.nativeElement, 0, 0);
-        } else if (side === 'left') {
-            // console.log('left');
-            ctxOgDrawing.drawImage(this.differenceDrawnCanvas.nativeElement, 0, 0);
-        }
+        // if (side === 'right') {
+        //     // console.log('right');
+        //     ctxDiffDrawing.drawImage(this.originalDrawnCanvas.nativeElement, 0, 0);
+        // } else if (side === 'left') {
+        //     // console.log('left');
+        //     ctxOgDrawing.drawImage(this.differenceDrawnCanvas.nativeElement, 0, 0);
+        // }
+        this.drawManipulationService.setProperties(this.canvasInformation);
+        this.drawManipulationService.duplicate(side);
     }
 
     clearPainting(side: string) {
