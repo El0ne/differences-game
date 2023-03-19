@@ -520,39 +520,12 @@ export class GameCreationPageComponent implements OnInit {
         }
     }
 
-    invert() {
-        // const ctxDiffDrawing = this.differenceDrawnCanvas.nativeElement.getContext('2d');
-        // const ctxOgDrawing = this.originalDrawnCanvas.nativeElement.getContext('2d');
-        // const ctxOgRectangle = this.originalRectangleCanvas.nativeElement.getContext('2d');
-
-        // if (ctxOgRectangle) ctxOgRectangle.drawImage(this.differenceDrawnCanvas.nativeElement, 0, 0);
-
-        // if (ctxDiffDrawing) {
-        //     ctxDiffDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-        //     ctxDiffDrawing.drawImage(this.originalDrawnCanvas.nativeElement, 0, 0);
-        // }
-
-        // if (ctxOgDrawing) {
-        //     ctxOgDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-        //     ctxOgDrawing.drawImage(this.originalRectangleCanvas.nativeElement, 0, 0);
-        // }
-
-        // if (ctxOgRectangle) ctxOgRectangle.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+    invert(): void {
         this.drawManipulationService.setProperties(this.canvasInformation);
         this.drawManipulationService.invert();
     }
 
-    duplicate(side: string) {
-        // const ctxDiffDrawing = this.differenceDrawnCanvas.nativeElement.getContext('2d');
-        // const ctxOgDrawing = this.originalDrawnCanvas.nativeElement.getContext('2d');
-
-        // if (side === 'right') {
-        //     // console.log('right');
-        //     ctxDiffDrawing.drawImage(this.originalDrawnCanvas.nativeElement, 0, 0);
-        // } else if (side === 'left') {
-        //     // console.log('left');
-        //     ctxOgDrawing.drawImage(this.differenceDrawnCanvas.nativeElement, 0, 0);
-        // }
+    duplicate(side: string): void {
         this.drawManipulationService.setProperties(this.canvasInformation);
         this.drawManipulationService.duplicate(side);
     }
