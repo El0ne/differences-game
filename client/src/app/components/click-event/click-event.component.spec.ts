@@ -92,6 +92,7 @@ describe('ClickEventComponent', () => {
         expect(answer[1]).toEqual(positionExpected[1]);
     });
 
+    // TODO sometimes fail expect 0 to equal -2
     it('getCoordInImage() should return the correct position', () => {
         const ClientX = 300;
         const ClientY = 100;
