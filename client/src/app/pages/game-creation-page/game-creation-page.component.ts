@@ -99,7 +99,8 @@ export class GameCreationPageComponent implements OnInit {
                 diffRectCanvas: this.diffRectCanvas,
             };
             this.penService.setAttributes(attributes);
-            console.log(this.ogDrawnCanvas);
+            this.eraserButtonService.setAttributes(attributes);
+            // console.log(this.ogDrawnCanvas);
         }, 50);
     }
 
@@ -432,7 +433,6 @@ export class GameCreationPageComponent implements OnInit {
     }
 */
 
-    /*
     removingListeners() {
         this.ogRectCanvas.nativeElement.removeEventListener('mousedown', this.recListener[0]);
         this.diffRectCanvas.nativeElement.removeEventListener('mousedown', this.recListener[0]);
@@ -440,7 +440,7 @@ export class GameCreationPageComponent implements OnInit {
         this.diffRectCanvas.nativeElement.removeEventListener('mouseup', this.recListener[1]);
         this.ogRectCanvas.nativeElement.removeEventListener('mousemove', this.recListener[2]);
         this.diffRectCanvas.nativeElement.removeEventListener('mousemove', this.recListener[2]);
-
+        /*
         this.ogDrawnCanvas.nativeElement.removeEventListener('mousedown', this.penService.penListener[0]);
         this.diffDrawnCanvas.nativeElement.removeEventListener('mousedown', this.penService.penListener[0]);
         this.ogDrawnCanvas.nativeElement.removeEventListener('mouseup', this.penService.penListener[1]);
@@ -454,8 +454,9 @@ export class GameCreationPageComponent implements OnInit {
         this.diffDrawnCanvas.nativeElement.removeEventListener('mouseup', this.eraseListener[1]);
         this.ogDrawnCanvas.nativeElement.removeEventListener('mousemove', this.eraseListener[2]);
         this.diffDrawnCanvas.nativeElement.removeEventListener('mousemove', this.eraseListener[2]);
+        */
     }
-*/
+
     changeZindex() {
         if (this.isRectEnabled) {
             this.canvas2ZIndex = 3;

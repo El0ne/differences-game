@@ -31,7 +31,7 @@ export class EraserButtonService {
         this.diffDrawnCanvas = attributes.diffDrawnCanvas;
         this.ogRectCanvas = attributes.ogRectCanvas;
         this.diffRectCanvas = attributes.diffDrawnCanvas;
-        console.log(this.ogDrawnCanvas);
+        // console.log(this.ogDrawnCanvas);
     }
 
     choseCanvas(e: MouseEvent) {
