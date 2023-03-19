@@ -332,7 +332,6 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     paintRectangle(mouseEvent: MouseEvent): void {
-        this.drawingRectangleService.setProperties(this.canvasInformation);
         this.drawingRectangleService.paintRectangle(mouseEvent);
         // const context = this.drawingCanvas2.getContext('2d');
 
@@ -356,14 +355,16 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     drawRectangle(): void {
-        this.originalRectangleCanvas.nativeElement.addEventListener('mousedown', this.rectangleListener[0]);
-        this.differenceRectangleCanvas.nativeElement.addEventListener('mousedown', this.rectangleListener[0]);
+        this.drawingRectangleService.setProperties(this.canvasInformation);
+        this.drawingRectangleService.drawRectangle();
+        // this.originalRectangleCanvas.nativeElement.addEventListener('mousedown', this.rectangleListener[0]);
+        // this.differenceRectangleCanvas.nativeElement.addEventListener('mousedown', this.rectangleListener[0]);
 
-        this.originalRectangleCanvas.nativeElement.addEventListener('mouseup', this.rectangleListener[1]);
-        this.differenceRectangleCanvas.nativeElement.addEventListener('mouseup', this.rectangleListener[1]);
+        // this.originalRectangleCanvas.nativeElement.addEventListener('mouseup', this.rectangleListener[1]);
+        // this.differenceRectangleCanvas.nativeElement.addEventListener('mouseup', this.rectangleListener[1]);
 
-        this.originalRectangleCanvas.nativeElement.addEventListener('mousemove', this.rectangleListener[2]);
-        this.differenceRectangleCanvas.nativeElement.addEventListener('mousemove', this.rectangleListener[2]);
+        // this.originalRectangleCanvas.nativeElement.addEventListener('mousemove', this.rectangleListener[2]);
+        // this.differenceRectangleCanvas.nativeElement.addEventListener('mousemove', this.rectangleListener[2]);
     }
 
     startPen(mouseEvent: MouseEvent): void {
