@@ -79,6 +79,7 @@ export class GameCreationPageComponent implements OnInit {
 
     canvasInformation: CanvasInformations;
 
+    // TODO remove the listeners when services are all implemented
     private eraseListener: ((mouseEvent: MouseEvent) => void)[] = [this.startErase.bind(this), this.stopErase.bind(this), this.erasing.bind(this)];
     private rectangleListener: ((mouseEvent: MouseEvent) => void)[] = [
         this.startDrawingRectangle.bind(this),
@@ -128,6 +129,10 @@ export class GameCreationPageComponent implements OnInit {
                 differenceCanvas: this.differenceCanvas.nativeElement,
             });
         }, 50);
+    }
+
+    setColor(): void {
+        this.drawingRectangleService.setColor(this.selectedColor);
     }
 
     setObject(): CanvasInformations {

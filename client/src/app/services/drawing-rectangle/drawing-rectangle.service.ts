@@ -16,6 +16,9 @@ export class DrawingRectangleService {
 
     constructor(private canvasSelection: CanvasSelectionService) {}
 
+    setColor(color: string): void {
+        this.canvasInformations.selectedColor = color;
+    }
     setProperties(information: CanvasInformations) {
         this.canvasInformations = information;
     }

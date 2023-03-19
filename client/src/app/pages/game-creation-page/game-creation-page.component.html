@@ -117,7 +117,7 @@
                         <button (click)="duplicate('right')"><mat-icon class="btn-image">arrow_forward</mat-icon></button>
                     </div>
                     <div class="color-container">
-                        <input type="color" [(ngModel)]="selectedColor" id="color-picker" value="#ff124f" />
+                        <input type="color" [(ngModel)]="selectedColor" id="color-picker" value="#ff124f" (input)="this.setColor()" />
                         <label for="color-picker">Choisir une couleur</label>
                     </div>
                     <div class="diff-range-container">
