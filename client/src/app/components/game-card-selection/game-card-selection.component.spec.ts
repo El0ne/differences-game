@@ -63,9 +63,6 @@ describe('GameCardSelectionComponent', () => {
     });
 
     it('deleteGame should call gameCardService.deleteGame and gameDeleted.emit', () => {
-        // const gameDeletedSpy = spyOn(component.gameDeleted, 'emit');
-        // expect(gameCardServiceSpy.deleteGame).toHaveBeenCalledWith(component.gameCardInformation._id);
-        // expect(gameDeletedSpy).toHaveBeenCalled();
         component.deleteGame();
         expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.DeleteGame, '123');
     });

@@ -38,7 +38,6 @@ describe('StageController', () => {
     let getGameCardByIdStub;
     let gameCardService: GameCardService;
     let imageManagerService: ImageManagerService;
-    // let gameManagerService: GameManagerService;
 
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
@@ -74,7 +73,6 @@ describe('StageController', () => {
         controller = module.get<StageController>(StageController);
         gameCardService = module.get<GameCardService>(GameCardService);
         imageManagerService = module.get<ImageManagerService>(ImageManagerService);
-        // gameManagerService = module.get<GameManagerService>(GameManagerService);
         connection = await module.get(getConnectionToken());
         getGameCardStub = stub(gameCardService, 'getGameCards');
         getGameCardsNumberStub = stub(gameCardService, 'getGameCardsNumber');
@@ -140,25 +138,6 @@ describe('StageController', () => {
         const response = await request(httpServer).get('/stage/:gameCardId');
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
-
-    // it('deleteGame() should call gameCardService.deleteGameCard and gameManagerService.deleteGame', async () => {
-    //     jest.spyOn(gameCardService, 'deleteGameCard').mockImplementationOnce(async () => Promise.resolve());
-    //     jest.spyOn(gameManagerService, 'deleteGame').mockImplementationOnce(async () => Promise.resolve());
-    //     await request(httpServer).post('/stage').send(FAKE_GAME_INFO);
-
-    //     const response = await request(httpServer).delete(`/stage/${FAKE_GAME_INFO._id}`);
-    //     // expect(gameCardService.deleteGameCard).toBeCalledWith('0');
-    //     // expect(gameManagerService.deleteGame).toBeCalledWith('0');
-    //     expect(response.status).toBe(HttpStatus.NO_CONTENT);
-    // });
-
-    // it('deleteGame() should return 500 if there is an error', async () => {
-    //     // jest.spyOn(gameCardService, 'deleteGameCard').mockImplementationOnce(async () => new Error('test'));
-    //     // gameCardService.deleteGameCard = jest.fn().mockRejectedValue(new Error());
-    //     jest.spyOn(gameCardService, 'deleteGameCard').mockRejectedValue(new Error());
-    //     const response = await request(httpServer).delete('/stage/:gameCardId');
-    //     expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
-    // });
 
     it('createGame() should call GameCardService.createGameCard() with the body as a parameter', async () => {
         const createGameCardStub = stub(gameCardService, 'createGameCard').callsFake(async () => Promise.resolve(FAKE_GAME_CARD));

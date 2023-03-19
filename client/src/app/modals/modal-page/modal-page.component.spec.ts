@@ -50,14 +50,6 @@ describe('ModalPageComponent', () => {
         clickService = TestBed.inject(ClickEventService);
     });
 
-    // it('should close the dialog on destroy', () => {
-    //     component.matDialogRef = dialogRefSpyObject;
-
-    //     component.ngOnDestroy();
-
-    //     expect(dialogRefSpyObject.close).toHaveBeenCalledWith(component.data);
-    // });
-
     it('createGame should call create game from service and redirection', () => {
         const redirectionMock = spyOn(component, 'redirection');
         const serviceCreateGameMock = spyOn(gameCardService, 'createGame').and.returnValue(of(GAMES[0]));

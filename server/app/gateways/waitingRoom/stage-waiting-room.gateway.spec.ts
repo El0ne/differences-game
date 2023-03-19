@@ -13,7 +13,6 @@ describe('StageWaitingRoomGateway', () => {
     let gameCardService: SinonStubbedInstance<GameCardService>;
     let gameManagerService: SinonStubbedInstance<GameManagerService>;
     const lookedStages = ['stage1', 'stage2', 'stage3', 'stage4'];
-    // const mockGameManagerService = { addGame: jest.fn(), deleteGame: jest.fn() };
 
     beforeEach(async () => {
         server = createStubInstance<Server>(Server);
