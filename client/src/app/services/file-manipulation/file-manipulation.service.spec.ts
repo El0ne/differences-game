@@ -116,6 +116,29 @@ describe('FileManipulationService', () => {
         expect(input.value).toBe('');
     });
 
+    it('uploadImages should upload to difference canvas if target-id is upload-different', fakeAsync(async () => {
+        const file = new File([new ArrayBuffer(IMAGE_DIMENSIONS.size)], 'testImage.bmp', { type: 'image/jpg' });
+        input.id = 'upload-different';
+
+        spyOn(service, 'uploadImage' as never).and.returnValue(Promise.resolve(file) as never);
+        await service['uploadImages'](file, input);
+
+        expect(service['uploadImage']).toHaveBeenCalledWith(file, input, service.originalCanvas);
+        expect(service.differenceFile).toEqual(file);
+    }));
+
+    it('uploadImages should upload to both original and difference canvas if target-id is different', fakeAsync(async () => {
+        const file = new File([new ArrayBuffer(IMAGE_DIMENSIONS.size)], 'testImage.bmp', { type: 'image/jpg' });
+        input.id = 'upload-other';
+
+        spyOn(service, 'uploadImage' as never).and.returnValue(Promise.resolve(file) as never);
+        await service['uploadImages'](file, input);
+
+        expect(service['uploadImage']).toHaveBeenCalledWith(file, input, service.originalCanvas);
+        expect(service.originalFile).toEqual(file);
+        expect(service.differenceFile).toEqual(file);
+    }));
+
     it('uploadImages should upload to original canvas if target-id is upload-original', fakeAsync(async () => {
         const file = new File([new ArrayBuffer(IMAGE_DIMENSIONS.size)], 'testImage.bmp', { type: 'image/jpg' });
         input.id = 'upload-original';
