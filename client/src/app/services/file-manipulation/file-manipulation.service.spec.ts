@@ -120,12 +120,11 @@ describe('FileManipulationService', () => {
         const file = new File([new ArrayBuffer(IMAGE_DIMENSIONS.size)], 'testImage.bmp', { type: 'image/jpg' });
         input.id = 'upload-original';
 
-        spyOn(service, 'uploadImage' as never).and.returnValue(Promise.resolve() as never);
+        spyOn(service, 'uploadImage' as never).and.returnValue(Promise.resolve(file) as never);
         await service['uploadImages'](file, input);
 
         expect(service['uploadImage']).toHaveBeenCalledWith(file, input, service.originalCanvas);
-        expect(service.originalFile).toBe(file);
-        expect(service.differenceFile).toBeNull();
+        expect(service.originalFile).toEqual(file);
     }));
 
     it('uploadImage should upload the image and return a file', fakeAsync(async () => {
