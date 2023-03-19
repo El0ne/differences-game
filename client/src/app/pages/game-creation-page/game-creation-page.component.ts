@@ -3,8 +3,11 @@ import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
+import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
+import { DrawingRectangleService } from '@app/services/drawing-rectangle/drawing-rectangle.service';
 import { FileManipulationService } from '@app/services/file-manipulation/file-manipulation.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { CanvasInformations } from '@common/canvas-informations';
 import { GameCardDto } from '@common/game-card.dto';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 import { GC_PATHS } from './game-creation-constants';
@@ -73,6 +76,8 @@ export class GameCreationPageComponent implements OnInit {
 
     isInOriginalCanvas: boolean = false;
 
+    canvasInformation: CanvasInformations;
+
     private eraseListener: ((mouseEvent: MouseEvent) => void)[] = [this.startErase.bind(this), this.stopErase.bind(this), this.erasing.bind(this)];
     private rectangleListener: ((mouseEvent: MouseEvent) => void)[] = [
         this.startDrawingRectangle.bind(this),
@@ -88,6 +93,8 @@ export class GameCreationPageComponent implements OnInit {
         private matDialog: MatDialog,
         public router: Router,
         private fileManipulationService: FileManipulationService,
+        private canvasSelectionService: CanvasSelectionService,
+        private drawingRectangleService: DrawingRectangleService,
     ) {}
 
     @HostListener('document:keydown.control.z', ['$event'])
@@ -109,16 +116,51 @@ export class GameCreationPageComponent implements OnInit {
 
         this.leftCanvasArray.push(emptyCanvas.toDataURL());
         this.rightCanvasArray.push(emptyCanvas.toDataURL());
-        setTimeout(
-            () =>
-                this.fileManipulationService.updateAttributes({
-                    originalFile: this.originalFile,
-                    differenceFile: this.differentFile,
-                    originalCanvas: this.originalCanvas.nativeElement,
-                    differenceCanvas: this.differenceCanvas.nativeElement,
-                }),
-            50,
-        );
+        setTimeout(() => {
+            this.canvasInformation = this.setObject();
+            this.canvasSelectionService.setProperties(this.canvasInformation);
+            this.fileManipulationService.updateAttributes({
+                originalFile: this.originalFile,
+                differenceFile: this.differentFile,
+                originalCanvas: this.originalCanvas.nativeElement,
+                differenceCanvas: this.differenceCanvas.nativeElement,
+            });
+        }, 50);
+    }
+
+    setObject(): CanvasInformations {
+        return {
+            differenceRectangleCanvas: this.differenceRectangleCanvas.nativeElement,
+            differenceDrawnCanvas: this.differenceDrawnCanvas.nativeElement,
+
+            originalRectangleCanvas: this.originalRectangleCanvas.nativeElement,
+            originalDrawnCanvas: this.originalDrawnCanvas.nativeElement,
+
+            drawingCanvas1: this.drawingCanvas1,
+            drawingCanvas2: this.drawingCanvas2,
+
+            isInOriginalCanvas: this.isInOriginalCanvas,
+
+            rightCanvasArray: this.rightCanvasArray,
+            leftCanvasArray: this.leftCanvasArray,
+            actionsArray: this.actionsArray,
+            nbElements: this.nbElements,
+            leftArrayPointer: this.leftArrayPointer,
+            rightArrayPointer: this.rightArrayPointer,
+            isFirstTimeInLeftCanvas: this.isFirstTimeInLeftCanvas,
+            isFirstTimeInRightCanvas: this.isFirstTimeInRightCanvas,
+            isRectangleEnabled: false,
+            isPenEnabled: false,
+            isEraserEnabled: false,
+            isDuplicateEnabled: false,
+            isClearEnabled: false,
+            isUserClicking: false,
+
+            rectangleInitialX: 0,
+            rectangleInitialY: 0,
+
+            selectedColor: '#ff124f',
+        };
     }
 
     getTitle(title: string): void {
@@ -255,57 +297,62 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     choseCanvas(mouseEvent: MouseEvent): void {
-        if ([this.differenceRectangleCanvas.nativeElement, this.differenceDrawnCanvas.nativeElement].includes(mouseEvent.target)) {
-            this.isInOriginalCanvas = false;
-            this.drawingCanvas1 = this.differenceDrawnCanvas.nativeElement;
-            this.drawingCanvas2 = this.differenceRectangleCanvas.nativeElement;
-        } else if ([this.originalRectangleCanvas.nativeElement, this.originalDrawnCanvas.nativeElement].includes(mouseEvent.target)) {
-            this.isInOriginalCanvas = true;
-            this.drawingCanvas1 = this.originalDrawnCanvas.nativeElement;
-            this.drawingCanvas2 = this.originalRectangleCanvas.nativeElement;
-        }
+        // if ([this.differenceRectangleCanvas.nativeElement, this.differenceDrawnCanvas.nativeElement].includes(mouseEvent.target)) {
+        //     this.isInOriginalCanvas = false;
+        //     this.drawingCanvas1 = this.differenceDrawnCanvas.nativeElement;
+        //     this.drawingCanvas2 = this.differenceRectangleCanvas.nativeElement;
+        // } else if ([this.originalRectangleCanvas.nativeElement, this.originalDrawnCanvas.nativeElement].includes(mouseEvent.target)) {
+        //     this.isInOriginalCanvas = true;
+        //     this.drawingCanvas1 = this.originalDrawnCanvas.nativeElement;
+        //     this.drawingCanvas2 = this.originalRectangleCanvas.nativeElement;
+        // }
+
+        this.canvasInformation = this.canvasSelectionService.choseCanvas(mouseEvent);
     }
 
     startDrawingRectangle(mouseEvent: MouseEvent): void {
-        const canvas = this.drawingCanvas2.getBoundingClientRect();
-        this.isUserClicking = true;
+        this.drawingRectangleService.startDrawingRectangle(mouseEvent);
+        // const canvas = this.drawingCanvas2.getBoundingClientRect();
+        // this.isUserClicking = true;
 
-        this.rectangleInitialX = mouseEvent.clientX - canvas.left;
-        this.rectangleInitialY = mouseEvent.clientY - canvas.top;
+        // this.rectangleInitialX = mouseEvent.clientX - canvas.left;
+        // this.rectangleInitialY = mouseEvent.clientY - canvas.top;
     }
 
     stopDrawingRectangle(): void {
-        const firstContext = this.drawingCanvas1.getContext('2d');
-        const secondContext = this.drawingCanvas2.getContext('2d');
-        this.isUserClicking = false;
+        this.drawingRectangleService.stopDrawingRectangle();
+        // const firstContext = this.drawingCanvas1.getContext('2d');
+        // const secondContext = this.drawingCanvas2.getContext('2d');
+        // this.isUserClicking = false;
 
-        if (firstContext) firstContext.drawImage(this.drawingCanvas2, 0, 0);
-        if (secondContext) secondContext.clearRect(0, 0, this.drawingCanvas2.width, this.drawingCanvas2.height);
+        // if (firstContext) firstContext.drawImage(this.drawingCanvas2, 0, 0);
+        // if (secondContext) secondContext.clearRect(0, 0, this.drawingCanvas2.width, this.drawingCanvas2.height);
 
-        this.pushCanvas(this.drawingCanvas1);
+        // this.pushCanvas(this.drawingCanvas1);
     }
 
     paintRectangle(mouseEvent: MouseEvent): void {
-        this.choseCanvas(mouseEvent);
-        const context = this.drawingCanvas2.getContext('2d');
+        this.drawingRectangleService.setProperties(this.canvasInformation);
+        this.drawingRectangleService.paintRectangle(mouseEvent);
+        // const context = this.drawingCanvas2.getContext('2d');
 
-        if (context && this.isUserClicking) {
-            const canvas = this.drawingCanvas2.getBoundingClientRect();
-            context.fillStyle = this.selectedColor;
-            context.clearRect(0, 0, this.drawingCanvas2.width, this.drawingCanvas2.height);
+        // if (context && this.isUserClicking) {
+        //     const canvas = this.drawingCanvas2.getBoundingClientRect();
+        //     context.fillStyle = this.selectedColor;
+        //     context.clearRect(0, 0, this.drawingCanvas2.width, this.drawingCanvas2.height);
 
-            const width = mouseEvent.clientX - canvas.left - this.rectangleInitialX;
-            const height = mouseEvent.clientY - canvas.top - this.rectangleInitialY;
+        //     const width = mouseEvent.clientX - canvas.left - this.rectangleInitialX;
+        //     const height = mouseEvent.clientY - canvas.top - this.rectangleInitialY;
 
-            if (mouseEvent.shiftKey) {
-                const size = Math.min(Math.abs(width), Math.abs(height));
-                const signX = Math.sign(width);
-                const signY = Math.sign(height);
-                context.fillRect(this.rectangleInitialX, this.rectangleInitialY, size * signX, size * signY);
-            } else {
-                context.fillRect(this.rectangleInitialX, this.rectangleInitialY, width, height);
-            }
-        }
+        //     if (mouseEvent.shiftKey) {
+        //         const size = Math.min(Math.abs(width), Math.abs(height));
+        //         const signX = Math.sign(width);
+        //         const signY = Math.sign(height);
+        //         context.fillRect(this.rectangleInitialX, this.rectangleInitialY, size * signX, size * signY);
+        //     } else {
+        //         context.fillRect(this.rectangleInitialX, this.rectangleInitialY, width, height);
+        //     }
+        // }
     }
 
     drawRectangle(): void {

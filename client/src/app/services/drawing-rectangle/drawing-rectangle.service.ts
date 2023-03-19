@@ -9,6 +9,12 @@ export class DrawingRectangleService {
     canvasInformations: CanvasInformations;
     constructor(private canvasSelection: CanvasSelectionService) {}
 
+    private rectangleListener: ((mouseEvent: MouseEvent) => void)[] = [
+        this.startDrawingRectangle.bind(this),
+        this.stopDrawingRectangle.bind(this),
+        this.paintRectangle.bind(this),
+    ];
+
     setProperties(information: CanvasInformations) {
         this.canvasInformations = information;
     }
@@ -29,7 +35,7 @@ export class DrawingRectangleService {
         if (firstContext) firstContext.drawImage(this.canvasInformations.drawingCanvas2, 0, 0);
         if (secondContext) secondContext.clearRect(0, 0, this.canvasInformations.drawingCanvas2.width, this.canvasInformations.drawingCanvas2.height);
 
-        this.pushCanvas(this.canvasInformations.drawingCanvas1);
+        // this.pushCanvas(this.canvasInformations.drawingCanvas1);
     }
 
     paintRectangle(mouseEvent: MouseEvent): void {
@@ -39,7 +45,7 @@ export class DrawingRectangleService {
         if (context && this.canvasInformations.isUserClicking) {
             const canvas = this.canvasInformations.drawingCanvas2.getBoundingClientRect();
             context.fillStyle = this.canvasInformations.selectedColor;
-            context.clearRect(0, 0, this.canvasInformations.drawingCanvas2.width, this.drawingCanvas2.height);
+            context.clearRect(0, 0, this.canvasInformations.drawingCanvas2.width, this.canvasInformations.drawingCanvas2.height);
 
             const width = mouseEvent.clientX - canvas.left - this.canvasInformations.rectangleInitialX;
             const height = mouseEvent.clientY - canvas.top - this.canvasInformations.rectangleInitialY;
@@ -56,13 +62,13 @@ export class DrawingRectangleService {
     }
 
     drawRectangle(): void {
-        this.canvasInformations.originalRectangleCanvas.nativeElement.addEventListener('mousedown', this.canvasInformations.rectangleListener[0]);
-        this.canvasInformations.differenceRectangleCanvas.nativeElement.addEventListener('mousedown', this.canvasInformations.rectangleListener[0]);
+        this.canvasInformations.originalRectangleCanvas.addEventListener('mousedown', this.rectangleListener[0]);
+        this.canvasInformations.differenceRectangleCanvas.addEventListener('mousedown', this.rectangleListener[0]);
 
-        this.canvasInformations.originalRectangleCanvas.nativeElement.addEventListener('mouseup', this.canvasInformations.rectangleListener[1]);
-        this.canvasInformations.differenceRectangleCanvas.nativeElement.addEventListener('mouseup', this.canvasInformations.rectangleListener[1]);
+        this.canvasInformations.originalRectangleCanvas.addEventListener('mouseup', this.rectangleListener[1]);
+        this.canvasInformations.differenceRectangleCanvas.addEventListener('mouseup', this.rectangleListener[1]);
 
-        this.canvasInformations.originalRectangleCanvas.nativeElement.addEventListener('mousemove', this.canvasInformations.rectangleListener[2]);
-        this.canvasInformations.differenceRectangleCanvas.nativeElement.addEventListener('mousemove', this.canvasInformations.rectangleListener[2]);
+        this.canvasInformations.originalRectangleCanvas.addEventListener('mousemove', this.rectangleListener[2]);
+        this.canvasInformations.differenceRectangleCanvas.addEventListener('mousemove', this.rectangleListener[2]);
     }
 }
