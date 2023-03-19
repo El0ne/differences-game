@@ -36,6 +36,7 @@ export class DrawingRectangleService {
         if (firstContext) firstContext.drawImage(this.canvasInformations.drawingCanvas2, 0, 0);
         if (secondContext) secondContext.clearRect(0, 0, this.canvasInformations.drawingCanvas2.width, this.canvasInformations.drawingCanvas2.height);
 
+        // TODO Uncomment later when undo and redo are implemented
         // this.pushCanvas(this.canvasInformations.drawingCanvas1);
     }
 
