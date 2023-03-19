@@ -132,7 +132,8 @@ describe('StageWaitingRoomGateway', () => {
         expect(socket.to.calledWith('refusedOpponent')).toBeTruthy();
     });
 
-    it('deleteGame should send a call services to delete game and emit to the stage room', async () => {
+    it('deleteGame should send a call services to delete game and emit to the stage room and clean the gameHost map of the stage', async () => {
+        gateway.gameHosts.set('stageId', 'host');
         server.to.returns({
             // eslint-disable-next-line @typescript-eslint/no-empty-function, no-unused-vars
             emit: (event: string) => {},
@@ -143,6 +144,7 @@ describe('StageWaitingRoomGateway', () => {
         expect(deleteGameCardSpy).toBeCalledWith('stageId');
         expect(deleteGameSpy).toBeCalledWith('stageId');
         expect(server.to.calledWith('stageId')).toBeTruthy();
+        expect(gateway.gameHosts.has('stageId')).toBeFalsy();
     });
 
     it('handleDisconnect should call unhostGame or quitHost on the right conditions', () => {

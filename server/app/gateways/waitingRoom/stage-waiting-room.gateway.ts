@@ -90,6 +90,8 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
         await this.gameCardService.deleteGameCard(stageId);
         await this.gameManagerService.deleteGame(stageId);
 
+        this.gameHosts.delete(stageId);
+
         this.server.to(stageId).emit(WAITING_ROOM_EVENTS.GameDeleted);
         this.server.to(stageId).emit(WAITING_ROOM_EVENTS.MatchRefused, "La fiche n'est plus disponible pour jouer");
     }
