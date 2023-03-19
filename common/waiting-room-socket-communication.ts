@@ -1,4 +1,4 @@
-export enum WaitingRoomEvents {
+export enum WAITING_ROOM_EVENTS {
     ScanForHost = 'scanForHost',
     HostGame = 'hostGame',
     UnhostGame = 'unhostGame',

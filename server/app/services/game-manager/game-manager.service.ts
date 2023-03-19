@@ -22,7 +22,6 @@ export class GameManagerService {
                 this.gamePlayedInformation.delete(stageId);
             }
         }
-        console.log('this.gamePlayedInformation', this.gamePlayedInformation);
     }
 
     addGame(stageId: string, numberOfPlayers: number): void {
@@ -35,17 +34,14 @@ export class GameManagerService {
                 isDeleted: false,
             });
         }
-        console.log('map ', this.gamePlayedInformation);
     }
 
     async deleteGame(stageId: string): Promise<void> {
-        // console.log('delete game');
         const currentMapGameInfo = this.gamePlayedInformation.get(stageId);
         if (currentMapGameInfo) {
             currentMapGameInfo.isDeleted = true;
         } else {
             await this.differenceClickService.deleteDifferences(stageId);
         }
-        console.log('map ', this.gamePlayedInformation);
     }
 }

@@ -9,10 +9,10 @@ import { BestTimeComponent } from '@app/components/best-time/best-time.component
 import { GAMES } from '@app/mock/game-cards';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { WaitingRoomComponent, WaitingRoomDataPassing } from '@app/modals/waiting-room/waiting-room.component';
-import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { GameCardInformation } from '@common/game-card';
-import { JoinHostInWaitingRequest, WaitingRoomEvents } from '@common/waiting-room-socket-communication';
+import { MATCH_EVENTS } from '@common/match-gateway-communication';
+import { JoinHostInWaitingRequest, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 import { of } from 'rxjs';
 import { GameCardSelectionComponent } from './game-card-selection.component';
 
@@ -22,7 +22,6 @@ describe('GameCardSelectionComponent', () => {
     const gameCardServiceSpyObj = jasmine.createSpyObj('GameCardInformationService', ['deleteGame', 'playGame']);
     gameCardServiceSpyObj.deleteGame.and.returnValue(of());
     gameCardServiceSpyObj.playGame.and.returnValue(of());
-    let gameCardServiceSpy: GameCardInformationService;
     let modalSpy: MatDialog;
     let choseNameAfterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
     let waitingRoomAfterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
@@ -48,14 +47,12 @@ describe('GameCardSelectionComponent', () => {
                     provide: SocketService,
                     useValue: socketServiceSpy,
                 },
-                { provide: GameCardInformationService, useValue: gameCardServiceSpyObj },
             ],
             teardown: { destroyAfterEach: false },
         }).compileComponents();
 
         fixture = TestBed.createComponent(GameCardSelectionComponent);
         component = fixture.componentInstance;
-        gameCardServiceSpy = TestBed.inject(GameCardInformationService) as jasmine.SpyObj<GameCardInformationService>;
         component.gameCardInformation = new GameCardInformation();
         component.gameCardInformation = GAMES[0];
         fixture.detectChanges();
@@ -66,11 +63,11 @@ describe('GameCardSelectionComponent', () => {
     });
 
     it('deleteGame should call gameCardService.deleteGame and gameDeleted.emit', () => {
-        component.gameCardInformation = GAMES[0];
-        const gameDeletedSpy = spyOn(component.gameDeleted, 'emit');
+        // const gameDeletedSpy = spyOn(component.gameDeleted, 'emit');
+        // expect(gameCardServiceSpy.deleteGame).toHaveBeenCalledWith(component.gameCardInformation._id);
+        // expect(gameDeletedSpy).toHaveBeenCalled();
         component.deleteGame();
-        expect(gameCardServiceSpy.deleteGame).toHaveBeenCalledWith(component.gameCardInformation._id);
-        expect(gameDeletedSpy).toHaveBeenCalled();
+        expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.DeleteGame, '123');
     });
 
     it('selectPlayerName should redirect to solo view after opening the modal if in soloGame', () => {
@@ -78,7 +75,7 @@ describe('GameCardSelectionComponent', () => {
         const routerSpy = spyOn(TestBed.inject(Router), 'navigate');
         component.selectPlayerName(true);
         expect(routerSpy).toHaveBeenCalledWith(['/solo/' + component.gameCardInformation._id]);
-        expect(socketServiceSpy.send).toHaveBeenCalledWith('createSologame', '123');
+        expect(socketServiceSpy.send).toHaveBeenCalledWith(MATCH_EVENTS.createSoloGame, '123');
     });
 
     it('selectPlayerName should call hostOrJoinGame if in multiplayer', () => {
@@ -91,7 +88,7 @@ describe('GameCardSelectionComponent', () => {
     it('hostOrJoinGame should send a hostGame event if the button is createButton', () => {
         component.createGameButton = true;
         component.hostOrJoinGame();
-        expect(socketServiceSpy.send).toHaveBeenCalledWith(WaitingRoomEvents.HostGame, '123');
+        expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.HostGame, '123');
         expect(modalSpy.open).toHaveBeenCalledWith(WaitingRoomComponent, {
             disableClose: true,
             data: { stageId: '123', isHost: true } as WaitingRoomDataPassing,
@@ -103,7 +100,7 @@ describe('GameCardSelectionComponent', () => {
         Object.defineProperty(socketServiceSpy, 'socketId', { value: 'playerId' });
         socketServiceSpy.names.set('playerId', 'playerName');
         component.hostOrJoinGame();
-        expect(socketServiceSpy.send).toHaveBeenCalledWith(WaitingRoomEvents.JoinHost, {
+        expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.JoinHost, {
             playerName: 'playerName',
             stageId: '123',
         } as JoinHostInWaitingRequest);

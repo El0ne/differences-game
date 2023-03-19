@@ -1,6 +1,6 @@
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
-import { JoinHostInWaitingRequest, PlayerInformations, WaitingRoomEvents } from '@common/waiting-room-socket-communication';
+import { JoinHostInWaitingRequest, PlayerInformations, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import { BroadcastOperator, Server, Socket } from 'socket.io';
@@ -44,17 +44,17 @@ describe('StageWaitingRoomGateway', () => {
 
     it('scanForHosts should emit a gameCreated for each of the stages where the is a host', () => {
         gateway.scanForHosts(socket, lookedStages);
-        expect(socket.emit.calledWith(WaitingRoomEvents.MatchCreated, 'stage1')).toBeTruthy();
-        expect(socket.emit.calledWith(WaitingRoomEvents.MatchCreated, 'stage4')).toBeTruthy();
-        expect(socket.emit.calledWith(WaitingRoomEvents.MatchCreated, 'stage2')).toBeFalsy();
-        expect(socket.emit.calledWith(WaitingRoomEvents.MatchCreated, 'stage5')).toBeFalsy();
+        expect(socket.emit.calledWith(WAITING_ROOM_EVENTS.MatchCreated, 'stage1')).toBeTruthy();
+        expect(socket.emit.calledWith(WAITING_ROOM_EVENTS.MatchCreated, 'stage4')).toBeTruthy();
+        expect(socket.emit.calledWith(WAITING_ROOM_EVENTS.MatchCreated, 'stage2')).toBeFalsy();
+        expect(socket.emit.calledWith(WAITING_ROOM_EVENTS.MatchCreated, 'stage5')).toBeFalsy();
         expect(socket.join.calledWith(lookedStages)).toBeTruthy();
     });
 
     it('hostGame should put the socket in the gameHosts and send a gameCreated to the the stageRoom', () => {
         socket.to.returns({
             emit: (event: string) => {
-                expect(event).toEqual(WaitingRoomEvents.MatchCreated);
+                expect(event).toEqual(WAITING_ROOM_EVENTS.MatchCreated);
             },
         } as BroadcastOperator<unknown, unknown>);
         gateway.hostGame(socket, 'stage1');
@@ -80,7 +80,7 @@ describe('StageWaitingRoomGateway', () => {
         const playerInfo: PlayerInformations = { playerName: 'name', playerSocketId: '123' };
         socket.to.returns({
             emit: (event: string, data: PlayerInformations) => {
-                expect(event).toEqual(WaitingRoomEvents.RequestMatch);
+                expect(event).toEqual(WAITING_ROOM_EVENTS.RequestMatch);
                 expect(data).toEqual(playerInfo);
             },
         } as BroadcastOperator<unknown, unknown>);
@@ -93,7 +93,7 @@ describe('StageWaitingRoomGateway', () => {
         socket.data.stageInWaiting = 'stage1';
         socket.to.returns({
             emit: (event: string, playerId: string) => {
-                expect(event).toEqual(WaitingRoomEvents.UnrequestMatch);
+                expect(event).toEqual(WAITING_ROOM_EVENTS.UnrequestMatch);
                 expect(playerId).toEqual('123');
             },
         } as BroadcastOperator<unknown, unknown>);
@@ -116,7 +116,7 @@ describe('StageWaitingRoomGateway', () => {
         } as BroadcastOperator<unknown, unknown>);
         gateway.acceptOpponent(socket, { playerName: 'host1', playerSocketId: 'opponentId' });
         expect(socket.to.calledWith('stage1')).toBeTruthy();
-        expect(socket.emit.calledWith(WaitingRoomEvents.DeclineOpponent, 'randomRoomId'));
+        expect(socket.emit.calledWith(WAITING_ROOM_EVENTS.DeclineOpponent, 'randomRoomId'));
         expect(socket.data.stageInHosting).toEqual(null);
         expect(opponentSocket.data.stageInWaiting).toEqual(null);
         expect(socket.data.room).not.toBe(undefined);
@@ -126,7 +126,7 @@ describe('StageWaitingRoomGateway', () => {
     it('declineOpponent should send a matchRefusedEvent to the opponent', () => {
         socket.to.returns({
             emit: (event: string) => {
-                expect(event).toEqual(WaitingRoomEvents.MatchRefused);
+                expect(event).toEqual(WAITING_ROOM_EVENTS.MatchRefused);
             },
         } as BroadcastOperator<unknown, unknown>);
         gateway.declineOpponent(socket, 'refusedOpponent');

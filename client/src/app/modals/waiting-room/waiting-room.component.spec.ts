@@ -4,7 +4,7 @@ import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/materia
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SocketService } from '@app/services/socket/socket.service';
-import { AcceptationInformation, PlayerInformations, WaitingRoomEvents } from '@common/waiting-room-socket-communication';
+import { AcceptationInformation, PlayerInformations, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 import { WaitingRoomComponent, WaitingRoomDataPassing } from './waiting-room.component';
 
 describe('WaitingRoomComponent', () => {
@@ -45,24 +45,24 @@ describe('WaitingRoomComponent', () => {
     it('all listeners should be removed at the destor of the dialog', () => {
         socketServiceSpy.connect();
         component.ngOnDestroy();
-        expect(socketServiceSpy.delete).toHaveBeenCalledWith(WaitingRoomEvents.RequestMatch);
-        expect(socketServiceSpy.delete).toHaveBeenCalledWith(WaitingRoomEvents.UnrequestMatch);
-        expect(socketServiceSpy.delete).toHaveBeenCalledWith(WaitingRoomEvents.MatchConfirmed);
+        expect(socketServiceSpy.delete).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.RequestMatch);
+        expect(socketServiceSpy.delete).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.UnrequestMatch);
+        expect(socketServiceSpy.delete).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.MatchConfirmed);
         component.waitingRoomInfo.isHost = false;
         component.ngOnInit();
         component.ngOnDestroy();
-        expect(socketServiceSpy.delete).toHaveBeenCalledWith(WaitingRoomEvents.MatchAccepted);
-        expect(socketServiceSpy.delete).toHaveBeenCalledWith(WaitingRoomEvents.MatchRefused);
+        expect(socketServiceSpy.delete).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.MatchAccepted);
+        expect(socketServiceSpy.delete).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.MatchRefused);
     });
 
     it('handleCancel shoul emit the right event depending on isHost', () => {
         component.handleCancel();
         expect(matDialogSpy.close).toHaveBeenCalled();
-        expect(socketServiceSpy.send).toHaveBeenCalledWith(WaitingRoomEvents.UnhostGame);
+        expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.UnhostGame);
 
         component.waitingRoomInfo.isHost = false;
         component.handleCancel();
-        expect(socketServiceSpy.send).toHaveBeenCalledWith(WaitingRoomEvents.QuitHost);
+        expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.QuitHost);
     });
 
     it('navigateToMultiplayer should close the dialog and navigate to the right game', () => {
@@ -78,19 +78,19 @@ describe('WaitingRoomComponent', () => {
         component.acceptOpponent('opponentId');
         expect(socketServiceSpy.names.set).toHaveBeenCalledWith('opponentId', 'testName');
         const expectedAcceptRequest: PlayerInformations = { playerName: 'myName', playerSocketId: 'opponentId' };
-        expect(socketServiceSpy.send).toHaveBeenCalledWith(WaitingRoomEvents.AcceptOpponent, expectedAcceptRequest);
+        expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.AcceptOpponent, expectedAcceptRequest);
     });
 
     it('declineOpponent should send the envent to the refused opponent and remove him from the opponents map', () => {
         component.clientsInWaitingRoom.set('opponentId', 'testName');
         component.declineOpponent('opponentId');
         expect(component.clientsInWaitingRoom.has('opponentId')).toBeFalsy();
-        expect(socketServiceSpy.send).toHaveBeenCalledWith(WaitingRoomEvents.DeclineOpponent, 'opponentId');
+        expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.DeclineOpponent, 'opponentId');
     });
 
     it('a requestMatch event should add the opponent to the map', () => {
         socketServiceSpy.listen = (event: string, callback: any) => {
-            if (event === WaitingRoomEvents.RequestMatch) callback({ playerName: 'testName', playerSocketId: 'opponentId' } as PlayerInformations);
+            if (event === WAITING_ROOM_EVENTS.RequestMatch) callback({ playerName: 'testName', playerSocketId: 'opponentId' } as PlayerInformations);
         };
         component.ngOnInit();
         expect(component.clientsInWaitingRoom.get('opponentId')).toEqual('testName');
@@ -99,7 +99,7 @@ describe('WaitingRoomComponent', () => {
     it('a unrequestMatch event should remove opponent to the map', () => {
         component.clientsInWaitingRoom.set('opponentId', 'nom');
         socketServiceSpy.listen = (event: string, callback: any) => {
-            if (event === WaitingRoomEvents.UnrequestMatch) callback('opponentId');
+            if (event === WAITING_ROOM_EVENTS.UnrequestMatch) callback('opponentId');
         };
         component.ngOnInit();
         expect(component.clientsInWaitingRoom.has('opponentId')).toBeFalsy();
@@ -108,7 +108,7 @@ describe('WaitingRoomComponent', () => {
     it('Match confirmed should redirect the host to the game', () => {
         spyOn(component, 'navigateToMultiplayer').and.callThrough();
         socketServiceSpy.listen = (event: string, callback: any) => {
-            if (event === WaitingRoomEvents.MatchConfirmed) callback('opponentId');
+            if (event === WAITING_ROOM_EVENTS.MatchConfirmed) callback('opponentId');
         };
         component.ngOnInit();
         expect(component.navigateToMultiplayer).toHaveBeenCalled();
@@ -119,7 +119,7 @@ describe('WaitingRoomComponent', () => {
         component.clientsInWaitingRoom.set('opponentId', 'nom');
         component.waitingRoomInfo.isHost = false;
         socketServiceSpy.listen = (event: string, callback: any) => {
-            if (event === WaitingRoomEvents.MatchAccepted)
+            if (event === WAITING_ROOM_EVENTS.MatchAccepted)
                 callback({ playerName: 'hostName', playerSocketId: 'hostId', roomId: 'roomId' } as AcceptationInformation);
         };
         component.ngOnInit();
@@ -132,7 +132,7 @@ describe('WaitingRoomComponent', () => {
             return;
         });
         socketServiceSpy.listen = (event: string, callback: any) => {
-            if (event === WaitingRoomEvents.MatchRefused) callback('refused reason');
+            if (event === WAITING_ROOM_EVENTS.MatchRefused) callback('refused reason');
         };
         component.waitingRoomInfo.isHost = false;
         component.ngOnInit();
