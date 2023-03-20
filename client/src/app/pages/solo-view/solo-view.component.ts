@@ -1,6 +1,6 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
@@ -12,7 +12,7 @@ import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { differenceInformation } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { MESSAGES_LENGTH } from './solo-view-constants';
 
 @Component({
@@ -40,6 +40,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     currentGameId: string;
     endGame: Subject<void> = new Subject<void>();
     gameCardInfo: GameCardInformation;
+    routerSubscription: Subscription;
 
     // eslint-disable-next-line max-params
     constructor(
@@ -49,7 +50,16 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         public foundDifferenceService: FoundDifferenceService,
         private route: ActivatedRoute,
         public dialog: MatDialog,
+        private router: Router,
     ) {}
+
+    // TODO: Remove when we replace with sockets later
+    @HostListener('window:beforeunload')
+    beforeUnloadHandler() {
+        // // TODO => fix to only endGamewhen game deleted (cuz we immediately recreate it after)
+        // Causes problem otherwise cuz we could potentially delete the difference array when there are still people playing
+        this.gameCardInfoService.endGame(this.currentGameId).subscribe();
+    }
 
     ngOnInit(): void {
         const gameId = this.route.snapshot.paramMap.get('stageId');
@@ -66,11 +76,19 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.playerName = result;
             this.showTime();
         });
+
+        // TODO: Remove when we replace with sockets later
+        this.routerSubscription = this.router.events.subscribe((event) => {
+            if (event instanceof NavigationStart) {
+                this.gameCardInfoService.endGame(this.currentGameId).subscribe();
+            }
+        });
     }
 
     ngOnDestroy(): void {
         this.timerService.stopTimer();
         this.foundDifferenceService.clearDifferenceFound();
+        this.routerSubscription.unsubscribe();
     }
 
     showTime(): void {

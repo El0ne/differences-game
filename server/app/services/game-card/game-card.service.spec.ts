@@ -1,7 +1,14 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-underscore-dangle */
+import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
 import { GameCard, GameCardDocument, gameCardSchema } from '@app/schemas/game-cards.schemas';
+import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
+import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
+import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
+import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
+import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
+import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { TestingModule } from '@nestjs/testing';
@@ -17,6 +24,8 @@ describe('GameCardService', () => {
     let gameCardModel: Model<GameCardDocument>;
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
+    let imageManagerService: ImageManagerService;
+    // let differenceClickService: DifferenceClickService;
 
     beforeEach(async () => {
         mongoServer = await MongoMemoryServer.create();
@@ -28,12 +37,25 @@ describe('GameCardService', () => {
                         uri: mongoServer.getUri(),
                     }),
                 }),
-                MongooseModule.forFeature([{ name: GameCard.name, schema: gameCardSchema }]),
+                MongooseModule.forFeature([
+                    { name: GameCard.name, schema: gameCardSchema },
+                    { name: Differences.name, schema: differencesSchema },
+                ]),
             ],
-            providers: [GameCardService],
+            providers: [
+                GameCardService,
+                DifferenceClickService,
+                ImageManagerService,
+                DifferencesCounterService,
+                ImageDimensionsService,
+                PixelRadiusService,
+                PixelPositionService,
+            ],
         }).compile();
 
         service = module.get<GameCardService>(GameCardService);
+        imageManagerService = module.get<ImageManagerService>(ImageManagerService);
+        // differenceClickService = module.get<DifferenceClickService>(DifferenceClickService);
         gameCardModel = module.get<Model<GameCardDocument>>(getModelToken(GameCard.name));
         connection = await module.get(getConnectionToken());
         await gameCardModel.deleteMany({});
@@ -103,6 +125,17 @@ describe('GameCardService', () => {
         expect(game).toEqual(expect.objectContaining(fakeGameCard));
     });
 
+    it('deleteGameCard should delete a gameCard, its 2 images and call the deleteDifferences service', async () => {
+        const gameCard = getFakeGameCard();
+        const imageManagerServiceMock = jest.spyOn(imageManagerService, 'deleteImage').mockImplementation();
+
+        await gameCardModel.create(gameCard);
+
+        await service.deleteGameCard(gameCard._id.toHexString());
+
+        expect(imageManagerServiceMock).toHaveBeenCalledWith(gameCard.originalImageName);
+        expect(imageManagerServiceMock).toHaveBeenCalledWith(gameCard.differenceImageName);
+    });
     it('generateGameCard should create a game card from a game informations', async () => {
         const gameCard = getFakeGameCard();
         gameCard._id = new ObjectId('00000000773db8b853265f32');

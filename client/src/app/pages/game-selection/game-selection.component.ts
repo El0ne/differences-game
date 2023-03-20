@@ -19,10 +19,7 @@ export class GameSelectionComponent implements OnInit {
 
     ngOnInit(): void {
         this.isConfig = this.router.url === '/config';
-        this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
-            this.numberOfGameInformations = data;
-            this.selectGameCards();
-        });
+        this.displayGameCards();
     }
 
     selectGameCards(): void {
@@ -52,5 +49,12 @@ export class GameSelectionComponent implements OnInit {
 
     isShowingLastCard(): boolean {
         return this.index + GAME_CARDS_TO_DISPLAY >= this.numberOfGameInformations;
+    }
+
+    displayGameCards(): void {
+        this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
+            this.numberOfGameInformations = data;
+            this.selectGameCards();
+        });
     }
 }

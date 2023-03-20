@@ -1,12 +1,30 @@
+/* eslint-disable no-underscore-dangle */
+// using _id property causes linting warning
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameDifficultyService } from '@app/services/game-difficulty/game-difficulty.service';
+import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { ImageUploadDto } from '@common/image-upload.dto';
+import { ImageDto } from '@common/image.dto';
 import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpException,
+    HttpStatus,
+    Param,
+    Post,
+    Put,
+    Query,
+    Res,
+    UploadedFiles,
+    UseInterceptors,
+} from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { diskStorage } from 'multer';
@@ -32,7 +50,20 @@ export class StageController {
         private imageManagerService: ImageManagerService,
         private differenceService: DifferenceDetectionService,
         private differenceClickService: DifferenceClickService,
+        private gameManagerService: GameManagerService,
     ) {}
+
+    // TODO: Remove when we replace with sockets later
+    @Put('/end-game')
+    endGame(@Body() id) {
+        this.gameManagerService.endGame(id.gameId);
+    }
+
+    // TODO: Remove when we replace with sockets later
+    @Put('/start-game')
+    startGame(@Body() id) {
+        this.gameManagerService.addGame(id.gameId);
+    }
 
     @Get('/')
     async getStages(@Query('index') index: number, @Query('endIndex') endIndex: number, @Res() res: Response): Promise<void> {
@@ -63,11 +94,23 @@ export class StageController {
         }
     }
 
+    @Delete('/:gameCardId')
+    async deleteGame(@Param() param, @Res() res: Response): Promise<void> {
+        try {
+            await this.gameCardService.deleteGameCard(param.gameCardId);
+            await this.gameManagerService.deleteGame(param.gameCardId);
+            res.status(HttpStatus.NO_CONTENT);
+        } catch {
+            throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @Post('/')
     async createGame(@Body() game: GameCardDto, @Res() res: Response): Promise<void> {
         try {
             if (Object.keys(game).length) {
                 const newGame = await this.gameCardService.createGameCard(game);
+                this.gameManagerService.createGame(game._id);
                 res.status(HttpStatus.CREATED).send(newGame);
             } else res.sendStatus(HttpStatus.BAD_REQUEST);
         } catch (err) {
@@ -76,39 +119,27 @@ export class StageController {
     }
 
     @Post('/image/:radius')
-    @UseInterceptors(
-        FileFieldsInterceptor(
-            [
-                { name: 'baseImage', maxCount: 1 },
-                { name: 'differenceImage', maxCount: 1 },
-            ],
-            { storage },
-        ),
-    )
+    @UseInterceptors(FileFieldsInterceptor([{ name: 'file', maxCount: 2 }], { storage }))
     async uploadImages(@UploadedFiles() files: ImageUploadDto, @Param() param, @Res() res: Response): Promise<void> {
         try {
             if (Object.keys(files).length) {
-                const differencesArray = await this.differenceService.compareImages(
-                    files.baseImage[0].path,
-                    files.differenceImage[0].path,
-                    param.radius,
-                );
-
+                const fileArray: ImageDto[] = files.file;
+                const differencesArray = await this.differenceService.compareImages(fileArray[0].path, fileArray[1].path, param.radius);
                 if (this.gameDifficultyService.isGameValid(differencesArray)) {
                     const differenceObjectId = await this.differenceClickService.createDifferenceArray(differencesArray);
                     const difficulty = this.gameDifficultyService.setGameDifficulty(differencesArray);
 
                     const data: ServerGeneratedGameInfo = {
                         gameId: differenceObjectId,
-                        originalImageName: files.baseImage[0].filename,
-                        differenceImageName: files.differenceImage[0].filename,
+                        originalImageName: fileArray[0].filename,
+                        differenceImageName: fileArray[1].filename,
                         gameDifficulty: difficulty,
                         gameDifferenceNumber: differencesArray.length,
                     };
                     res.status(HttpStatus.CREATED).send(data);
                 } else {
-                    this.imageManagerService.deleteImage(files.baseImage[0].path);
-                    this.imageManagerService.deleteImage(files.differenceImage[0].path);
+                    this.imageManagerService.deleteImage(fileArray[0].filename);
+                    this.imageManagerService.deleteImage(fileArray[1].filename);
                     res.status(HttpStatus.OK).send([]);
                 }
             } else res.sendStatus(HttpStatus.BAD_REQUEST);
@@ -122,6 +153,16 @@ export class StageController {
         try {
             const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);
             res.status(HttpStatus.OK).sendFile(imagePath);
+        } catch (err) {
+            res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Delete('/image/:imageName')
+    async deleteImage(@Param() param, @Res() res: Response): Promise<void> {
+        try {
+            this.imageManagerService.deleteImage(param.imageName);
+            res.status(HttpStatus.NO_CONTENT).send([]);
         } catch (err) {
             res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         }

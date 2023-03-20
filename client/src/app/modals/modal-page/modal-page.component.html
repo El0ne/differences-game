@@ -9,5 +9,8 @@
         <h1>Il y a {{ data.difference }} différences</h1>
         <h1>Difficulté : {{ data.difficulty }}</h1>
     </div>
-    <button class="continue" (click)="close()">Continuer</button>
+    <div class="button-containers">
+        <button class="button" (click)="createGame()">Créer la partie</button>
+        <button class="button" (click)="dropGame()">Annuler</button>
+    </div>
 </div>

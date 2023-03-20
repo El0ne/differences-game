@@ -27,10 +27,10 @@ h1 {
     font-style: bold;
 }
 
-.continue {
+.button {
     display: inline-block;
     height: 4rem;
-    width: 130px;
+    width: 170px;
     margin: 1%;
     font-size: 24px;
 
@@ -44,12 +44,19 @@ h1 {
     border-radius: 15px;
     box-shadow: 0 5px #999;
 }
-.continue:hover {
+.button:hover {
     background-color: #ff124dc5;
 }
 
-.continue:active {
+.button:active {
     background-color: #ff124dc5;
     box-shadow: 0 5px #666;
     transform: translateY(4px);
+}
+
+.button-containers {
+    display: flex;
+    justify-content: space-between;
+    margin-left: 35px;
+    margin-right: 35px;
 }

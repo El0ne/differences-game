@@ -1,4 +1,6 @@
+/* eslint-disable no-underscore-dangle */
 import { GameCard, GameCardDocument } from '@app/schemas/game-cards.schemas';
+import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -7,7 +9,7 @@ import { Model } from 'mongoose';
 
 @Injectable()
 export class GameCardService {
-    constructor(@InjectModel(GameCard.name) private gameCardModel: Model<GameCardDocument>) {}
+    constructor(@InjectModel(GameCard.name) private gameCardModel: Model<GameCardDocument>, private imageManagerService: ImageManagerService) {}
 
     async getAllGameCards(): Promise<GameCard[]> {
         return await this.gameCardModel.find({});
@@ -34,9 +36,14 @@ export class GameCardService {
         return newGameCard.save();
     }
 
+    async deleteGameCard(id: string): Promise<void> {
+        const deletedGameCard = await this.gameCardModel.findByIdAndDelete(new ObjectId(id));
+        await this.imageManagerService.deleteImage(deletedGameCard.originalImageName);
+        await this.imageManagerService.deleteImage(deletedGameCard.differenceImageName);
+    }
+
     generateGameCard(game: GameCardDto): GameCard {
         return {
-            // eslint-disable-next-line no-underscore-dangle
             _id: new ObjectId(game._id),
             name: game.name,
             difficulty: game.difficulty,

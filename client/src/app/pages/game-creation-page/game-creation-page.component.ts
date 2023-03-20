@@ -10,6 +10,7 @@ import { EraserButtonService } from '@app/services/eraser-button/eraser-button.s
 import { FileManipulationService } from '@app/services/file-manipulation/file-manipulation.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { PenService } from '@app/services/pen-service/pen-service.service';
+import { STAGE } from '@app/services/server-routes';
 import { UndoRedoService } from '@app/services/undo-redo/undo-redo.service';
 import { CanvasInformations } from '@common/canvas-informations';
 import { GameCardDto } from '@common/game-card.dto';
@@ -194,10 +195,12 @@ export class GameCreationPageComponent implements OnInit {
 
     openSaveModal() {
         const dialogRef = this.matDialog.open(ModalPageComponent, {
+            disableClose: true,
             data: {
                 image: this.differenceImage,
                 difference: this.differenceNumber,
                 difficulty: this.difficulty,
+                gameInfo: this.createdGameInfo,
             },
         });
 
@@ -215,40 +218,6 @@ export class GameCreationPageComponent implements OnInit {
         await this.fileManipulationService.fileValidation(event);
     }
 
-    // async uploadImage(file: File, target: HTMLInputElement): Promise<void> {
-    //     console.log('upload');
-    //     const ogContext = this.originalCanvas.nativeElement.getContext('2d');
-    //     const diffContext = this.differenceCanvas.nativeElement.getContext('2d');
-    //     const reader = new FileReader();
-    //     reader.readAsDataURL(file);
-
-    //     reader.onload = () => {
-    //         const img = new Image();
-    //         img.src = reader.result as string;
-    //         img.onload = () => {
-    //             if (!target.files?.length) {
-    //                 return;
-    //             }
-    //             if (target.id === this.originalId) {
-    //                 console.log('original');
-    //                 if (ogContext) ogContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-    //                 this.originalFile = target.files[0];
-    //             } else if (target.id === this.differentId) {
-    //                 console.log('difference');
-    //                 if (diffContext) diffContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-    //                 this.differentFile = target.files[0];
-    //             } else {
-    //                 if (ogContext && diffContext) {
-    //                     ogContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-    //                     diffContext.drawImage(img, 0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-    //                     this.originalFile = target.files[0];
-    //                     this.differentFile = target.files[0];
-    //                 }
-    //             }
-    //         };
-    //     };
-    // }
-
     saveVerification(): boolean {
         if (this.gameTitle === '' && this.originalFile === null && this.differentFile === null) {
             alert('Il manque une image et un titre à votre jeu !');
@@ -265,49 +234,53 @@ export class GameCreationPageComponent implements OnInit {
         return true;
     }
 
-    mergeCanvas(): void {
-        // const diffContext = this.differenceCanvas.nativeElement.getContext('2d');
-        // diffContext.drawImage(this.differenceDrawnCanvas.nativeElement, 0, 0);
-        // this.drawCtx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height); // just here to verify that merge works well
-        const binaryData = new Uint8Array(
-            this.differenceCanvas.nativeElement
-                .toDataURL('image/bmp')
-                .split(',')[1]
-                .split('')
-                .map((c: string) => c.charCodeAt(0)),
-        );
-        const blob = new Blob([binaryData], { type: 'image/bmp' });
-        this.differentFile = new File([blob], 'mergedImage.bmp', { type: 'image/bmp' });
+    mergeCanvas(canvas: HTMLCanvasElement, canvas2: HTMLCanvasElement): Blob {
+        console.log('canvas', canvas);
+        const context = canvas.getContext('2d');
+        if (context) {
+            context.drawImage(canvas2, 0, 0);
+            console.log('tes');
+        }
+        console.log('canvas', canvas);
+
+        return this.createBlob(canvas);
+    }
+    createBlob(canvas: HTMLCanvasElement): Blob {
+        const imageData = canvas.toDataURL('image/bmp');
+        const byteString = atob(imageData.split(',')[1]);
+        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const uint8Array = new Uint8Array(arrayBuffer);
+        for (let i = 0; i < byteString.length; i++) {
+            uint8Array[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([uint8Array], { type: 'image/bmp' });
     }
 
-    async save(): Promise<void> {
-        const updatedFiles = this.fileManipulationService.updateFiles();
-        this.originalFile = updatedFiles[0];
-        this.differentFile = updatedFiles[1];
+    async save() {
         if (this.saveVerification() && this.originalFile && this.differentFile) {
-            // this.isSaveDisabled = true;
-            // this.gameCardService.uploadImages(this.originalFile, this.differentFile, this.differenceRadius).subscribe((data) => {
-            //     if (data.gameDifferenceNumber) {
-            //         this.createdGameInfo = {
-            //             _id: data.gameId,
-            //             name: this.gameTitle,
-            //             difficulty: data.gameDifficulty,
-            //             baseImage: data.originalImageName,
-            //             differenceImage: data.differenceImageName,
-            //             radius: this.differenceRadius,
-            //             differenceNumber: data.gameDifferenceNumber,
-            //         };
-            //         this.difficulty = data.gameDifficulty;
-            //         this.differenceNumber = data.gameDifferenceNumber;
-            //         this.differenceImage = `${STAGE}/image/difference-image.bmp`;
-            //         this.openSaveModal();
-            //         this.isSaveDisabled = false;
-            //     } else {
-            //         this.isSaveDisabled = false;
-            //         alert("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
-            //     }
-            // });
-            console.log('okok');
+            // this.isDisabled = true;
+            const originalBlob = await this.mergeCanvas(this.originalCanvas.nativeElement, this.originalDrawnCanvas.nativeElement);
+            const differenceBlob = await this.mergeCanvas(this.differenceCanvas.nativeElement, this.differenceDrawnCanvas.nativeElement);
+            this.gameCardService.uploadImages(originalBlob, differenceBlob, this.differenceRadius).subscribe((data) => {
+                if (data.gameDifferenceNumber) {
+                    this.createdGameInfo = {
+                        _id: data.gameId,
+                        name: this.gameTitle,
+                        difficulty: data.gameDifficulty,
+                        baseImage: data.originalImageName,
+                        differenceImage: data.differenceImageName,
+                        radius: this.differenceRadius,
+                        differenceNumber: data.gameDifferenceNumber,
+                    };
+                    this.difficulty = data.gameDifficulty;
+                    this.differenceNumber = data.gameDifferenceNumber;
+                    this.differenceImage = `${STAGE}/image/difference-image.bmp`;
+                    this.openSaveModal();
+                } else {
+                    alert("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
+                }
+                this.isSaveDisabled = false;
+            });
         }
     }
 
@@ -499,46 +472,10 @@ export class GameCreationPageComponent implements OnInit {
             ctxOgDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
             this.isInOriginalCanvas = true;
         }
-
         // this.pushCanvas(this.drawingCanvas1);
     }
-
-    // verifyFirstTime(position: string) {
-    //     const emptyCanvas = document.createElement('canvas');
-    //     emptyCanvas.width = 640;
-    //     emptyCanvas.height = 480;
-    //     if (position === 'right') {
-    //         this.rigthCanvasArray.push({ canvas: emptyCanvas.toDataURL(), isInLeftCanvas: false });
-    //         this.isFirstTimeInRightCanvas = false;
-    //     } else if (position === 'left') {
-    //         this.rigthCanvasArray.push({ canvas: emptyCanvas.toDataURL(), isInLeftCanvas: true });
-    //         this.isFirstTimeInLeftCanvas = false;
-    //     }
-    // }
-
     pushCanvas(canvas: HTMLCanvasElement) {
         this.undoRedoService.pushCanvas(canvas);
-        //     this.nbElements++;
-        //     // if (this.nbElements < this.actionsArray.length) {
-        //     //     // added this to make sure that if someone undos then adds new modifications
-        //     //     // that it won't allow user to undo back to the old saved canvases
-        //     //     this.actionsArray.length = this.nbElements;
-        //     // }
-
-        //     const canvasDataURL = canvas.toDataURL();
-        //     if (this.isInOriginalCanvas) {
-        //         // if (this.isFirstTimeInLeftCanvas) this.verifyFirstTime('left');
-        //         this.actionsArray.push(true);
-        //         this.leftArrayPointer++;
-        //         this.leftCanvasArray.push(canvasDataURL);
-        //     } else {
-        //         this.actionsArray.push(false);
-        //         this.rightArrayPointer++;
-        //         this.rightCanvasArray.push(canvasDataURL);
-        //         // if (this.isFirstTimeInRightCanvas) this.verifyFirstTime('right');
-        //     }
-
-        //     this.consoleStuff();
     }
 
     undoAction(array: string[], pointer: number) {

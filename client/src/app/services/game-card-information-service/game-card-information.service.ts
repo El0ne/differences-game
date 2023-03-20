@@ -33,10 +33,28 @@ export class GameCardInformationService {
         return this.http.post<GameCardInformation>(STAGE, body, { headers });
     }
 
-    uploadImages(baseImage: File, differenceImage: File, radius: number): Observable<ServerGeneratedGameInfo> {
+    uploadImages(baseImage: Blob, differenceImage: Blob, radius: number): Observable<ServerGeneratedGameInfo> {
         const formData = new FormData();
-        formData.append('baseImage', baseImage, baseImage.name);
-        formData.append('differenceImage', differenceImage, differenceImage.name);
+        formData.append('file', baseImage, 'image1.bmp');
+        formData.append('file', differenceImage, 'image2.bmp');
         return this.http.post<ServerGeneratedGameInfo>(`${STAGE}/image/${radius}`, formData);
+    }
+
+    deleteGame(gameId: string): Observable<void> {
+        return this.http.delete<void>(`${STAGE}/${gameId}`);
+    }
+
+    // TODO: Remove when we replace with sockets later
+    endGame(gameId: string): Observable<void> {
+        return this.http.put<void>(`${STAGE}/end-game`, { gameId });
+    }
+
+    // TODO: Remove when we replace with sockets later
+    playGame(gameId: string): Observable<void> {
+        return this.http.put<void>(`${STAGE}/start-game`, { gameId });
+    }
+
+    deleteImage(image: string): Observable<void> {
+        return this.http.delete<void>(`${STAGE}/image/${image}`);
     }
 }

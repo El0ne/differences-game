@@ -19,10 +19,11 @@ describe('ImageManagerService', () => {
     });
 
     it('should delete the image at the provided path', () => {
-        const imagePath = 'assets/images/test.bmp';
+        const image = 'test.bmp';
+        const imagePath = `assets/images/${image}`;
         fs.writeFileSync(imagePath, 'Test image data');
         expect(fs.existsSync(imagePath)).toBe(true);
-        service.deleteImage(imagePath);
+        service.deleteImage(image);
         setTimeout(() => {
             expect(fs.existsSync(imagePath)).toBe(false);
         }, 100);

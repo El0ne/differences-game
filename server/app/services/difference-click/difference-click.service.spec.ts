@@ -36,7 +36,6 @@ describe('DifferenceClickService', () => {
         }).compile();
 
         service = module.get<DifferenceClickService>(DifferenceClickService);
-        // service.jsonPath = path.join(__dirname, '/differents-test.json');
 
         imageDimService = module.get<ImageDimensionsService>(ImageDimensionsService);
         differenceCounterService = module.get<DifferencesCounterService>(DifferencesCounterService);
@@ -78,6 +77,14 @@ describe('DifferenceClickService', () => {
     it('getDifferenceArrayFromStageId should return an empty array if id is not found', async () => {
         const differences = await service.getDifferenceArrayFromStageID(new ObjectId().toHexString());
         expect(differences).toEqual([]);
+    });
+
+    it('deleteDifferences should call differenceModel.FindByIdAndDelete with a certain id', async () => {
+        const differencesArray = getFakeDifferencesArray();
+        const id = await service.createDifferenceArray(differencesArray);
+        const findAndDeleteMock = jest.spyOn(differenceModel, 'findByIdAndDelete');
+        await service.deleteDifferences(id);
+        expect(findAndDeleteMock).toHaveBeenCalledWith(id);
     });
 
     it('createDifferenceArray should create a difference array given an id and the array', async () => {

@@ -1,4 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
+/* eslint-disable no-underscore-dangle */
+// because we the _id property causes linting errorz
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { STAGE } from '@app/services/server-routes';
 import { GameCardInformation } from '@common/game-card';
 
@@ -10,12 +13,23 @@ import { GameCardInformation } from '@common/game-card';
 export class GameCardSelectionComponent implements OnInit {
     @Input() gameCardInformation: GameCardInformation;
     @Input() isConfig: boolean | null;
+    @Output() gameDeleted = new EventEmitter<void>();
     image: string = '';
 
+    constructor(private gameCardService: GameCardInformationService) {}
     ngOnInit() {
         this.image = `${STAGE}/image/${this.gameCardInformation.originalImageName}`;
     }
     // TODO: ajouter la logique pour que le reset des temps et le delete se fait pour le sprint 2
 
     // TODO: Ajouter la logique pour que les temps de configurations viennent du database pour dynamiquement les loader.
+
+    deleteGame(): void {
+        this.gameCardService.deleteGame(this.gameCardInformation._id).subscribe();
+        this.gameDeleted.emit();
+    }
+
+    startGame(): void {
+        this.gameCardService.playGame(this.gameCardInformation._id).subscribe();
+    }
 }
