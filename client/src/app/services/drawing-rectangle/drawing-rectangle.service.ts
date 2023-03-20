@@ -9,12 +9,6 @@ import { CanvasInformations } from '@common/canvas-informations';
 export class DrawingRectangleService {
     canvasInformations: CanvasInformations;
 
-    private rectangleListener: ((mouseEvent: MouseEvent) => void)[] = [
-        this.startDrawingRectangle.bind(this),
-        this.stopDrawingRectangle.bind(this),
-        this.paintRectangle.bind(this),
-    ];
-
     constructor(private canvasSelectionService: CanvasSelectionService, private undoRedoService: UndoRedoService) {}
 
     setColor(color: string): void {
@@ -69,24 +63,4 @@ export class DrawingRectangleService {
             }
         }
     }
-
-    drawRectangle(): void {
-        this.canvasInformations.originalRectangleCanvas.addEventListener('mousedown', this.rectangleListener[0]);
-        this.canvasInformations.differenceRectangleCanvas.addEventListener('mousedown', this.rectangleListener[0]);
-
-        this.canvasInformations.originalRectangleCanvas.addEventListener('mouseup', this.rectangleListener[1]);
-        this.canvasInformations.differenceRectangleCanvas.addEventListener('mouseup', this.rectangleListener[1]);
-
-        this.canvasInformations.originalRectangleCanvas.addEventListener('mousemove', this.rectangleListener[2]);
-        this.canvasInformations.differenceRectangleCanvas.addEventListener('mousemove', this.rectangleListener[2]);
-    }
-
-    // removingListeners() {
-    //     this.canvasInformations.originalRectangleCanvas.removeEventListener('mousedown', this.rectangleListener[0]);
-    //     this.canvasInformations.differenceRectangleCanvas.removeEventListener('mousedown', this.rectangleListener[0]);
-    //     this.canvasInformations.originalRectangleCanvas.removeEventListener('mouseup', this.rectangleListener[1]);
-    //     this.canvasInformations.differenceRectangleCanvas.removeEventListener('mouseup', this.rectangleListener[1]);
-    //     this.canvasInformations.originalRectangleCanvas.removeEventListener('mousemove', this.rectangleListener[2]);
-    //     this.canvasInformations.differenceRectangleCanvas.removeEventListener('mousemove', this.rectangleListener[2]);
-    // }
 }

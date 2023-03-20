@@ -8,8 +8,6 @@ import { CanvasInformations } from '@common/canvas-informations';
 export class EraserButtonService {
     canvasInformations: CanvasInformations;
 
-    private eraseListener: ((mouseEvent: MouseEvent) => void)[] = [this.startErase.bind(this), this.stopErase.bind(this), this.erasing.bind(this)];
-
     constructor(private canvasSelectionService: CanvasSelectionService) {}
 
     setColor(color: string): void {
@@ -53,27 +51,4 @@ export class EraserButtonService {
             );
         }
     }
-
-    erase() {
-        // this.eraseListener = this.startErase.bind(this);
-        this.canvasInformations.originalDrawnCanvas.addEventListener('mousedown', this.eraseListener[0]);
-        this.canvasInformations.differenceDrawnCanvas.addEventListener('mousedown', this.eraseListener[0]);
-
-        // this.eraseListener = this.stopErase.bind(this);
-        this.canvasInformations.originalDrawnCanvas.addEventListener('mouseup', this.eraseListener[1]);
-        this.canvasInformations.differenceDrawnCanvas.addEventListener('mouseup', this.eraseListener[1]);
-
-        // this.eraseListener = this.erasing.bind(this);
-        this.canvasInformations.originalDrawnCanvas.addEventListener('mousemove', this.eraseListener[2]);
-        this.canvasInformations.differenceDrawnCanvas.addEventListener('mousemove', this.eraseListener[2]);
-    }
-
-    // removingListeners() {
-    //     this.canvasInformations.originalDrawnCanvas.removeEventListener('mousedown', this.eraseListener[0]);
-    //     this.canvasInformations.differenceDrawnCanvas.removeEventListener('mousedown', this.eraseListener[0]);
-    //     this.canvasInformations.originalDrawnCanvas.removeEventListener('mouseup', this.eraseListener[1]);
-    //     this.canvasInformations.differenceDrawnCanvas.removeEventListener('mouseup', this.eraseListener[1]);
-    //     this.canvasInformations.originalDrawnCanvas.removeEventListener('mousemove', this.eraseListener[2]);
-    //     this.canvasInformations.differenceDrawnCanvas.removeEventListener('mousemove', this.eraseListener[2]);
-    // }
 }
