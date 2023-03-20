@@ -34,4 +34,6 @@ export const getFakeCanvasInformations = (): CanvasInformations => ({
     rectangleInitialY: 0,
 
     selectedColor: '#ff124f',
+    penSize: 10,
+    eraserSize: 50,
 });
