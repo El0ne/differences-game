@@ -33,109 +33,65 @@ describe('EraserButtonService', () => {
         expect(service.canvasInformations).toEqual(fakeCanvasInfo);
     });
 
-    /*
-    it('should chose the correct canvas', () => {
-        const attributes = {
-            ogDrawnCanvas: { nativeElement: mockOgDrawnCanvas } as ElementRef,
-            diffDrawnCanvas: { nativeElement: mockDiffDrawnCanvas } as ElementRef,
-            ogRectCanvas: { nativeElement: mockOgRectCanvas } as ElementRef,
-            diffRectCanvas: { nativeElement: mockDiffRectCanvas } as ElementRef,
-        };
-        service.setAttributes(attributes);
-
-        const fakeMouseEvent = {
-            target: mockDiffRectCanvas,
-            altKey: false,
-            button: 0,
-            buttons: 1,
-        } as unknown as MouseEvent;
-
-        service.choseCanvas(fakeMouseEvent);
-
-        expect(service.isInOgCanvas).toEqual(false);
-        expect(service.drawingCanvas1).toEqual(mockDiffDrawnCanvas);
-        expect(service.drawingCanvas2).toEqual(mockDiffRectCanvas);
-
-        // console.log('Mock attributes: ', mockAttributes);
-        // console.log('PenService variables: ', service);
+    it('startErase should call clearRect with the right parameters', () => {
+        const mouseEvent = new MouseEvent('mousedown', {
+            clientX: 25,
+            clientY: 50,
+        });
+        const myContext = service.canvasInformations.drawingCanvas1.getContext('2d');
+        const canvasRect = service.canvasInformations.drawingCanvas1.getBoundingClientRect();
+        const clearRectMock = spyOn(myContext!, 'clearRect');
+        service.startErase(mouseEvent);
+        if (myContext) {
+            expect(clearRectMock).toHaveBeenCalledWith(
+                mouseEvent.clientX - canvasRect.left - service.canvasInformations.eraserSize / 2,
+                mouseEvent.clientY - canvasRect.top - service.canvasInformations.eraserSize / 2,
+                service.canvasInformations.eraserSize,
+                service.canvasInformations.eraserSize,
+            );
+            expect(clearRectMock).toHaveBeenCalled();
+        }
     });
-    */
 
-    // it('should chose the correct canvas', () => {
-    //     const attributes = {
-    //         ogDrawnCanvas: { nativeElement: mockOgDrawnCanvas } as ElementRef,
-    //         diffDrawnCanvas: { nativeElement: mockDiffDrawnCanvas } as ElementRef,
-    //         ogRectCanvas: { nativeElement: mockOgRectCanvas } as ElementRef,
-    //         diffRectCanvas: { nativeElement: mockDiffRectCanvas } as ElementRef,
-    //     };
-    //     service.setAttributes(attributes);
+    it('stopErase should set isUserClicking to false', () => {
+        service.stopErase();
+        expect(service.canvasInformations.isUserClicking).toBe(false);
+    });
 
-    //     const fakeMouseEvent = {
-    //         target: mockOgRectCanvas,
-    //         altKey: false,
-    //         button: 0,
-    //         buttons: 1,
-    //     } as unknown as MouseEvent;
+    it('erasing should call choseCanvas but nothing else if isUserClicking is false', () => {
+        const mouseEvent = new MouseEvent('mousedown', {
+            clientX: 25,
+            clientY: 50,
+        });
 
-    //     service.choseCanvas(fakeMouseEvent);
+        const myContext = service.canvasInformations.drawingCanvas1.getContext('2d');
+        const clearRectMock = spyOn(myContext!, 'clearRect');
 
-    //     expect(service.isInOgCanvas).toEqual(true);
-    //     expect(service.drawingCanvas1).toEqual(mockOgDrawnCanvas);
-    //     expect(service.drawingCanvas2).toEqual(mockOgRectCanvas);
+        service.canvasInformations.isUserClicking = false;
+        service.erasing(mouseEvent);
+        expect(mockCanvasSelectionService.choseCanvas).toHaveBeenCalledWith(mouseEvent);
+        expect(clearRectMock).not.toHaveBeenCalled();
+    });
 
-    //     // console.log('Mock attributes: ', mockAttributes);
-    //     // console.log('PenService variables: ', service);
-    // });
+    it('erasing should call choseCanvas and clearRect with the right parameters if isUserClicking is true', () => {
+        const mouseEvent = new MouseEvent('mousedown', {
+            clientX: 25,
+            clientY: 50,
+        });
 
-    // it('should add event listeners for mouse events on canvas elements', () => {
-    //     const mouseDownSpy = jasmine.createSpy('mouseDownSpy');
-    //     const mouseUpSpy = jasmine.createSpy('mouseUpSpy');
-    //     const mouseMoveSpy = jasmine.createSpy('mouseMoveSpy');
+        const myContext = service.canvasInformations.drawingCanvas1.getContext('2d');
+        const canvasRect = service.canvasInformations.drawingCanvas1.getBoundingClientRect();
+        const clearRectMock = spyOn(myContext!, 'clearRect');
 
-    //     const ogDrawnCanvas = jasmine.createSpyObj('ogDrawnCanvas', ['addEventListener']);
-    //     const diffDrawnCanvas = jasmine.createSpyObj('diffDrawnCanvas', ['addEventListener']);
-
-    //     ogDrawnCanvas.addEventListener.withArgs('mousedown', jasmine.any(Function)).and.callFake(mouseDownSpy);
-    //     ogDrawnCanvas.addEventListener.withArgs('mouseup', jasmine.any(Function)).and.callFake(mouseUpSpy);
-    //     ogDrawnCanvas.addEventListener.withArgs('mousemove', jasmine.any(Function)).and.callFake(mouseMoveSpy);
-
-    //     diffDrawnCanvas.addEventListener.withArgs('mousedown', jasmine.any(Function)).and.callFake(mouseDownSpy);
-    //     diffDrawnCanvas.addEventListener.withArgs('mouseup', jasmine.any(Function)).and.callFake(mouseUpSpy);
-    //     diffDrawnCanvas.addEventListener.withArgs('mousemove', jasmine.any(Function)).and.callFake(mouseMoveSpy);
-
-    //     service.ogDrawnCanvas = { nativeElement: ogDrawnCanvas };
-    //     service.diffDrawnCanvas = { nativeElement: diffDrawnCanvas };
-
-    //     service.erase();
-
-    //     expect(mouseDownSpy).toHaveBeenCalledTimes(2);
-    //     expect(mouseUpSpy).toHaveBeenCalledTimes(2);
-    //     expect(mouseMoveSpy).toHaveBeenCalledTimes(2);
-    // });
-
-    // it('should remove event listeners for mouse events on canvas elements', () => {
-    //     const mouseDownSpy = jasmine.createSpy('mouseDownSpy');
-    //     const mouseUpSpy = jasmine.createSpy('mouseUpSpy');
-    //     const mouseMoveSpy = jasmine.createSpy('mouseMoveSpy');
-
-    //     const ogDrawnCanvas = jasmine.createSpyObj('ogDrawnCanvas', ['removeEventListener']);
-    //     const diffDrawnCanvas = jasmine.createSpyObj('diffDrawnCanvas', ['removeEventListener']);
-
-    //     ogDrawnCanvas.removeEventListener.withArgs('mousedown', jasmine.any(Function)).and.callFake(mouseDownSpy);
-    //     ogDrawnCanvas.removeEventListener.withArgs('mouseup', jasmine.any(Function)).and.callFake(mouseUpSpy);
-    //     ogDrawnCanvas.removeEventListener.withArgs('mousemove', jasmine.any(Function)).and.callFake(mouseMoveSpy);
-
-    //     diffDrawnCanvas.removeEventListener.withArgs('mousedown', jasmine.any(Function)).and.callFake(mouseDownSpy);
-    //     diffDrawnCanvas.removeEventListener.withArgs('mouseup', jasmine.any(Function)).and.callFake(mouseUpSpy);
-    //     diffDrawnCanvas.removeEventListener.withArgs('mousemove', jasmine.any(Function)).and.callFake(mouseMoveSpy);
-
-    //     service.ogDrawnCanvas = { nativeElement: ogDrawnCanvas };
-    //     service.diffDrawnCanvas = { nativeElement: diffDrawnCanvas };
-
-    //     service.removingListeners();
-
-    //     expect(mouseDownSpy).toHaveBeenCalledTimes(2);
-    //     expect(mouseUpSpy).toHaveBeenCalledTimes(2);
-    //     expect(mouseMoveSpy).toHaveBeenCalledTimes(2);
-    // });
+        service.canvasInformations.isUserClicking = true;
+        service.erasing(mouseEvent);
+        if (myContext) {
+            expect(clearRectMock).toHaveBeenCalledWith(
+                mouseEvent.clientX - canvasRect.left - service.canvasInformations.eraserSize / 2,
+                mouseEvent.clientY - canvasRect.top - service.canvasInformations.eraserSize / 2,
+                service.canvasInformations.eraserSize,
+                service.canvasInformations.eraserSize,
+            );
+        }
+    });
 });

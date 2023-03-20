@@ -54,7 +54,7 @@ describe('PenService', () => {
         }
     });
 
-    it('stopPen should set userClicking property to false and call beginPath', () => {
+    it('stopPen should set isUserClicking property to false and call beginPath', () => {
         service.canvasInformations.isUserClicking = true;
         const myContext = service.canvasInformations.drawingCanvas1.getContext('2d');
         const beginPathMock = spyOn(myContext!, 'beginPath');
@@ -65,7 +65,7 @@ describe('PenService', () => {
         expect(service.canvasInformations.isUserClicking).toBe(false);
     });
 
-    it('writing should call choseCanvas but nothing else if uisUserClicking is false', () => {
+    it('writing should call choseCanvas but nothing else if isUserClicking is false', () => {
         const mouseEvent = new MouseEvent('mousedown', {
             clientX: 25,
             clientY: 50,
@@ -80,7 +80,7 @@ describe('PenService', () => {
         expect(beginPathMock).not.toHaveBeenCalled();
     });
 
-    it('writing should call choseCanvas and draw a line if uisUserClicking is true', () => {
+    it('writing should call choseCanvas and draw a line if isUserClicking is true', () => {
         const mouseEvent = new MouseEvent('mousedown', {
             clientX: 25,
             clientY: 50,
