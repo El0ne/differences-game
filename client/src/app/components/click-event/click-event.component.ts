@@ -32,7 +32,7 @@ export class ClickEventComponent implements OnInit {
     differenceData: ClickDifferenceVerification;
     endGame: boolean;
     foundDifferences: number[];
-    toggleCheatMode: boolean = false;
+    toggleCheatMode: boolean;
 
     constructor(
         public clickEventService: ClickEventService,
@@ -41,6 +41,7 @@ export class ClickEventComponent implements OnInit {
     ) {}
 
     async ngOnInit(): Promise<void> {
+        this.toggleCheatMode = false;
         this.timeout = false;
         this.endGame = false;
         this.foundDifferences = [];
@@ -91,6 +92,7 @@ export class ClickEventComponent implements OnInit {
         if (!this.endGame) {
             const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
             await this.pixelModificationService.flashEffect(originalContext, currentDifferences);
+            console.log(this.toggleCheatMode);
             if (this.toggleCheatMode) {
                 this.differenceEffect(currentDifferences);
             }

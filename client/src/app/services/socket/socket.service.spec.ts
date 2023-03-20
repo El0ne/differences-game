@@ -40,6 +40,10 @@ describe('SocketService', () => {
 
     it('disconnect should disconnect socket from the server', () => {
         service.disconnect();
+        expect(service.sio.disconnect).not.toHaveBeenCalled();
+
+        spyOn(service, 'liveSocket').and.returnValue(true);
+        service.disconnect();
         expect(service.sio.disconnect).toHaveBeenCalled();
     });
 

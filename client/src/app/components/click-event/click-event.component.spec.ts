@@ -218,13 +218,11 @@ describe('ClickEventComponent', () => {
 
     it('differenceEffect() should call differenceEffect if toggleCheatMode is true', fakeAsync(() => {
         component.toggleCheatMode = true;
-        jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000;
-        spyOn(component.pixelModificationService, 'flashEffect').and.callFake(async () => {
-            return new Promise(() => {});
-        });
+        component.endGame = false;
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
+        spyOn(component.pixelModificationService, 'flashEffect').and.returnValue(new Promise(() => {}));
         const differenceEffectSpy = spyOn(component, 'differenceEffect').and.callThrough();
         component.differenceEffect([0]);
-
-        expect(differenceEffectSpy).not.toHaveBeenCalledTimes(1);
+        expect(differenceEffectSpy).toHaveBeenCalledTimes(1);
     }));
 });

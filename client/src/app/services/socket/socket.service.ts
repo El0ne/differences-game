@@ -20,8 +20,10 @@ export class SocketService {
     }
 
     disconnect(): void {
-        this.sio.disconnect();
-        this.names.clear();
+        if (this.liveSocket()) {
+            this.sio.disconnect();
+            this.names.clear();
+        }
     }
 
     liveSocket(): boolean {

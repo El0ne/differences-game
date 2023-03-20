@@ -62,6 +62,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         const gameId = this.route.snapshot.paramMap.get('stageId');
         this.isMultiplayer = this.router.url.includes('multiplayer');
+        if (!this.socketService.liveSocket()) {
+            this.router.navigate(['/home']);
+            return;
+        }
+
         if (gameId) {
             this.currentGameId = gameId;
             this.gameCardInfoService.getGameCardInfoFromId(this.currentGameId).subscribe((gameCardData) => {
@@ -89,7 +94,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.messages.push(data);
         });
         this.socketService.listen<RoomMessage>(CHAT_EVENTS.Abandon, (message: RoomMessage) => {
-            this.winGame(message.socketId);
+            this.winGame(this.socketService.socketId);
             message.message = `${message.message} - ${this.opponent} a abandonné la partie.`;
             this.messages.push(message);
         });
