@@ -14,7 +14,7 @@ export class DrawingRectangleService {
         this.paintRectangle.bind(this),
     ];
 
-    constructor(private canvasSelection: CanvasSelectionService) {}
+    constructor(private canvasSelectionService: CanvasSelectionService) {}
 
     setColor(color: string): void {
         this.canvasInformations.selectedColor = color;
@@ -44,7 +44,7 @@ export class DrawingRectangleService {
     }
 
     paintRectangle(mouseEvent: MouseEvent): void {
-        this.canvasSelection.choseCanvas(mouseEvent);
+        this.canvasSelectionService.choseCanvas(mouseEvent);
         const context = this.canvasInformations.drawingCanvas2.getContext('2d');
 
         if (context && this.canvasInformations.isUserClicking) {
