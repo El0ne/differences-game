@@ -90,7 +90,7 @@ export class ClickEventComponent implements OnInit {
     async differenceEffect(currentDifferences: number[]): Promise<void> {
         if (!this.endGame) {
             const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-            this.pixelModificationService.flashEffect(originalContext, currentDifferences);
+            await this.pixelModificationService.flashEffect(originalContext, currentDifferences);
             if (this.toggleCheatMode) {
                 this.differenceEffect(currentDifferences);
             }
