@@ -8,8 +8,6 @@ import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 export class UndoRedoService {
     canvasInformations: CanvasInformations;
 
-    constructor() {}
-
     setProperties(information: CanvasInformations) {
         this.canvasInformations = information;
     }
