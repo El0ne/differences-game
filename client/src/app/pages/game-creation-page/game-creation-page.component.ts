@@ -6,8 +6,10 @@ import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component'
 import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
 import { DrawManipulationService } from '@app/services/draw-manipulation/draw-manipulation.service';
 import { DrawingRectangleService } from '@app/services/drawing-rectangle/drawing-rectangle.service';
+import { EraserButtonService } from '@app/services/eraser-button/eraser-button.service';
 import { FileManipulationService } from '@app/services/file-manipulation/file-manipulation.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { PenService } from '@app/services/pen-service.service';
 import { UndoRedoService } from '@app/services/undo-redo/undo-redo.service';
 import { CanvasInformations } from '@common/canvas-informations';
 import { GameCardDto } from '@common/game-card.dto';
@@ -97,7 +99,9 @@ export class GameCreationPageComponent implements OnInit {
         public router: Router,
         private fileManipulationService: FileManipulationService,
         private canvasSelectionService: CanvasSelectionService,
+        private penService: PenService,
         private drawingRectangleService: DrawingRectangleService,
+        private eraserButtonService: EraserButtonService,
         private drawManipulationService: DrawManipulationService,
         private undoRedoService: UndoRedoService,
     ) {}
@@ -169,6 +173,8 @@ export class GameCreationPageComponent implements OnInit {
             rectangleInitialY: 0,
 
             selectedColor: '#ff124f',
+            penSize: 10,
+            eraserSize: 50,
         };
     }
 
@@ -309,6 +315,23 @@ export class GameCreationPageComponent implements OnInit {
         this.canvasInformation = this.canvasSelectionService.choseCanvas(mouseEvent);
     }
 
+    startPen(mouseEvent: MouseEvent): void {
+        this.penService.startPen(mouseEvent);
+    }
+
+    stopPen() {
+        this.penService.stopPen();
+    }
+
+    writing(mouseEvent: MouseEvent) {
+        this.penService.writing(mouseEvent);
+    }
+
+    drawPen() {
+        this.penService.setProperties(this.canvasInformation);
+        this.penService.drawPen();
+    }
+
     startDrawingRectangle(mouseEvent: MouseEvent): void {
         this.drawingRectangleService.startDrawingRectangle(mouseEvent);
     }
@@ -326,119 +349,21 @@ export class GameCreationPageComponent implements OnInit {
         this.drawingRectangleService.drawRectangle();
     }
 
-    startPen(mouseEvent: MouseEvent): void {
-        this.isUserClicking = true;
-        const context = this.drawingCanvas1.getContext('2d');
-        const canvas = this.drawingCanvas1.getBoundingClientRect();
-
-        if (context) {
-            context.lineWidth = this.penSize;
-            context.lineCap = 'round';
-            context.strokeStyle = this.selectedColor;
-            context.beginPath();
-            context.arc(mouseEvent.clientX - canvas.left, mouseEvent.clientY - canvas.top, 0, 0, 2 * Math.PI);
-            context.stroke();
-            context.beginPath();
-        }
-    }
-
-    stopPen() {
-        // console.log('stopped writing');
-        const ctx1 = this.drawingCanvas1.getContext('2d');
-        if (ctx1) {
-            this.isUserClicking = false;
-            ctx1.beginPath();
-        }
-        // this.savePixels();
-        // this.pushCanvas(this.drawingCanvas1);
-        console.log('finished drawing');
-        this.consoleStuff();
-    }
-
-    writing(e: MouseEvent) {
-        this.choseCanvas(e);
-        const ctx1 = this.drawingCanvas1.getContext('2d');
-
-        if (ctx1 && this.isUserClicking) {
-            const canvasRect = this.drawingCanvas1.getBoundingClientRect();
-
-            ctx1.lineWidth = this.penSize;
-            ctx1.lineCap = 'round';
-            ctx1.strokeStyle = this.selectedColor;
-
-            ctx1.lineTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
-            ctx1.stroke();
-            ctx1.beginPath();
-            ctx1.moveTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
-
-            // this.drawingActions.push({
-            //     position: this.isInOgCanvas,
-            //     data: [e.clientX - e.clientY - canvasRect.top],
-            // });
-        }
-    }
-
-    drawPen() {
-        // this.penListener = this.startPen.bind(this);
-        this.originalDrawnCanvas.nativeElement.addEventListener('mousedown', this.penListener[0]);
-        this.differenceDrawnCanvas.nativeElement.addEventListener('mousedown', this.penListener[0]);
-
-        // this.penListener = this.stopPen.bind(this);
-        this.originalDrawnCanvas.nativeElement.addEventListener('mouseup', this.penListener[1]);
-        this.differenceDrawnCanvas.nativeElement.addEventListener('mouseup', this.penListener[1]);
-
-        // this.penListener = this.writing.bind(this);
-        this.originalDrawnCanvas.nativeElement.addEventListener('mousemove', this.penListener[2]);
-        this.differenceDrawnCanvas.nativeElement.addEventListener('mousemove', this.penListener[2]);
-    }
-
-    startErase(e: MouseEvent) {
-        this.isUserClicking = true;
-        const ctx1 = this.drawingCanvas1.getContext('2d');
-
-        const canvasRect = this.drawingCanvas1.getBoundingClientRect();
-
-        if (ctx1)
-            ctx1.clearRect(
-                e.clientX - canvasRect.left - this.eraserSize / 2,
-                e.clientY - canvasRect.top - this.eraserSize / 2,
-                this.eraserSize,
-                this.eraserSize,
-            );
+    startErase(mouseEvent: MouseEvent) {
+        this.eraserButtonService.startErase(mouseEvent);
     }
 
     stopErase() {
-        this.isUserClicking = false;
-        // this.pushCanvas(this.drawingCanvas1);
+        this.eraserButtonService.stopErase();
     }
 
-    erasing(e: MouseEvent) {
-        this.choseCanvas(e);
-        const ctx1 = this.drawingCanvas1.getContext('2d');
-
-        if (ctx1 && this.isUserClicking) {
-            const canvasRect = this.drawingCanvas1.getBoundingClientRect();
-            ctx1.clearRect(
-                e.clientX - canvasRect.left - this.eraserSize / 2,
-                e.clientY - canvasRect.top - this.eraserSize / 2,
-                this.eraserSize,
-                this.eraserSize,
-            );
-        }
+    erasing(mouseEvent: MouseEvent) {
+        this.eraserButtonService.erasing(mouseEvent);
     }
 
     erase() {
-        // this.eraseListener = this.startErase.bind(this);
-        this.originalDrawnCanvas.nativeElement.addEventListener('mousedown', this.eraseListener[0]);
-        this.differenceDrawnCanvas.nativeElement.addEventListener('mousedown', this.eraseListener[0]);
-
-        // this.eraseListener = this.stopErase.bind(this);
-        this.originalDrawnCanvas.nativeElement.addEventListener('mouseup', this.eraseListener[1]);
-        this.differenceDrawnCanvas.nativeElement.addEventListener('mouseup', this.eraseListener[1]);
-
-        // this.eraseListener = this.erasing.bind(this);
-        this.originalDrawnCanvas.nativeElement.addEventListener('mousemove', this.eraseListener[2]);
-        this.differenceDrawnCanvas.nativeElement.addEventListener('mousemove', this.eraseListener[2]);
+        this.eraserButtonService.setProperties(this.canvasInformation);
+        this.eraserButtonService.erase();
     }
 
     removingListeners() {

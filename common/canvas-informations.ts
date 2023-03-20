@@ -30,4 +30,6 @@ export interface CanvasInformations {
     rectangleInitialY: number;
 
     selectedColor: string;
+    penSize: number;
+    eraserSize: number;
 }
