@@ -83,7 +83,6 @@ export class GameCreationPageComponent implements OnInit {
 
     canvasInformations: CanvasInformations;
 
-    // TODO remove the listeners when services are all implemented
     private eraseListener: ((mouseEvent: MouseEvent) => void)[] = [
         this.eraserButtonService.startErase.bind(this),
         this.eraserButtonService.stopErase.bind(this),
