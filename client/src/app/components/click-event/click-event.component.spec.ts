@@ -92,18 +92,6 @@ describe('ClickEventComponent', () => {
         expect(answer[1]).toEqual(positionExpected[1]);
     });
 
-    // TODO sometimes fail expect 0 to equal -2
-    it('getCoordInImage() should return the correct position', () => {
-        const ClientX = 300;
-        const ClientY = 100;
-        const mockClick = new MouseEvent('click', { clientX: ClientX, clientY: ClientY });
-        const rect = component.modification.nativeElement.getBoundingClientRect();
-        const answer = component.getCoordInImage(mockClick);
-        const positionExpected = [Math.floor(ClientX - rect.left), Math.floor(ClientY - rect.top)];
-        expect(answer[0]).toEqual(positionExpected[0]);
-        expect(answer[1]).toEqual(positionExpected[1]);
-    });
-
     it('isDifferent() should return true if a difference is detected', () => {
         spyOn(component.clickEventService, 'isADifference').and.returnValue(of(DIFFERENCE_FOUND));
         const mockClick = new MouseEvent('click', { clientX: 0, clientY: 0 });
