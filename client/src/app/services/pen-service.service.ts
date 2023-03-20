@@ -8,8 +8,6 @@ import { CanvasSelectionService } from './canvas-selection/canvas-selection.serv
 export class PenService {
     canvasInformations: CanvasInformations;
 
-    private penListener: ((MouseEvent: MouseEvent) => void)[] = [this.startPen.bind(this), this.stopPen.bind(this), this.writing.bind(this)];
-
     constructor(private canvasSelectionService: CanvasSelectionService) {}
 
     setColor(color: string): void {
@@ -69,27 +67,4 @@ export class PenService {
             // });
         }
     }
-
-    drawPen() {
-        // this.penListener = this.startPen.bind(this);
-        this.canvasInformations.originalDrawnCanvas.addEventListener('mousedown', this.penListener[0]);
-        this.canvasInformations.differenceDrawnCanvas.addEventListener('mousedown', this.penListener[0]);
-
-        // this.penListener = this.stopPen.bind(this);
-        this.canvasInformations.originalDrawnCanvas.addEventListener('mouseup', this.penListener[1]);
-        this.canvasInformations.differenceDrawnCanvas.addEventListener('mouseup', this.penListener[1]);
-
-        // this.penListener = this.writing.bind(this);
-        this.canvasInformations.originalDrawnCanvas.addEventListener('mousemove', this.penListener[2]);
-        this.canvasInformations.differenceDrawnCanvas.addEventListener('mousemove', this.penListener[2]);
-    }
-
-    // removingListeners() {
-    //     this.canvasInformations.originalDrawnCanvas.removeEventListener('mousedown', this.penListener[0]);
-    //     this.canvasInformations.differenceDrawnCanvas.removeEventListener('mousedown', this.penListener[0]);
-    //     this.canvasInformations.originalDrawnCanvas.removeEventListener('mouseup', this.penListener[1]);
-    //     this.canvasInformations.differenceDrawnCanvas.removeEventListener('mouseup', this.penListener[1]);
-    //     this.canvasInformations.originalDrawnCanvas.removeEventListener('mousemove', this.penListener[2]);
-    //     this.canvasInformations.differenceDrawnCanvas.removeEventListener('mousemove', this.penListener[2]);
-    // }
 }

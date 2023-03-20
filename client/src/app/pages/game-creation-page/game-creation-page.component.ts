@@ -79,7 +79,7 @@ export class GameCreationPageComponent implements OnInit {
 
     isInOriginalCanvas: boolean = false;
 
-    canvasInformation: CanvasInformations;
+    canvasInformations: CanvasInformations;
 
     // TODO remove the listeners when services are all implemented
     private eraseListener: ((mouseEvent: MouseEvent) => void)[] = [this.startErase.bind(this), this.stopErase.bind(this), this.erasing.bind(this)];
@@ -124,8 +124,8 @@ export class GameCreationPageComponent implements OnInit {
         this.leftCanvasArray.push(emptyCanvas.toDataURL());
         this.rightCanvasArray.push(emptyCanvas.toDataURL());
         setTimeout(() => {
-            this.canvasInformation = this.setObject();
-            this.canvasSelectionService.setProperties(this.canvasInformation);
+            this.canvasInformations = this.setObject();
+            this.canvasSelectionService.setProperties(this.canvasInformations);
             this.fileManipulationService.updateAttributes({
                 originalFile: this.originalFile,
                 differenceFile: this.differentFile,
@@ -310,7 +310,7 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     choseCanvas(mouseEvent: MouseEvent): void {
-        this.canvasInformation = this.canvasSelectionService.choseCanvas(mouseEvent);
+        this.canvasInformations = this.canvasSelectionService.choseCanvas(mouseEvent);
     }
 
     startPen(mouseEvent: MouseEvent): void {
@@ -326,8 +326,18 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     drawPen() {
-        this.penService.setProperties(this.canvasInformation);
-        this.penService.drawPen();
+        this.penService.setProperties(this.canvasInformations);
+        // this.penListener = this.startPen.bind(this);
+        this.canvasInformations.originalDrawnCanvas.addEventListener('mousedown', this.penListener[0]);
+        this.canvasInformations.differenceDrawnCanvas.addEventListener('mousedown', this.penListener[0]);
+
+        // this.penListener = this.stopPen.bind(this);
+        this.canvasInformations.originalDrawnCanvas.addEventListener('mouseup', this.penListener[1]);
+        this.canvasInformations.differenceDrawnCanvas.addEventListener('mouseup', this.penListener[1]);
+
+        // this.penListener = this.writing.bind(this);
+        this.canvasInformations.originalDrawnCanvas.addEventListener('mousemove', this.penListener[2]);
+        this.canvasInformations.differenceDrawnCanvas.addEventListener('mousemove', this.penListener[2]);
     }
 
     startDrawingRectangle(mouseEvent: MouseEvent): void {
@@ -343,8 +353,15 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     drawRectangle(): void {
-        this.drawingRectangleService.setProperties(this.canvasInformation);
-        this.drawingRectangleService.drawRectangle();
+        this.drawingRectangleService.setProperties(this.canvasInformations);
+        this.canvasInformations.originalRectangleCanvas.addEventListener('mousedown', this.rectangleListener[0]);
+        this.canvasInformations.differenceRectangleCanvas.addEventListener('mousedown', this.rectangleListener[0]);
+
+        this.canvasInformations.originalRectangleCanvas.addEventListener('mouseup', this.rectangleListener[1]);
+        this.canvasInformations.differenceRectangleCanvas.addEventListener('mouseup', this.rectangleListener[1]);
+
+        this.canvasInformations.originalRectangleCanvas.addEventListener('mousemove', this.rectangleListener[2]);
+        this.canvasInformations.differenceRectangleCanvas.addEventListener('mousemove', this.rectangleListener[2]);
     }
 
     startErase(mouseEvent: MouseEvent) {
@@ -360,8 +377,18 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     erase() {
-        this.eraserButtonService.setProperties(this.canvasInformation);
-        this.eraserButtonService.erase();
+        this.eraserButtonService.setProperties(this.canvasInformations);
+        // this.eraseListener = this.startErase.bind(this);
+        this.canvasInformations.originalDrawnCanvas.addEventListener('mousedown', this.eraseListener[0]);
+        this.canvasInformations.differenceDrawnCanvas.addEventListener('mousedown', this.eraseListener[0]);
+
+        // this.eraseListener = this.stopErase.bind(this);
+        this.canvasInformations.originalDrawnCanvas.addEventListener('mouseup', this.eraseListener[1]);
+        this.canvasInformations.differenceDrawnCanvas.addEventListener('mouseup', this.eraseListener[1]);
+
+        // this.eraseListener = this.erasing.bind(this);
+        this.canvasInformations.originalDrawnCanvas.addEventListener('mousemove', this.eraseListener[2]);
+        this.canvasInformations.differenceDrawnCanvas.addEventListener('mousemove', this.eraseListener[2]);
     }
 
     removingListeners() {
@@ -451,12 +478,12 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     invert(): void {
-        this.drawManipulationService.setProperties(this.canvasInformation);
+        this.drawManipulationService.setProperties(this.canvasInformations);
         this.drawManipulationService.invert();
     }
 
     duplicate(side: string): void {
-        this.drawManipulationService.setProperties(this.canvasInformation);
+        this.drawManipulationService.setProperties(this.canvasInformations);
         this.drawManipulationService.duplicate(side);
     }
 
