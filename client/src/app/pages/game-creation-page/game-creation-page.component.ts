@@ -9,7 +9,7 @@ import { DrawingRectangleService } from '@app/services/drawing-rectangle/drawing
 import { EraserButtonService } from '@app/services/eraser-button/eraser-button.service';
 import { FileManipulationService } from '@app/services/file-manipulation/file-manipulation.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
-import { PenService } from '@app/services/pen-service.service';
+import { PenService } from '@app/services/pen-service/pen-service.service';
 import { UndoRedoService } from '@app/services/undo-redo/undo-redo.service';
 import { CanvasInformations } from '@common/canvas-informations';
 import { GameCardDto } from '@common/game-card.dto';
