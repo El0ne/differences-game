@@ -43,7 +43,7 @@ export class FileManipulationService {
     async fileValidation(event: Event): Promise<void> {
         const target = event.target as HTMLInputElement;
         const file: File = (target.files as FileList)[0];
-        if (file !== undefined && file.size === IMAGE_DIMENSIONS.size && file.type === 'image/bmp') {
+        if (file && file.size === IMAGE_DIMENSIONS.size && file.type === 'image/bmp') {
             await this.uploadImages(file, target);
         } else {
             alert('wrong size or file type please choose again');

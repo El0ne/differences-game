@@ -215,13 +215,13 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     saveVerification(): boolean {
-        if (this.gameTitle === '' && this.originalFile === null && this.differentFile === null) {
+        if (this.gameTitle === '' && !this.originalFile && !this.differentFile) {
             alert('Il manque une image et un titre à votre jeu !');
             return false;
         } else if (this.gameTitle === '') {
             alert("N'oubliez pas d'ajouter un titre à votre jeu !");
             return false;
-        } else if (this.originalFile === null || this.differentFile === null) {
+        } else if (!this.originalFile || !this.differentFile) {
             alert('Un jeu de différences sans image est pour ainsi dire... intéressant ? Ajoutez une image.');
             return false;
         }
