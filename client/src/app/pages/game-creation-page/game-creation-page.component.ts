@@ -8,6 +8,7 @@ import { DrawManipulationService } from '@app/services/draw-manipulation/draw-ma
 import { DrawingRectangleService } from '@app/services/drawing-rectangle/drawing-rectangle.service';
 import { FileManipulationService } from '@app/services/file-manipulation/file-manipulation.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { UndoRedoService } from '@app/services/undo-redo/undo-redo.service';
 import { CanvasInformations } from '@common/canvas-informations';
 import { GameCardDto } from '@common/game-card.dto';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
@@ -98,6 +99,7 @@ export class GameCreationPageComponent implements OnInit {
         private canvasSelectionService: CanvasSelectionService,
         private drawingRectangleService: DrawingRectangleService,
         private drawManipulationService: DrawManipulationService,
+        private undoRedoService: UndoRedoService,
     ) {}
 
     @HostListener('document:keydown.control.z', ['$event'])
@@ -348,7 +350,7 @@ export class GameCreationPageComponent implements OnInit {
             ctx1.beginPath();
         }
         // this.savePixels();
-        this.pushCanvas(this.drawingCanvas1);
+        // this.pushCanvas(this.drawingCanvas1);
         console.log('finished drawing');
         this.consoleStuff();
     }
@@ -407,7 +409,7 @@ export class GameCreationPageComponent implements OnInit {
 
     stopErase() {
         this.isUserClicking = false;
-        this.pushCanvas(this.drawingCanvas1);
+        // this.pushCanvas(this.drawingCanvas1);
     }
 
     erasing(e: MouseEvent) {
@@ -546,7 +548,7 @@ export class GameCreationPageComponent implements OnInit {
             this.isInOriginalCanvas = true;
         }
 
-        this.pushCanvas(this.drawingCanvas1);
+        // this.pushCanvas(this.drawingCanvas1);
     }
 
     // verifyFirstTime(position: string) {
@@ -563,87 +565,93 @@ export class GameCreationPageComponent implements OnInit {
     // }
 
     pushCanvas(canvas: HTMLCanvasElement) {
-        this.nbElements++;
-        // if (this.nbElements < this.actionsArray.length) {
-        //     // added this to make sure that if someone undos then adds new modifications
-        //     // that it won't allow user to undo back to the old saved canvases
-        //     this.actionsArray.length = this.nbElements;
-        // }
+        this.undoRedoService.pushCanvas(canvas);
+        //     this.nbElements++;
+        //     // if (this.nbElements < this.actionsArray.length) {
+        //     //     // added this to make sure that if someone undos then adds new modifications
+        //     //     // that it won't allow user to undo back to the old saved canvases
+        //     //     this.actionsArray.length = this.nbElements;
+        //     // }
 
-        const canvasDataURL = canvas.toDataURL();
-        if (this.isInOriginalCanvas) {
-            // if (this.isFirstTimeInLeftCanvas) this.verifyFirstTime('left');
-            this.actionsArray.push(true);
-            this.leftArrayPointer++;
-            this.leftCanvasArray.push(canvasDataURL);
-        } else {
-            this.actionsArray.push(false);
-            this.rightArrayPointer++;
-            this.rightCanvasArray.push(canvasDataURL);
-            // if (this.isFirstTimeInRightCanvas) this.verifyFirstTime('right');
-        }
+        //     const canvasDataURL = canvas.toDataURL();
+        //     if (this.isInOriginalCanvas) {
+        //         // if (this.isFirstTimeInLeftCanvas) this.verifyFirstTime('left');
+        //         this.actionsArray.push(true);
+        //         this.leftArrayPointer++;
+        //         this.leftCanvasArray.push(canvasDataURL);
+        //     } else {
+        //         this.actionsArray.push(false);
+        //         this.rightArrayPointer++;
+        //         this.rightCanvasArray.push(canvasDataURL);
+        //         // if (this.isFirstTimeInRightCanvas) this.verifyFirstTime('right');
+        //     }
 
-        this.consoleStuff();
+        //     this.consoleStuff();
     }
 
     undoAction(array: string[], pointer: number) {
-        const ctx = this.actionsArray[this.nbElements]
-            ? this.originalDrawnCanvas.nativeElement.getContext('2d')
-            : this.differenceDrawnCanvas.nativeElement.getContext('2d');
+        this.undoRedoService.undoAction(array, pointer);
+        //     const ctx = this.actionsArray[this.nbElements]
+        //         ? this.originalDrawnCanvas.nativeElement.getContext('2d')
+        //         : this.differenceDrawnCanvas.nativeElement.getContext('2d');
 
-        const canvasPic = new Image();
-        canvasPic.src = array[pointer];
-        canvasPic.onload = () => {
-            ctx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-            ctx.drawImage(canvasPic, 0, 0);
-        };
-        const test = `undo on the left canvas: ${this.actionsArray[this.nbElements]} at index ${pointer}`;
-        console.log(test);
+        //     const canvasPic = new Image();
+        //     canvasPic.src = array[pointer];
+        //     canvasPic.onload = () => {
+        //         ctx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+        //         ctx.drawImage(canvasPic, 0, 0);
+        //     };
+        //     const test = `undo on the left canvas: ${this.actionsArray[this.nbElements]} at index ${pointer}`;
+        //     console.log(test);
     }
-    undo() {
-        if (this.nbElements > 0) {
-            this.nbElements--;
 
-            if (this.actionsArray[this.nbElements]) {
-                this.leftArrayPointer--;
-                this.undoAction(this.leftCanvasArray, this.leftArrayPointer);
-            } else {
-                this.rightArrayPointer--;
-                this.undoAction(this.rightCanvasArray, this.rightArrayPointer);
-            }
-        }
-        this.consoleStuff();
+    undo() {
+        this.undoRedoService.undo();
+        //     if (this.nbElements > 0) {
+        //         this.nbElements--;
+
+        //         if (this.actionsArray[this.nbElements]) {
+        //             this.leftArrayPointer--;
+        //             this.undoAction(this.leftCanvasArray, this.leftArrayPointer);
+        //         } else {
+        //             this.rightArrayPointer--;
+        //             this.undoAction(this.rightCanvasArray, this.rightArrayPointer);
+        //         }
+        //     }
+        //     this.consoleStuff();
     }
 
     redoAction(array: string[], pointer: number) {
-        const ctx = this.actionsArray[this.nbElements]
-            ? this.originalDrawnCanvas.nativeElement.getContext('2d')
-            : this.differenceDrawnCanvas.nativeElement.getContext('2d');
+        this.undoRedoService.redoAction(array, pointer);
+        //     const ctx = this.actionsArray[this.nbElements]
+        //         ? this.originalDrawnCanvas.nativeElement.getContext('2d')
+        //         : this.differenceDrawnCanvas.nativeElement.getContext('2d');
 
-        const canvasPic = new Image();
-        canvasPic.src = array[pointer];
+        //     const canvasPic = new Image();
+        //     canvasPic.src = array[pointer];
 
-        canvasPic.onload = () => {
-            ctx.drawImage(canvasPic, 0, 0);
-        };
-        ctx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-        const test = `redo on the left canvas: ${this.actionsArray[this.nbElements]} at index ${pointer}`;
-        console.log(test);
+        //     canvasPic.onload = () => {
+        //         ctx.drawImage(canvasPic, 0, 0);
+        //     };
+        //     ctx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+        //     const test = `redo on the left canvas: ${this.actionsArray[this.nbElements]} at index ${pointer}`;
+        //     console.log(test);
     }
 
     redo() {
-        console.log('this.actionsArray', this.actionsArray);
-        if (this.nbElements < this.actionsArray.length) {
-            console.log('this.nbElements', this.nbElements);
-            if (this.actionsArray[this.nbElements]) {
-                this.leftArrayPointer++;
-                this.redoAction(this.leftCanvasArray, this.leftArrayPointer);
-            } else {
-                this.rightArrayPointer++;
-                this.redoAction(this.rightCanvasArray, this.rightArrayPointer);
-            }
-            this.nbElements++;
-        }
-        this.consoleStuff();
+        this.undoRedoService.redo();
+        //     console.log('this.actionsArray', this.actionsArray);
+        //     if (this.nbElements < this.actionsArray.length) {
+        //         console.log('this.nbElements', this.nbElements);
+        //         if (this.actionsArray[this.nbElements]) {
+        //             this.leftArrayPointer++;
+        //             this.redoAction(this.leftCanvasArray, this.leftArrayPointer);
+        //         } else {
+        //             this.rightArrayPointer++;
+        //             this.redoAction(this.rightCanvasArray, this.rightArrayPointer);
+        //         }
+        //         this.nbElements++;
+        //     }
+        //     this.consoleStuff();
     }
 }

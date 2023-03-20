@@ -17,19 +17,14 @@ export class UndoRedoService {
     pushCanvas(canvas: HTMLCanvasElement) {
         this.canvasInformations.nbElements++;
         // if (this.canvasInformations.nbElements < this.canvasInformations.actionsArray.length) {
-        //     // added this to make sure that if someone undos then adds new modifications
-        //     // that it won't allow user to undo back to the old saved canvases
         //     this.canvasInformations.actionsArray.length = this.canvasInformations.nbElements;
-        //     // if (this.canvasInformations.leftArrayPointer < this.canvasInformations.leftCanvasArray.length) {
-        //     //     this.canvasInformations.leftCanvasArray.length = this.canvasInformations.leftArrayPointer;
-        //     // } else if (this.canvasInformations.rightArrayPointer < this.canvasInformations.rightCanvasArray.length) {
-        //     //     this.canvasInformations.rightCanvasArray.length = this.canvasInformations.rightArrayPointer;
-        //     // }
+        //     this.canvasInformations.leftCanvasArray.length = this.canvasInformations.leftArrayPointer;
+        //     this.canvasInformations.rightCanvasArray.length = this.canvasInformations.rightArrayPointer;
+
         // }
 
         const canvasDataURL = canvas.toDataURL();
         if (this.canvasInformations.isInOriginalCanvas) {
-            // if (this.isFirstTimeInLeftCanvas) this.verifyFirstTime('left');
             this.canvasInformations.actionsArray.push(true);
             this.canvasInformations.leftArrayPointer++;
             this.canvasInformations.leftCanvasArray.push(canvasDataURL);
@@ -37,7 +32,6 @@ export class UndoRedoService {
             this.canvasInformations.actionsArray.push(false);
             this.canvasInformations.rightArrayPointer++;
             this.canvasInformations.rightCanvasArray.push(canvasDataURL);
-            // if (this.isFirstTimeInRightCanvas) this.verifyFirstTime('right');
         }
     }
 
