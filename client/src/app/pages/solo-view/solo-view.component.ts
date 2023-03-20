@@ -8,7 +8,6 @@ import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
-import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { EndGame } from '@common/chat-dialog-constants';
@@ -36,11 +35,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     opponent: string;
     messages: RoomMessage[] = [];
     messageContent: string = '';
-    differenceArray: number[][];
     currentScorePlayer: number = 0;
     currentScoreOpponent: number = 0;
     numberOfDifferences: number;
-    currentTime: number;
     currentGameId: string;
     endGame: Subject<void> = new Subject<void>();
     gameCardInfo: GameCardInformation;
@@ -50,7 +47,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     // eslint-disable-next-line max-params
     constructor(
         public timerService: TimerSoloService,
-        private convertService: SecondToMinuteService,
         private gameCardInfoService: GameCardInformationService,
         private foundDifferenceService: FoundDifferenceService,
         private route: ActivatedRoute,
@@ -147,7 +143,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     timesConvertion(time: number): string {
-        return this.convertService.convert(time);
+        return this.timerService.convert(time);
     }
 
     winGame(winnerId: string): void {
