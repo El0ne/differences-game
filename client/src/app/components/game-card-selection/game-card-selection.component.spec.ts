@@ -1,4 +1,5 @@
 /* eslint-disable no-underscore-dangle */
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,13 +10,18 @@ import { GAMES } from '@app/mock/game-cards';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { WaitingRoomComponent, WaitingRoomDataPassing } from '@app/modals/waiting-room/waiting-room.component';
 import { SocketService } from '@app/services/socket/socket.service';
-import { JoinHostInWaitingRequest, WaitingRoomEvents } from '@common/waiting-room-socket-communication';
+import { GameCardInformation } from '@common/game-card';
+import { MATCH_EVENTS } from '@common/match-gateway-communication';
+import { JoinHostInWaitingRequest, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 import { of } from 'rxjs';
 import { GameCardSelectionComponent } from './game-card-selection.component';
 
 describe('GameCardSelectionComponent', () => {
     let component: GameCardSelectionComponent;
     let fixture: ComponentFixture<GameCardSelectionComponent>;
+    const gameCardServiceSpyObj = jasmine.createSpyObj('GameCardInformationService', ['deleteGame', 'playGame']);
+    gameCardServiceSpyObj.deleteGame.and.returnValue(of());
+    gameCardServiceSpyObj.playGame.and.returnValue(of());
     let modalSpy: MatDialog;
     let choseNameAfterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
     let waitingRoomAfterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
@@ -34,7 +40,7 @@ describe('GameCardSelectionComponent', () => {
 
         await TestBed.configureTestingModule({
             declarations: [GameCardSelectionComponent, BestTimeComponent, ChosePlayerNameDialogComponent, WaitingRoomComponent],
-            imports: [MatIconModule, RouterTestingModule],
+            imports: [MatIconModule, RouterTestingModule, HttpClientTestingModule],
             providers: [
                 { provide: MatDialog, useValue: modalSpy },
                 {
@@ -47,6 +53,7 @@ describe('GameCardSelectionComponent', () => {
 
         fixture = TestBed.createComponent(GameCardSelectionComponent);
         component = fixture.componentInstance;
+        component.gameCardInformation = new GameCardInformation();
         component.gameCardInformation = GAMES[0];
         fixture.detectChanges();
     });
@@ -55,11 +62,17 @@ describe('GameCardSelectionComponent', () => {
         expect(component).toBeTruthy();
     });
 
+    it('deleteGame should call gameCardService.deleteGame and gameDeleted.emit', () => {
+        component.deleteGame();
+        expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.DeleteGame, '123');
+    });
+
     it('selectPlayerName should redirect to solo view after opening the modal if in soloGame', () => {
         modalSpy.open = () => choseNameAfterClosedSpy;
         const routerSpy = spyOn(TestBed.inject(Router), 'navigate');
         component.selectPlayerName(true);
         expect(routerSpy).toHaveBeenCalledWith(['/solo/' + component.gameCardInformation._id]);
+        expect(socketServiceSpy.send).toHaveBeenCalledWith(MATCH_EVENTS.createSoloGame, '123');
     });
 
     it('selectPlayerName should call hostOrJoinGame if in multiplayer', () => {
@@ -72,7 +85,7 @@ describe('GameCardSelectionComponent', () => {
     it('hostOrJoinGame should send a hostGame event if the button is createButton', () => {
         component.createGameButton = true;
         component.hostOrJoinGame();
-        expect(socketServiceSpy.send).toHaveBeenCalledWith(WaitingRoomEvents.HostGame, '123');
+        expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.HostGame, '123');
         expect(modalSpy.open).toHaveBeenCalledWith(WaitingRoomComponent, {
             disableClose: true,
             data: { stageId: '123', isHost: true } as WaitingRoomDataPassing,
@@ -84,7 +97,7 @@ describe('GameCardSelectionComponent', () => {
         Object.defineProperty(socketServiceSpy, 'socketId', { value: 'playerId' });
         socketServiceSpy.names.set('playerId', 'playerName');
         component.hostOrJoinGame();
-        expect(socketServiceSpy.send).toHaveBeenCalledWith(WaitingRoomEvents.JoinHost, {
+        expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.JoinHost, {
             playerName: 'playerName',
             stageId: '123',
         } as JoinHostInWaitingRequest);

@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 // @ts-ignore
 
 import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
@@ -7,6 +8,7 @@ import { DifferenceDetectionService } from '@app/services/difference-detection/d
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameDifficultyService } from '@app/services/game-difficulty/game-difficulty.service';
+import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
@@ -61,6 +63,7 @@ describe('StageController', () => {
                 DifferencesCounterService,
                 PixelPositionService,
                 DifferenceClickService,
+                GameManagerService,
             ],
         }).compile();
 

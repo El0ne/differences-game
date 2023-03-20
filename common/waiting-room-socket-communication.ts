@@ -1,4 +1,4 @@
-export enum WaitingRoomEvents {
+export enum WAITING_ROOM_EVENTS {
     ScanForHost = 'scanForHost',
     HostGame = 'hostGame',
     UnhostGame = 'unhostGame',
@@ -13,6 +13,8 @@ export enum WaitingRoomEvents {
     MatchAccepted = 'matchAccepted',
     MatchRefused = 'matchRefused',
     MatchConfirmed = 'matchConfirmed',
+    DeleteGame = 'deleteGame',
+    GameDeleted = 'gameDeleted',
 }
 
 export interface PlayerInformations {

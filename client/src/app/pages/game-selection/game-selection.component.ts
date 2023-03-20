@@ -5,7 +5,7 @@ import { GameCardSelectionComponent } from '@app/components/game-card-selection/
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { GameCardInformation } from '@common/game-card';
-import { WaitingRoomEvents } from '@common/waiting-room-socket-communication';
+import { WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
 
 @Component({
@@ -26,22 +26,19 @@ export class GameSelectionComponent implements OnInit {
         this.isConfig = this.router.url === '/config';
         this.socket.connect();
         if (!this.isConfig) {
-            this.socket.listen(WaitingRoomEvents.MatchCreated, (stageId: string) => {
+            this.socket.listen(WAITING_ROOM_EVENTS.MatchCreated, (stageId: string) => {
                 this.setGameCardCreateOrJoin(false, stageId);
             });
 
-            this.socket.listen(WaitingRoomEvents.MatchDeleted, (stageId: string) => {
+            this.socket.listen(WAITING_ROOM_EVENTS.MatchDeleted, (stageId: string) => {
                 this.setGameCardCreateOrJoin(true, stageId);
             });
         }
-        // this.socket.listen(WaitingRoomEvents.GameDeleted, (stageId: string) => {
-        //     this.setGameCardCreateOrJoin(true, stageId);
-        // });
-
-        this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
-            this.numberOfGameInformations = data;
-            this.selectGameCards();
+        this.socket.listen(WAITING_ROOM_EVENTS.GameDeleted, () => {
+            this.refreshGameCards();
         });
+
+        this.refreshGameCards();
     }
 
     selectGameCards(): void {
@@ -50,7 +47,7 @@ export class GameSelectionComponent implements OnInit {
             this.gameCardInformations = data;
 
             this.socket.send(
-                WaitingRoomEvents.ScanForHost,
+                WAITING_ROOM_EVENTS.ScanForHost,
                 this.gameCardInformations.map((gameCardInfo: GameCardInformation) => gameCardInfo._id),
             );
         });
@@ -76,6 +73,13 @@ export class GameSelectionComponent implements OnInit {
 
     isShowingLastCard(): boolean {
         return this.index + GAME_CARDS_TO_DISPLAY >= this.numberOfGameInformations;
+    }
+
+    refreshGameCards(): void {
+        this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
+            this.numberOfGameInformations = data;
+            this.selectGameCards();
+        });
     }
 
     setGameCardCreateOrJoin(isCreate: boolean, stageId: string) {

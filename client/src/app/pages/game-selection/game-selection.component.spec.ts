@@ -9,7 +9,7 @@ import { GAMES } from '@app/mock/game-cards';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { GameCardInformation } from '@common/game-card';
-import { WaitingRoomEvents } from '@common/waiting-room-socket-communication';
+import { WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 import { of, Subject } from 'rxjs';
 import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
 import { GameSelectionComponent } from './game-selection.component';
@@ -127,16 +127,25 @@ describe('GameSelectionComponent', () => {
 
     it('MatchCreated event should call setGameCardCreateOrJoin with isCreate at false', () => {
         socketServiceSpy.listen = (event: string, callback: any) => {
-            if (event === WaitingRoomEvents.MatchCreated) callback('stageId');
+            if (event === WAITING_ROOM_EVENTS.MatchCreated) callback('stageId');
         };
         spyOn(component, 'setGameCardCreateOrJoin').and.returnValue();
         component.ngOnInit();
         expect(component.setGameCardCreateOrJoin).toHaveBeenCalledWith(false, 'stageId');
     });
 
+    it('gameDeleted event should call refreshGameCards', () => {
+        socketServiceSpy.listen = (event: string, callback: any) => {
+            if (event === WAITING_ROOM_EVENTS.GameDeleted) callback();
+        };
+        spyOn(component, 'refreshGameCards').and.returnValue();
+        component.ngOnInit();
+        expect(component.refreshGameCards).toHaveBeenCalled();
+    });
+
     it('MatchDeleted event should call setGameCardCreateOrJoin with isCreate at true', () => {
         socketServiceSpy.listen = (event: string, callback: any) => {
-            if (event === WaitingRoomEvents.MatchDeleted) callback('stageId');
+            if (event === WAITING_ROOM_EVENTS.MatchDeleted) callback('stageId');
         };
         spyOn(component, 'setGameCardCreateOrJoin').and.returnValue();
         component.ngOnInit();
@@ -155,6 +164,6 @@ describe('GameSelectionComponent', () => {
         component.index = 0;
         component.numberOfGameInformations = 5;
         component.selectGameCards();
-        expect(socketServiceSpy.send).toHaveBeenCalledWith(WaitingRoomEvents.ScanForHost, ['123']);
+        expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.ScanForHost, ['123']);
     });
 });

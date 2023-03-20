@@ -1,7 +1,7 @@
 import { RoomMessage } from '@common/chat-gateway-constants';
-import { ChatEvents, Room, RoomEvent, RoomManagement } from '@common/chat.gateway.events';
+import { CHAT_EVENTS, Room, RoomEvent, RoomManagement } from '@common/chat.gateway.events';
 import { MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { MESSAGE_MAX_LENGTH } from './chat.gateway.constants';
@@ -13,19 +13,17 @@ export class ChatGateway implements OnGatewayDisconnect {
 
     private waitingRoom: Room[] = [];
 
-    constructor(private readonly logger: Logger) {}
-
-    @SubscribeMessage(ChatEvents.Validate)
+    @SubscribeMessage(CHAT_EVENTS.Validate)
     validate(socket: Socket, message: string): void {
         if (message && message.length < MESSAGE_MAX_LENGTH) {
-            socket.emit(ChatEvents.WordValidated, { isValidated: true, originalMessage: message });
+            socket.emit(CHAT_EVENTS.WordValidated, { isValidated: true, originalMessage: message });
         } else {
             const error = 'Votre message ne respecte pas le bon format. Veuillez entrer un nouveau message';
-            socket.emit(ChatEvents.WordValidated, { isValidated: false, originalMessage: error });
+            socket.emit(CHAT_EVENTS.WordValidated, { isValidated: false, originalMessage: error });
         }
     }
 
-    @SubscribeMessage(ChatEvents.Difference)
+    @SubscribeMessage(CHAT_EVENTS.Difference)
     difference(socket: Socket, data: MultiplayerDifferenceInformation) {
         if (socket.rooms.has(data.room)) {
             const differenceInformation: PlayerDifference = {
@@ -33,11 +31,11 @@ export class ChatGateway implements OnGatewayDisconnect {
                 lastDifferences: data.lastDifferences,
                 socket: socket.id,
             };
-            this.server.to(data.room).emit(ChatEvents.Difference, differenceInformation);
+            this.server.to(data.room).emit(CHAT_EVENTS.Difference, differenceInformation);
         }
     }
 
-    @SubscribeMessage(ChatEvents.Event)
+    @SubscribeMessage(CHAT_EVENTS.Event)
     event(socket: Socket, data: RoomEvent): void {
         if (socket.rooms.has(data.room)) {
             const date = this.dateCreator();
@@ -50,35 +48,35 @@ export class ChatGateway implements OnGatewayDisconnect {
 
             this.server
                 .to(data.room)
-                .emit(ChatEvents.RoomMessage, { socketId: socket.id, message: dateFormatted, event: 'notification' } as RoomMessage);
+                .emit(CHAT_EVENTS.RoomMessage, { socketId: socket.id, message: dateFormatted, event: 'notification' } as RoomMessage);
         }
     }
 
-    @SubscribeMessage(ChatEvents.Win)
+    @SubscribeMessage(CHAT_EVENTS.Win)
     win(socket: Socket, room: string): void {
         if (socket.rooms.has(room)) {
-            this.server.to(room).emit(ChatEvents.Win, socket.id);
+            this.server.to(room).emit(CHAT_EVENTS.Win, socket.id);
         }
     }
 
-    @SubscribeMessage(ChatEvents.Hint)
+    @SubscribeMessage(CHAT_EVENTS.Hint)
     hint(socket: Socket, room: string): void {
         if (socket.rooms.has(room)) {
             const date = this.dateCreator();
             const dateFormatted = `${date} - Indice utilisé.`;
             this.server
                 .to(room)
-                .emit(ChatEvents.RoomMessage, { socketId: ChatEvents.Event, message: dateFormatted, event: 'notification' } as RoomMessage);
+                .emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message: dateFormatted, event: 'notification' } as RoomMessage);
         }
     }
 
-    @SubscribeMessage(ChatEvents.RoomMessage)
+    @SubscribeMessage(CHAT_EVENTS.RoomMessage)
     roomMessage(socket: Socket, message: RoomManagement): void {
         if (socket.rooms.has(message.room)) {
             const transformedMessage = message.message.toString();
             this.server
                 .to(message.room)
-                .emit(ChatEvents.RoomMessage, { socketId: socket.id, message: transformedMessage, event: 'message' } as RoomMessage);
+                .emit(CHAT_EVENTS.RoomMessage, { socketId: socket.id, message: transformedMessage, event: 'message' } as RoomMessage);
         }
     }
 
@@ -86,7 +84,7 @@ export class ChatGateway implements OnGatewayDisconnect {
         if (socket.data.room)
             this.server
                 .to(socket.data.room)
-                .emit(ChatEvents.Abandon, { socketId: socket.id, message: this.dateCreator(), event: 'abandon' } as RoomMessage);
+                .emit(CHAT_EVENTS.Abandon, { socketId: socket.id, message: this.dateCreator(), event: 'abandon' } as RoomMessage);
     }
 
     dateCreator(): string {

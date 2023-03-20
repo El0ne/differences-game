@@ -20,7 +20,7 @@ import { ClickEventService } from '@app/services/click-event/click-event.service
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { SocketService } from '@app/services/socket/socket.service';
-import { ChatEvents } from '@common/chat.gateway.events';
+import { CHAT_EVENTS } from '@common/chat.gateway.events';
 import { DifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
 import { of } from 'rxjs';
@@ -116,24 +116,24 @@ describe('SoloViewComponent', () => {
     it('ConfigureSocketReactions should configure sockets correctly & react properly according to event', () => {
         chatSocketServiceMock.listen = (event: string, callback: any) => {
             switch (event) {
-                case ChatEvents.WordValidated: {
+                case CHAT_EVENTS.WordValidated: {
                     callback({ isValidated: true, originalMessage: 'Test message' });
                     callback({ isValidated: false, originalMessage: 'Error message' });
                     break;
                 }
-                case ChatEvents.RoomMessage: {
+                case CHAT_EVENTS.RoomMessage: {
                     callback({ socketId: 'test', message: 'Test message' });
                     break;
                 }
-                case ChatEvents.Abandon: {
+                case CHAT_EVENTS.Abandon: {
                     callback({ socketId: 'abandon', message: 'abandon' });
                     break;
                 }
-                case ChatEvents.Difference: {
+                case CHAT_EVENTS.Difference: {
                     callback({ lastDifferences: [0, 1, 2, 3], differencesPosition: 2, socketId: 'test' });
                     break;
                 }
-                case ChatEvents.Win: {
+                case CHAT_EVENTS.Win: {
                     callback('test');
                     callback('wrong');
                     break;
@@ -264,12 +264,12 @@ describe('SoloViewComponent', () => {
         });
         const sendSpy = spyOn(chatSocketServiceMock, 'send').and.callThrough();
         component.differenceHandler(MOCK_INFORMATION);
-        expect(sendSpy).toHaveBeenCalledWith(ChatEvents.Difference, {
+        expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.Difference, {
             room: component.currentRoom,
             lastDifferences: [0, 1, 2, 3],
             differencesPosition: 2,
         });
-        expect(sendSpy).toHaveBeenCalledWith(ChatEvents.Event, { room: component.currentRoom, isMultiplayer: true, event: 'Différence trouvée' });
+        expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.Event, { room: component.currentRoom, isMultiplayer: true, event: 'Différence trouvée' });
         expect(component.left.emitSound).toHaveBeenCalledWith(false);
     });
 
@@ -283,7 +283,7 @@ describe('SoloViewComponent', () => {
         });
         spyOn(component, 'effectHandler');
         component.differenceHandler(MOCK_INFORMATION);
-        expect(sendSpy).toHaveBeenCalledWith(ChatEvents.Event, { room: component.currentRoom, isMultiplayer: false, event: 'Différence trouvée' });
+        expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.Event, { room: component.currentRoom, isMultiplayer: false, event: 'Différence trouvée' });
         expect(component.left.emitSound).toHaveBeenCalledWith(false);
         const information: PlayerDifference = { lastDifferences: [0, 1, 2, 3], differencesPosition: 2, socket: chatSocketServiceMock.socketId };
         expect(component.effectHandler).toHaveBeenCalledWith(information);
@@ -296,7 +296,7 @@ describe('SoloViewComponent', () => {
         component.currentRoom = 'win';
         const sendSpy = spyOn(chatSocketServiceMock, 'send').and.callThrough();
         component.endGameVerification();
-        expect(sendSpy).toHaveBeenCalledWith(ChatEvents.Win, component.currentRoom);
+        expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.Win, component.currentRoom);
     });
 
     it('endGameVerification should call winGame if currentScore of player is equal to number of differences', () => {

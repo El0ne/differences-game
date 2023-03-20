@@ -1,6 +1,7 @@
-import { Component, Inject, NgZone, OnDestroy } from '@angular/core';
+import { Component, Inject, NgZone } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameCardDto } from '@common/game-card.dto';
 
@@ -9,9 +10,9 @@ import { GameCardDto } from '@common/game-card.dto';
     templateUrl: './modal-page.component.html',
     styleUrls: ['./modal-page.component.scss'],
 })
-export class ModalPageComponent implements OnDestroy {
-    // eslint-disable-next-line max-params
+export class ModalPageComponent {
     // We have more than 3 necessary parameters
+    // eslint-disable-next-line max-params
     constructor(
         @Inject(MAT_DIALOG_DATA)
         public data: {
@@ -23,19 +24,19 @@ export class ModalPageComponent implements OnDestroy {
         public matDialogRef: MatDialogRef<ModalPageComponent>,
         public router: Router,
         private gameCardService: GameCardInformationService,
+        private clickService: ClickEventService,
         private ngZone: NgZone,
     ) {}
 
-    ngOnDestroy() {
-        this.matDialogRef.close(this.data);
-    }
     createGame(): void {
         this.gameCardService.createGame(this.data.gameInfo).subscribe();
         this.redirection('/config');
     }
 
-    deleteImages(): void {
-        // TODO call service to delete difference object
+    dropGame(): void {
+        // using _id property which causes linting error
+        // eslint-disable-next-line no-underscore-dangle
+        this.clickService.deleteDifferences(this.data.gameInfo._id).subscribe();
         this.gameCardService.deleteImage(this.data.gameInfo.baseImage).subscribe();
         this.gameCardService.deleteImage(this.data.gameInfo.differenceImage).subscribe();
         this.redirection('/creatingGame');

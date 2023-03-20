@@ -10,12 +10,16 @@ import { Observable } from 'rxjs';
 export class ClickEventService {
     constructor(public http: HttpClient) {}
 
+    getDifferences(stageId: string): Observable<number[][]> {
+        return this.http.get<number[][]>(`${CLICK}/${stageId}`);
+    }
+
     isADifference(clickPositionX: number, clickPositionY: number, id: string): Observable<ClickDifferenceVerification> {
         const options = { params: new HttpParams().set('x', clickPositionX).set('y', clickPositionY).set('id', id) };
         return this.http.get<ClickDifferenceVerification>(CLICK, options);
     }
 
-    getDifferences(stageId: string): Observable<number[][]> {
-        return this.http.get<number[][]>(`${CLICK}/${stageId}`);
+    deleteDifferences(id: string): Observable<void> {
+        return this.http.delete<void>(`${CLICK}/${id}`);
     }
 }
