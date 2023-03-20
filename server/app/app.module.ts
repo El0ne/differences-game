@@ -8,7 +8,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { GameClickController } from './controllers/game-click/game-click.controller';
 import { StageController } from './controllers/stage/stage.controller';
 import { MatchGateway } from './gateways/match/match/match.gateway';
-import { TimerGateway } from './gateways/timer/timer.gateway';
 import { StageWaitingRoomGateway } from './gateways/waitingRoom/stage-waiting-room.gateway';
 import { DifferenceClickService } from './services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from './services/difference-detection/difference-detection.service';
@@ -49,7 +48,6 @@ import { PixelRadiusService } from './services/pixel-radius/pixel-radius.service
         PixelPositionService,
         ImageDimensionsService,
         ImageManagerService,
-        TimerGateway,
         GameManagerService,
         MatchGateway,
     ],

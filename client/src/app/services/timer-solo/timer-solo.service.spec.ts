@@ -22,7 +22,7 @@ describe('TimerSoloService', () => {
         expect(service.currentTime).toEqual(TEN_SECONDS);
     }));
 
-    it('stopTimer should unsubscribe from all subscriptions', fakeAsync(() => {
+    it('stopTimer should send a stop timer event', fakeAsync(() => {
         const mockSubscriptions = [of('1').subscribe(), of('2').subscribe(), of('3').subscribe()];
         service.subArray = mockSubscriptions;
 

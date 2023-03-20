@@ -89,6 +89,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.messages.push(data);
         });
         this.socketService.listen<RoomMessage>(CHAT_EVENTS.Abandon, (message: RoomMessage) => {
+            this.timerService.stopTimer();
             this.winGame(message.socketId);
             message.message = `${message.message} - ${this.opponent} a abandonné la partie.`;
             this.messages.push(message);
@@ -102,7 +103,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.timerService.stopTimer();
+        this.timerService.currentTime = 0;
         this.foundDifferenceService.clearDifferenceFound();
         this.socketService.disconnect();
         this.removeCheatMode();
