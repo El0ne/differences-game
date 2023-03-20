@@ -1,116 +1,79 @@
-import { ElementRef, Injectable } from '@angular/core';
-import { Attributes } from '@app/pages/game-creation-page/game-creation-page.component';
+import { Injectable } from '@angular/core';
+import { CanvasInformations } from '@common/canvas-informations';
+import { CanvasSelectionService } from '../canvas-selection/canvas-selection.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class EraserButtonService {
-    ogDrawnCanvas: ElementRef;
-    diffDrawnCanvas: ElementRef;
-    ogRectCanvas: ElementRef;
-    diffRectCanvas: ElementRef;
+    canvasInformations: CanvasInformations;
 
-    drawingCanvas1: HTMLCanvasElement;
-    drawingCanvas2: HTMLCanvasElement;
+    private eraseListener: ((mouseEvent: MouseEvent) => void)[] = [this.startErase.bind(this), this.stopErase.bind(this), this.erasing.bind(this)];
 
-    isUserClicking: boolean = false;
-    eraserSize: number = 50;
+    constructor(private canvasSelectionService: CanvasSelectionService) {}
 
-    canvasArray = new Array();
-    drawingActions = new Array();
-    nbElements: number = 0;
-
-    isInOgCanvas: boolean = false;
-
-    private eraseListener: ((e: MouseEvent) => void)[] = [this.startErase.bind(this), this.stopErase.bind(this), this.erasing.bind(this)];
-
-    constructor() {}
-
-    setAttributes(attributes: Attributes) {
-        this.ogDrawnCanvas = attributes.ogDrawnCanvas;
-        this.diffDrawnCanvas = attributes.diffDrawnCanvas;
-        this.ogRectCanvas = attributes.ogRectCanvas;
-        this.diffRectCanvas = attributes.diffDrawnCanvas;
-        // console.log(this.ogDrawnCanvas);
+    setColor(color: string): void {
+        this.canvasInformations.selectedColor = color;
+    }
+    setProperties(information: CanvasInformations) {
+        this.canvasInformations = information;
     }
 
-    choseCanvas(e: MouseEvent) {
-        if ([this.diffRectCanvas.nativeElement, this.diffDrawnCanvas.nativeElement].includes(e.target)) {
-            // console.log('in diff canvas');
-            this.isInOgCanvas = false;
-            this.drawingCanvas1 = this.diffDrawnCanvas.nativeElement;
-            this.drawingCanvas2 = this.diffRectCanvas.nativeElement;
-        } else if ([this.ogRectCanvas.nativeElement, this.ogDrawnCanvas.nativeElement].includes(e.target)) {
-            // console.log('in og canvas');
-            this.isInOgCanvas = true;
-            this.drawingCanvas1 = this.ogDrawnCanvas.nativeElement;
-            this.drawingCanvas2 = this.ogRectCanvas.nativeElement;
-        }
-    }
+    startErase(mouseEvent: MouseEvent) {
+        this.canvasInformations.isUserClicking = true;
+        const ctx1 = this.canvasInformations.drawingCanvas1.getContext('2d');
 
-    startErase(e: MouseEvent) {
-        this.isUserClicking = true;
-        const ctx1 = this.drawingCanvas1.getContext('2d');
-
-        const canvasRect = this.drawingCanvas1.getBoundingClientRect();
+        const canvasRect = this.canvasInformations.drawingCanvas1.getBoundingClientRect();
 
         if (ctx1)
             ctx1.clearRect(
-                e.clientX - canvasRect.left - this.eraserSize / 2,
-                e.clientY - canvasRect.top - this.eraserSize / 2,
-                this.eraserSize,
-                this.eraserSize,
+                mouseEvent.clientX - canvasRect.left - this.canvasInformations.eraserSize / 2,
+                mouseEvent.clientY - canvasRect.top - this.canvasInformations.eraserSize / 2,
+                this.canvasInformations.eraserSize,
+                this.canvasInformations.eraserSize,
             );
     }
 
     stopErase() {
-        this.isUserClicking = false;
+        this.canvasInformations.isUserClicking = false;
         // this.pushCanvas(this.drawingCanvas1);
-        const canvas = this.drawingCanvas1;
-        this.nbElements++;
-        if (this.nbElements < this.canvasArray.length) {
-            this.canvasArray.length = this.nbElements; // added this to make sure that if someone undos then adds new modifications that it won't allow user to undo back to the old saved canvases
-        }
-        const canvasDataURL = canvas.toDataURL();
-
-        this.canvasArray.push(canvasDataURL);
     }
 
-    erasing(e: MouseEvent) {
-        this.choseCanvas(e);
-        const ctx1 = this.drawingCanvas1.getContext('2d');
+    erasing(mouseEvent: MouseEvent) {
+        this.canvasSelectionService.choseCanvas(mouseEvent);
+        const ctx1 = this.canvasInformations.drawingCanvas1.getContext('2d');
 
-        if (ctx1 && this.isUserClicking) {
-            const canvasRect = this.drawingCanvas1.getBoundingClientRect();
+        if (ctx1 && this.canvasInformations.isUserClicking) {
+            const canvasRect = this.canvasInformations.drawingCanvas1.getBoundingClientRect();
             ctx1.clearRect(
-                e.clientX - canvasRect.left - this.eraserSize / 2,
-                e.clientY - canvasRect.top - this.eraserSize / 2,
-                this.eraserSize,
-                this.eraserSize,
+                mouseEvent.clientX - canvasRect.left - this.canvasInformations.eraserSize / 2,
+                mouseEvent.clientY - canvasRect.top - this.canvasInformations.eraserSize / 2,
+                this.canvasInformations.eraserSize,
+                this.canvasInformations.eraserSize,
             );
         }
     }
 
     erase() {
         // this.eraseListener = this.startErase.bind(this);
-        this.ogDrawnCanvas.nativeElement.addEventListener('mousedown', this.eraseListener[0]);
-        this.diffDrawnCanvas.nativeElement.addEventListener('mousedown', this.eraseListener[0]);
+        this.canvasInformations.originalDrawnCanvas.addEventListener('mousedown', this.eraseListener[0]);
+        this.canvasInformations.differenceDrawnCanvas.addEventListener('mousedown', this.eraseListener[0]);
 
         // this.eraseListener = this.stopErase.bind(this);
-        this.ogDrawnCanvas.nativeElement.addEventListener('mouseup', this.eraseListener[1]);
-        this.diffDrawnCanvas.nativeElement.addEventListener('mouseup', this.eraseListener[1]);
+        this.canvasInformations.originalDrawnCanvas.addEventListener('mouseup', this.eraseListener[1]);
+        this.canvasInformations.differenceDrawnCanvas.addEventListener('mouseup', this.eraseListener[1]);
 
         // this.eraseListener = this.erasing.bind(this);
-        this.ogDrawnCanvas.nativeElement.addEventListener('mousemove', this.eraseListener[2]);
-        this.diffDrawnCanvas.nativeElement.addEventListener('mousemove', this.eraseListener[2]);
+        this.canvasInformations.originalDrawnCanvas.addEventListener('mousemove', this.eraseListener[2]);
+        this.canvasInformations.differenceDrawnCanvas.addEventListener('mousemove', this.eraseListener[2]);
     }
 
     removingListeners() {
-        this.ogDrawnCanvas.nativeElement.removeEventListener('mousedown', this.eraseListener[0]);
-        this.diffDrawnCanvas.nativeElement.removeEventListener('mousedown', this.eraseListener[0]);
-        this.ogDrawnCanvas.nativeElement.removeEventListener('mouseup', this.eraseListener[1]);
-        this.diffDrawnCanvas.nativeElement.removeEventListener('mouseup', this.eraseListener[1]);
-        this.ogDrawnCanvas.nativeElement.removeEventListener('mousemove', this.eraseListener[2]);
-        this.diffDrawnCanvas.nativeElement.removeEventListener('mousemove', this.eraseListener[2]);
+        this.canvasInformations.originalDrawnCanvas.removeEventListener('mousedown', this.eraseListener[0]);
+        this.canvasInformations.differenceDrawnCanvas.removeEventListener('mousedown', this.eraseListener[0]);
+        this.canvasInformations.originalDrawnCanvas.removeEventListener('mouseup', this.eraseListener[1]);
+        this.canvasInformations.differenceDrawnCanvas.removeEventListener('mouseup', this.eraseListener[1]);
+        this.canvasInformations.originalDrawnCanvas.removeEventListener('mousemove', this.eraseListener[2]);
+        this.canvasInformations.differenceDrawnCanvas.removeEventListener('mousemove', this.eraseListener[2]);
     }
 }

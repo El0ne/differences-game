@@ -1,74 +1,36 @@
-import { ElementRef, Injectable } from '@angular/core';
-import { Attributes } from '@app/pages/game-creation-page/game-creation-page.component';
+import { Injectable } from '@angular/core';
+import { CanvasInformations } from '@common/canvas-informations';
+import { CanvasSelectionService } from './canvas-selection/canvas-selection.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PenService {
-    // @ViewChild('canvas1') myOgCanvas: ElementRef;
-    // @ViewChild('canvas2') myDiffCanvas: ElementRef;
+    canvasInformations: CanvasInformations;
 
-    // @ViewChild('drawingCanvas1') ogDrawnCanvas: ElementRef;
-    // @ViewChild('drawingCanvas2') diffDrawnCanvas: ElementRef;
-    // @ViewChild('drawingCanvas3') diffRectCanvas: ElementRef;
-    // @ViewChild('drawingCanvas4') ogRectCanvas: ElementRef;
+    private penListener: ((MouseEvent: MouseEvent) => void)[] = [this.startPen.bind(this), this.stopPen.bind(this), this.writing.bind(this)];
 
-    ogDrawnCanvas: ElementRef;
-    diffDrawnCanvas: ElementRef;
-    ogRectCanvas: ElementRef;
-    diffRectCanvas: ElementRef;
+    constructor(private canvasSelectionService: CanvasSelectionService) {}
 
-    drawingCanvas1: HTMLCanvasElement;
-    drawingCanvas2: HTMLCanvasElement;
-
-    isUserClicking: boolean = false;
-    color: string = '#ff124f';
-    penSize: number = 10;
-
-    canvasArray = new Array();
-    drawingActions = new Array();
-    nbElements: number = 0;
-
-    isInOgCanvas: boolean = false;
-
-    private penListener: ((e: MouseEvent) => void)[] = [this.startPen.bind(this), this.stopPen.bind(this), this.writing.bind(this)];
-
-    constructor() {}
-
-    setAttributes(attributes: Attributes) {
-        this.ogDrawnCanvas = attributes.ogDrawnCanvas;
-        this.diffDrawnCanvas = attributes.diffDrawnCanvas;
-        this.ogRectCanvas = attributes.ogRectCanvas;
-        this.diffRectCanvas = attributes.diffDrawnCanvas;
-        // console.log(this.ogDrawnCanvas);
+    setColor(color: string): void {
+        this.canvasInformations.selectedColor = color;
+    }
+    setProperties(information: CanvasInformations) {
+        this.canvasInformations = information;
     }
 
-    choseCanvas(e: MouseEvent) {
-        if ([this.diffRectCanvas.nativeElement, this.diffDrawnCanvas.nativeElement].includes(e.target)) {
-            // console.log('in diff canvas');
-            this.isInOgCanvas = false;
-            this.drawingCanvas1 = this.diffDrawnCanvas.nativeElement;
-            this.drawingCanvas2 = this.diffRectCanvas.nativeElement;
-        } else if ([this.ogRectCanvas.nativeElement, this.ogDrawnCanvas.nativeElement].includes(e.target)) {
-            // console.log('in og canvas');
-            this.isInOgCanvas = true;
-            this.drawingCanvas1 = this.ogDrawnCanvas.nativeElement;
-            this.drawingCanvas2 = this.ogRectCanvas.nativeElement;
-        }
-    }
-
-    startPen(e: MouseEvent) {
+    startPen(mouseEvent: MouseEvent) {
         // console.log('starting drawing');
-        this.isUserClicking = true;
-        const ctx1 = this.drawingCanvas1.getContext('2d');
-        const canvasRect = this.drawingCanvas1.getBoundingClientRect();
+        this.canvasInformations.isUserClicking = true;
+        const ctx1 = this.canvasInformations.drawingCanvas1.getContext('2d');
+        const canvasRect = this.canvasInformations.drawingCanvas1.getBoundingClientRect();
 
         if (ctx1) {
-            ctx1.lineWidth = this.penSize;
+            ctx1.lineWidth = this.canvasInformations.penSize;
             ctx1.lineCap = 'round';
-            ctx1.strokeStyle = this.color;
+            ctx1.strokeStyle = this.canvasInformations.selectedColor;
             ctx1.beginPath();
-            ctx1.arc(e.clientX - canvasRect.left, e.clientY - canvasRect.top, 0, 0, 2 * Math.PI);
+            ctx1.arc(mouseEvent.clientX - canvasRect.left, mouseEvent.clientY - canvasRect.top, 0, 0, 2 * Math.PI);
             ctx1.stroke();
             ctx1.beginPath();
         }
@@ -76,38 +38,30 @@ export class PenService {
 
     stopPen() {
         // console.log('stopped writing');
-        const ctx1 = this.drawingCanvas1.getContext('2d');
+        const ctx1 = this.canvasInformations.drawingCanvas1.getContext('2d');
         if (ctx1) {
-            this.isUserClicking = false;
+            this.canvasInformations.isUserClicking = false;
             ctx1.beginPath();
         }
         // this.savePixels();
         // this.pushCanvas(this.drawingCanvas1);
-        const canvas = this.drawingCanvas1;
-        this.nbElements++;
-        if (this.nbElements < this.canvasArray.length) {
-            this.canvasArray.length = this.nbElements; // added this to make sure that if someone undos then adds new modifications that it won't allow user to undo back to the old saved canvases
-        }
-        const canvasDataURL = canvas.toDataURL();
-
-        this.canvasArray.push(canvasDataURL);
     }
 
-    writing(e: MouseEvent) {
-        this.choseCanvas(e);
-        const ctx1 = this.drawingCanvas1.getContext('2d');
+    writing(mouseEvent: MouseEvent) {
+        this.canvasSelectionService.choseCanvas(mouseEvent);
+        const ctx1 = this.canvasInformations.drawingCanvas1.getContext('2d');
 
-        if (ctx1 && this.isUserClicking) {
-            const canvasRect = this.drawingCanvas1.getBoundingClientRect();
+        if (ctx1 && this.canvasInformations.isUserClicking) {
+            const canvasRect = this.canvasInformations.drawingCanvas1.getBoundingClientRect();
 
-            ctx1.lineWidth = this.penSize;
+            ctx1.lineWidth = this.canvasInformations.penSize;
             ctx1.lineCap = 'round';
-            ctx1.strokeStyle = this.color;
+            ctx1.strokeStyle = this.canvasInformations.selectedColor;
 
-            ctx1.lineTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+            ctx1.lineTo(mouseEvent.clientX - canvasRect.left, mouseEvent.clientY - canvasRect.top);
             ctx1.stroke();
             ctx1.beginPath();
-            ctx1.moveTo(e.clientX - canvasRect.left, e.clientY - canvasRect.top);
+            ctx1.moveTo(mouseEvent.clientX - canvasRect.left, mouseEvent.clientY - canvasRect.top);
 
             // this.drawingActions.push({
             //     position: this.isInOgCanvas,
@@ -118,24 +72,24 @@ export class PenService {
 
     drawPen() {
         // this.penListener = this.startPen.bind(this);
-        this.ogDrawnCanvas.nativeElement.addEventListener('mousedown', this.penListener[0]);
-        this.diffDrawnCanvas.nativeElement.addEventListener('mousedown', this.penListener[0]);
+        this.canvasInformations.originalDrawnCanvas.addEventListener('mousedown', this.penListener[0]);
+        this.canvasInformations.differenceDrawnCanvas.addEventListener('mousedown', this.penListener[0]);
 
         // this.penListener = this.stopPen.bind(this);
-        this.ogDrawnCanvas.nativeElement.addEventListener('mouseup', this.penListener[1]);
-        this.diffDrawnCanvas.nativeElement.addEventListener('mouseup', this.penListener[1]);
+        this.canvasInformations.originalDrawnCanvas.addEventListener('mouseup', this.penListener[1]);
+        this.canvasInformations.differenceDrawnCanvas.addEventListener('mouseup', this.penListener[1]);
 
         // this.penListener = this.writing.bind(this);
-        this.ogDrawnCanvas.nativeElement.addEventListener('mousemove', this.penListener[2]);
-        this.diffDrawnCanvas.nativeElement.addEventListener('mousemove', this.penListener[2]);
+        this.canvasInformations.originalDrawnCanvas.addEventListener('mousemove', this.penListener[2]);
+        this.canvasInformations.differenceDrawnCanvas.addEventListener('mousemove', this.penListener[2]);
     }
 
     removingListeners() {
-        this.ogDrawnCanvas.nativeElement.removeEventListener('mousedown', this.penListener[0]);
-        this.diffDrawnCanvas.nativeElement.removeEventListener('mousedown', this.penListener[0]);
-        this.ogDrawnCanvas.nativeElement.removeEventListener('mouseup', this.penListener[1]);
-        this.diffDrawnCanvas.nativeElement.removeEventListener('mouseup', this.penListener[1]);
-        this.ogDrawnCanvas.nativeElement.removeEventListener('mousemove', this.penListener[2]);
-        this.diffDrawnCanvas.nativeElement.removeEventListener('mousemove', this.penListener[2]);
+        this.canvasInformations.originalDrawnCanvas.removeEventListener('mousedown', this.penListener[0]);
+        this.canvasInformations.differenceDrawnCanvas.removeEventListener('mousedown', this.penListener[0]);
+        this.canvasInformations.originalDrawnCanvas.removeEventListener('mouseup', this.penListener[1]);
+        this.canvasInformations.differenceDrawnCanvas.removeEventListener('mouseup', this.penListener[1]);
+        this.canvasInformations.originalDrawnCanvas.removeEventListener('mousemove', this.penListener[2]);
+        this.canvasInformations.differenceDrawnCanvas.removeEventListener('mousemove', this.penListener[2]);
     }
 }
