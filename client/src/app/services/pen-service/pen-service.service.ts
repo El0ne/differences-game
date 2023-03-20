@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
+import { UndoRedoService } from '@app/services/undo-redo/undo-redo.service';
 import { CanvasInformations } from '@common/canvas-informations';
 
 @Injectable({
@@ -8,7 +9,7 @@ import { CanvasInformations } from '@common/canvas-informations';
 export class PenService {
     canvasInformations: CanvasInformations;
 
-    constructor(private canvasSelectionService: CanvasSelectionService) {}
+    constructor(private canvasSelectionService: CanvasSelectionService, private undoRedoService: UndoRedoService) {}
 
     setColor(color: string): void {
         this.canvasInformations.selectedColor = color;
@@ -18,7 +19,6 @@ export class PenService {
     }
 
     startPen(mouseEvent: MouseEvent) {
-        // console.log('starting drawing');
         this.canvasInformations.isUserClicking = true;
         const ctx1 = this.canvasInformations.drawingCanvas1.getContext('2d');
         const canvasRect = this.canvasInformations.drawingCanvas1.getBoundingClientRect();
@@ -35,14 +35,12 @@ export class PenService {
     }
 
     stopPen() {
-        // console.log('stopped writing');
         const ctx1 = this.canvasInformations.drawingCanvas1.getContext('2d');
         if (ctx1) {
             this.canvasInformations.isUserClicking = false;
             ctx1.beginPath();
         }
-        // this.savePixels();
-        // this.pushCanvas(this.drawingCanvas1);
+        this.undoRedoService.pushCanvas(this.canvasInformations.drawingCanvas1);
     }
 
     writing(mouseEvent: MouseEvent) {
@@ -60,11 +58,6 @@ export class PenService {
             ctx1.stroke();
             ctx1.beginPath();
             ctx1.moveTo(mouseEvent.clientX - canvasRect.left, mouseEvent.clientY - canvasRect.top);
-
-            // this.drawingActions.push({
-            //     position: this.isInOgCanvas,
-            //     data: [e.clientX - e.clientY - canvasRect.top],
-            // });
         }
     }
 }

@@ -27,6 +27,9 @@ export const getFakeCanvasInformations = (): CanvasInformations => ({
     isClearEnabled: false,
     isUserClicking: false,
 
+    penSize: 10,
+    eraserSize: 50,
+
     rectangleInitialX: 0,
     rectangleInitialY: 0,
 

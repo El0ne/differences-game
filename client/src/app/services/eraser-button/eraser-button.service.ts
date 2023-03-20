@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
+import { UndoRedoService } from '@app/services/undo-redo/undo-redo.service';
 import { CanvasInformations } from '@common/canvas-informations';
 
 @Injectable({
@@ -8,7 +9,7 @@ import { CanvasInformations } from '@common/canvas-informations';
 export class EraserButtonService {
     canvasInformations: CanvasInformations;
 
-    constructor(private canvasSelectionService: CanvasSelectionService) {}
+    constructor(private canvasSelectionService: CanvasSelectionService, private undoRedoServices: UndoRedoService) {}
 
     setColor(color: string): void {
         this.canvasInformations.selectedColor = color;
@@ -34,7 +35,7 @@ export class EraserButtonService {
 
     stopErase() {
         this.canvasInformations.isUserClicking = false;
-        // this.pushCanvas(this.drawingCanvas1);
+        this.undoRedoServices.pushCanvas(this.canvasInformations.drawingCanvas1);
     }
 
     erasing(mouseEvent: MouseEvent) {

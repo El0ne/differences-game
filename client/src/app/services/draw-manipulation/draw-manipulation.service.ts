@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { UndoRedoService } from '@app/services/undo-redo/undo-redo.service';
 import { CanvasInformations } from '@common/canvas-informations';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 
@@ -7,6 +8,8 @@ import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 })
 export class DrawManipulationService {
     canvasInformations: CanvasInformations;
+
+    constructor(private undoRedoService: UndoRedoService) {}
 
     setProperties(information: CanvasInformations): void {
         this.canvasInformations = information;
@@ -42,5 +45,20 @@ export class DrawManipulationService {
         } else if (side === 'left' && originalDrawingContext) {
             originalDrawingContext.drawImage(this.canvasInformations.differenceDrawnCanvas, 0, 0);
         }
+    }
+
+    clearPainting(side: string) {
+        const ctxDiffDrawing = this.canvasInformations.differenceDrawnCanvas.getContext('2d');
+        const ctxOgDrawing = this.canvasInformations.originalDrawnCanvas.getContext('2d');
+        if (side === 'right') {
+            if (ctxDiffDrawing) ctxDiffDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+            this.canvasInformations.isInOriginalCanvas = false;
+        } else if (side === 'left') {
+            if (ctxOgDrawing) ctxOgDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+            this.canvasInformations.isInOriginalCanvas = true;
+        }
+
+        this.undoRedoService.setProperties(this.canvasInformations);
+        this.undoRedoService.pushCanvas(this.canvasInformations.drawingCanvas1);
     }
 }

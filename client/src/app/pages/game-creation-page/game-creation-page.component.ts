@@ -84,13 +84,21 @@ export class GameCreationPageComponent implements OnInit {
     canvasInformations: CanvasInformations;
 
     // TODO remove the listeners when services are all implemented
-    private eraseListener: ((mouseEvent: MouseEvent) => void)[] = [this.startErase.bind(this), this.stopErase.bind(this), this.erasing.bind(this)];
-    private rectangleListener: ((mouseEvent: MouseEvent) => void)[] = [
-        this.startDrawingRectangle.bind(this),
-        this.stopDrawingRectangle.bind(this),
-        this.paintRectangle.bind(this),
+    private eraseListener: ((mouseEvent: MouseEvent) => void)[] = [
+        this.eraserButtonService.startErase.bind(this),
+        this.eraserButtonService.stopErase.bind(this),
+        this.eraserButtonService.erasing.bind(this),
     ];
-    private penListener: ((mouseEvent: MouseEvent) => void)[] = [this.startPen.bind(this), this.stopPen.bind(this), this.writing.bind(this)];
+    private rectangleListener: ((mouseEvent: MouseEvent) => void)[] = [
+        this.drawingRectangleService.startDrawingRectangle.bind(this),
+        this.drawingRectangleService.stopDrawingRectangle.bind(this),
+        this.drawingRectangleService.paintRectangle.bind(this),
+    ];
+    private penListener: ((mouseEvent: MouseEvent) => void)[] = [
+        this.penService.startPen.bind(this),
+        this.penService.stopPen.bind(this),
+        this.penService.writing.bind(this),
+    ];
 
     // eslint-disable-next-line max-params
     constructor(
@@ -108,13 +116,13 @@ export class GameCreationPageComponent implements OnInit {
     ) {}
 
     @HostListener('document:keydown.control.z', ['$event'])
-    onCtrlZ(event: KeyboardEvent) {
+    onCtrlZ(event: KeyboardEvent): void {
         event.preventDefault();
         this.undo();
     }
 
     @HostListener('document:keydown.control.shift.z', ['$event'])
-    onCtrlShiftZ(event: KeyboardEvent) {
+    onCtrlShiftZ(event: KeyboardEvent): void {
         event.preventDefault();
         this.redo();
     }
@@ -182,17 +190,6 @@ export class GameCreationPageComponent implements OnInit {
     getTitle(title: string): void {
         this.gameTitle = title;
     }
-
-    consoleStuff() {
-        // const right = this.rightCanvasArray;
-        // console.log('this.rightCanvasArray', this.rightCanvasArray);
-        // console.log('this.rightArrayPointer', right);
-        // console.log('this.leftCanvasArray', this.leftCanvasArray);
-        // console.log('this.leftArrayPointer', this.leftArrayPointer);
-        // console.log('this.actionsArray', this.actionsArray);
-        // console.log('this.nbElements', this.nbElements);
-    }
-
     openSaveModal() {
         const dialogRef = this.matDialog.open(ModalPageComponent, {
             disableClose: true,
@@ -226,8 +223,6 @@ export class GameCreationPageComponent implements OnInit {
             alert("N'oubliez pas d'ajouter un titre à votre jeu !");
             return false;
         } else if (this.originalFile === null || this.differentFile === null) {
-            console.log('this.originalFile', this.originalFile);
-            console.log('this.differentFile', this.differentFile);
             alert('Un jeu de différences sans image est pour ainsi dire... intéressant ? Ajoutez une image.');
             return false;
         }
@@ -235,13 +230,10 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     mergeCanvas(canvas: HTMLCanvasElement, canvas2: HTMLCanvasElement): Blob {
-        console.log('canvas', canvas);
         const context = canvas.getContext('2d');
         if (context) {
             context.drawImage(canvas2, 0, 0);
-            console.log('tes');
         }
-        console.log('canvas', canvas);
 
         return this.createBlob(canvas);
     }
@@ -257,8 +249,11 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     async save() {
+        const updatedFiles = this.fileManipulationService.updateFiles();
+        this.originalFile = updatedFiles[0];
+        this.differentFile = updatedFiles[1];
         if (this.saveVerification() && this.originalFile && this.differentFile) {
-            // this.isDisabled = true;
+            this.isSaveDisabled = true;
             const originalBlob = await this.mergeCanvas(this.originalCanvas.nativeElement, this.originalDrawnCanvas.nativeElement);
             const differenceBlob = await this.mergeCanvas(this.differenceCanvas.nativeElement, this.differenceDrawnCanvas.nativeElement);
             this.gameCardService.uploadImages(originalBlob, differenceBlob, this.differenceRadius).subscribe((data) => {
@@ -284,51 +279,22 @@ export class GameCreationPageComponent implements OnInit {
         }
     }
 
-    choseCanvas(mouseEvent: MouseEvent): void {
-        this.canvasInformations = this.canvasSelectionService.choseCanvas(mouseEvent);
-    }
-
-    startPen(mouseEvent: MouseEvent): void {
-        this.penService.startPen(mouseEvent);
-    }
-
-    stopPen() {
-        this.penService.stopPen();
-    }
-
-    writing(mouseEvent: MouseEvent) {
-        this.penService.writing(mouseEvent);
-    }
-
-    drawPen() {
+    drawPen(): void {
         this.penService.setProperties(this.canvasInformations);
-        // this.penListener = this.startPen.bind(this);
+
         this.canvasInformations.originalDrawnCanvas.addEventListener('mousedown', this.penListener[0]);
         this.canvasInformations.differenceDrawnCanvas.addEventListener('mousedown', this.penListener[0]);
 
-        // this.penListener = this.stopPen.bind(this);
         this.canvasInformations.originalDrawnCanvas.addEventListener('mouseup', this.penListener[1]);
         this.canvasInformations.differenceDrawnCanvas.addEventListener('mouseup', this.penListener[1]);
 
-        // this.penListener = this.writing.bind(this);
         this.canvasInformations.originalDrawnCanvas.addEventListener('mousemove', this.penListener[2]);
         this.canvasInformations.differenceDrawnCanvas.addEventListener('mousemove', this.penListener[2]);
     }
 
-    startDrawingRectangle(mouseEvent: MouseEvent): void {
-        this.drawingRectangleService.startDrawingRectangle(mouseEvent);
-    }
-
-    stopDrawingRectangle(): void {
-        this.drawingRectangleService.stopDrawingRectangle();
-    }
-
-    paintRectangle(mouseEvent: MouseEvent): void {
-        this.drawingRectangleService.paintRectangle(mouseEvent);
-    }
-
     drawRectangle(): void {
         this.drawingRectangleService.setProperties(this.canvasInformations);
+
         this.canvasInformations.originalRectangleCanvas.addEventListener('mousedown', this.rectangleListener[0]);
         this.canvasInformations.differenceRectangleCanvas.addEventListener('mousedown', this.rectangleListener[0]);
 
@@ -339,34 +305,19 @@ export class GameCreationPageComponent implements OnInit {
         this.canvasInformations.differenceRectangleCanvas.addEventListener('mousemove', this.rectangleListener[2]);
     }
 
-    startErase(mouseEvent: MouseEvent) {
-        this.eraserButtonService.startErase(mouseEvent);
-    }
-
-    stopErase() {
-        this.eraserButtonService.stopErase();
-    }
-
-    erasing(mouseEvent: MouseEvent) {
-        this.eraserButtonService.erasing(mouseEvent);
-    }
-
-    erase() {
+    erase(): void {
         this.eraserButtonService.setProperties(this.canvasInformations);
-        // this.eraseListener = this.startErase.bind(this);
         this.canvasInformations.originalDrawnCanvas.addEventListener('mousedown', this.eraseListener[0]);
         this.canvasInformations.differenceDrawnCanvas.addEventListener('mousedown', this.eraseListener[0]);
 
-        // this.eraseListener = this.stopErase.bind(this);
         this.canvasInformations.originalDrawnCanvas.addEventListener('mouseup', this.eraseListener[1]);
         this.canvasInformations.differenceDrawnCanvas.addEventListener('mouseup', this.eraseListener[1]);
 
-        // this.eraseListener = this.erasing.bind(this);
         this.canvasInformations.originalDrawnCanvas.addEventListener('mousemove', this.eraseListener[2]);
         this.canvasInformations.differenceDrawnCanvas.addEventListener('mousemove', this.eraseListener[2]);
     }
 
-    removingListeners() {
+    removingListeners(): void {
         this.originalRectangleCanvas.nativeElement.removeEventListener('mousedown', this.rectangleListener[0]);
         this.differenceRectangleCanvas.nativeElement.removeEventListener('mousedown', this.rectangleListener[0]);
         this.originalRectangleCanvas.nativeElement.removeEventListener('mouseup', this.rectangleListener[1]);
@@ -462,85 +413,17 @@ export class GameCreationPageComponent implements OnInit {
         this.drawManipulationService.duplicate(side);
     }
 
-    clearPainting(side: string) {
-        const ctxDiffDrawing = this.differenceDrawnCanvas.nativeElement.getContext('2d');
-        const ctxOgDrawing = this.originalDrawnCanvas.nativeElement.getContext('2d');
-        if (side === 'right') {
-            ctxDiffDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-            this.isInOriginalCanvas = false;
-        } else if (side === 'left') {
-            ctxOgDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-            this.isInOriginalCanvas = true;
-        }
-        // this.pushCanvas(this.drawingCanvas1);
-    }
-    pushCanvas(canvas: HTMLCanvasElement) {
-        this.undoRedoService.pushCanvas(canvas);
+    clearPainting(side: string): void {
+        this.drawManipulationService.setProperties(this.canvasInformations);
+        this.drawManipulationService.clearPainting(side);
     }
 
-    undoAction(array: string[], pointer: number) {
-        this.undoRedoService.undoAction(array, pointer);
-        //     const ctx = this.actionsArray[this.nbElements]
-        //         ? this.originalDrawnCanvas.nativeElement.getContext('2d')
-        //         : this.differenceDrawnCanvas.nativeElement.getContext('2d');
-
-        //     const canvasPic = new Image();
-        //     canvasPic.src = array[pointer];
-        //     canvasPic.onload = () => {
-        //         ctx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-        //         ctx.drawImage(canvasPic, 0, 0);
-        //     };
-        //     const test = `undo on the left canvas: ${this.actionsArray[this.nbElements]} at index ${pointer}`;
-        //     console.log(test);
-    }
-
-    undo() {
+    undo(): void {
+        this.undoRedoService.setProperties(this.canvasInformations);
         this.undoRedoService.undo();
-        //     if (this.nbElements > 0) {
-        //         this.nbElements--;
-
-        //         if (this.actionsArray[this.nbElements]) {
-        //             this.leftArrayPointer--;
-        //             this.undoAction(this.leftCanvasArray, this.leftArrayPointer);
-        //         } else {
-        //             this.rightArrayPointer--;
-        //             this.undoAction(this.rightCanvasArray, this.rightArrayPointer);
-        //         }
-        //     }
-        //     this.consoleStuff();
     }
-
-    redoAction(array: string[], pointer: number) {
-        this.undoRedoService.redoAction(array, pointer);
-        //     const ctx = this.actionsArray[this.nbElements]
-        //         ? this.originalDrawnCanvas.nativeElement.getContext('2d')
-        //         : this.differenceDrawnCanvas.nativeElement.getContext('2d');
-
-        //     const canvasPic = new Image();
-        //     canvasPic.src = array[pointer];
-
-        //     canvasPic.onload = () => {
-        //         ctx.drawImage(canvasPic, 0, 0);
-        //     };
-        //     ctx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-        //     const test = `redo on the left canvas: ${this.actionsArray[this.nbElements]} at index ${pointer}`;
-        //     console.log(test);
-    }
-
-    redo() {
+    redo(): void {
+        this.undoRedoService.setProperties(this.canvasInformations);
         this.undoRedoService.redo();
-        //     console.log('this.actionsArray', this.actionsArray);
-        //     if (this.nbElements < this.actionsArray.length) {
-        //         console.log('this.nbElements', this.nbElements);
-        //         if (this.actionsArray[this.nbElements]) {
-        //             this.leftArrayPointer++;
-        //             this.redoAction(this.leftCanvasArray, this.leftArrayPointer);
-        //         } else {
-        //             this.rightArrayPointer++;
-        //             this.redoAction(this.rightCanvasArray, this.rightArrayPointer);
-        //         }
-        //         this.nbElements++;
-        //     }
-        //     this.consoleStuff();
     }
 }
