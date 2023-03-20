@@ -84,12 +84,12 @@ export class PenService {
         this.canvasInformations.differenceDrawnCanvas.addEventListener('mousemove', this.penListener[2]);
     }
 
-    removingListeners() {
-        this.canvasInformations.originalDrawnCanvas.removeEventListener('mousedown', this.penListener[0]);
-        this.canvasInformations.differenceDrawnCanvas.removeEventListener('mousedown', this.penListener[0]);
-        this.canvasInformations.originalDrawnCanvas.removeEventListener('mouseup', this.penListener[1]);
-        this.canvasInformations.differenceDrawnCanvas.removeEventListener('mouseup', this.penListener[1]);
-        this.canvasInformations.originalDrawnCanvas.removeEventListener('mousemove', this.penListener[2]);
-        this.canvasInformations.differenceDrawnCanvas.removeEventListener('mousemove', this.penListener[2]);
-    }
+    // removingListeners() {
+    //     this.canvasInformations.originalDrawnCanvas.removeEventListener('mousedown', this.penListener[0]);
+    //     this.canvasInformations.differenceDrawnCanvas.removeEventListener('mousedown', this.penListener[0]);
+    //     this.canvasInformations.originalDrawnCanvas.removeEventListener('mouseup', this.penListener[1]);
+    //     this.canvasInformations.differenceDrawnCanvas.removeEventListener('mouseup', this.penListener[1]);
+    //     this.canvasInformations.originalDrawnCanvas.removeEventListener('mousemove', this.penListener[2]);
+    //     this.canvasInformations.differenceDrawnCanvas.removeEventListener('mousemove', this.penListener[2]);
+    // }
 }

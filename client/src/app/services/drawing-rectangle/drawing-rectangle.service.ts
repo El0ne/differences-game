@@ -81,12 +81,12 @@ export class DrawingRectangleService {
         this.canvasInformations.differenceRectangleCanvas.addEventListener('mousemove', this.rectangleListener[2]);
     }
 
-    removingListeners() {
-        this.canvasInformations.originalRectangleCanvas.removeEventListener('mousedown', this.rectangleListener[0]);
-        this.canvasInformations.differenceRectangleCanvas.removeEventListener('mousedown', this.rectangleListener[0]);
-        this.canvasInformations.originalRectangleCanvas.removeEventListener('mouseup', this.rectangleListener[1]);
-        this.canvasInformations.differenceRectangleCanvas.removeEventListener('mouseup', this.rectangleListener[1]);
-        this.canvasInformations.originalRectangleCanvas.removeEventListener('mousemove', this.rectangleListener[2]);
-        this.canvasInformations.differenceRectangleCanvas.removeEventListener('mousemove', this.rectangleListener[2]);
-    }
+    // removingListeners() {
+    //     this.canvasInformations.originalRectangleCanvas.removeEventListener('mousedown', this.rectangleListener[0]);
+    //     this.canvasInformations.differenceRectangleCanvas.removeEventListener('mousedown', this.rectangleListener[0]);
+    //     this.canvasInformations.originalRectangleCanvas.removeEventListener('mouseup', this.rectangleListener[1]);
+    //     this.canvasInformations.differenceRectangleCanvas.removeEventListener('mouseup', this.rectangleListener[1]);
+    //     this.canvasInformations.originalRectangleCanvas.removeEventListener('mousemove', this.rectangleListener[2]);
+    //     this.canvasInformations.differenceRectangleCanvas.removeEventListener('mousemove', this.rectangleListener[2]);
+    // }
 }

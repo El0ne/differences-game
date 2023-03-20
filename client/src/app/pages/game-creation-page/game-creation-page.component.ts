@@ -82,13 +82,13 @@ export class GameCreationPageComponent implements OnInit {
     canvasInformation: CanvasInformations;
 
     // TODO remove the listeners when services are all implemented
-    // private eraseListener: ((mouseEvent: MouseEvent) => void)[] = [this.startErase.bind(this), this.stopErase.bind(this), this.erasing.bind(this)];
-    // private rectangleListener: ((mouseEvent: MouseEvent) => void)[] = [
-    //     this.startDrawingRectangle.bind(this),
-    //     this.stopDrawingRectangle.bind(this),
-    //     this.paintRectangle.bind(this),
-    // ];
-    // private penListener: ((mouseEvent: MouseEvent) => void)[] = [this.startPen.bind(this), this.stopPen.bind(this), this.writing.bind(this)];
+    private eraseListener: ((mouseEvent: MouseEvent) => void)[] = [this.startErase.bind(this), this.stopErase.bind(this), this.erasing.bind(this)];
+    private rectangleListener: ((mouseEvent: MouseEvent) => void)[] = [
+        this.startDrawingRectangle.bind(this),
+        this.stopDrawingRectangle.bind(this),
+        this.paintRectangle.bind(this),
+    ];
+    private penListener: ((mouseEvent: MouseEvent) => void)[] = [this.startPen.bind(this), this.stopPen.bind(this), this.writing.bind(this)];
 
     // eslint-disable-next-line max-params
     constructor(
@@ -365,9 +365,26 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     removingListeners() {
-        this.penService.removingListeners();
-        this.drawingRectangleService.removingListeners();
-        this.eraserButtonService.removingListeners();
+        this.originalRectangleCanvas.nativeElement.removeEventListener('mousedown', this.rectangleListener[0]);
+        this.differenceRectangleCanvas.nativeElement.removeEventListener('mousedown', this.rectangleListener[0]);
+        this.originalRectangleCanvas.nativeElement.removeEventListener('mouseup', this.rectangleListener[1]);
+        this.differenceRectangleCanvas.nativeElement.removeEventListener('mouseup', this.rectangleListener[1]);
+        this.originalRectangleCanvas.nativeElement.removeEventListener('mousemove', this.rectangleListener[2]);
+        this.differenceRectangleCanvas.nativeElement.removeEventListener('mousemove', this.rectangleListener[2]);
+
+        this.originalDrawnCanvas.nativeElement.removeEventListener('mousedown', this.penListener[0]);
+        this.differenceDrawnCanvas.nativeElement.removeEventListener('mousedown', this.penListener[0]);
+        this.originalDrawnCanvas.nativeElement.removeEventListener('mouseup', this.penListener[1]);
+        this.differenceDrawnCanvas.nativeElement.removeEventListener('mouseup', this.penListener[1]);
+        this.originalDrawnCanvas.nativeElement.removeEventListener('mousemove', this.penListener[2]);
+        this.differenceDrawnCanvas.nativeElement.removeEventListener('mousemove', this.penListener[2]);
+
+        this.originalDrawnCanvas.nativeElement.removeEventListener('mousedown', this.eraseListener[0]);
+        this.differenceDrawnCanvas.nativeElement.removeEventListener('mousedown', this.eraseListener[0]);
+        this.originalDrawnCanvas.nativeElement.removeEventListener('mouseup', this.eraseListener[1]);
+        this.differenceDrawnCanvas.nativeElement.removeEventListener('mouseup', this.eraseListener[1]);
+        this.originalDrawnCanvas.nativeElement.removeEventListener('mousemove', this.eraseListener[2]);
+        this.differenceDrawnCanvas.nativeElement.removeEventListener('mousemove', this.eraseListener[2]);
     }
 
     changeZindex() {
