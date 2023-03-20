@@ -21,6 +21,7 @@
                     *ngIf="even"
                     [gameCardInformation]="gameCardInformation"
                     [isConfig]="isConfig"
+                    (gameDeleted)="refreshGameCards()"
                 ></app-game-card-selection>
             </div>
         </div>
@@ -41,6 +42,7 @@
                     *ngIf="odd"
                     [gameCardInformation]="gameCardInformation"
                     [isConfig]="isConfig"
+                    (gameDeleted)="refreshGameCards()"
                 ></app-game-card-selection>
             </div>
         </div>

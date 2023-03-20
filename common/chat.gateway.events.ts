@@ -1,4 +1,4 @@
-export enum ChatEvents {
+export enum CHAT_EVENTS {
     Abandon = 'abandon',
     Hint = 'hint',
     Event = 'event',

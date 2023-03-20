@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { RoomMessage } from '@common/chat-gateway-constants';
-import { ChatEvents } from '@common/chat.gateway.events';
+import { CHAT_EVENTS } from '@common/chat.gateway.events';
 import { PlayerDifference } from '@common/difference-information';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -53,19 +53,19 @@ describe('ChatGateway', () => {
         const error = 'Votre message ne respecte pas le bon format. Veuillez entrer un nouveau message';
         gateway.validate(socket, validWordCase.word);
         expect(
-            socket.emit.calledWith(ChatEvents.WordValidated, { isValidated: validWordCase.isValid, originalMessage: validWordCase.word }),
+            socket.emit.calledWith(CHAT_EVENTS.WordValidated, { isValidated: validWordCase.isValid, originalMessage: validWordCase.word }),
         ).toBeTruthy();
         gateway.validate(socket, invalidWordCase.word);
-        expect(socket.emit.calledWith(ChatEvents.WordValidated, { isValidated: invalidWordCase.isValid, originalMessage: error })).toBeTruthy();
+        expect(socket.emit.calledWith(CHAT_EVENTS.WordValidated, { isValidated: invalidWordCase.isValid, originalMessage: error })).toBeTruthy();
         gateway.validate(socket, emptyStringTestCase);
-        expect(socket.emit.calledWith(ChatEvents.WordValidated, { isValidated: false, originalMessage: error })).toBeTruthy();
+        expect(socket.emit.calledWith(CHAT_EVENTS.WordValidated, { isValidated: false, originalMessage: error })).toBeTruthy();
     });
 
     it('difference() should emit to room a difference Event when room exists', () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
             emit: (event: string, data: PlayerDifference) => {
-                expect(event).toEqual(ChatEvents.Difference);
+                expect(event).toEqual(CHAT_EVENTS.Difference);
                 expect(data).toEqual({ differencesPosition: 3, lastDifferences: [0, 1, 2], socket: socket.id });
             },
         } as any);
@@ -83,7 +83,7 @@ describe('ChatGateway', () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
             emit: (event: string, data: string) => {
-                expect(event).toEqual(ChatEvents.Win);
+                expect(event).toEqual(CHAT_EVENTS.Win);
                 expect(data).toEqual(socket.id);
             },
         } as any);
@@ -107,7 +107,7 @@ describe('ChatGateway', () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
             emit: (event: string, message) => {
-                expect(event).toEqual(ChatEvents.RoomMessage);
+                expect(event).toEqual(CHAT_EVENTS.RoomMessage);
                 expect(message.message).toEqual('X');
             },
         } as any);
@@ -118,7 +118,7 @@ describe('ChatGateway', () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
             emit: (event: string, data) => {
-                expect(event).toEqual(ChatEvents.RoomMessage);
+                expect(event).toEqual(CHAT_EVENTS.RoomMessage);
                 expect(data.message.includes('Error')).toBe(true);
                 expect(data.message.includes('par')).toBe(true);
             },
@@ -130,7 +130,7 @@ describe('ChatGateway', () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
             emit: (event: string, data) => {
-                expect(event).toEqual(ChatEvents.RoomMessage);
+                expect(event).toEqual(CHAT_EVENTS.RoomMessage);
                 expect(data.message.includes('Différence')).toBe(true);
                 expect(data.message.includes('par')).toBe(false);
             },
@@ -142,7 +142,7 @@ describe('ChatGateway', () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
             emit: (event: string, data) => {
-                expect(event).toEqual(ChatEvents.RoomMessage);
+                expect(event).toEqual(CHAT_EVENTS.RoomMessage);
                 expect(data.message.includes('Indice')).toBe(true);
                 expect(data.socketId).toEqual('event');
             },
@@ -155,7 +155,7 @@ describe('ChatGateway', () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
             emit: (event: string, data: RoomMessage) => {
-                expect(event).toEqual(ChatEvents.Abandon);
+                expect(event).toEqual(CHAT_EVENTS.Abandon);
                 expect(data.event).toEqual('abandon');
                 expect(data.socketId).toEqual('id');
             },

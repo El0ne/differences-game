@@ -7,13 +7,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GameClickController } from './controllers/game-click/game-click.controller';
 import { StageController } from './controllers/stage/stage.controller';
+import { MatchGateway } from './gateways/match/match/match.gateway';
 import { TimerGateway } from './gateways/timer/timer.gateway';
-
 import { StageWaitingRoomGateway } from './gateways/waitingRoom/stage-waiting-room.gateway';
 import { DifferenceClickService } from './services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from './services/difference-detection/difference-detection.service';
 import { DifferencesCounterService } from './services/differences-counter/differences-counter.service';
 import { GameDifficultyService } from './services/game-difficulty/game-difficulty.service';
+import { GameManagerService } from './services/game-manager/game-manager.service';
 import { ImageDimensionsService } from './services/image-dimensions/image-dimensions.service';
 import { ImageManagerService } from './services/image-manager/image-manager.service';
 import { PixelPositionService } from './services/pixel-position/pixel-position/pixel-position.service';
@@ -49,6 +50,8 @@ import { PixelRadiusService } from './services/pixel-radius/pixel-radius.service
         ImageDimensionsService,
         ImageManagerService,
         TimerGateway,
+        GameManagerService,
+        MatchGateway,
     ],
 })
 export class AppModule {}

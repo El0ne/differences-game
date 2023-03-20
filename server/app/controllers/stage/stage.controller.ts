@@ -1,7 +1,10 @@
+/* eslint-disable no-underscore-dangle */
+// using _id property causes linting warning
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameDifficultyService } from '@app/services/game-difficulty/game-difficulty.service';
+import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { ImageUploadDto } from '@common/image-upload.dto';
@@ -32,6 +35,7 @@ export class StageController {
         private imageManagerService: ImageManagerService,
         private differenceService: DifferenceDetectionService,
         private differenceClickService: DifferenceClickService,
+        private gameManagerService: GameManagerService,
     ) {}
 
     @Get('/')

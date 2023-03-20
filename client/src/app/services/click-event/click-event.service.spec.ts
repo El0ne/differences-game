@@ -68,4 +68,11 @@ describe('ClickEventService', () => {
         service.isADifference(1, 1, '0');
         expect(getSpy).toHaveBeenCalled();
     });
+
+    it('deleteDifferences() should call delete with an id', () => {
+        const deleteSpy = spyOn(service.http, 'delete');
+        const id = 'owdfe';
+        service.deleteDifferences(id);
+        expect(deleteSpy).toHaveBeenCalledOnceWith(`${CLICK}/${id}`);
+    });
 });

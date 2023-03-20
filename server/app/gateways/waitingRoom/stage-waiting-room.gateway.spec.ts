@@ -1,5 +1,6 @@
-import { JoinHostInWaitingRequest, PlayerInformations, WaitingRoomEvents } from '@common/waiting-room-socket-communication';
-import { Logger } from '@nestjs/common';
+import { GameCardService } from '@app/services/game-card/game-card.service';
+import { GameManagerService } from '@app/services/game-manager/game-manager.service';
+import { JoinHostInWaitingRequest, PlayerInformations, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import { BroadcastOperator, Server, Socket } from 'socket.io';
@@ -7,25 +8,25 @@ import { StageWaitingRoomGateway } from './stage-waiting-room.gateway';
 
 describe('StageWaitingRoomGateway', () => {
     let gateway: StageWaitingRoomGateway;
-    let logger: SinonStubbedInstance<Logger>;
     let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
+    let gameCardService: SinonStubbedInstance<GameCardService>;
+    let gameManagerService: SinonStubbedInstance<GameManagerService>;
     const lookedStages = ['stage1', 'stage2', 'stage3', 'stage4'];
 
     beforeEach(async () => {
-        logger = createStubInstance(Logger);
         server = createStubInstance<Server>(Server);
         socket = createStubInstance<Socket>(Socket);
+        gameCardService = createStubInstance<GameCardService>(GameCardService);
+        gameManagerService = createStubInstance<GameManagerService>(GameManagerService);
         socket.data = {};
         Object.defineProperty(socket, 'id', { value: '123' });
         Object.defineProperty(server, 'sockets', { value: { sockets: new Map<string, Socket>() } });
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 StageWaitingRoomGateway,
-                {
-                    provide: Logger,
-                    useValue: logger,
-                },
+                { provide: GameCardService, useValue: gameCardService },
+                { provide: GameManagerService, useValue: gameManagerService },
             ],
         }).compile();
 
@@ -42,17 +43,17 @@ describe('StageWaitingRoomGateway', () => {
 
     it('scanForHosts should emit a gameCreated for each of the stages where the is a host', () => {
         gateway.scanForHosts(socket, lookedStages);
-        expect(socket.emit.calledWith(WaitingRoomEvents.MatchCreated, 'stage1')).toBeTruthy();
-        expect(socket.emit.calledWith(WaitingRoomEvents.MatchCreated, 'stage4')).toBeTruthy();
-        expect(socket.emit.calledWith(WaitingRoomEvents.MatchCreated, 'stage2')).toBeFalsy();
-        expect(socket.emit.calledWith(WaitingRoomEvents.MatchCreated, 'stage5')).toBeFalsy();
+        expect(socket.emit.calledWith(WAITING_ROOM_EVENTS.MatchCreated, 'stage1')).toBeTruthy();
+        expect(socket.emit.calledWith(WAITING_ROOM_EVENTS.MatchCreated, 'stage4')).toBeTruthy();
+        expect(socket.emit.calledWith(WAITING_ROOM_EVENTS.MatchCreated, 'stage2')).toBeFalsy();
+        expect(socket.emit.calledWith(WAITING_ROOM_EVENTS.MatchCreated, 'stage5')).toBeFalsy();
         expect(socket.join.calledWith(lookedStages)).toBeTruthy();
     });
 
     it('hostGame should put the socket in the gameHosts and send a gameCreated to the the stageRoom', () => {
         socket.to.returns({
             emit: (event: string) => {
-                expect(event).toEqual(WaitingRoomEvents.MatchCreated);
+                expect(event).toEqual(WAITING_ROOM_EVENTS.MatchCreated);
             },
         } as BroadcastOperator<unknown, unknown>);
         gateway.hostGame(socket, 'stage1');
@@ -78,7 +79,7 @@ describe('StageWaitingRoomGateway', () => {
         const playerInfo: PlayerInformations = { playerName: 'name', playerSocketId: '123' };
         socket.to.returns({
             emit: (event: string, data: PlayerInformations) => {
-                expect(event).toEqual(WaitingRoomEvents.RequestMatch);
+                expect(event).toEqual(WAITING_ROOM_EVENTS.RequestMatch);
                 expect(data).toEqual(playerInfo);
             },
         } as BroadcastOperator<unknown, unknown>);
@@ -91,7 +92,7 @@ describe('StageWaitingRoomGateway', () => {
         socket.data.stageInWaiting = 'stage1';
         socket.to.returns({
             emit: (event: string, playerId: string) => {
-                expect(event).toEqual(WaitingRoomEvents.UnrequestMatch);
+                expect(event).toEqual(WAITING_ROOM_EVENTS.UnrequestMatch);
                 expect(playerId).toEqual('123');
             },
         } as BroadcastOperator<unknown, unknown>);
@@ -114,7 +115,7 @@ describe('StageWaitingRoomGateway', () => {
         } as BroadcastOperator<unknown, unknown>);
         gateway.acceptOpponent(socket, { playerName: 'host1', playerSocketId: 'opponentId' });
         expect(socket.to.calledWith('stage1')).toBeTruthy();
-        expect(socket.emit.calledWith(WaitingRoomEvents.DeclineOpponent, 'randomRoomId'));
+        expect(socket.emit.calledWith(WAITING_ROOM_EVENTS.DeclineOpponent, 'randomRoomId'));
         expect(socket.data.stageInHosting).toEqual(null);
         expect(opponentSocket.data.stageInWaiting).toEqual(null);
         expect(socket.data.room).not.toBe(undefined);
@@ -124,11 +125,26 @@ describe('StageWaitingRoomGateway', () => {
     it('declineOpponent should send a matchRefusedEvent to the opponent', () => {
         socket.to.returns({
             emit: (event: string) => {
-                expect(event).toEqual(WaitingRoomEvents.MatchRefused);
+                expect(event).toEqual(WAITING_ROOM_EVENTS.MatchRefused);
             },
         } as BroadcastOperator<unknown, unknown>);
         gateway.declineOpponent(socket, 'refusedOpponent');
         expect(socket.to.calledWith('refusedOpponent')).toBeTruthy();
+    });
+
+    it('deleteGame should send a call services to delete game and emit to the stage room and clean the gameHost map of the stage', async () => {
+        gateway.gameHosts.set('stageId', 'host');
+        server.to.returns({
+            // eslint-disable-next-line @typescript-eslint/no-empty-function, no-unused-vars
+            emit: (event: string) => {},
+        } as BroadcastOperator<unknown, unknown>);
+        const deleteGameCardSpy = jest.spyOn(gameCardService, 'deleteGameCard');
+        const deleteGameSpy = jest.spyOn(gameManagerService, 'deleteGame');
+        await gateway.deleteGame('stageId');
+        expect(deleteGameCardSpy).toBeCalledWith('stageId');
+        expect(deleteGameSpy).toBeCalledWith('stageId');
+        expect(server.to.calledWith('stageId')).toBeTruthy();
+        expect(gateway.gameHosts.has('stageId')).toBeFalsy();
     });
 
     it('handleDisconnect should call unhostGame or quitHost on the right conditions', () => {

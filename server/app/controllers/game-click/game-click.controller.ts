@@ -1,6 +1,6 @@
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Query } from '@nestjs/common';
 
 @Controller('game-click')
 export class GameClickController {
@@ -18,5 +18,10 @@ export class GameClickController {
     @Get(':id')
     async getDifferencesFromId(@Param('id') stageId: string): Promise<number[][]> {
         return await this.differenceClickService.getDifferenceArrayFromStageID(stageId);
+    }
+
+    @Delete(':id')
+    async deleteDifferences(@Param('id') id: string): Promise<void> {
+        return await this.differenceClickService.deleteDifferences(id);
     }
 }

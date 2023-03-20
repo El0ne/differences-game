@@ -74,6 +74,13 @@ describe('GameClickController', () => {
         expect(response.status).toBe(HttpStatus.OK);
         expect(response.body).toEqual([]);
     });
+
+    it('deleteDifferences() should call differenceClickService.deleteDifferences with the id passed in param', async () => {
+        const differenceClickServiceStub = stub(differenceClickService, 'deleteDifferences').returns([]);
+        const response = await request(httpServer).delete('/game-click/5');
+        expect(differenceClickServiceStub.calledWith('5')).toBeTruthy();
+        expect(response.status).toBe(HttpStatus.OK);
+    });
 });
 
 const FAKE_CDV: ClickDifferenceVerification = {

@@ -1,12 +1,12 @@
 <div class="win neon modal-page">
-    <div *ngIf="data.isMultiplayer;else soloWin" class="text">
+    <div *ngIf="data.isMultiplayer" class="text">
         <p>{{ data.winner }} est le vainqueur!</p>
         <p>Bien joué!</p>
     </div>
+    <div *ngIf="!data.isMultiplayer" class="text">
+        <p>Vous Avez Gagné!</p>
+        <p>Bravo!</p>
+    </div>
+
     <button class="normal-button" (click)="confirm()">Continuer</button>
 </div>
-
-<ng-template #soloWin class="text">
-    <p>Vous Avez Gagné!</p>
-    <p>Bravo!</p>
-</ng-template>

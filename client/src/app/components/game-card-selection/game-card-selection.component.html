@@ -34,7 +34,7 @@
         </div>
     </div>
     <div class="row" *ngIf="isConfig">
-        <button class="normal-button option-button">Supprimer</button>
+        <button class="normal-button option-button" (click)="deleteGame()">Supprimer</button>
         <button class="normal-button option-button">Réinitialiser</button>
     </div>
     <div class="row" *ngIf="!isConfig">
