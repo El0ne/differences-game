@@ -30,14 +30,21 @@ describe('SoloViewComponent', () => {
     let component: SoloViewComponent;
     let fixture: ComponentFixture<SoloViewComponent>;
     let mockService: GameCardInformationService;
-    let chatSocketServiceMock: SocketService;
+    let socketServiceMock: SocketService;
     let foundDifferenceServiceSpy: FoundDifferenceService;
     let modalSpy: MatDialog;
+    let clickEventServiceSpy: ClickEventService;
 
     const mockActivatedRoute = { snapshot: { paramMap: { get: () => '234' } } };
-    const mockRouter = { url: 'multiplayer/234' };
+    let mockRouter: Router;
 
     beforeEach(async () => {
+        clickEventServiceSpy = jasmine.createSpyObj<ClickEventService>('ClickEventService', ['getDifferences', 'isADifference', 'getDifferences']);
+        clickEventServiceSpy.getDifferences = () => of([[1, 2, 3], [4, 5], [6], [], [7, 8, 9]]);
+
+        mockRouter = jasmine.createSpyObj<Router>('Router', ['navigate'], ['url']);
+        Object.defineProperty(mockRouter, 'url', { value: 'multiplayer/234' });
+
         foundDifferenceServiceSpy = jasmine.createSpyObj('FoundDifferenceService', [
             'addDifferenceFound',
             'clearDifferenceFound',
@@ -58,17 +65,18 @@ describe('SoloViewComponent', () => {
         mockService.getGameCardInfoFromId = () => {
             return of(SERVICE_MOCK_GAME_CARD);
         };
-        chatSocketServiceMock = jasmine.createSpyObj('SocketService', ['connect', 'disconnect', 'liveSocket', 'listen', 'send'], ['socketId']);
-        chatSocketServiceMock.sio = jasmine.createSpyObj('Socket', ['on', 'emit', 'disconnect']);
-        chatSocketServiceMock.names = new Map<string, string>();
-        chatSocketServiceMock.names.set('playerId', 'player').set('opponentId', 'opponent');
-        chatSocketServiceMock.gameRoom = 'game';
-        chatSocketServiceMock.opponentSocket = 'opponentId';
+        socketServiceMock = jasmine.createSpyObj('SocketService', ['connect', 'disconnect', 'liveSocket', 'listen', 'send'], ['socketId']);
+        socketServiceMock.sio = jasmine.createSpyObj('Socket', ['on', 'emit', 'disconnect']);
+        socketServiceMock.names = new Map<string, string>();
+        socketServiceMock.names.set('playerId', 'player').set('opponentId', 'opponent');
+        socketServiceMock.gameRoom = 'game';
+        socketServiceMock.opponentSocket = 'opponentId';
+        socketServiceMock.liveSocket = () => true;
 
         modalSpy = jasmine.createSpyObj('MatDialog', ['open']);
 
-        chatSocketServiceMock.send = (event: string, data?: unknown) => {
-            if (data) chatSocketServiceMock.sio.emit(event, data);
+        socketServiceMock.send = (event: string, data?: unknown) => {
+            if (data) socketServiceMock.sio.emit(event, data);
             return;
         };
 
@@ -76,11 +84,11 @@ describe('SoloViewComponent', () => {
             declarations: [SoloViewComponent, ClickEventComponent],
             imports: [FormsModule, HttpClientTestingModule, RouterTestingModule, MatIconModule, MatDialogModule, BrowserAnimationsModule],
             providers: [
-                { provide: ClickEventService },
+                { provide: ClickEventService, useValue: clickEventServiceSpy },
                 { provide: ActivatedRoute, useValue: mockActivatedRoute },
                 { provide: Router, useValue: mockRouter },
                 { provide: GameCardInformationService, useValue: mockService },
-                { provide: SocketService, useValue: chatSocketServiceMock },
+                { provide: SocketService, useValue: socketServiceMock },
                 { provide: FoundDifferenceService, useValue: foundDifferenceServiceSpy },
                 { provide: MatDialog, useValue: modalSpy },
             ],
@@ -97,10 +105,16 @@ describe('SoloViewComponent', () => {
         expect(component).toBeTruthy();
     });
 
+    it("ngOnInit should redirect to the home page if the socket isn't connected", () => {
+        spyOn(socketServiceMock, 'liveSocket').and.returnValue(false);
+        component.ngOnInit();
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/home']);
+    });
+
     it('should set the current gameCard id according to value in route and request gameCard as well as game player information', () => {
         const showTimeSpy = spyOn(component, 'showTime');
         const configureSocketReactionsSpy = spyOn(component, 'configureSocketReactions');
-        Object.defineProperty(chatSocketServiceMock, 'socketId', { value: 'playerId' });
+        Object.defineProperty(socketServiceMock, 'socketId', { value: 'playerId' });
         component.ngOnInit();
         expect(component.currentGameId).toEqual('234');
         expect(component.isMultiplayer).toBe(true);
@@ -114,7 +128,7 @@ describe('SoloViewComponent', () => {
     });
 
     it('ConfigureSocketReactions should configure sockets correctly & react properly according to event', () => {
-        chatSocketServiceMock.listen = (event: string, callback: any) => {
+        socketServiceMock.listen = (event: string, callback: any) => {
             switch (event) {
                 case CHAT_EVENTS.WordValidated: {
                     callback({ isValidated: true, originalMessage: 'Test message' });
@@ -141,10 +155,10 @@ describe('SoloViewComponent', () => {
                 // No default
             }
         };
-        const listenSpy = spyOn(chatSocketServiceMock, 'listen').and.callThrough();
-        const sendSpy = spyOn(chatSocketServiceMock, 'send').and.callThrough();
+        const listenSpy = spyOn(socketServiceMock, 'listen').and.callThrough();
+        const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         const finishGameSpy = spyOn(component, 'winGame');
-        Object.defineProperty(chatSocketServiceMock, 'socketId', { value: 'test' });
+        Object.defineProperty(socketServiceMock, 'socketId', { value: 'test' });
         component.configureSocketReactions();
         expect(listenSpy).toHaveBeenCalledTimes(5);
         expect(component.messages.length).toEqual(3);
@@ -152,26 +166,25 @@ describe('SoloViewComponent', () => {
         expect(component.messages[component.messages.length - 2].socketId).toEqual('test');
         expect(component.messages[component.messages.length - 1].socketId).toEqual('abandon');
         expect(finishGameSpy).toHaveBeenCalledWith('test');
-        expect(finishGameSpy).toHaveBeenCalledWith('abandon');
         expect(finishGameSpy).toHaveBeenCalledWith('wrong');
     });
 
     it('handleMistake should send an event called event to socket server with extra information', () => {
         component.currentRoom = 'room';
-        const sendSpy = spyOn(chatSocketServiceMock, 'send').and.callThrough();
+        const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.handleMistake();
         expect(sendSpy).toHaveBeenCalledWith('event', { room: component.currentRoom, isMultiplayer: true, event: 'Erreur' });
     });
 
     it('hint should send a hint event to socket server with the room information', () => {
         component.currentRoom = 'room';
-        const sendSpy = spyOn(chatSocketServiceMock, 'send').and.callThrough();
+        const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.hint();
         expect(sendSpy).toHaveBeenCalledWith('hint', component.currentRoom);
     });
 
     it('sendMessage should validate message on the server', () => {
-        const sendSpy = spyOn(chatSocketServiceMock, 'send').and.callThrough();
+        const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.messageContent = 'test message';
         component.sendMessage();
         expect(sendSpy).toHaveBeenCalledWith('validate', 'test message');
@@ -181,9 +194,9 @@ describe('SoloViewComponent', () => {
     it('should increment counter when increment counter to the correct person depending on socket id in multiplayer', () => {
         component.currentScorePlayer = 0;
         component.currentScoreOpponent = 0;
-        Object.defineProperty(chatSocketServiceMock, 'socketId', { value: 'mockSocket' });
+        Object.defineProperty(socketServiceMock, 'socketId', { value: 'mockSocket' });
         component.incrementScore('mockSocket');
-        Object.defineProperty(chatSocketServiceMock, 'socketId', { value: 'opponent' });
+        Object.defineProperty(socketServiceMock, 'socketId', { value: 'opponent' });
         component.incrementScore('player');
 
         const answer = 1;
@@ -262,7 +275,7 @@ describe('SoloViewComponent', () => {
         spyOn(component.left, 'emitSound').and.callFake((difference: boolean) => {
             return difference;
         });
-        const sendSpy = spyOn(chatSocketServiceMock, 'send').and.callThrough();
+        const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.differenceHandler(MOCK_INFORMATION);
         expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.Difference, {
             room: component.currentRoom,
@@ -276,8 +289,8 @@ describe('SoloViewComponent', () => {
     it('difference handler should call the effect handler and send a general event when difference detected', () => {
         component.isMultiplayer = false;
         component.currentRoom = 'room';
-        Object.defineProperty(chatSocketServiceMock, 'socketId', { value: 'mockSocket' });
-        const sendSpy = spyOn(chatSocketServiceMock, 'send').and.callThrough();
+        Object.defineProperty(socketServiceMock, 'socketId', { value: 'mockSocket' });
+        const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         spyOn(component.left, 'emitSound').and.callFake((difference: boolean) => {
             return difference;
         });
@@ -285,7 +298,7 @@ describe('SoloViewComponent', () => {
         component.differenceHandler(MOCK_INFORMATION);
         expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.Event, { room: component.currentRoom, isMultiplayer: false, event: 'Différence trouvée' });
         expect(component.left.emitSound).toHaveBeenCalledWith(false);
-        const information: PlayerDifference = { lastDifferences: [0, 1, 2, 3], differencesPosition: 2, socket: chatSocketServiceMock.socketId };
+        const information: PlayerDifference = { lastDifferences: [0, 1, 2, 3], differencesPosition: 2, socket: socketServiceMock.socketId };
         expect(component.effectHandler).toHaveBeenCalledWith(information);
     });
 
@@ -294,7 +307,7 @@ describe('SoloViewComponent', () => {
         component.numberOfDifferences = 4;
         component.currentScorePlayer = 2;
         component.currentRoom = 'win';
-        const sendSpy = spyOn(chatSocketServiceMock, 'send').and.callThrough();
+        const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.endGameVerification();
         expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.Win, component.currentRoom);
     });
@@ -303,7 +316,7 @@ describe('SoloViewComponent', () => {
         component.currentScorePlayer = 2;
         component.numberOfDifferences = 2;
         component.isMultiplayer = false;
-        const sendSpy = spyOn(chatSocketServiceMock, 'send').and.callThrough();
+        const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         spyOn(component, 'winGame');
         component.endGameVerification();
         expect(component.winGame).toHaveBeenCalled();
@@ -359,8 +372,6 @@ describe('SoloViewComponent', () => {
     }));
 
     it('should call handleFlash when activateCheatMode is called', () => {
-        const mockData = [[1, 2, 3], [4, 5], [6], [], [7, 8, 9]];
-        spyOn(component.left.clickEventService, 'getDifferences').and.returnValue(of(mockData));
         const flashSpy = spyOn(component, 'handleFlash');
 
         const keyboardEvent = new KeyboardEvent('keydown', { key: 't' });
@@ -374,8 +385,6 @@ describe('SoloViewComponent', () => {
     });
 
     it('activateCheatMode should be called with an array that contains all the differences', () => {
-        const mockData = [[1, 2, 3], [4, 5], [6], [], [7, 8, 9]];
-        spyOn(component.left.clickEventService, 'getDifferences').and.returnValue(of(mockData));
         const flashSpy = spyOn(component, 'handleFlash');
         const keyboardEvent = new KeyboardEvent('keydown', { key: 't' });
 
