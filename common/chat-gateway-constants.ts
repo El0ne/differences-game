@@ -1,10 +1,10 @@
 export interface Validation {
-    validated: boolean;
+    isValidated: boolean;
     originalMessage: string;
 }
 
 export interface RoomMessage {
     socketId: string;
     message: string;
-    event: boolean;
+    event: string;
 }

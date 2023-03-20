@@ -14,33 +14,29 @@ import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
     styleUrls: ['./game-selection.component.scss'],
 })
 export class GameSelectionComponent implements OnInit {
-    @ViewChildren('stages') private stages: QueryList<GameCardSelectionComponent>;
+    @ViewChildren('stages') stages: QueryList<GameCardSelectionComponent>;
     gameCardInformations: GameCardInformation[] = [];
     numberOfGameInformations = 0;
     index: number = 0;
     isConfig: boolean | null;
 
-    constructor(public gameCardService: GameCardInformationService, public router: Router, public socket: SocketService) {}
+    constructor(public gameCardService: GameCardInformationService, public router: Router, private socket: SocketService) {}
 
     ngOnInit(): void {
         this.isConfig = this.router.url === '/config';
         this.socket.connect();
-
-        this.socket.listen(WaitingRoomEvents.GameCreated, (stageId: string) => {
-            this.stages.forEach((gameCardSelection: GameCardSelectionComponent) => {
-                if (gameCardSelection.gameCardInformation._id === stageId) {
-                    gameCardSelection.createGameButton = false;
-                }
+        if (!this.isConfig) {
+            this.socket.listen(WaitingRoomEvents.MatchCreated, (stageId: string) => {
+                this.setGameCardCreateOrJoin(false, stageId);
             });
-        });
 
-        this.socket.listen(WaitingRoomEvents.GameDeleted, (stageId: string) => {
-            this.stages.forEach((gameCardSelection: GameCardSelectionComponent) => {
-                if (gameCardSelection.gameCardInformation._id === stageId) {
-                    gameCardSelection.createGameButton = true;
-                }
+            this.socket.listen(WaitingRoomEvents.MatchDeleted, (stageId: string) => {
+                this.setGameCardCreateOrJoin(true, stageId);
             });
-        });
+        }
+        // this.socket.listen(WaitingRoomEvents.GameDeleted, (stageId: string) => {
+        //     this.setGameCardCreateOrJoin(true, stageId);
+        // });
 
         this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
             this.numberOfGameInformations = data;
@@ -80,5 +76,14 @@ export class GameSelectionComponent implements OnInit {
 
     isShowingLastCard(): boolean {
         return this.index + GAME_CARDS_TO_DISPLAY >= this.numberOfGameInformations;
+    }
+
+    setGameCardCreateOrJoin(isCreate: boolean, stageId: string) {
+        for (const gameCardSelection of this.stages) {
+            if (gameCardSelection.gameCardInformation._id === stageId) {
+                gameCardSelection.createGameButton = isCreate;
+                break;
+            }
+        }
     }
 }

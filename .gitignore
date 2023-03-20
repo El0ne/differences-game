@@ -10,3 +10,4 @@ coverage/
 
 #Node Modules
 /node_modules
+server/assets/images/difference-image.bmp

@@ -2,8 +2,8 @@ export enum WaitingRoomEvents {
     ScanForHost = 'scanForHost',
     HostGame = 'hostGame',
     UnhostGame = 'unhostGame',
-    GameCreated = 'gameCreated',
-    GameDeleted = 'gameDeleted',
+    MatchCreated = 'matchCreated',
+    MatchDeleted = 'matchDeleted',
     JoinHost = 'joinHost',
     QuitHost = 'quitHost',
     RequestMatch = 'requestMatch',
@@ -12,16 +12,16 @@ export enum WaitingRoomEvents {
     DeclineOpponent = 'declineOpponent',
     MatchAccepted = 'matchAccepted',
     MatchRefused = 'matchRefused',
-}
-
-export interface OpponentAppoval {
-    stageId: string;
-    OpponentId: string;
+    MatchConfirmed = 'matchConfirmed',
 }
 
 export interface PlayerInformations {
     playerName: string;
     playerSocketId: string;
+}
+
+export interface AcceptationInformation extends PlayerInformations {
+    roomId: string;
 }
 
 export interface JoinHostInWaitingRequest {

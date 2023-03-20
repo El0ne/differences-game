@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
-import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
 import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal.component';
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
@@ -11,9 +11,10 @@ import { GameCardInformationService } from '@app/services/game-card-information-
 import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
+import { EndGame } from '@common/chat-dialog-constants';
 import { RoomMessage, Validation } from '@common/chat-gateway-constants';
 import { ChatEvents, RoomEvent, RoomManagement } from '@common/chat.gateway.events';
-import { differenceInformation } from '@common/difference-information';
+import { DifferenceInformation, MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
 import { Subject } from 'rxjs';
 
@@ -27,25 +28,24 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     left: ClickEventComponent;
     @ViewChild('right')
     right: ClickEventComponent;
-    is1v1: boolean;
+    isMultiplayer: boolean;
     showErrorMessage: boolean = false;
-    showNameErrorMessage: boolean = false;
     showTextBox: boolean = false;
-    showWinMessage: boolean = false;
     showNavBar: boolean = true;
     player: string;
     opponent: string;
     messages: RoomMessage[] = [];
     messageContent: string = '';
     differenceArray: number[][];
-    currentScorePlayer1: number = 0;
-    currentScorePlayer2: number = 0;
+    currentScorePlayer: number = 0;
+    currentScoreOpponent: number = 0;
     numberOfDifferences: number;
     currentTime: number;
     currentGameId: string;
     endGame: Subject<void> = new Subject<void>();
     gameCardInfo: GameCardInformation;
     currentRoom: string;
+    boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
 
     // eslint-disable-next-line max-params
     constructor(
@@ -56,14 +56,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private dialog: MatDialog,
         private router: Router,
-        public chat: SocketService,
+        public socketService: SocketService,
     ) {}
 
     ngOnInit(): void {
-        this.player = 'Player';
-        this.opponent = 'Player 2';
         const gameId = this.route.snapshot.paramMap.get('stageId');
-        this.is1v1 = this.router.url.includes('1v1');
+        this.isMultiplayer = this.router.url.includes('multiplayer');
         if (gameId) {
             this.currentGameId = gameId;
             this.gameCardInfoService.getGameCardInfoFromId(this.currentGameId).subscribe((gameCardData) => {
@@ -71,43 +69,72 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.numberOfDifferences = this.gameCardInfo.differenceNumber;
             });
         }
-
-        const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true, data: { game: gameId, multiplayer: this.is1v1 } });
-        dialogRef.afterClosed().subscribe(() => {
-            this.player = this.chat.names[0];
-            if (this.is1v1) {
-                this.opponent = this.chat.names[1];
-            } else this.opponent = '';
-            this.currentRoom = this.chat.gameRoom;
-            this.showTime();
-            this.configureSocketReactions();
-        });
+        this.player = this.socketService.names.get(this.socketService.socketId) as string;
+        this.opponent = this.socketService.names.get(this.socketService.opponentSocket) as string;
+        this.currentRoom = this.socketService.gameRoom;
+        this.showTime();
+        this.addCheatMode();
+        this.configureSocketReactions();
     }
 
     configureSocketReactions(): void {
-        this.chat.listen<Validation>(ChatEvents.WordValidated, (validation: Validation) => {
-            if (validation.validated) {
-                this.chat.send<RoomManagement>(ChatEvents.RoomMessage, { room: this.currentRoom, message: validation.originalMessage });
+        this.socketService.listen<Validation>(ChatEvents.WordValidated, (validation: Validation) => {
+            if (validation.isValidated) {
+                this.socketService.send<RoomManagement>(ChatEvents.RoomMessage, { room: this.currentRoom, message: validation.originalMessage });
             } else {
-                this.messages.push({ socketId: this.chat.socketId, message: validation.originalMessage, event: true });
+                this.messages.push({ socketId: this.socketService.socketId, message: validation.originalMessage, event: 'notification' });
             }
         });
-        this.chat.listen<RoomMessage>(ChatEvents.RoomMessage, (data: RoomMessage) => {
+        this.socketService.listen<RoomMessage>(ChatEvents.RoomMessage, (data: RoomMessage) => {
             this.messages.push(data);
         });
-        this.chat.listen<RoomMessage>(ChatEvents.Abandon, (message: RoomMessage) => {
-            if (!(message.socketId === this.chat.socketId)) {
-                this.finishGame();
-            }
-            this.opponent = '';
+        this.socketService.listen<RoomMessage>(ChatEvents.Abandon, (message: RoomMessage) => {
+            this.winGame(message.socketId);
+            message.message = `${message.message} - ${this.opponent} a abandonné la partie.`;
             this.messages.push(message);
+        });
+        this.socketService.listen<PlayerDifference>(ChatEvents.Difference, (data: PlayerDifference) => {
+            this.effectHandler(data);
+        });
+        this.socketService.listen<string>(ChatEvents.Win, (socketId: string) => {
+            this.winGame(socketId);
         });
     }
 
     ngOnDestroy(): void {
         this.timerService.stopTimer();
         this.foundDifferenceService.clearDifferenceFound();
-        this.chat.disconnect();
+        this.socketService.disconnect();
+        this.removeCheatMode();
+    }
+
+    invertDifferences(): void {
+        this.left.toggleCheatMode = !this.left.toggleCheatMode;
+        this.right.toggleCheatMode = !this.right.toggleCheatMode;
+    }
+
+    removeCheatMode(): void {
+        document.removeEventListener('keydown', this.boundActivateCheatMode);
+    }
+
+    addCheatMode(): void {
+        document.addEventListener('keydown', this.boundActivateCheatMode);
+    }
+
+    resetDifferences(event: KeyboardEvent): void {
+        this.invertDifferences();
+        setTimeout(() => {
+            this.activateCheatMode(event);
+        }, MAX_EFFECT_TIME);
+    }
+
+    activateCheatMode(event: KeyboardEvent): void {
+        if (event.key === 't') {
+            this.invertDifferences();
+            this.left.clickEventService.getDifferences(this.currentGameId).subscribe((data) => {
+                if (this.left.toggleCheatMode) this.handleFlash(this.foundDifferenceService.findPixelsFromDifference(data));
+            });
+        }
     }
 
     showTime(): void {
@@ -118,26 +145,29 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         return this.convertService.convert(time);
     }
 
-    finishGame(): void {
-        this.left.endGame = true;
-        this.right.endGame = true;
-        this.showWinMessage = true;
-        this.showNavBar = false;
-
-        this.dialog.open(GameWinModalComponent, { disableClose: true });
+    winGame(winnerId: string): void {
+        if (!this.left.endGame) {
+            this.timerService.stopTimer();
+            this.left.endGame = true;
+            this.right.endGame = true;
+            this.showNavBar = false;
+            this.dialog.open(GameWinModalComponent, {
+                disableClose: true,
+                data: { isMultiplayer: this.isMultiplayer, winner: this.socketService.names.get(winnerId) } as EndGame,
+            });
+        }
     }
 
-    // logic needed to be modified according to who adds a point
-    incrementScore(): void {
-        this.currentScorePlayer1 += 1;
-        if (this.numberOfDifferences === this.currentScorePlayer1) {
-            this.finishGame();
+    incrementScore(socket: string): void {
+        if (this.socketService.socketId === socket) {
+            this.currentScorePlayer += 1;
+        } else {
+            this.currentScoreOpponent += 1;
         }
     }
 
     addDifferenceDetected(differenceIndex: number): void {
         this.foundDifferenceService.addDifferenceFound(differenceIndex);
-        this.chat.send('event', { room: this.currentRoom, multiplayer: this.is1v1, event: 'Différence trouvée' });
     }
 
     openInfoModal(): void {
@@ -150,11 +180,13 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     quitGame(): void {
-        this.dialog.open(QuitGameModalComponent, { disableClose: true, data: { player: this.player, room: this.currentRoom } });
+        this.dialog.open(QuitGameModalComponent, {
+            disableClose: true,
+        });
     }
 
     sendMessage(): void {
-        this.chat.send('validate', this.messageContent);
+        this.socketService.send<string>(ChatEvents.Validate, this.messageContent);
         this.messageContent = '';
     }
 
@@ -164,20 +196,60 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     handleMistake(): void {
-        this.chat.send<RoomEvent>(ChatEvents.Event, { room: this.currentRoom, multiplayer: this.is1v1, event: 'Erreur' });
+        this.socketService.send<RoomEvent>(ChatEvents.Event, { room: this.currentRoom, isMultiplayer: this.isMultiplayer, event: 'Erreur' });
     }
 
     hint(): void {
-        this.chat.send<string>(ChatEvents.Hint, this.currentRoom);
+        this.socketService.send<string>(ChatEvents.Hint, this.currentRoom);
     }
     handleFlash(currentDifferences: number[]): void {
         this.left.differenceEffect(currentDifferences);
         this.right.differenceEffect(currentDifferences);
     }
-    emitHandler(information: differenceInformation): void {
-        this.handleFlash(information.lastDifferences);
+    differenceHandler(information: DifferenceInformation): void {
+        if (this.isMultiplayer) {
+            const multiplayerInformation: MultiplayerDifferenceInformation = {
+                room: this.currentRoom,
+                differencesPosition: information.differencesPosition,
+                lastDifferences: information.lastDifferences,
+            };
+            this.socketService.send<DifferenceInformation>(ChatEvents.Difference, multiplayerInformation);
+        } else {
+            const difference: PlayerDifference = {
+                differencesPosition: information.differencesPosition,
+                lastDifferences: information.lastDifferences,
+                socket: this.socketService.socketId,
+            };
+            this.effectHandler(difference);
+        }
+        this.left.emitSound(false);
+        this.socketService.send<RoomEvent>(ChatEvents.Event, {
+            room: this.currentRoom,
+            isMultiplayer: this.isMultiplayer,
+            event: 'Différence trouvée',
+        });
+    }
+
+    effectHandler(information: PlayerDifference): void {
+        if (!this.left.toggleCheatMode) {
+            this.handleFlash(information.lastDifferences);
+        }
         this.paintPixel(information.lastDifferences);
-        this.incrementScore();
+        this.incrementScore(information.socket);
         this.addDifferenceDetected(information.differencesPosition);
+        this.endGameVerification();
+    }
+
+    endGameVerification(): void {
+        if (this.isMultiplayer) {
+            const endGameVerification = this.numberOfDifferences / 2;
+            if (this.currentScorePlayer >= endGameVerification) {
+                this.socketService.send<string>(ChatEvents.Win, this.currentRoom);
+            }
+        } else {
+            if (this.currentScorePlayer === this.numberOfDifferences) {
+                this.winGame(this.socketService.socketId);
+            }
+        }
     }
 }

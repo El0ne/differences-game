@@ -15,8 +15,9 @@ export enum ChatEvents {
     MassMessage = 'massMessage',
     Hello = 'hello',
     Clock = 'clock',
-
-    Elouan = 'ef',
+    Difference = 'Difference',
+    Win = 'Win',
+    Disconnect = 'Disconnect',
 }
 
 export interface RoomManagement {
@@ -38,10 +39,5 @@ export interface MultiplayerRequestInformation {
 export interface RoomEvent {
     room: string;
     event: string;
-    multiplayer: boolean;
-}
-
-export interface AbandonGame {
-    room: string;
-    name: string;
+    isMultiplayer: boolean;
 }

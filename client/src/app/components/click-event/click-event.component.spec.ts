@@ -6,12 +6,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MOCK_ARRAY } from '@app/pages/solo-view/mock-array';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
+import { PixelModificationService } from '@app/services/pixel-modification/pixel-modification.service';
 import { STAGE } from '@app/services/server-routes';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { of, Subject } from 'rxjs';
-import { FLASH_AMOUNT } from './click-event-constant';
 import { DIFFERENCE_FOUND, DIFFERENCE_NOT_FOUND, TEST_DIFFERENCES } from './click-event-constants-testing';
 import { ClickEventComponent } from './click-event.component';
+
 describe('ClickEventComponent', () => {
     let component: ClickEventComponent;
     let fixture: ComponentFixture<ClickEventComponent>;
@@ -37,7 +38,7 @@ describe('ClickEventComponent', () => {
         TestBed.configureTestingModule({
             declarations: [ClickEventComponent],
             imports: [RouterTestingModule, MatIconModule],
-            providers: [{ provide: ClickEventService, useValue: mockService }],
+            providers: [{ provide: ClickEventService, PixelModificationService, useValue: mockService }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(ClickEventComponent);
@@ -53,12 +54,6 @@ describe('ClickEventComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
-    });
-
-    it('positionToPixel() should return correct pixel coordinates when given linear position', () => {
-        const postToCheck = 307199;
-        const position = component.positionToPixel(postToCheck);
-        expect(position).toEqual([639, 479]);
     });
 
     it('emit sound should call play', () => {
@@ -105,6 +100,7 @@ describe('ClickEventComponent', () => {
     });
 
     it('isDifferent() should return true if a difference is detected', () => {
+        component.toggleCheatMode = true;
         spyOn(component.clickEventService, 'isADifference').and.returnValue(of(DIFFERENCE_FOUND));
         const mockClick = new MouseEvent('click', { clientX: 0, clientY: 0 });
         spyOn(component, 'emitSound').and.callFake(() => {});
@@ -118,6 +114,7 @@ describe('ClickEventComponent', () => {
     });
 
     it('isDifferent() should return false if a difference is not detected', () => {
+        component.toggleCheatMode = false;
         spyOn(component.clickEventService, 'isADifference').and.returnValue(of(DIFFERENCE_NOT_FOUND));
         const mockClick = new MouseEvent('click', { clientX: 100, clientY: 365 });
         spyOn(component, 'emitSound').and.callFake(() => {});
@@ -128,23 +125,6 @@ describe('ClickEventComponent', () => {
             '1',
         );
         expect(component.differenceData).toEqual(DIFFERENCE_NOT_FOUND);
-    });
-
-    it('turnDifferenceYellow() should call fillRect() in order to construct flashing effect', () => {
-        component.lastDifferenceClicked = [0, 0, 0];
-        spyOn(CanvasRenderingContext2D.prototype, 'fillRect');
-        component.turnDifferenceYellow(
-            component.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D,
-            component.lastDifferenceClicked,
-        );
-        expect(CanvasRenderingContext2D.prototype.fillRect).toHaveBeenCalledTimes(3);
-    });
-
-    it('turnOffYellow() should call clearRect() in order to construct flashing effect', () => {
-        component.lastDifferenceClicked = [0, 0, 0, 0, 0];
-        spyOn(CanvasRenderingContext2D.prototype, 'clearRect');
-        component.turnOffYellow(component.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D, component.lastDifferenceClicked);
-        expect(CanvasRenderingContext2D.prototype.clearRect).toHaveBeenCalledTimes(5);
     });
 
     it('ngOnInit should initialize the elements of the component correctly', () => {
@@ -189,26 +169,6 @@ describe('ClickEventComponent', () => {
         expect(fillRectSpy).toHaveBeenCalledWith(2, 0, 1, 1);
     });
 
-    it('delay should delay for a given amount of time in ms', fakeAsync(() => {
-        const start = Date.now();
-        component.delay(100).then(() => {
-            const end = Date.now();
-            expect(end - start).toBeCloseTo(100, -1);
-        });
-        tick(100);
-    }));
-
-    it('differenceEffect() should flash yellow 2 times', async () => {
-        const turnYellowSpy = spyOn(component, 'turnDifferenceYellow');
-        const turnOffYellowSpy = spyOn(component, 'turnOffYellow');
-        spyOn(component, 'delay').and.callThrough();
-        spyOn(component, 'emitSound').and.callFake(() => {});
-        await component.differenceEffect([0]);
-
-        expect(turnYellowSpy).toHaveBeenCalledTimes(FLASH_AMOUNT);
-        expect(turnOffYellowSpy).toHaveBeenCalledTimes(FLASH_AMOUNT);
-    });
-
     it('component should draw image on canvas on init', waitForAsync(async () => {
         const imageSpyObj = jasmine.createSpyObj('Image', ['onload']);
         spyOn(window, 'Image').and.returnValue(imageSpyObj);
@@ -235,5 +195,36 @@ describe('ClickEventComponent', () => {
         expect(fillTextSpy).toHaveBeenCalled();
         tick(1000);
         expect(clearRectSpy).toHaveBeenCalled();
+    }));
+
+    it('clearEffect should get context and call turnOffYellow', () => {
+        const getContextSpy = spyOn(component.modification.nativeElement, 'getContext');
+        const turnOffYellowSpy = spyOn(component.pixelModificationService, 'turnOffYellow');
+
+        component.clearEffect();
+
+        expect(getContextSpy).toHaveBeenCalled();
+        expect(turnOffYellowSpy).toHaveBeenCalled();
+    });
+
+    it('differenceEffect() should flash yellow ', async () => {
+        const flashEffectSpy = spyOn(component.pixelModificationService, 'flashEffect');
+        spyOn(component.pixelModificationService, 'delay').and.callThrough();
+        spyOn(component, 'emitSound').and.callFake(() => {});
+        await component.differenceEffect([0]);
+
+        expect(flashEffectSpy).toHaveBeenCalled();
+    });
+
+    it('differenceEffect() should call differenceEffect if toggleCheatMode is true', fakeAsync(() => {
+        component.toggleCheatMode = true;
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000;
+        spyOn(component.pixelModificationService, 'flashEffect').and.callFake(async () => {
+            return new Promise(() => {});
+        });
+        const differenceEffectSpy = spyOn(component, 'differenceEffect').and.callThrough();
+        component.differenceEffect([0]);
+
+        expect(differenceEffectSpy).not.toHaveBeenCalledTimes(1);
     }));
 });
