@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
+import { UndoRedoService } from '@app/services/undo-redo/undo-redo.service';
 import { CanvasInformations } from '@common/canvas-informations';
-import { UndoRedoService } from '../undo-redo/undo-redo.service';
 
 @Injectable({
     providedIn: 'root',
@@ -15,7 +15,7 @@ export class DrawingRectangleService {
         this.paintRectangle.bind(this),
     ];
 
-    constructor(private canvasSelection: CanvasSelectionService, private undoRedoService: UndoRedoService) {}
+    constructor(private canvasSelectionService: CanvasSelectionService, private undoRedoService: UndoRedoService) {}
 
     setColor(color: string): void {
         this.canvasInformations.selectedColor = color;
@@ -48,7 +48,7 @@ export class DrawingRectangleService {
     }
 
     paintRectangle(mouseEvent: MouseEvent): void {
-        this.canvasSelection.choseCanvas(mouseEvent);
+        this.canvasSelectionService.choseCanvas(mouseEvent);
         const context = this.canvasInformations.drawingCanvas2.getContext('2d');
 
         if (context && this.canvasInformations.isUserClicking) {
