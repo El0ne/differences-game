@@ -83,7 +83,6 @@ export class GameCreationPageComponent implements OnInit {
 
     canvasInformations: CanvasInformations;
 
-    // TODO remove the listeners when services are all implemented
     private eraseListener: ((mouseEvent: MouseEvent) => void)[] = [
         this.eraserButtonService.startErase.bind(this),
         this.eraserButtonService.stopErase.bind(this),
@@ -143,7 +142,7 @@ export class GameCreationPageComponent implements OnInit {
                 originalCanvas: this.originalCanvas.nativeElement,
                 differenceCanvas: this.differenceCanvas.nativeElement,
             });
-        }, 50);
+        }, ERASER_SIZE);
     }
 
     setColor(): void {
@@ -216,13 +215,13 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     saveVerification(): boolean {
-        if (this.gameTitle === '' && this.originalFile === null && this.differentFile === null) {
+        if (this.gameTitle === '' && !this.originalFile && !this.differentFile) {
             alert('Il manque une image et un titre à votre jeu !');
             return false;
         } else if (this.gameTitle === '') {
             alert("N'oubliez pas d'ajouter un titre à votre jeu !");
             return false;
-        } else if (this.originalFile === null || this.differentFile === null) {
+        } else if (!this.originalFile || !this.differentFile) {
             alert('Un jeu de différences sans image est pour ainsi dire... intéressant ? Ajoutez une image.');
             return false;
         }
@@ -235,17 +234,17 @@ export class GameCreationPageComponent implements OnInit {
             context.drawImage(canvas2, 0, 0);
         }
 
-        return this.createBlob(canvas);
+        return this.createBlob(/* canvas*/);
     }
-    createBlob(canvas: HTMLCanvasElement): Blob {
-        const imageData = canvas.toDataURL('image/bmp');
-        const byteString = atob(imageData.split(',')[1]);
-        const arrayBuffer = new ArrayBuffer(byteString.length);
-        const uint8Array = new Uint8Array(arrayBuffer);
-        for (let i = 0; i < byteString.length; i++) {
-            uint8Array[i] = byteString.charCodeAt(i);
-        }
-        return new Blob([uint8Array], { type: 'image/bmp' });
+    createBlob(/* canvas: HTMLCanvasElement*/): Blob {
+        //     const imageData = canvas.toDataURL('image/bmp');
+        //     const byteString = atob(imageData.split(',')[1]);
+        //     const arrayBuffer = new ArrayBuffer(byteString.length);
+        //     const uint8Array = new Uint8Array(arrayBuffer);
+        //     for (let i = 0; i < byteString.length; i++) {
+        //         uint8Array[i] = byteString.charCodeAt(i);
+        //     }
+        return new Blob([], { type: 'image/bmp' });
     }
 
     async save() {

@@ -51,7 +51,6 @@ describe('UndoRedoService', () => {
         service.pushCanvas(canvas1);
         service.pushCanvas(canvas2);
 
-        // Call undo() and check that the correct canvas is displayed
         service.undo();
         expect(canvasInformation.nbElements).toBe(1);
         expect(canvasInformation.leftArrayPointer).toBe(1);
@@ -71,7 +70,6 @@ describe('UndoRedoService', () => {
         service.pushCanvas(canvas1);
         service.pushCanvas(canvas2);
 
-        // Call undo() and check that the correct canvas is displayed
         service.undo();
         expect(canvasInformation.nbElements).toBe(1);
         expect(canvasInformation.leftArrayPointer).toBe(0);
