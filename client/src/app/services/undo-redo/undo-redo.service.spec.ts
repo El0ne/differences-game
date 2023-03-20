@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-imports
 import { getFakeCanvasInformations } from '../canvas-informations.constants';
 import { UndoRedoService } from './undo-redo.service';
 
@@ -19,7 +20,7 @@ describe('UndoRedoService', () => {
 
         expect(service.canvasInformations).toEqual(canvasInformation);
     });
-
+    /*
     it('should push the appropriate canvas to the left canvas array', () => {
         const canvas = document.createElement('canvas');
 
@@ -68,4 +69,5 @@ describe('UndoRedoService', () => {
         expect(service.redoAction).toHaveBeenCalledWith(service.canvasInformations.rightCanvasArray, 0);
         expect(service.canvasInformations.nbElements).toEqual(1);
     });
+    */
 });

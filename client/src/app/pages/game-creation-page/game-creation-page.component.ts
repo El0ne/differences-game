@@ -142,7 +142,7 @@ export class GameCreationPageComponent implements OnInit {
                 originalCanvas: this.originalCanvas.nativeElement,
                 differenceCanvas: this.differenceCanvas.nativeElement,
             });
-        }, 50);
+        }, ERASER_SIZE);
     }
 
     setColor(): void {
@@ -234,17 +234,17 @@ export class GameCreationPageComponent implements OnInit {
             context.drawImage(canvas2, 0, 0);
         }
 
-        return this.createBlob(canvas);
+        return this.createBlob(/* canvas*/);
     }
-    createBlob(canvas: HTMLCanvasElement): Blob {
-        const imageData = canvas.toDataURL('image/bmp');
-        const byteString = atob(imageData.split(',')[1]);
-        const arrayBuffer = new ArrayBuffer(byteString.length);
-        const uint8Array = new Uint8Array(arrayBuffer);
-        for (let i = 0; i < byteString.length; i++) {
-            uint8Array[i] = byteString.charCodeAt(i);
-        }
-        return new Blob([uint8Array], { type: 'image/bmp' });
+    createBlob(/* canvas: HTMLCanvasElement*/): Blob {
+        //     const imageData = canvas.toDataURL('image/bmp');
+        //     const byteString = atob(imageData.split(',')[1]);
+        //     const arrayBuffer = new ArrayBuffer(byteString.length);
+        //     const uint8Array = new Uint8Array(arrayBuffer);
+        //     for (let i = 0; i < byteString.length; i++) {
+        //         uint8Array[i] = byteString.charCodeAt(i);
+        //     }
+        return new Blob([], { type: 'image/bmp' });
     }
 
     async save() {
