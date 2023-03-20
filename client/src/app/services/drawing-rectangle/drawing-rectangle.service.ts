@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
 import { CanvasInformations } from '@common/canvas-informations';
+import { UndoRedoService } from '../undo-redo/undo-redo.service';
 
 @Injectable({
     providedIn: 'root',
@@ -14,7 +15,7 @@ export class DrawingRectangleService {
         this.paintRectangle.bind(this),
     ];
 
-    constructor(private canvasSelection: CanvasSelectionService) {}
+    constructor(private canvasSelection: CanvasSelectionService, private undoRedoService: UndoRedoService) {}
 
     setColor(color: string): void {
         this.canvasInformations.selectedColor = color;
@@ -40,7 +41,10 @@ export class DrawingRectangleService {
         if (secondContext) secondContext.clearRect(0, 0, this.canvasInformations.drawingCanvas2.width, this.canvasInformations.drawingCanvas2.height);
 
         // TODO Uncomment later when undo and redo are implemented
-        // this.pushCanvas(this.canvasInformations.drawingCanvas1);
+        console.log(this.canvasInformations.nbElements);
+
+        this.undoRedoService.setProperties(this.canvasInformations);
+        this.undoRedoService.pushCanvas(this.canvasInformations.drawingCanvas1);
     }
 
     paintRectangle(mouseEvent: MouseEvent): void {
