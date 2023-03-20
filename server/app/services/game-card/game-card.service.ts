@@ -1,4 +1,4 @@
-/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-underscore-dangle */ // need it because the id_ attribute from MongoDb
 import { GameCard, GameCardDocument } from '@app/schemas/game-cards.schemas';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { GameCardDto } from '@common/game-card.dto';
@@ -38,8 +38,8 @@ export class GameCardService {
 
     async deleteGameCard(id: string): Promise<void> {
         const deletedGameCard = await this.gameCardModel.findByIdAndDelete(new ObjectId(id));
-        await this.imageManagerService.deleteImage(deletedGameCard.originalImageName);
-        await this.imageManagerService.deleteImage(deletedGameCard.differenceImageName);
+        this.imageManagerService.deleteImage(deletedGameCard.originalImageName);
+        this.imageManagerService.deleteImage(deletedGameCard.differenceImageName);
     }
 
     generateGameCard(game: GameCardDto): GameCard {

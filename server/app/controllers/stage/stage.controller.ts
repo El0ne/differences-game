@@ -10,21 +10,7 @@ import { GameCardDto } from '@common/game-card.dto';
 import { ImageUploadDto } from '@common/image-upload.dto';
 import { ImageDto } from '@common/image.dto';
 import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
-import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    HttpException,
-    HttpStatus,
-    Param,
-    Post,
-    Put,
-    Query,
-    Res,
-    UploadedFiles,
-    UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { diskStorage } from 'multer';
@@ -52,18 +38,6 @@ export class StageController {
         private differenceClickService: DifferenceClickService,
         private gameManagerService: GameManagerService,
     ) {}
-
-    // TODO: Remove when we replace with sockets later
-    @Put('/end-game')
-    endGame(@Body() id) {
-        this.gameManagerService.endGame(id.gameId);
-    }
-
-    // TODO: Remove when we replace with sockets later
-    @Put('/start-game')
-    startGame(@Body() id) {
-        this.gameManagerService.addGame(id.gameId);
-    }
 
     @Get('/')
     async getStages(@Query('index') index: number, @Query('endIndex') endIndex: number, @Res() res: Response): Promise<void> {
@@ -94,23 +68,11 @@ export class StageController {
         }
     }
 
-    @Delete('/:gameCardId')
-    async deleteGame(@Param() param, @Res() res: Response): Promise<void> {
-        try {
-            await this.gameCardService.deleteGameCard(param.gameCardId);
-            await this.gameManagerService.deleteGame(param.gameCardId);
-            res.status(HttpStatus.NO_CONTENT);
-        } catch {
-            throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     @Post('/')
     async createGame(@Body() game: GameCardDto, @Res() res: Response): Promise<void> {
         try {
             if (Object.keys(game).length) {
                 const newGame = await this.gameCardService.createGameCard(game);
-                this.gameManagerService.createGame(game._id);
                 res.status(HttpStatus.CREATED).send(newGame);
             } else res.sendStatus(HttpStatus.BAD_REQUEST);
         } catch (err) {

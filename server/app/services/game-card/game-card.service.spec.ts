@@ -25,7 +25,6 @@ describe('GameCardService', () => {
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
     let imageManagerService: ImageManagerService;
-    // let differenceClickService: DifferenceClickService;
 
     beforeEach(async () => {
         mongoServer = await MongoMemoryServer.create();
@@ -55,7 +54,6 @@ describe('GameCardService', () => {
 
         service = module.get<GameCardService>(GameCardService);
         imageManagerService = module.get<ImageManagerService>(ImageManagerService);
-        // differenceClickService = module.get<DifferenceClickService>(DifferenceClickService);
         gameCardModel = module.get<Model<GameCardDocument>>(getModelToken(GameCard.name));
         connection = await module.get(getConnectionToken());
         await gameCardModel.deleteMany({});

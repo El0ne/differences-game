@@ -1,11 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BestTimeComponent } from '@app/components/best-time/best-time.component';
 import { GameCardSelectionComponent } from '@app/components/game-card-selection/game-card-selection.component';
 import { GAMES } from '@app/mock/game-cards';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { SocketService } from '@app/services/socket/socket.service';
 import { GameCardInformation } from '@common/game-card';
+import { WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 import { of, Subject } from 'rxjs';
 import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
 import { GameSelectionComponent } from './game-selection.component';
@@ -16,6 +20,7 @@ describe('GameSelectionComponent', () => {
     let mockService: GameCardInformationService;
     let testNumber: Subject<number>;
     let testGameCardsInformation: Subject<GameCardInformation[]>;
+    let socketServiceSpy: SocketService;
 
     beforeEach(() => {
         testNumber = new Subject<number>();
@@ -31,10 +36,15 @@ describe('GameSelectionComponent', () => {
             return testGameCardsInformation.asObservable();
         };
 
+        socketServiceSpy = jasmine.createSpyObj('SocketService', ['names', 'listen', 'delete', 'send', 'connect'], ['socketId']);
+
         TestBed.configureTestingModule({
             declarations: [GameSelectionComponent, GameCardSelectionComponent, BestTimeComponent],
-            imports: [RouterTestingModule, MatIconModule],
-            providers: [{ provide: GameCardInformationService, useValue: mockService }],
+            imports: [RouterTestingModule, MatIconModule, MatDialogModule],
+            providers: [
+                { provide: GameCardInformationService, useValue: mockService },
+                { provide: SocketService, useValue: socketServiceSpy },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(GameSelectionComponent);
@@ -113,5 +123,47 @@ describe('GameSelectionComponent', () => {
         expect(component.isShowingLastCard()).toBeFalsy();
         component.index = component.numberOfGameInformations;
         expect(component.isShowingLastCard()).toBeTruthy();
+    });
+
+    it('MatchCreated event should call setGameCardCreateOrJoin with isCreate at false', () => {
+        socketServiceSpy.listen = (event: string, callback: any) => {
+            if (event === WAITING_ROOM_EVENTS.MatchCreated) callback('stageId');
+        };
+        spyOn(component, 'setGameCardCreateOrJoin').and.returnValue();
+        component.ngOnInit();
+        expect(component.setGameCardCreateOrJoin).toHaveBeenCalledWith(false, 'stageId');
+    });
+
+    it('gameDeleted event should call refreshGameCards', () => {
+        socketServiceSpy.listen = (event: string, callback: any) => {
+            if (event === WAITING_ROOM_EVENTS.GameDeleted) callback();
+        };
+        spyOn(component, 'refreshGameCards').and.returnValue();
+        component.ngOnInit();
+        expect(component.refreshGameCards).toHaveBeenCalled();
+    });
+
+    it('MatchDeleted event should call setGameCardCreateOrJoin with isCreate at true', () => {
+        socketServiceSpy.listen = (event: string, callback: any) => {
+            if (event === WAITING_ROOM_EVENTS.MatchDeleted) callback('stageId');
+        };
+        spyOn(component, 'setGameCardCreateOrJoin').and.returnValue();
+        component.ngOnInit();
+        expect(component.setGameCardCreateOrJoin).toHaveBeenCalledWith(true, 'stageId');
+    });
+
+    it('setGameCardCreateOrJoin should find the right gameCard to change his createGame button', () => {
+        component.gameCardInformations = GAMES;
+        fixture.detectChanges();
+        component.setGameCardCreateOrJoin(false, '123');
+        expect(component.stages.get(0)?.createGameButton).toBeFalsy();
+    });
+
+    it('selectGameCards() should put the end Index at 3 more than index unless there is less than 4 other gameCards to show', () => {
+        spyOn(component.gameCardService, 'getGameCardsInformations').and.returnValue(of(GAMES.slice(0, 1)));
+        component.index = 0;
+        component.numberOfGameInformations = 5;
+        component.selectGameCards();
+        expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.ScanForHost, ['123']);
     });
 });

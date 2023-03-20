@@ -1,63 +1,98 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from '@nestjs/websockets';
+import { RoomMessage } from '@common/chat-gateway-constants';
+import { CHAT_EVENTS, Room, RoomEvent, RoomManagement } from '@common/chat.gateway.events';
+import { MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
+import { Injectable } from '@nestjs/common';
+import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID, WORD_MIN_LENGTH } from './chat.gateway.constants';
-import { ChatEvents } from './chat.gateway.events';
+import { MESSAGE_MAX_LENGTH } from './chat.gateway.constants';
 
 @WebSocketGateway({ cors: true })
 @Injectable()
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
+export class ChatGateway implements OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
 
-    private readonly room = PRIVATE_ROOM_ID;
+    private waitingRoom: Room[] = [];
 
-    constructor(private readonly logger: Logger) {}
-
-    @SubscribeMessage(ChatEvents.Message)
-    message(_: Socket, message: string) {
-        this.logger.log(`Message reçu : ${message}`);
-    }
-
-    @SubscribeMessage(ChatEvents.Validate)
-    validate(socket: Socket, word: string) {
-        socket.emit(ChatEvents.WordValidated, word.length > WORD_MIN_LENGTH);
-    }
-
-    @SubscribeMessage(ChatEvents.BroadcastAll)
-    broadcastAll(socket: Socket, message: string) {
-        this.server.emit(ChatEvents.MassMessage, `${socket.id} : ${message}`);
-    }
-
-    @SubscribeMessage(ChatEvents.JoinRoom)
-    joinRoom(socket: Socket) {
-        socket.join(this.room);
-    }
-
-    @SubscribeMessage(ChatEvents.RoomMessage)
-    roomMessage(socket: Socket, message: string) {
-        // Seulement un membre de la salle peut envoyer un message aux autres
-        if (socket.rooms.has(this.room)) {
-            this.server.to(this.room).emit(ChatEvents.RoomMessage, `${socket.id} : ${message}`);
+    @SubscribeMessage(CHAT_EVENTS.Validate)
+    validate(socket: Socket, message: string): void {
+        if (message && message.length < MESSAGE_MAX_LENGTH) {
+            socket.emit(CHAT_EVENTS.WordValidated, { isValidated: true, originalMessage: message });
+        } else {
+            const error = 'Votre message ne respecte pas le bon format. Veuillez entrer un nouveau message';
+            socket.emit(CHAT_EVENTS.WordValidated, { isValidated: false, originalMessage: error });
         }
     }
 
-    afterInit() {
-        setInterval(() => {
-            this.emitTime();
-        }, DELAY_BEFORE_EMITTING_TIME);
+    @SubscribeMessage(CHAT_EVENTS.Difference)
+    difference(socket: Socket, data: MultiplayerDifferenceInformation) {
+        if (socket.rooms.has(data.room)) {
+            const differenceInformation: PlayerDifference = {
+                differencesPosition: data.differencesPosition,
+                lastDifferences: data.lastDifferences,
+                socket: socket.id,
+            };
+            this.server.to(data.room).emit(CHAT_EVENTS.Difference, differenceInformation);
+        }
     }
 
-    handleConnection(socket: Socket) {
-        this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
-        // message initial
-        socket.emit(ChatEvents.Hello, 'Hello World!');
+    @SubscribeMessage(CHAT_EVENTS.Event)
+    event(socket: Socket, data: RoomEvent): void {
+        if (socket.rooms.has(data.room)) {
+            const date = this.dateCreator();
+            let dateFormatted: string;
+            if (data.isMultiplayer) {
+                dateFormatted = `${date} - ${data.event} par `;
+            } else {
+                dateFormatted = `${date} - ${data.event}.`;
+            }
+
+            this.server
+                .to(data.room)
+                .emit(CHAT_EVENTS.RoomMessage, { socketId: socket.id, message: dateFormatted, event: 'notification' } as RoomMessage);
+        }
     }
 
-    handleDisconnect(socket: Socket) {
-        this.logger.log(`Déconnexion par l'utilisateur avec id : ${socket.id}`);
+    @SubscribeMessage(CHAT_EVENTS.Win)
+    win(socket: Socket, room: string): void {
+        if (socket.rooms.has(room)) {
+            this.server.to(room).emit(CHAT_EVENTS.Win, socket.id);
+        }
     }
 
-    private emitTime() {
-        this.server.emit(ChatEvents.Clock, new Date().toLocaleTimeString());
+    @SubscribeMessage(CHAT_EVENTS.Hint)
+    hint(socket: Socket, room: string): void {
+        if (socket.rooms.has(room)) {
+            const date = this.dateCreator();
+            const dateFormatted = `${date} - Indice utilisé.`;
+            this.server
+                .to(room)
+                .emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message: dateFormatted, event: 'notification' } as RoomMessage);
+        }
+    }
+
+    @SubscribeMessage(CHAT_EVENTS.RoomMessage)
+    roomMessage(socket: Socket, message: RoomManagement): void {
+        if (socket.rooms.has(message.room)) {
+            const transformedMessage = message.message.toString();
+            this.server
+                .to(message.room)
+                .emit(CHAT_EVENTS.RoomMessage, { socketId: socket.id, message: transformedMessage, event: 'message' } as RoomMessage);
+        }
+    }
+
+    handleDisconnect(socket: Socket): void {
+        if (socket.data.room)
+            this.server
+                .to(socket.data.room)
+                .emit(CHAT_EVENTS.Abandon, { socketId: socket.id, message: this.dateCreator(), event: 'abandon' } as RoomMessage);
+    }
+
+    dateCreator(): string {
+        const date = new Date();
+        const hour = date.getHours().toString();
+        const minutes = date.getMinutes().toString();
+        const seconds = date.getSeconds().toString();
+        const dateFormatted = `${hour}:${minutes}:${seconds}`;
+        return dateFormatted;
     }
 }

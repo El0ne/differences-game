@@ -17,10 +17,11 @@
                 }"
             >
                 <app-game-card-selection
+                    #stages
                     *ngIf="even"
                     [gameCardInformation]="gameCardInformation"
                     [isConfig]="isConfig"
-                    (gameDeleted)="displayGameCards()"
+                    (gameDeleted)="refreshGameCards()"
                 ></app-game-card-selection>
             </div>
         </div>
@@ -36,7 +37,13 @@
                     card: odd
                 }"
             >
-                <app-game-card-selection *ngIf="odd" [gameCardInformation]="gameCardInformation" [isConfig]="isConfig"></app-game-card-selection>
+                <app-game-card-selection
+                    #stages
+                    *ngIf="odd"
+                    [gameCardInformation]="gameCardInformation"
+                    [isConfig]="isConfig"
+                    (gameDeleted)="refreshGameCards()"
+                ></app-game-card-selection>
             </div>
         </div>
     </div>

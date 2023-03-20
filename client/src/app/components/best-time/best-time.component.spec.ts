@@ -11,6 +11,7 @@ describe('BestTimeComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [BestTimeComponent],
+            teardown: { destroyAfterEach: false },
         }).compileComponents();
 
         fixture = TestBed.createComponent(BestTimeComponent);

@@ -1,4 +1,4 @@
-import { Component, Inject, NgZone, OnDestroy } from '@angular/core';
+import { Component, Inject, NgZone } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
@@ -10,9 +10,9 @@ import { GameCardDto } from '@common/game-card.dto';
     templateUrl: './modal-page.component.html',
     styleUrls: ['./modal-page.component.scss'],
 })
-export class ModalPageComponent implements OnDestroy {
-    // eslint-disable-next-line max-params
+export class ModalPageComponent {
     // We have more than 3 necessary parameters
+    // eslint-disable-next-line max-params
     constructor(
         @Inject(MAT_DIALOG_DATA)
         public data: {
@@ -28,9 +28,6 @@ export class ModalPageComponent implements OnDestroy {
         private ngZone: NgZone,
     ) {}
 
-    ngOnDestroy() {
-        this.matDialogRef.close(this.data);
-    }
     createGame(): void {
         this.gameCardService.createGame(this.data.gameInfo).subscribe();
         this.redirection('/config');

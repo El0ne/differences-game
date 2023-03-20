@@ -38,6 +38,7 @@ describe('ModalPageComponent', () => {
                 GameCardInformationService,
                 ClickEventService,
             ],
+            teardown: { destroyAfterEach: false },
         }).compileComponents();
 
         dialogRefSpyObject = jasmine.createSpyObj({ afterClosed: of({}), close: null });
@@ -47,14 +48,6 @@ describe('ModalPageComponent', () => {
         fixture.detectChanges();
         gameCardService = TestBed.inject(GameCardInformationService);
         clickService = TestBed.inject(ClickEventService);
-    });
-
-    it('should close the dialog on destroy', () => {
-        component.matDialogRef = dialogRefSpyObject;
-
-        component.ngOnDestroy();
-
-        expect(dialogRefSpyObject.close).toHaveBeenCalledWith(component.data);
     });
 
     it('createGame should call create game from service and redirection', () => {

@@ -11,7 +11,8 @@ const routes: Routes = [
     { path: 'creatingGame', component: GameCreationPageComponent },
     { path: 'stage-selection', component: GameSelectionComponent },
     { path: 'config', component: GameSelectionComponent },
-    { path: 'soloview/:stageId', component: SoloViewComponent },
+    { path: 'solo/:stageId', component: SoloViewComponent },
+    { path: 'multiplayer/:stageId', component: SoloViewComponent },
     { path: '**', redirectTo: '/home' },
 ];
 
