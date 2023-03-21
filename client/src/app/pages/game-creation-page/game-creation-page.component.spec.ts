@@ -12,6 +12,7 @@ import { DrawingRectangleService } from '@app/services/drawing-rectangle/drawing
 import { EraserButtonService } from '@app/services/eraser-button/eraser-button.service';
 import { FileManipulationService } from '@app/services/file-manipulation/file-manipulation.service';
 import { PenService } from '@app/services/pen-service/pen-service.service';
+import { UndoRedoService } from '@app/services/undo-redo/undo-redo.service';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 import { of } from 'rxjs';
 import { GameCreationPageComponent } from './game-creation-page.component';
@@ -25,6 +26,7 @@ describe('GameCreationPageComponent', () => {
     let penService: PenService;
     let canvasSelectionService: CanvasSelectionService;
     let eraserButtonService: EraserButtonService;
+    let undoRedoService: UndoRedoService;
     let drawManipulationService: DrawManipulationService;
 
     beforeEach(async () => {
@@ -44,6 +46,7 @@ describe('GameCreationPageComponent', () => {
         ]);
         drawManipulationService = jasmine.createSpyObj('DrawManipulationService', ['setProperties', 'invert', 'duplicate', 'clearPainting']);
         canvasSelectionService = jasmine.createSpyObj('CanvasSelectionService', ['setProperties', 'choseCanvas']);
+        undoRedoService = jasmine.createSpyObj('UndoRedoService', ['setProperties', 'pushCanvas', 'undoAction', 'undo', 'redoAction', 'redo']);
         await TestBed.configureTestingModule({
             declarations: [GameCreationPageComponent],
             imports: [HttpClientModule, FormsModule, MatDialogModule, RouterTestingModule, MatIconModule],
@@ -66,6 +69,7 @@ describe('GameCreationPageComponent', () => {
                 { provide: CanvasSelectionService, useValue: canvasSelectionService },
                 { provide: EraserButtonService, useValue: eraserButtonService },
                 { provide: DrawManipulationService, useValue: drawManipulationService },
+                { provide: UndoRedoService, useValue: undoRedoService },
             ],
         }).compileComponents();
 
@@ -315,5 +319,19 @@ describe('GameCreationPageComponent', () => {
 
         expect(drawManipulationService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
         expect(drawManipulationService.clearPainting).toHaveBeenCalled();
+    });
+
+    it("should set the undoRedo service's properties and call the undo method of the service", () => {
+        component.undo();
+
+        expect(undoRedoService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
+        expect(undoRedoService.undo).toHaveBeenCalled();
+    });
+
+    it("should set the undoRedo service's properties and call the redo method of the service", () => {
+        component.redo();
+
+        expect(undoRedoService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
+        expect(undoRedoService.redo).toHaveBeenCalled();
     });
 });
