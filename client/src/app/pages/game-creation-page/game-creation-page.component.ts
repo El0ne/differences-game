@@ -84,17 +84,17 @@ export class GameCreationPageComponent implements OnInit {
 
     canvasInformations: CanvasInformations;
 
-    private eraseListener: ((mouseEvent: MouseEvent) => void)[] = [
+    eraseListener: ((mouseEvent: MouseEvent) => void)[] = [
         this.eraserButtonService.startErase.bind(this),
         this.eraserButtonService.stopErase.bind(this),
         this.eraserButtonService.erasing.bind(this),
     ];
-    private rectangleListener: ((mouseEvent: MouseEvent) => void)[] = [
+    rectangleListener: ((mouseEvent: MouseEvent) => void)[] = [
         this.drawingRectangleService.startDrawingRectangle.bind(this),
         this.drawingRectangleService.stopDrawingRectangle.bind(this),
         this.drawingRectangleService.paintRectangle.bind(this),
     ];
-    private penListener: ((mouseEvent: MouseEvent) => void)[] = [
+    penListener: ((mouseEvent: MouseEvent) => void)[] = [
         this.penService.startPen.bind(this),
         this.penService.stopPen.bind(this),
         this.penService.writing.bind(this),
@@ -103,16 +103,16 @@ export class GameCreationPageComponent implements OnInit {
     // eslint-disable-next-line max-params
     constructor(
         // we need more than 3 Services/Routers/Dialogs
-        public gameCardService: GameCardInformationService,
+        private gameCardService: GameCardInformationService,
         public matDialog: MatDialog,
         public router: Router,
-        public fileManipulationService: FileManipulationService,
-        public canvasSelectionService: CanvasSelectionService,
-        public penService: PenService,
-        public drawingRectangleService: DrawingRectangleService,
-        public eraserButtonService: EraserButtonService,
-        public drawManipulationService: DrawManipulationService,
-        public undoRedoService: UndoRedoService,
+        private fileManipulationService: FileManipulationService,
+        private canvasSelectionService: CanvasSelectionService,
+        private penService: PenService,
+        private drawingRectangleService: DrawingRectangleService,
+        private eraserButtonService: EraserButtonService,
+        private drawManipulationService: DrawManipulationService,
+        private undoRedoService: UndoRedoService,
     ) {}
 
     @HostListener('document:keydown.control.z', ['$event'])

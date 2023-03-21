@@ -9,7 +9,7 @@ import { CanvasInformations } from '@common/canvas-informations';
 export class EraserButtonService {
     canvasInformations: CanvasInformations;
 
-    constructor(private canvasSelectionService: CanvasSelectionService, private undoRedoServices: UndoRedoService) {}
+    constructor(private canvasSelectionService: CanvasSelectionService, private undoRedoService: UndoRedoService) {}
 
     setColor(color: string): void {
         this.canvasInformations.selectedColor = color;
@@ -35,7 +35,8 @@ export class EraserButtonService {
 
     stopErase() {
         this.canvasInformations.isUserClicking = false;
-        this.undoRedoServices.pushCanvas(this.canvasInformations.drawingCanvas1);
+        this.undoRedoService.setProperties(this.canvasInformations);
+        this.undoRedoService.pushCanvas(this.canvasInformations.drawingCanvas1);
     }
 
     erasing(mouseEvent: MouseEvent) {

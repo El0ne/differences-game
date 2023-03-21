@@ -41,6 +41,7 @@ export class PenService {
             this.canvasInformations.isUserClicking = false;
             ctx1.beginPath();
         }
+        this.undoRedoService.setProperties(this.canvasInformations);
         this.undoRedoService.pushCanvas(this.canvasInformations.drawingCanvas1);
     }
 

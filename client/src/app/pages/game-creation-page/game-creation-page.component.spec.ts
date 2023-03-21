@@ -4,8 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
+import { getFakeCanvasInformations } from '@app/services/canvas-informations.constants';
+import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
+import { DrawManipulationService } from '@app/services/draw-manipulation/draw-manipulation.service';
 import { DrawingRectangleService } from '@app/services/drawing-rectangle/drawing-rectangle.service';
+import { EraserButtonService } from '@app/services/eraser-button/eraser-button.service';
 import { FileManipulationService } from '@app/services/file-manipulation/file-manipulation.service';
+import { PenService } from '@app/services/pen-service/pen-service.service';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 import { of } from 'rxjs';
 import { GameCreationPageComponent } from './game-creation-page.component';
@@ -16,8 +21,27 @@ describe('GameCreationPageComponent', () => {
     let canvasOg: HTMLCanvasElement;
     let drawingRectangleService: DrawingRectangleService;
     let fileManipulationService: FileManipulationService;
+    let penService: PenService;
+    let canvasSelectionService: CanvasSelectionService;
+    let eraserButtonService: EraserButtonService;
+    let drawManipulationService: DrawManipulationService;
 
     beforeEach(async () => {
+        penService = jasmine.createSpyObj('PenService', ['setProperties', 'startPen', 'stopPen', 'writing']);
+        drawingRectangleService = jasmine.createSpyObj('DrawingRectangleService', [
+            'setProperties',
+            'startDrawingRectangle',
+            'stopDrawingRectangle',
+            'paintRectangle',
+        ]);
+        eraserButtonService = jasmine.createSpyObj('EraserButtonService', ['setProperties', 'startErase', 'stopErase', 'erasing']);
+        fileManipulationService = jasmine.createSpyObj('FileManipulationService', [
+            'setProperties',
+            'updateAttributes',
+            'clearFile',
+            'fileValidation',
+        ]);
+        drawManipulationService = jasmine.createSpyObj('DrawManipulationService', ['setProperties', 'invert', 'duplicate', 'clearPainting']);
         await TestBed.configureTestingModule({
             declarations: [GameCreationPageComponent],
             imports: [HttpClientModule, FormsModule, MatDialogModule, RouterTestingModule, MatIconModule],
@@ -34,6 +58,10 @@ describe('GameCreationPageComponent', () => {
                 },
                 { provide: MAT_DIALOG_DATA, useValue: {} },
                 { provide: MatDialogRef, useValue: {} },
+                { provide: PenService, useValue: penService },
+                { provide: DrawingRectangleService, useValue: drawingRectangleService },
+                { provide: FileManipulationService, useValue: fileManipulationService },
+                { provide: CanvasSelectionService, useValue: canvasSelectionService },
             ],
         }).compileComponents();
 
@@ -43,6 +71,7 @@ describe('GameCreationPageComponent', () => {
         canvasOg = document.createElement('canvas');
         canvasOg.width = IMAGE_DIMENSIONS.width;
         canvasOg.height = IMAGE_DIMENSIONS.height;
+        component.canvasInformations = getFakeCanvasInformations();
     });
 
     it('should create', () => {
@@ -50,16 +79,16 @@ describe('GameCreationPageComponent', () => {
     });
 
     it('should set canvas informations after timeout', fakeAsync(() => {
-        spyOn(component.canvasSelectionService, 'setProperties');
-        spyOn(component.fileManipulationService, 'updateAttributes');
+        spyOn(canvasSelectionService, 'setProperties');
+        spyOn(fileManipulationService, 'updateAttributes');
 
         component.ngOnInit();
 
         tick(50);
 
         expect(component.setObject()).toEqual(component.canvasInformations);
-        expect(component.canvasSelectionService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
-        expect(component.fileManipulationService.updateAttributes).toHaveBeenCalledWith({
+        expect(canvasSelectionService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
+        expect(fileManipulationService.updateAttributes).toHaveBeenCalledWith({
             originalFile: component.originalFile,
             differenceFile: component.differentFile,
             originalCanvas: component.originalCanvas.nativeElement,
@@ -184,5 +213,122 @@ describe('GameCreationPageComponent', () => {
         }
         const result = component.mergeCanvas(canvas1, canvas2);
         expect(result).toBeInstanceOf(Blob);
+    });
+
+    it('should add event listeners when user draws on the canvases with a pen', () => {
+        component.drawPen();
+
+        expect(penService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
+
+        component.canvasInformations.originalDrawnCanvas.dispatchEvent(new MouseEvent('mousedown'));
+        expect(penService.startPen).toHaveBeenCalled();
+        component.canvasInformations.differenceDrawnCanvas.dispatchEvent(new MouseEvent('mousedown'));
+        expect(penService.startPen).toHaveBeenCalled();
+
+        component.canvasInformations.originalDrawnCanvas.dispatchEvent(new MouseEvent('mouseup'));
+        expect(penService.stopPen).toHaveBeenCalled();
+        component.canvasInformations.differenceDrawnCanvas.dispatchEvent(new MouseEvent('mouseup'));
+        expect(penService.stopPen).toHaveBeenCalled();
+
+        component.canvasInformations.originalDrawnCanvas.dispatchEvent(new MouseEvent('mousemove'));
+        expect(penService.writing).toHaveBeenCalled();
+        component.canvasInformations.differenceDrawnCanvas.dispatchEvent(new MouseEvent('mousemove'));
+        expect(penService.writing).toHaveBeenCalled();
+    });
+
+    it('should add event listeners when user draws a rectangle on the canvases', () => {
+        component.drawRectangle();
+
+        expect(drawingRectangleService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
+
+        component.canvasInformations.originalDrawnCanvas.dispatchEvent(new MouseEvent('mousedown'));
+        expect(drawingRectangleService.startDrawingRectangle).toHaveBeenCalled();
+        component.canvasInformations.differenceDrawnCanvas.dispatchEvent(new MouseEvent('mousedown'));
+        expect(drawingRectangleService.startDrawingRectangle).toHaveBeenCalled();
+
+        component.canvasInformations.originalDrawnCanvas.dispatchEvent(new MouseEvent('mouseup'));
+        expect(drawingRectangleService.stopDrawingRectangle).toHaveBeenCalled();
+        component.canvasInformations.differenceDrawnCanvas.dispatchEvent(new MouseEvent('mouseup'));
+        expect(drawingRectangleService.stopDrawingRectangle).toHaveBeenCalled();
+
+        component.canvasInformations.originalDrawnCanvas.dispatchEvent(new MouseEvent('mousemove'));
+        expect(drawingRectangleService.paintRectangle).toHaveBeenCalled();
+        component.canvasInformations.differenceDrawnCanvas.dispatchEvent(new MouseEvent('mousemove'));
+        expect(drawingRectangleService.paintRectangle).toHaveBeenCalled();
+    });
+
+    it('should add event listeners when user erases on the canvas', () => {
+        component.erase();
+
+        expect(eraserButtonService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
+
+        component.canvasInformations.originalDrawnCanvas.dispatchEvent(new MouseEvent('mousedown'));
+        expect(eraserButtonService.startErase).toHaveBeenCalled();
+        component.canvasInformations.differenceDrawnCanvas.dispatchEvent(new MouseEvent('mousedown'));
+        expect(eraserButtonService.startErase).toHaveBeenCalled();
+
+        component.canvasInformations.originalDrawnCanvas.dispatchEvent(new MouseEvent('mouseup'));
+        expect(eraserButtonService.stopErase).toHaveBeenCalled();
+        component.canvasInformations.differenceDrawnCanvas.dispatchEvent(new MouseEvent('mouseup'));
+        expect(eraserButtonService.stopErase).toHaveBeenCalled();
+
+        component.canvasInformations.originalDrawnCanvas.dispatchEvent(new MouseEvent('mousemove'));
+        expect(eraserButtonService.erasing).toHaveBeenCalled();
+        component.canvasInformations.differenceDrawnCanvas.dispatchEvent(new MouseEvent('mousemove'));
+        expect(eraserButtonService.erasing).toHaveBeenCalled();
+    });
+
+    it('should remove event listeners', () => {
+        const spy = spyOn(component.originalDrawnCanvas.nativeElement, 'removeEventListener');
+        component.removingListeners();
+
+        expect(spy).toHaveBeenCalledWith('mousedown', component.rectangleListener[0]);
+        expect(spy).toHaveBeenCalledWith('mouseup', component.rectangleListener[1]);
+        expect(spy).toHaveBeenCalledWith('mousemove', component.rectangleListener[2]);
+
+        expect(spy).toHaveBeenCalledWith('mousedown', component.penListener[0]);
+        expect(spy).toHaveBeenCalledWith('mouseup', component.penListener[1]);
+        expect(spy).toHaveBeenCalledWith('mousemove', component.penListener[2]);
+
+        expect(spy).toHaveBeenCalledWith('mousedown', component.eraseListener[0]);
+        expect(spy).toHaveBeenCalledWith('mouseup', component.eraseListener[1]);
+        expect(spy).toHaveBeenCalledWith('mousemove', component.eraseListener[2]);
+    });
+
+    it('should change the z indexes if the rectangle button is enabled', () => {
+        component.isRectangleEnabled = true;
+        component.changeZindex();
+
+        expect(component.canvas2ZIndex).toEqual(3);
+        expect(component.canvas1ZIndex).toEqual(2);
+    });
+
+    it('should change the z indexes if the rectangle button is disabled', () => {
+        component.isRectangleEnabled = false;
+        component.changeZindex();
+
+        expect(component.canvas2ZIndex).toEqual(2);
+        expect(component.canvas1ZIndex).toEqual(3);
+    });
+
+    it("should set the drawManipulation service's properties and call the invert method of the service", () => {
+        component.invert();
+
+        expect(drawManipulationService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
+        expect(drawManipulationService.invert).toHaveBeenCalled();
+    });
+
+    it("should set the drawManipulation service's properties and call the duplicate method of the service", () => {
+        component.duplicate('left');
+
+        expect(drawManipulationService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
+        expect(drawManipulationService.duplicate).toHaveBeenCalled();
+    });
+
+    it("should set the drawManipulation service's properties and call the clearPainting method of the service", () => {
+        component.clearPainting('left');
+
+        expect(drawManipulationService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
+        expect(drawManipulationService.clearPainting).toHaveBeenCalled();
     });
 });

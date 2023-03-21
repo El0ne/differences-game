@@ -47,6 +47,7 @@ export class UndoRedoService {
             }
         };
     }
+
     undo() {
         if (this.canvasInformations.nbElements > 0) {
             this.canvasInformations.nbElements--;
