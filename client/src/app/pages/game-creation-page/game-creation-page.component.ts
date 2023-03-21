@@ -192,7 +192,7 @@ export class GameCreationPageComponent implements OnInit {
     getTitle(title: string): void {
         this.gameTitle = title;
     }
-    openSaveModal() {
+    openSaveModal(): void {
         const dialogRef = this.matDialog.open(ModalPageComponent, {
             disableClose: true,
             data: {
@@ -248,7 +248,7 @@ export class GameCreationPageComponent implements OnInit {
         return new Blob([uint8Array], { type: 'image/bmp' });
     }
 
-    async save() {
+    async save(): Promise<void> {
         const updatedFiles = this.fileManipulationService.updateFiles();
         this.originalFile = updatedFiles[0];
         this.differentFile = updatedFiles[1];
@@ -340,7 +340,7 @@ export class GameCreationPageComponent implements OnInit {
         this.differenceDrawnCanvas.nativeElement.removeEventListener('mousemove', this.eraseListener[2]);
     }
 
-    changeZindex() {
+    changeZindex(): void {
         if (this.isRectangleEnabled) {
             this.canvas2ZIndex = 3;
             this.canvas1ZIndex = 2;
@@ -350,7 +350,7 @@ export class GameCreationPageComponent implements OnInit {
         }
     }
 
-    toggleButton(id: string) {
+    toggleButton(id: string): void {
         this.removingListeners();
 
         switch (id) {

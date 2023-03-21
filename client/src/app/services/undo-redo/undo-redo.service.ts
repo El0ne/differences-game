@@ -8,18 +8,12 @@ import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 export class UndoRedoService {
     canvasInformations: CanvasInformations;
 
-    setProperties(information: CanvasInformations) {
+    setProperties(information: CanvasInformations): void {
         this.canvasInformations = information;
     }
 
-    pushCanvas(canvas: HTMLCanvasElement) {
+    pushCanvas(canvas: HTMLCanvasElement): void {
         this.canvasInformations.nbElements++;
-        // if (this.canvasInformations.nbElements < this.canvasInformations.actionsArray.length) {
-        //     this.canvasInformations.actionsArray.length = this.canvasInformations.nbElements;
-        //     this.canvasInformations.leftCanvasArray.length = this.canvasInformations.leftArrayPointer;
-        //     this.canvasInformations.rightCanvasArray.length = this.canvasInformations.rightArrayPointer;
-
-        // }
 
         const canvasDataURL = canvas.toDataURL();
         if (this.canvasInformations.isInOriginalCanvas) {
@@ -33,7 +27,7 @@ export class UndoRedoService {
         }
     }
 
-    undoAction(array: string[], pointer: number) {
+    undoAction(array: string[], pointer: number): void {
         const ctx = this.canvasInformations.actionsArray[this.canvasInformations.nbElements]
             ? this.canvasInformations.originalDrawnCanvas.getContext('2d')
             : this.canvasInformations.differenceDrawnCanvas.getContext('2d');
@@ -48,7 +42,7 @@ export class UndoRedoService {
         };
     }
 
-    undo() {
+    undo(): void {
         if (this.canvasInformations.nbElements > 0) {
             this.canvasInformations.nbElements--;
 
@@ -62,7 +56,7 @@ export class UndoRedoService {
         }
     }
 
-    redoAction(array: string[], pointer: number) {
+    redoAction(array: string[], pointer: number): void {
         const ctx = this.canvasInformations.actionsArray[this.canvasInformations.nbElements]
             ? this.canvasInformations.originalDrawnCanvas.getContext('2d')
             : this.canvasInformations.differenceDrawnCanvas.getContext('2d');
@@ -76,7 +70,7 @@ export class UndoRedoService {
         if (ctx) ctx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
     }
 
-    redo() {
+    redo(): void {
         if (this.canvasInformations.nbElements < this.canvasInformations.actionsArray.length) {
             if (this.canvasInformations.actionsArray[this.canvasInformations.nbElements]) {
                 this.canvasInformations.leftArrayPointer++;
