@@ -20,7 +20,7 @@ import { GC_PATHS } from './game-creation-constants';
 
 const PEN_SIZE = 10;
 const ERASER_SIZE = 50;
-
+const ONLOAD_DELAY = 50;
 @Component({
     selector: 'app-game-creation-page',
     templateUrl: './game-creation-page.component.html',
@@ -143,7 +143,7 @@ export class GameCreationPageComponent implements OnInit {
                 originalCanvas: this.originalCanvas.nativeElement,
                 differenceCanvas: this.differenceCanvas.nativeElement,
             });
-        }, 50);
+        }, ONLOAD_DELAY);
     }
 
     setColor(): void {

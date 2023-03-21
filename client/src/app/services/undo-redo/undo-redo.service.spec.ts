@@ -96,12 +96,6 @@ describe('UndoRedoService', () => {
         service.pushCanvas(canvas);
         service.undo();
         service.redo();
-
-        // const imageData = canvasInformation.originalDrawnCanvas.getContext('2d')?.getImageData(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-        // const canvasDataURL = canvasInformation.leftCanvasArray[1];
-
-        // expect(imageData).toEqual(undefined);
-        // expect(canvasDataURL).toEqual(canvas.toDataURL());
         expect(canvasInformation.leftArrayPointer).toBe(1);
         expect(canvasInformation.rightArrayPointer).toBe(0);
         expect(canvasInformation.nbElements).toBe(1);

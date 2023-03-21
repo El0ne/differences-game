@@ -12,7 +12,6 @@ export class PenService {
     constructor(private canvasSelectionService: CanvasSelectionService, private undoRedoService: UndoRedoService) {}
 
     setColor(color: string): void {
-        console.log('hey');
         this.canvasInformations.selectedColor = color;
     }
     setProperties(information: CanvasInformations) {
