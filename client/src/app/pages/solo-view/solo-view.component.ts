@@ -16,6 +16,7 @@ import { RoomMessage, Validation } from '@common/chat-gateway-constants';
 import { CHAT_EVENTS, RoomEvent, RoomManagement } from '@common/chat.gateway.events';
 import { DifferenceInformation, MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
+import { MATCH_EVENTS } from '@common/match-gateway-communication';
 import { Subject } from 'rxjs';
 
 @Component({
@@ -98,10 +99,10 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             message.message = `${message.message} - ${this.opponent} a abandonné la partie.`;
             this.messages.push(message);
         });
-        this.socketService.listen<PlayerDifference>(CHAT_EVENTS.Difference, (data: PlayerDifference) => {
+        this.socketService.listen<PlayerDifference>(MATCH_EVENTS.Difference, (data: PlayerDifference) => {
             this.effectHandler(data);
         });
-        this.socketService.listen<string>(CHAT_EVENTS.Win, (socketId: string) => {
+        this.socketService.listen<string>(MATCH_EVENTS.Win, (socketId: string) => {
             this.winGame(socketId);
         });
     }
@@ -218,7 +219,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 differencesPosition: information.differencesPosition,
                 lastDifferences: information.lastDifferences,
             };
-            this.socketService.send<DifferenceInformation>(CHAT_EVENTS.Difference, multiplayerInformation);
+            this.socketService.send<DifferenceInformation>(MATCH_EVENTS.Difference, multiplayerInformation);
         } else {
             const difference: PlayerDifference = {
                 differencesPosition: information.differencesPosition,
@@ -249,7 +250,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         if (this.isMultiplayer) {
             const endGameVerification = this.numberOfDifferences / 2;
             if (this.currentScorePlayer >= endGameVerification) {
-                this.socketService.send<string>(CHAT_EVENTS.Win, this.currentRoom);
+                this.socketService.send<string>(MATCH_EVENTS.Win, this.currentRoom);
             }
         } else {
             if (this.currentScorePlayer === this.numberOfDifferences) {

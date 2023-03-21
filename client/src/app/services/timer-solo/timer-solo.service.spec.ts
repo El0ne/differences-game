@@ -29,6 +29,9 @@ describe('TimerSoloService', () => {
 
     it('stopTimer should send a stop timer event', fakeAsync(() => {
         mockSocketService.gameRoom = 'test';
+        mockSocketService.send = () => {
+            return;
+        };
         const sendSpy = spyOn(mockSocketService, 'send').and.callThrough();
         service.stopTimer();
         expect(sendSpy).toHaveBeenCalledWith(MATCH_EVENTS.EndTime, 'test');

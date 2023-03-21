@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
-import { ONE_SECOND } from '@common/match-gateway-communication';
+import { PlayerDifference } from '@common/difference-information';
+import { MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import { BroadcastOperator, Server, Socket } from 'socket.io';
@@ -11,6 +12,7 @@ describe('MatchGateway', () => {
     let gameManagerServiceSpy: SinonStubbedInstance<GameManagerService>;
     let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
+    const TEST_ROOM_ID = 'test';
 
     beforeEach(async () => {
         jest.useFakeTimers();
@@ -37,6 +39,42 @@ describe('MatchGateway', () => {
 
     it('should be defined', () => {
         expect(gateway).toBeDefined();
+    });
+
+    it('difference() should emit to room a difference Event when room exists', () => {
+        stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
+        server.to.returns({
+            emit: (event: string, data: PlayerDifference) => {
+                expect(event).toEqual(MATCH_EVENTS.Difference);
+                expect(data).toEqual({ differencesPosition: 3, lastDifferences: [0, 1, 2], socket: socket.id });
+            },
+        } as any);
+
+        gateway.difference(socket, { differencesPosition: 3, lastDifferences: [0, 1, 2], room: TEST_ROOM_ID });
+    });
+
+    it('difference() should not emit when room does not exists', () => {
+        stub(socket, 'rooms').value(new Set());
+        gateway.difference(socket, { differencesPosition: 3, lastDifferences: [0, 1, 2], room: TEST_ROOM_ID });
+        expect(server.to.called).toBeFalsy();
+    });
+
+    it('win() should emit to room a win Event when room exists', () => {
+        stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
+        server.to.returns({
+            emit: (event: string, data: string) => {
+                expect(event).toEqual(MATCH_EVENTS.Win);
+                expect(data).toEqual(socket.id);
+            },
+        } as any);
+
+        gateway.win(socket, TEST_ROOM_ID);
+    });
+
+    it('win() should not emit when room does not exists', () => {
+        stub(socket, 'rooms').value(new Set());
+        gateway.win(socket, TEST_ROOM_ID);
+        expect(server.to.called).toBeFalsy();
     });
 
     it('createSoloGame should call gameManagerService.addGame', async () => {

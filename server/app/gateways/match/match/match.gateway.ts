@@ -1,4 +1,5 @@
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
+import { MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
 import { Injectable } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -22,6 +23,25 @@ export class MatchGateway implements OnGatewayDisconnect {
     stopTimer(socket: Socket, room: string): void {
         clearTimeout(this.timers.get(room));
         this.timers.delete(room);
+    }
+
+    @SubscribeMessage(MATCH_EVENTS.Win)
+    win(socket: Socket, room: string): void {
+        if (socket.rooms.has(room)) {
+            this.server.to(room).emit(MATCH_EVENTS.Win, socket.id);
+        }
+    }
+
+    @SubscribeMessage(MATCH_EVENTS.Difference)
+    difference(socket: Socket, data: MultiplayerDifferenceInformation) {
+        if (socket.rooms.has(data.room)) {
+            const differenceInformation: PlayerDifference = {
+                differencesPosition: data.differencesPosition,
+                lastDifferences: data.lastDifferences,
+                socket: socket.id,
+            };
+            this.server.to(data.room).emit(MATCH_EVENTS.Difference, differenceInformation);
+        }
     }
 
     timer(room: string): void {

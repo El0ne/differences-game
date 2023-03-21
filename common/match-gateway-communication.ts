@@ -3,6 +3,8 @@ export enum MATCH_EVENTS {
     Timer = 'Timer',
     EndTime = 'EndTime',
     StartTime = 'StartTime',
+    Difference = 'Difference',
+    Win = 'Win',
 }
 
 export const ONE_SECOND = 1000;

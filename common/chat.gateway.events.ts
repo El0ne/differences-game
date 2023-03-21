@@ -15,8 +15,7 @@ export enum CHAT_EVENTS {
     MassMessage = 'massMessage',
     Hello = 'hello',
     Clock = 'clock',
-    Difference = 'Difference',
-    Win = 'Win',
+
     Disconnect = 'Disconnect',
 }
 

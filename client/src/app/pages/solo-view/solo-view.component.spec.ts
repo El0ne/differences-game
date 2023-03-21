@@ -23,6 +23,7 @@ import { SocketService } from '@app/services/socket/socket.service';
 import { CHAT_EVENTS } from '@common/chat.gateway.events';
 import { DifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
+import { MATCH_EVENTS } from '@common/match-gateway-communication';
 import { of } from 'rxjs';
 import { SoloViewComponent } from './solo-view.component';
 
@@ -143,11 +144,11 @@ describe('SoloViewComponent', () => {
                     callback({ socketId: 'abandon', message: 'abandon' });
                     break;
                 }
-                case CHAT_EVENTS.Difference: {
+                case MATCH_EVENTS.Difference: {
                     callback({ lastDifferences: [0, 1, 2, 3], differencesPosition: 2, socketId: 'test' });
                     break;
                 }
-                case CHAT_EVENTS.Win: {
+                case MATCH_EVENTS.Win: {
                     callback('test');
                     callback('wrong');
                     break;
@@ -277,7 +278,7 @@ describe('SoloViewComponent', () => {
         });
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.differenceHandler(MOCK_INFORMATION);
-        expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.Difference, {
+        expect(sendSpy).toHaveBeenCalledWith(MATCH_EVENTS.Difference, {
             room: component.currentRoom,
             lastDifferences: [0, 1, 2, 3],
             differencesPosition: 2,
@@ -309,7 +310,7 @@ describe('SoloViewComponent', () => {
         component.currentRoom = 'win';
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.endGameVerification();
-        expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.Win, component.currentRoom);
+        expect(sendSpy).toHaveBeenCalledWith(MATCH_EVENTS.Win, component.currentRoom);
     });
 
     it('endGameVerification should call winGame if currentScore of player is equal to number of differences', () => {

@@ -2,7 +2,6 @@
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { RoomMessage } from '@common/chat-gateway-constants';
 import { CHAT_EVENTS } from '@common/chat.gateway.events';
-import { PlayerDifference } from '@common/difference-information';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
@@ -61,7 +60,7 @@ describe('ChatGateway', () => {
         expect(socket.emit.calledWith(CHAT_EVENTS.WordValidated, { isValidated: false, originalMessage: error })).toBeTruthy();
     });
 
-    it('difference() should emit to room a difference Event when room exists', () => {
+    /* it('difference() should emit to room a difference Event when room exists', () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
             emit: (event: string, data: PlayerDifference) => {
@@ -95,7 +94,7 @@ describe('ChatGateway', () => {
         stub(socket, 'rooms').value(new Set());
         gateway.win(socket, TEST_ROOM_ID);
         expect(server.to.called).toBeFalsy();
-    });
+    }); */
 
     it('roomMessage() should not send message if socket not in the room', () => {
         stub(socket, 'rooms').value(new Set());
