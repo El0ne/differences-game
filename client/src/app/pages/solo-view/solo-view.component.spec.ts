@@ -20,7 +20,7 @@ import { ClickEventService } from '@app/services/click-event/click-event.service
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { SocketService } from '@app/services/socket/socket.service';
-import { CHAT_EVENTS } from '@common/chat.gateway.events';
+import { CHAT_EVENTS } from '@common/chat-gateway-events';
 import { DifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
 import { MATCH_EVENTS } from '@common/match-gateway-communication';
