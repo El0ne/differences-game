@@ -94,6 +94,11 @@ export class GameCreationPageComponent implements OnInit {
         this.rectangleService.stopDrawingRectangle.bind(this),
         this.rectangleService.paintRectangle.bind(this),
     ];
+    penListener: ((mouseEvent: MouseEvent) => void)[] = [
+        this.penService.startPen.bind(this),
+        this.penService.stopPen.bind(this),
+        this.penService.writing.bind(this),
+    ];
 
     // eslint-disable-next-line max-params
     constructor(
@@ -277,14 +282,14 @@ export class GameCreationPageComponent implements OnInit {
     drawPen(): void {
         this.penService.setProperties(this.canvasInformations);
 
-        this.canvasInformations.originalDrawnCanvas.addEventListener('mousedown', this.rectangleListener[0]);
-        this.canvasInformations.differenceDrawnCanvas.addEventListener('mousedown', this.rectangleListener[0]);
+        this.canvasInformations.originalDrawnCanvas.addEventListener('mousedown', this.penListener[0]);
+        this.canvasInformations.differenceDrawnCanvas.addEventListener('mousedown', this.penListener[0]);
 
-        this.canvasInformations.originalDrawnCanvas.addEventListener('mouseup', this.rectangleListener[1]);
-        this.canvasInformations.differenceDrawnCanvas.addEventListener('mouseup', this.rectangleListener[1]);
+        this.canvasInformations.originalDrawnCanvas.addEventListener('mouseup', this.penListener[1]);
+        this.canvasInformations.differenceDrawnCanvas.addEventListener('mouseup', this.penListener[1]);
 
-        this.canvasInformations.originalDrawnCanvas.addEventListener('mousemove', this.rectangleListener[2]);
-        this.canvasInformations.differenceDrawnCanvas.addEventListener('mousemove', this.rectangleListener[2]);
+        this.canvasInformations.originalDrawnCanvas.addEventListener('mousemove', this.penListener[2]);
+        this.canvasInformations.differenceDrawnCanvas.addEventListener('mousemove', this.penListener[2]);
     }
 
     drawRectangle(): void {
@@ -320,12 +325,12 @@ export class GameCreationPageComponent implements OnInit {
         this.originalRectangleCanvas.nativeElement.removeEventListener('mousemove', this.rectangleListener[2]);
         this.differenceRectangleCanvas.nativeElement.removeEventListener('mousemove', this.rectangleListener[2]);
 
-        this.originalDrawnCanvas.nativeElement.removeEventListener('mousedown', this.rectangleListener[0]);
-        this.differenceDrawnCanvas.nativeElement.removeEventListener('mousedown', this.rectangleListener[0]);
-        this.originalDrawnCanvas.nativeElement.removeEventListener('mouseup', this.rectangleListener[1]);
-        this.differenceDrawnCanvas.nativeElement.removeEventListener('mouseup', this.rectangleListener[1]);
-        this.originalDrawnCanvas.nativeElement.removeEventListener('mousemove', this.rectangleListener[2]);
-        this.differenceDrawnCanvas.nativeElement.removeEventListener('mousemove', this.rectangleListener[2]);
+        this.originalDrawnCanvas.nativeElement.removeEventListener('mousedown', this.penListener[0]);
+        this.differenceDrawnCanvas.nativeElement.removeEventListener('mousedown', this.penListener[0]);
+        this.originalDrawnCanvas.nativeElement.removeEventListener('mouseup', this.penListener[1]);
+        this.differenceDrawnCanvas.nativeElement.removeEventListener('mouseup', this.penListener[1]);
+        this.originalDrawnCanvas.nativeElement.removeEventListener('mousemove', this.penListener[2]);
+        this.differenceDrawnCanvas.nativeElement.removeEventListener('mousemove', this.penListener[2]);
 
         this.originalDrawnCanvas.nativeElement.removeEventListener('mousedown', this.eraseListener[0]);
         this.differenceDrawnCanvas.nativeElement.removeEventListener('mousedown', this.eraseListener[0]);
