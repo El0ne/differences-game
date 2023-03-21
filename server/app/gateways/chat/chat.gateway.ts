@@ -1,9 +1,8 @@
 import { RoomMessage } from '@common/chat-gateway-constants';
-import { CHAT_EVENTS, Room, RoomEvent, RoomManagement } from '@common/chat.gateway.events';
+import { CHAT_EVENTS, MESSAGE_MAX_LENGTH, Room, RoomEvent, RoomManagement } from '@common/chat-gateway-events';
 import { Injectable } from '@nestjs/common';
 import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { MESSAGE_MAX_LENGTH } from './chat.gateway.constants';
 
 @WebSocketGateway({ cors: true })
 @Injectable()
@@ -14,7 +13,6 @@ export class ChatGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage(CHAT_EVENTS.Validate)
     validate(socket: Socket, message: string): void {
-        // console.log('server');
         if (message && message.length < MESSAGE_MAX_LENGTH) {
             socket.emit(CHAT_EVENTS.WordValidated, { isValidated: true, originalMessage: message });
         } else {
@@ -70,10 +68,6 @@ export class ChatGateway implements OnGatewayDisconnect {
 
     dateCreator(): string {
         const date = new Date();
-        const hour = date.getHours().toString();
-        const minutes = date.getMinutes().toString();
-        const seconds = date.getSeconds().toString();
-        const dateFormatted = `${hour}:${minutes}:${seconds}`;
-        return dateFormatted;
+        return date.toLocaleTimeString('it-IT');
     }
 }
