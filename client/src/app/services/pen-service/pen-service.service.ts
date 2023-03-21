@@ -14,51 +14,51 @@ export class PenService {
     setColor(color: string): void {
         this.canvasInformations.selectedColor = color;
     }
-    setProperties(information: CanvasInformations) {
+    setProperties(information: CanvasInformations): void {
         this.canvasInformations = information;
     }
 
-    startPen(mouseEvent: MouseEvent) {
+    startPen(mouseEvent: MouseEvent): void {
         this.canvasInformations.isUserClicking = true;
-        const ctx1 = this.canvasInformations.drawingCanvas1.getContext('2d');
+        const context = this.canvasInformations.drawingCanvas1.getContext('2d');
         const canvasRect = this.canvasInformations.drawingCanvas1.getBoundingClientRect();
 
-        if (ctx1) {
-            ctx1.lineWidth = this.canvasInformations.penSize;
-            ctx1.lineCap = 'round';
-            ctx1.strokeStyle = this.canvasInformations.selectedColor;
-            ctx1.beginPath();
-            ctx1.arc(mouseEvent.clientX - canvasRect.left, mouseEvent.clientY - canvasRect.top, 0, 0, 2 * Math.PI);
-            ctx1.stroke();
-            ctx1.beginPath();
+        if (context) {
+            context.lineWidth = this.canvasInformations.penSize;
+            context.lineCap = 'round';
+            context.strokeStyle = this.canvasInformations.selectedColor;
+            context.beginPath();
+            context.arc(mouseEvent.clientX - canvasRect.left, mouseEvent.clientY - canvasRect.top, 0, 0, 2 * Math.PI);
+            context.stroke();
+            context.beginPath();
         }
     }
 
-    stopPen() {
-        const ctx1 = this.canvasInformations.drawingCanvas1.getContext('2d');
-        if (ctx1) {
+    stopPen(): void {
+        const context = this.canvasInformations.drawingCanvas1.getContext('2d');
+        if (context) {
             this.canvasInformations.isUserClicking = false;
-            ctx1.beginPath();
+            context.beginPath();
         }
         this.undoRedoService.setProperties(this.canvasInformations);
         this.undoRedoService.pushCanvas(this.canvasInformations.drawingCanvas1);
     }
 
-    writing(mouseEvent: MouseEvent) {
+    writing(mouseEvent: MouseEvent): void {
         this.canvasSelectionService.choseCanvas(mouseEvent);
-        const ctx1 = this.canvasInformations.drawingCanvas1.getContext('2d');
+        const context = this.canvasInformations.drawingCanvas1.getContext('2d');
 
-        if (ctx1 && this.canvasInformations.isUserClicking) {
+        if (context && this.canvasInformations.isUserClicking) {
             const canvasRect = this.canvasInformations.drawingCanvas1.getBoundingClientRect();
 
-            ctx1.lineWidth = this.canvasInformations.penSize;
-            ctx1.lineCap = 'round';
-            ctx1.strokeStyle = this.canvasInformations.selectedColor;
+            context.lineWidth = this.canvasInformations.penSize;
+            context.lineCap = 'round';
+            context.strokeStyle = this.canvasInformations.selectedColor;
 
-            ctx1.lineTo(mouseEvent.clientX - canvasRect.left, mouseEvent.clientY - canvasRect.top);
-            ctx1.stroke();
-            ctx1.beginPath();
-            ctx1.moveTo(mouseEvent.clientX - canvasRect.left, mouseEvent.clientY - canvasRect.top);
+            context.lineTo(mouseEvent.clientX - canvasRect.left, mouseEvent.clientY - canvasRect.top);
+            context.stroke();
+            context.beginPath();
+            context.moveTo(mouseEvent.clientX - canvasRect.left, mouseEvent.clientY - canvasRect.top);
         }
     }
 }
