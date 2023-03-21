@@ -5,7 +5,9 @@ import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testin
 import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
 import { getFakeCanvasInformations } from '@app/services/canvas-informations.constants';
 import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
 import { DrawManipulationService } from '@app/services/draw-manipulation/draw-manipulation.service';
@@ -14,8 +16,8 @@ import { EraserButtonService } from '@app/services/eraser-button/eraser-button.s
 import { FileManipulationService } from '@app/services/file-manipulation/file-manipulation.service';
 import { PenService } from '@app/services/pen-service/pen-service.service';
 import { UndoRedoService } from '@app/services/undo-redo/undo-redo.service';
+import { GameCardDto } from '@common/game-card.dto';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
-import { of } from 'rxjs';
 import { GameCreationPageComponent } from './game-creation-page.component';
 
 describe('GameCreationPageComponent', () => {
@@ -29,6 +31,8 @@ describe('GameCreationPageComponent', () => {
     let eraserButtonService: EraserButtonService;
     let undoRedoService: UndoRedoService;
     let drawManipulationService: DrawManipulationService;
+    let router: Router;
+    let matDialog: MatDialog;
 
     beforeEach(async () => {
         penService = jasmine.createSpyObj('PenService', ['setProperties', 'startPen', 'stopPen', 'writing']);
@@ -48,21 +52,13 @@ describe('GameCreationPageComponent', () => {
         drawManipulationService = jasmine.createSpyObj('DrawManipulationService', ['setProperties', 'invert', 'duplicate', 'clearPainting']);
         canvasSelectionService = jasmine.createSpyObj('CanvasSelectionService', ['setProperties', 'choseCanvas']);
         undoRedoService = jasmine.createSpyObj('UndoRedoService', ['setProperties', 'pushCanvas', 'undoAction', 'undo', 'redoAction', 'redo']);
+        matDialog = jasmine.createSpyObj('MatDialog', ['open']);
         await TestBed.configureTestingModule({
             declarations: [GameCreationPageComponent],
             imports: [HttpClientModule, FormsModule, MatDialogModule, RouterTestingModule, MatIconModule],
             providers: [
-                {
-                    provide: MatDialog,
-                    useValue: {
-                        open: () => ({
-                            afterClosed: () => of({}),
-                            // eslint-disable-next-line @typescript-eslint/no-empty-function
-                            close: () => {},
-                        }),
-                    },
-                },
                 { provide: MAT_DIALOG_DATA, useValue: {} },
+                { provide: MatDialog, useValue: { matDialog } },
                 { provide: MatDialogRef, useValue: {} },
                 { provide: PenService, useValue: penService },
                 { provide: DrawingRectangleService, useValue: drawingRectangleService },
@@ -135,6 +131,48 @@ describe('GameCreationPageComponent', () => {
         const input = 'Test title';
         component.getTitle(input);
         expect(component.gameTitle).toBe(input);
+    });
+
+    it('should open the modal and navigate to the configuration page after', () => {
+        const gameCardDto: GameCardDto = {
+            _id: '1',
+            name: 'Test Game',
+            difficulty: 'easy',
+            baseImage: 'testBaseImage',
+            differenceImage: 'testDifferenceImage',
+            radius: 5,
+            differenceNumber: 3,
+        };
+
+        component.differenceImage = gameCardDto.differenceImage;
+        component.differenceNumber = gameCardDto.differenceNumber;
+        component.difficulty = gameCardDto.difficulty;
+        component.createdGameInfo = gameCardDto;
+
+        component.openSaveModal();
+        expect(matDialog.open).toHaveBeenCalledWith(ModalPageComponent, {
+            disableClose: true,
+            data: {
+                image: gameCardDto.differenceImage,
+                difference: gameCardDto.differenceNumber,
+                difficulty: gameCardDto.difficulty,
+                gameInfo: gameCardDto,
+            },
+        });
+
+        expect(router.navigate).toHaveBeenCalledWith(['/config']);
+
+        // const result = { image: 'testImage' };
+        // spyOn(result, 'image').set;
+        // spyOn(router, 'navigate');
+        // spyOn(matDialog, 'open').and.returnValue({
+        //     afterClosed: () => of(result),
+        // } );
+
+        // component.openSaveModal();
+
+        // expect(result.image.set).toHaveBeenCalledWith('');
+        // expect(router.navigate).toHaveBeenCalledWith(['/config']);
     });
 
     it('should call setColor on drawingRectangleService with selectedColor', () => {
