@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subscription, timer } from 'rxjs';
-import { ONE_SEC_IN_MS, START_TIME, ZERO } from './timer-solo.constants';
+import { ONE_SEC_IN_MS, SECONDS_IN_MINUTE, START_TIME, TEN, ZERO } from './timer-solo.constants';
 
 @Injectable({
     providedIn: 'root',
@@ -22,5 +22,14 @@ export class TimerSoloService {
 
     stopTimer(): void {
         this.subArray.forEach((sub) => sub.unsubscribe());
+    }
+
+    convert(seconds: number): string {
+        let minute = 0;
+        while (seconds >= SECONDS_IN_MINUTE) {
+            minute++;
+            seconds -= SECONDS_IN_MINUTE;
+        }
+        return seconds < TEN ? `${minute}:0${seconds}` : `${minute}:${seconds}`;
     }
 }
