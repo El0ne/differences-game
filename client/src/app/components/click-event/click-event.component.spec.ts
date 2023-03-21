@@ -6,7 +6,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MOCK_ARRAY } from '@app/pages/solo-view/mock-array';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
-import { PixelModificationService } from '@app/services/pixel-modification/pixel-modification.service';
 import { STAGE } from '@app/services/server-routes';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { of, Subject } from 'rxjs';
@@ -38,7 +37,7 @@ describe('ClickEventComponent', () => {
         TestBed.configureTestingModule({
             declarations: [ClickEventComponent],
             imports: [RouterTestingModule, MatIconModule],
-            providers: [{ provide: ClickEventService, PixelModificationService, useValue: mockService }],
+            providers: [{ provide: ClickEventService, useValue: mockService }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(ClickEventComponent);
@@ -101,29 +100,21 @@ describe('ClickEventComponent', () => {
 
     it('isDifferent() should return true if a difference is detected', () => {
         component.toggleCheatMode = true;
-        spyOn(component.clickEventService, 'isADifference').and.returnValue(of(DIFFERENCE_FOUND));
+        spyOn(mockService, 'isADifference').and.returnValue(of(DIFFERENCE_FOUND));
         const mockClick = new MouseEvent('click', { clientX: 0, clientY: 0 });
         spyOn(component, 'emitSound').and.callFake(() => {});
         component.isDifferent(mockClick);
-        expect(component.clickEventService.isADifference).toHaveBeenCalledWith(
-            component.getCoordInImage(mockClick)[0],
-            component.getCoordInImage(mockClick)[1],
-            '1',
-        );
+        expect(mockService.isADifference).toHaveBeenCalledWith(component.getCoordInImage(mockClick)[0], component.getCoordInImage(mockClick)[1], '1');
         expect(component.differenceData).toEqual(DIFFERENCE_FOUND);
     });
 
     it('isDifferent() should return false if a difference is not detected', () => {
         component.toggleCheatMode = false;
-        spyOn(component.clickEventService, 'isADifference').and.returnValue(of(DIFFERENCE_NOT_FOUND));
+        spyOn(mockService, 'isADifference').and.returnValue(of(DIFFERENCE_NOT_FOUND));
         const mockClick = new MouseEvent('click', { clientX: 100, clientY: 365 });
         spyOn(component, 'emitSound').and.callFake(() => {});
         component.isDifferent(mockClick);
-        expect(component.clickEventService.isADifference).toHaveBeenCalledWith(
-            component.getCoordInImage(mockClick)[0],
-            component.getCoordInImage(mockClick)[1],
-            '1',
-        );
+        expect(mockService.isADifference).toHaveBeenCalledWith(component.getCoordInImage(mockClick)[0], component.getCoordInImage(mockClick)[1], '1');
         expect(component.differenceData).toEqual(DIFFERENCE_NOT_FOUND);
     });
 
@@ -197,32 +188,19 @@ describe('ClickEventComponent', () => {
         expect(clearRectSpy).toHaveBeenCalled();
     }));
 
-    it('clearEffect should get context and call turnOffYellow', () => {
-        const getContextSpy = spyOn(component.modification.nativeElement, 'getContext');
-        const turnOffYellowSpy = spyOn(component.pixelModificationService, 'turnOffYellow');
-
-        component.clearEffect();
-
-        expect(getContextSpy).toHaveBeenCalled();
-        expect(turnOffYellowSpy).toHaveBeenCalled();
-    });
-
-    it('differenceEffect() should flash yellow ', async () => {
-        const flashEffectSpy = spyOn(component.pixelModificationService, 'flashEffect');
-        spyOn(component.pixelModificationService, 'delay').and.callThrough();
-        spyOn(component, 'emitSound').and.callFake(() => {});
-        await component.differenceEffect([0]);
-
-        expect(flashEffectSpy).toHaveBeenCalled();
-    });
-
-    it('differenceEffect() should call differenceEffect if toggleCheatMode is true', fakeAsync(() => {
+    it('differenceEffect() should call differenceEffect if toggleCheatMode is true', async () => {
         component.toggleCheatMode = true;
         component.endGame = false;
         jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
-        spyOn(component.pixelModificationService, 'flashEffect').and.returnValue(new Promise(() => {}));
         const differenceEffectSpy = spyOn(component, 'differenceEffect').and.callThrough();
         component.differenceEffect([0]);
         expect(differenceEffectSpy).toHaveBeenCalledTimes(1);
-    }));
+    });
+
+    it('clearEffect should get context', async () => {
+        const getContextSpy = spyOn(component.modification.nativeElement, 'getContext');
+
+        await component.clearEffect();
+        expect(getContextSpy).toHaveBeenCalled();
+    });
 });
