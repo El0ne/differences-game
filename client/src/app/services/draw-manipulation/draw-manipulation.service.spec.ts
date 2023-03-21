@@ -1,16 +1,21 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { TestBed } from '@angular/core/testing';
 import { getFakeCanvasInformations } from '@app/services/canvas-informations.constants';
+import { UndoRedoService } from '@app/services/undo-redo/undo-redo.service';
 import { CanvasInformations } from '@common/canvas-informations';
 
 import { DrawManipulationService } from './draw-manipulation.service';
 
 describe('DrawManipulationService', () => {
     let service: DrawManipulationService;
+    let undoRedoService: UndoRedoService;
     let fakeCanvasInfo: CanvasInformations;
 
     beforeEach(() => {
-        TestBed.configureTestingModule({});
+        undoRedoService = jasmine.createSpyObj<UndoRedoService>('UndoRedoService', ['setProperties', 'pushCanvas']);
+        TestBed.configureTestingModule({
+            providers: [{ provide: UndoRedoService, useValue: undoRedoService }],
+        });
         service = TestBed.inject(DrawManipulationService);
         fakeCanvasInfo = getFakeCanvasInformations();
     });
@@ -81,6 +86,8 @@ describe('DrawManipulationService', () => {
 
         expect(originalCanvasMock.getContext('2d')!.clearRect).toHaveBeenCalled();
         expect(service.canvasInformations.isInOriginalCanvas).toEqual(true);
+        expect(undoRedoService.setProperties).toHaveBeenCalledOnceWith(service.canvasInformations);
+        expect(undoRedoService.pushCanvas).toHaveBeenCalledOnceWith(service.canvasInformations.drawingCanvas1);
     });
 
     it('clearPainting should call clearRect on the difference context if the side is right', () => {
@@ -94,5 +101,7 @@ describe('DrawManipulationService', () => {
 
         expect(differenceCanvasMock.getContext('2d')!.clearRect).toHaveBeenCalled();
         expect(service.canvasInformations.isInOriginalCanvas).toEqual(false);
+        expect(undoRedoService.setProperties).toHaveBeenCalledOnceWith(service.canvasInformations);
+        expect(undoRedoService.pushCanvas).toHaveBeenCalledOnceWith(service.canvasInformations.drawingCanvas1);
     });
 });
