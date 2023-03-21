@@ -1,13 +1,17 @@
-import { discardPeriodicTasks, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { of, Subscription } from 'rxjs';
-import { TEN_SECONDS, TEN_SEC_IN_MS } from './timer-solo.constants';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { fakeAsync, TestBed } from '@angular/core/testing';
+import { SocketService } from '@app/services/socket/socket.service';
+import { MATCH_EVENTS } from '@common/match-gateway-communication';
+import { TEN_SECONDS } from './timer-solo.constants';
 import { TimerSoloService } from './timer-solo.service';
 
 describe('TimerSoloService', () => {
     let service: TimerSoloService;
+    let mockSocketService: SocketService;
 
     beforeEach(() => {
-        TestBed.configureTestingModule({});
+        mockSocketService = jasmine.createSpyObj('SocketService', ['listen', 'send']);
+        TestBed.configureTestingModule({ providers: [{ provide: SocketService, useValue: mockSocketService }] });
         service = TestBed.inject(TimerSoloService);
     });
 
@@ -16,18 +20,17 @@ describe('TimerSoloService', () => {
     });
 
     it('should increment 10 seconds after 10 seconds properly', fakeAsync(() => {
+        mockSocketService.listen = (event: string, callback: any) => {
+            if (event === MATCH_EVENTS.Timer) callback(TEN_SECONDS);
+        };
         service.startTimer();
-        tick(TEN_SEC_IN_MS);
-        discardPeriodicTasks();
         expect(service.currentTime).toEqual(TEN_SECONDS);
     }));
 
     it('stopTimer should send a stop timer event', fakeAsync(() => {
-        const mockSubscriptions = [of('1').subscribe(), of('2').subscribe(), of('3').subscribe()];
-        service.subArray = mockSubscriptions;
-
+        mockSocketService.gameRoom = 'test';
+        const sendSpy = spyOn(mockSocketService, 'send').and.callThrough();
         service.stopTimer();
-
-        expect(mockSubscriptions.every((sub: Subscription) => sub.closed)).toBeTrue();
+        expect(sendSpy).toHaveBeenCalledWith(MATCH_EVENTS.EndTime, 'test');
     }));
 });

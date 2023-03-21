@@ -18,7 +18,12 @@ export class MatchGateway implements OnGatewayDisconnect {
         this.gameManagerService.addGame(stageId, 1);
     }
 
-    @SubscribeMessage(MATCH_EVENTS.StartTime)
+    @SubscribeMessage(MATCH_EVENTS.EndTime)
+    stopTimer(socket: Socket, room: string): void {
+        clearTimeout(this.timers.get(room));
+        this.timers.delete(room);
+    }
+
     timer(room: string): void {
         let timerCount = 0;
         const timer = setInterval(() => {
@@ -26,11 +31,6 @@ export class MatchGateway implements OnGatewayDisconnect {
             this.server.to(room).emit(MATCH_EVENTS.Timer, timerCount);
         }, ONE_SECOND);
         this.timers.set(room, timer);
-    }
-
-    @SubscribeMessage(MATCH_EVENTS.EndTime)
-    stopTimer(socket: Socket, room: string): void {
-        clearTimeout(this.timers.get(room));
     }
 
     async handleDisconnect(socket: Socket): Promise<void> {

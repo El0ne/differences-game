@@ -1,3 +1,4 @@
+import { MatchGateway } from '@app/gateways/match/match/match.gateway';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { JoinHostInWaitingRequest, PlayerInformations, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
@@ -12,6 +13,7 @@ describe('StageWaitingRoomGateway', () => {
     let server: SinonStubbedInstance<Server>;
     let gameCardService: SinonStubbedInstance<GameCardService>;
     let gameManagerService: SinonStubbedInstance<GameManagerService>;
+    let matchGatewayStub: SinonStubbedInstance<MatchGateway>;
     const lookedStages = ['stage1', 'stage2', 'stage3', 'stage4'];
 
     beforeEach(async () => {
@@ -19,6 +21,7 @@ describe('StageWaitingRoomGateway', () => {
         socket = createStubInstance<Socket>(Socket);
         gameCardService = createStubInstance<GameCardService>(GameCardService);
         gameManagerService = createStubInstance<GameManagerService>(GameManagerService);
+        matchGatewayStub = createStubInstance<MatchGateway>(MatchGateway);
         socket.data = {};
         Object.defineProperty(socket, 'id', { value: '123' });
         Object.defineProperty(server, 'sockets', { value: { sockets: new Map<string, Socket>() } });
@@ -27,6 +30,7 @@ describe('StageWaitingRoomGateway', () => {
                 StageWaitingRoomGateway,
                 { provide: GameCardService, useValue: gameCardService },
                 { provide: GameManagerService, useValue: gameManagerService },
+                { provide: MatchGateway, useValue: matchGatewayStub },
             ],
         }).compile();
 

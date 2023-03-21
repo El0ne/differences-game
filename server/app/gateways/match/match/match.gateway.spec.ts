@@ -1,17 +1,29 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
+import { ONE_SECOND } from '@common/match-gateway-communication';
 import { Test, TestingModule } from '@nestjs/testing';
-import { createStubInstance, SinonStubbedInstance } from 'sinon';
-import { Socket } from 'socket.io';
+import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
+import { BroadcastOperator, Server, Socket } from 'socket.io';
 import { MatchGateway } from './match.gateway';
 
 describe('MatchGateway', () => {
     let gateway: MatchGateway;
     let gameManagerServiceSpy: SinonStubbedInstance<GameManagerService>;
     let socket: SinonStubbedInstance<Socket>;
+    // eslint-disable-next-line no-unused-vars
+    let server: SinonStubbedInstance<Server>;
 
     beforeEach(async () => {
+        jest.useFakeTimers();
         gameManagerServiceSpy = createStubInstance<GameManagerService>(GameManagerService);
         socket = createStubInstance<Socket>(Socket);
+        server = createStubInstance<Server>(Server);
+
+        server.to.returns({
+            // eslint-disable-next-line no-unused-vars
+            emit: (event: string, data: number) => {},
+        } as BroadcastOperator<unknown, unknown>);
+
         socket.data = {};
 
         const module: TestingModule = await Test.createTestingModule({
@@ -19,6 +31,7 @@ describe('MatchGateway', () => {
         }).compile();
 
         gateway = module.get<MatchGateway>(MatchGateway);
+        gateway['server'] = server;
     });
 
     it('should be defined', () => {
@@ -39,5 +52,23 @@ describe('MatchGateway', () => {
         socket.data.stageId = 'stageId';
         gateway.handleDisconnect(socket);
         expect(endgameSpy).toHaveBeenCalledWith('stageId');
+    });
+
+    it('timer should add a new timer to timer map', async () => {
+        stub(socket, 'rooms').value(new Set(['test']));
+        gateway.timer('test');
+        jest.advanceTimersByTime(ONE_SECOND);
+        expect(gateway.timers.has('test')).toBeTruthy();
+    });
+
+    it('timer should stop a timer according to room given', async () => {
+        gateway.timers.set(
+            'room',
+            setTimeout(() => {
+                return;
+            }, ONE_SECOND),
+        );
+        gateway.stopTimer(socket, 'room');
+        expect(gateway.timers.has('room')).toBeFalsy();
     });
 });
