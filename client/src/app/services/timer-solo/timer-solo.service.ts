@@ -1,26 +1,34 @@
 import { Injectable } from '@angular/core';
-import { Subscription, timer } from 'rxjs';
-import { ONE_SEC_IN_MS, START_TIME, ZERO } from './timer-solo.constants';
+import { SocketService } from '@app/services/socket/socket.service';
+import { MATCH_EVENTS } from '@common/match-gateway-communication';
+import { Subscription } from 'rxjs';
+import { SECONDS_IN_MINUTE, TEN } from './timer-solo.constants';
 
 @Injectable({
     providedIn: 'root',
 })
 export class TimerSoloService {
-    currentTime: number = START_TIME;
+    currentTime: number = 0;
     subArray: Subscription[] = [];
 
+    constructor(private socket: SocketService) {}
+
     startTimer(): void {
-        this.currentTime = -1;
-        const timer1 = timer(ZERO, ONE_SEC_IN_MS);
-
-        const sub = timer1.subscribe(() => {
-            this.currentTime++;
+        this.socket.listen<number>(MATCH_EVENTS.Timer, (timerValue: number) => {
+            this.currentTime = timerValue;
         });
-
-        this.subArray.push(sub);
     }
 
     stopTimer(): void {
-        this.subArray.forEach((sub) => sub.unsubscribe());
+        this.socket.send(MATCH_EVENTS.EndTime, this.socket.gameRoom);
+    }
+
+    convert(seconds: number): string {
+        let minute = 0;
+        while (seconds >= SECONDS_IN_MINUTE) {
+            minute++;
+            seconds -= SECONDS_IN_MINUTE;
+        }
+        return seconds < TEN ? `${minute}:0${seconds}` : `${minute}:${seconds}`;
     }
 }

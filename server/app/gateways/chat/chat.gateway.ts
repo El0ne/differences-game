@@ -1,10 +1,8 @@
 import { RoomMessage } from '@common/chat-gateway-constants';
-import { CHAT_EVENTS, Room, RoomEvent, RoomManagement } from '@common/chat.gateway.events';
-import { MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
+import { CHAT_EVENTS, MESSAGE_MAX_LENGTH, Room, RoomEvent, RoomManagement } from '@common/chat-gateway-events';
 import { Injectable } from '@nestjs/common';
 import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { MESSAGE_MAX_LENGTH } from './chat.gateway.constants';
 
 @WebSocketGateway({ cors: true })
 @Injectable()
@@ -23,18 +21,6 @@ export class ChatGateway implements OnGatewayDisconnect {
         }
     }
 
-    @SubscribeMessage(CHAT_EVENTS.Difference)
-    difference(socket: Socket, data: MultiplayerDifferenceInformation) {
-        if (socket.rooms.has(data.room)) {
-            const differenceInformation: PlayerDifference = {
-                differencesPosition: data.differencesPosition,
-                lastDifferences: data.lastDifferences,
-                socket: socket.id,
-            };
-            this.server.to(data.room).emit(CHAT_EVENTS.Difference, differenceInformation);
-        }
-    }
-
     @SubscribeMessage(CHAT_EVENTS.Event)
     event(socket: Socket, data: RoomEvent): void {
         if (socket.rooms.has(data.room)) {
@@ -49,13 +35,6 @@ export class ChatGateway implements OnGatewayDisconnect {
             this.server
                 .to(data.room)
                 .emit(CHAT_EVENTS.RoomMessage, { socketId: socket.id, message: dateFormatted, event: 'notification' } as RoomMessage);
-        }
-    }
-
-    @SubscribeMessage(CHAT_EVENTS.Win)
-    win(socket: Socket, room: string): void {
-        if (socket.rooms.has(room)) {
-            this.server.to(room).emit(CHAT_EVENTS.Win, socket.id);
         }
     }
 
@@ -89,10 +68,6 @@ export class ChatGateway implements OnGatewayDisconnect {
 
     dateCreator(): string {
         const date = new Date();
-        const hour = date.getHours().toString();
-        const minutes = date.getMinutes().toString();
-        const seconds = date.getSeconds().toString();
-        const dateFormatted = `${hour}:${minutes}:${seconds}`;
-        return dateFormatted;
+        return date.toLocaleTimeString('it-IT');
     }
 }
