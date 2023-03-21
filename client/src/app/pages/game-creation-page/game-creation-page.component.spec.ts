@@ -43,6 +43,7 @@ describe('GameCreationPageComponent', () => {
             'fileValidation',
         ]);
         drawManipulationService = jasmine.createSpyObj('DrawManipulationService', ['setProperties', 'invert', 'duplicate', 'clearPainting']);
+        canvasSelectionService = jasmine.createSpyObj('CanvasSelectionService', ['setProperties', 'choseCanvas']);
         await TestBed.configureTestingModule({
             declarations: [GameCreationPageComponent],
             imports: [HttpClientModule, FormsModule, MatDialogModule, RouterTestingModule, MatIconModule],
@@ -63,6 +64,8 @@ describe('GameCreationPageComponent', () => {
                 { provide: DrawingRectangleService, useValue: drawingRectangleService },
                 { provide: FileManipulationService, useValue: fileManipulationService },
                 { provide: CanvasSelectionService, useValue: canvasSelectionService },
+                { provide: EraserButtonService, useValue: eraserButtonService },
+                { provide: DrawManipulationService, useValue: drawManipulationService },
             ],
         }).compileComponents();
 
@@ -80,9 +83,6 @@ describe('GameCreationPageComponent', () => {
     });
 
     it('should set canvas informations after timeout', fakeAsync(() => {
-        spyOn(canvasSelectionService, 'setProperties');
-        spyOn(fileManipulationService, 'updateAttributes');
-
         component.ngOnInit();
 
         tick(50);
@@ -140,18 +140,16 @@ describe('GameCreationPageComponent', () => {
         expect(canvasInfo.eraserSize).toBe(component.eraserSize);
     });
 
-    it('should call fileManipulationService.clearFile with canvas, id, and file', () => {
+    it('should call the clearFile method of the fileManipulation service', () => {
         const canvas = document.createElement('canvas');
         const id = 'upload-different';
         const file = new File([], 'filename');
-        spyOn(fileManipulationService, 'clearFile');
         component.clearFile(canvas, id, file);
         expect(fileManipulationService.clearFile).toHaveBeenCalledWith(canvas, id, file);
     });
 
-    it('should call fileManipulationService.fileValidation', async () => {
+    it('should call the fileValidation of the fileManipulation service', async () => {
         const event = new Event('change');
-        spyOn(fileManipulationService, 'fileValidation').and.returnValue(Promise.resolve());
         await component.fileValidation(event);
         expect(fileManipulationService.fileValidation).toHaveBeenCalledWith(event);
     });
