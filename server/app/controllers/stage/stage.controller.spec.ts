@@ -166,7 +166,7 @@ describe('StageController', () => {
     });
 
     it('uploadImages() should return 500 if there is an error', async () => {
-        const response = await request(httpServer).post('/stage/image/3'); // .attach('file', Buffer.from('')).attach('file', Buffer.from(''));
+        const response = await request(httpServer).post('/stage/image/3');
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 
