@@ -48,13 +48,14 @@ export class DrawManipulationService {
     }
 
     clearPainting(side: string) {
-        const ctxDiffDrawing = this.canvasInformations.differenceDrawnCanvas.getContext('2d');
-        const ctxOgDrawing = this.canvasInformations.originalDrawnCanvas.getContext('2d');
+        const differenceDrawingContext = this.canvasInformations.differenceDrawnCanvas.getContext('2d');
+        const originalDrawingContext = this.canvasInformations.originalDrawnCanvas.getContext('2d');
+
         if (side === 'right') {
-            if (ctxDiffDrawing) ctxDiffDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+            if (differenceDrawingContext) differenceDrawingContext.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
             this.canvasInformations.isInOriginalCanvas = false;
         } else if (side === 'left') {
-            if (ctxOgDrawing) ctxOgDrawing.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+            if (originalDrawingContext) originalDrawingContext.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
             this.canvasInformations.isInOriginalCanvas = true;
         }
 

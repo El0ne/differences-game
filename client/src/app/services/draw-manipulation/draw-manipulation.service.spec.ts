@@ -1,29 +1,29 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { TestBed } from '@angular/core/testing';
 import { getFakeCanvasInformations } from '@app/services/canvas-informations.constants';
+import { CanvasInformations } from '@common/canvas-informations';
 
 import { DrawManipulationService } from './draw-manipulation.service';
 
 describe('DrawManipulationService', () => {
     let service: DrawManipulationService;
+    let fakeCanvasInfo: CanvasInformations;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
         service = TestBed.inject(DrawManipulationService);
+        fakeCanvasInfo = getFakeCanvasInformations();
     });
 
     it('should be created', () => {
         expect(service).toBeTruthy();
     });
     it('setProperties should update the canvasInformations attribute', () => {
-        const fakeCanvasInfo = getFakeCanvasInformations();
         service.setProperties(fakeCanvasInfo);
         expect(service.canvasInformations).toEqual(fakeCanvasInfo);
     });
 
     it('should invert the canvas', () => {
-        // Draw something on the canvas before inverting
-        const fakeCanvasInfo = getFakeCanvasInformations();
         service.setProperties(fakeCanvasInfo);
         const size = 10;
         const originalDrawingContext = service.canvasInformations.originalDrawnCanvas.getContext('2d');
@@ -49,10 +49,9 @@ describe('DrawManipulationService', () => {
         const differenceCanvasMock = document.createElement('canvas');
         spyOn(differenceCanvasMock.getContext('2d')!, 'drawImage');
 
-        const fakeInfos = getFakeCanvasInformations();
-        fakeInfos.differenceDrawnCanvas = differenceCanvasMock;
+        fakeCanvasInfo.differenceDrawnCanvas = differenceCanvasMock;
 
-        service.setProperties(fakeInfos);
+        service.setProperties(fakeCanvasInfo);
         service.duplicate('right');
 
         expect(differenceCanvasMock.getContext('2d')).not.toBeNull();
@@ -63,13 +62,37 @@ describe('DrawManipulationService', () => {
         const originalCanvasMock = document.createElement('canvas');
         spyOn(originalCanvasMock.getContext('2d')!, 'drawImage');
 
-        const fakeInfos = getFakeCanvasInformations();
-        fakeInfos.originalDrawnCanvas = originalCanvasMock;
-
-        service.setProperties(fakeInfos);
+        fakeCanvasInfo.originalDrawnCanvas = originalCanvasMock;
+        service.setProperties(fakeCanvasInfo);
         service.duplicate('left');
 
         expect(originalCanvasMock.getContext('2d')).not.toBeNull();
         expect(originalCanvasMock.getContext('2d')!.drawImage).toHaveBeenCalled();
+    });
+
+    it('clearPainting should call clearRect on the original context if the side is left', () => {
+        const originalCanvasMock = document.createElement('canvas');
+        spyOn(originalCanvasMock.getContext('2d')!, 'clearRect');
+
+        fakeCanvasInfo.originalDrawnCanvas = originalCanvasMock;
+        fakeCanvasInfo.isInOriginalCanvas = false;
+        service.setProperties(fakeCanvasInfo);
+        service.clearPainting('left');
+
+        expect(originalCanvasMock.getContext('2d')!.clearRect).toHaveBeenCalled();
+        expect(service.canvasInformations.isInOriginalCanvas).toEqual(true);
+    });
+
+    it('clearPainting should call clearRect on the difference context if the side is right', () => {
+        const differenceCanvasMock = document.createElement('canvas');
+        spyOn(differenceCanvasMock.getContext('2d')!, 'clearRect');
+
+        fakeCanvasInfo.differenceDrawnCanvas = differenceCanvasMock;
+        fakeCanvasInfo.isInOriginalCanvas = true;
+        service.setProperties(fakeCanvasInfo);
+        service.clearPainting('right');
+
+        expect(differenceCanvasMock.getContext('2d')!.clearRect).toHaveBeenCalled();
+        expect(service.canvasInformations.isInOriginalCanvas).toEqual(false);
     });
 });
