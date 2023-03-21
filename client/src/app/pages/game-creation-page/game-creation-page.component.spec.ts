@@ -101,6 +101,35 @@ describe('GameCreationPageComponent', () => {
         });
     }));
 
+    it('pressing on ctrl z should call undo method', () => {
+        const keyboardEvent = new KeyboardEvent('keydown', {
+            key: 'z',
+            ctrlKey: true,
+        });
+        const preventDefaultSpy = spyOn(keyboardEvent, 'preventDefault');
+        const undoSpy = spyOn(component, 'undo');
+
+        component.onCtrlZ(keyboardEvent);
+
+        expect(preventDefaultSpy).toHaveBeenCalledTimes(1);
+        expect(undoSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('pressing on ctrl shift z should call undo method', () => {
+        const keyboardEvent = new KeyboardEvent('keydown', {
+            key: 'z',
+            ctrlKey: true,
+            shiftKey: true,
+        });
+        const preventDefaultSpy = spyOn(keyboardEvent, 'preventDefault');
+        const redoSpy = spyOn(component, 'redo');
+
+        component.onCtrlShiftZ(keyboardEvent);
+
+        expect(preventDefaultSpy).toHaveBeenCalledTimes(1);
+        expect(redoSpy).toHaveBeenCalledTimes(1);
+    });
+
     it('should get a title', () => {
         const input = 'Test title';
         component.getTitle(input);
