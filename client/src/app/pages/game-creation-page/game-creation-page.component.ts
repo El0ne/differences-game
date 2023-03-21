@@ -15,6 +15,7 @@ import { UndoRedoService } from '@app/services/undo-redo/undo-redo.service';
 import { CanvasInformations } from '@common/canvas-informations';
 import { GameCardDto } from '@common/game-card.dto';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
+import { Buffer } from 'buffer';
 import { GC_PATHS } from './game-creation-constants';
 
 const PEN_SIZE = 10;
@@ -236,14 +237,12 @@ export class GameCreationPageComponent implements OnInit {
 
         return this.createBlob(canvas);
     }
+
     createBlob(canvas: HTMLCanvasElement): Blob {
         const imageData = canvas.toDataURL('image/bmp');
-        const byteString = atob(imageData.split(',')[1]);
-        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const byteString = imageData.split(',')[1];
+        const arrayBuffer = Buffer.from(byteString, 'base64');
         const uint8Array = new Uint8Array(arrayBuffer);
-        for (let i = 0; i < byteString.length; i++) {
-            uint8Array[i] = byteString.charCodeAt(i);
-        }
         return new Blob([uint8Array], { type: 'image/bmp' });
     }
 
