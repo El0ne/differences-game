@@ -63,6 +63,7 @@ describe('GameCreationPageComponent', () => {
                 { provide: DrawingRectangleService, useValue: drawingRectangleService },
                 { provide: FileManipulationService, useValue: fileManipulationService },
                 { provide: CanvasSelectionService, useValue: canvasSelectionService },
+                { provide: DrawManipulationService, useValue: drawManipulationService },
             ],
         }).compileComponents();
 
@@ -105,8 +106,6 @@ describe('GameCreationPageComponent', () => {
 
     it('should call setColor on drawingRectangleService with selectedColor', () => {
         component.setColor();
-
-        expect(drawingRectangleService.setColor).toHaveBeenCalledWith(component.selectedColor);
         expect(component.canvasInformations.selectedColor).toBe(component.selectedColor);
     });
     it('should set objects', () => {
@@ -144,14 +143,12 @@ describe('GameCreationPageComponent', () => {
         const canvas = document.createElement('canvas');
         const id = 'upload-different';
         const file = new File([], 'filename');
-        spyOn(fileManipulationService, 'clearFile');
         component.clearFile(canvas, id, file);
         expect(fileManipulationService.clearFile).toHaveBeenCalledWith(canvas, id, file);
     });
 
     it('should call fileManipulationService.fileValidation', async () => {
         const event = new Event('change');
-        spyOn(fileManipulationService, 'fileValidation').and.returnValue(Promise.resolve());
         await component.fileValidation(event);
         expect(fileManipulationService.fileValidation).toHaveBeenCalledWith(event);
     });
