@@ -136,10 +136,6 @@ export class GameCreationPageComponent implements OnInit {
         setTimeout(() => {
             this.canvasInformations = this.setObject();
             this.canvasSelectionService.setProperties(this.canvasInformations);
-            this.penService.setProperties(this.canvasInformations);
-            this.drawManipulationService.setProperties(this.canvasInformations);
-            this.drawingRectangleService.setProperties(this.canvasInformations);
-            this.eraserButtonService.setProperties(this.canvasInformations);
             this.fileManipulationService.updateAttributes({
                 originalFile: this.originalFile,
                 differenceFile: this.differentFile,
@@ -150,8 +146,7 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     setColor(): void {
-        this.penService.setColor(this.selectedColor);
-        this.drawingRectangleService.setColor(this.selectedColor);
+        this.canvasInformations.selectedColor = this.selectedColor;
     }
 
     setObject(): CanvasInformations {
