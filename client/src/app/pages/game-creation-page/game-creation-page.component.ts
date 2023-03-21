@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
 import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
 import { DrawManipulationService } from '@app/services/draw-manipulation/draw-manipulation.service';
-import { EraserButtonService } from '@app/services/eraser-button/eraser-button.service';
+import { EraserService } from '@app/services/eraser/eraser.service';
 import { FileManipulationService } from '@app/services/file-manipulation/file-manipulation.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { PenService } from '@app/services/pen-service/pen-service.service';
@@ -110,7 +110,7 @@ export class GameCreationPageComponent implements OnInit {
         private canvasSelectionService: CanvasSelectionService,
         private penService: PenService,
         private rectangleService: RectangleService,
-        private eraserService: EraserButtonService,
+        private eraserService: EraserService,
         private drawManipulationService: DrawManipulationService,
         private undoRedoService: UndoRedoService,
     ) {}

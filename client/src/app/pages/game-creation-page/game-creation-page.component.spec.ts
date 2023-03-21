@@ -11,7 +11,7 @@ import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component'
 import { getFakeCanvasInformations } from '@app/services/canvas-informations.constants';
 import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
 import { DrawManipulationService } from '@app/services/draw-manipulation/draw-manipulation.service';
-import { EraserButtonService } from '@app/services/eraser-button/eraser-button.service';
+import { EraserService } from '@app/services/eraser/eraser.service';
 import { FileManipulationService } from '@app/services/file-manipulation/file-manipulation.service';
 import { PenService } from '@app/services/pen-service/pen-service.service';
 import { RectangleService } from '@app/services/rectangle/rectangle.service';
@@ -28,7 +28,7 @@ describe('GameCreationPageComponent', () => {
     let fileManipulationService: FileManipulationService;
     let penService: PenService;
     let canvasSelectionService: CanvasSelectionService;
-    let eraserButtonService: EraserButtonService;
+    let eraserService: EraserService;
     let undoRedoService: UndoRedoService;
     let drawManipulationService: DrawManipulationService;
     let router: Router;
@@ -42,7 +42,7 @@ describe('GameCreationPageComponent', () => {
             'stopDrawingRectangle',
             'paintRectangle',
         ]);
-        eraserButtonService = jasmine.createSpyObj('EraserButtonService', ['setProperties', 'startErase', 'stopErase', 'erasing']);
+        eraserService = jasmine.createSpyObj('EraserButtonService', ['setProperties', 'startErase', 'stopErase', 'erasing']);
         fileManipulationService = jasmine.createSpyObj('FileManipulationService', [
             'setProperties',
             'updateAttributes',
@@ -64,7 +64,7 @@ describe('GameCreationPageComponent', () => {
                 { provide: RectangleService, useValue: rectangleService },
                 { provide: FileManipulationService, useValue: fileManipulationService },
                 { provide: CanvasSelectionService, useValue: canvasSelectionService },
-                { provide: EraserButtonService, useValue: eraserButtonService },
+                { provide: EraserService, useValue: eraserService },
                 { provide: DrawManipulationService, useValue: drawManipulationService },
                 { provide: UndoRedoService, useValue: undoRedoService },
             ],
@@ -314,7 +314,7 @@ describe('GameCreationPageComponent', () => {
 
         component.erase();
 
-        expect(eraserButtonService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
+        expect(eraserService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
 
         expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mousedown', component.eraseListener[0]);
         expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mouseup', component.eraseListener[1]);
