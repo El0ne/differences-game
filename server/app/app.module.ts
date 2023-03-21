@@ -1,6 +1,7 @@
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
 import { GameCard, gameCardSchema } from '@app/schemas/game-cards.schemas';
+import { GameCardService } from '@app/services/game-card/game-card.service';
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -11,7 +12,6 @@ import { StageWaitingRoomGateway } from './gateways/waitingRoom/stage-waiting-ro
 import { DifferenceClickService } from './services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from './services/difference-detection/difference-detection.service';
 import { DifferencesCounterService } from './services/differences-counter/differences-counter.service';
-import { GameCardService } from './services/game-card/game-card.service';
 import { GameDifficultyService } from './services/game-difficulty/game-difficulty.service';
 import { GameManagerService } from './services/game-manager/game-manager.service';
 import { ImageDimensionsService } from './services/image-dimensions/image-dimensions.service';
