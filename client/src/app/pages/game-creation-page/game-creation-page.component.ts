@@ -103,15 +103,15 @@ export class GameCreationPageComponent implements OnInit {
     constructor(
         // we need more than 3 Services/Routers/Dialogs
         public gameCardService: GameCardInformationService,
-        private matDialog: MatDialog,
+        public matDialog: MatDialog,
         public router: Router,
-        private fileManipulationService: FileManipulationService,
-        private canvasSelectionService: CanvasSelectionService,
-        private penService: PenService,
-        private drawingRectangleService: DrawingRectangleService,
-        private eraserButtonService: EraserButtonService,
-        private drawManipulationService: DrawManipulationService,
-        private undoRedoService: UndoRedoService,
+        public fileManipulationService: FileManipulationService,
+        public canvasSelectionService: CanvasSelectionService,
+        public penService: PenService,
+        public drawingRectangleService: DrawingRectangleService,
+        public eraserButtonService: EraserButtonService,
+        public drawManipulationService: DrawManipulationService,
+        public undoRedoService: UndoRedoService,
     ) {}
 
     @HostListener('document:keydown.control.z', ['$event'])
