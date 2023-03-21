@@ -136,16 +136,21 @@ export class GameCreationPageComponent implements OnInit {
         setTimeout(() => {
             this.canvasInformations = this.setObject();
             this.canvasSelectionService.setProperties(this.canvasInformations);
+            this.penService.setProperties(this.canvasInformations);
+            this.drawManipulationService.setProperties(this.canvasInformations);
+            this.drawingRectangleService.setProperties(this.canvasInformations);
+            this.eraserButtonService.setProperties(this.canvasInformations);
             this.fileManipulationService.updateAttributes({
                 originalFile: this.originalFile,
                 differenceFile: this.differentFile,
                 originalCanvas: this.originalCanvas.nativeElement,
                 differenceCanvas: this.differenceCanvas.nativeElement,
             });
-        }, ERASER_SIZE);
+        }, 50);
     }
 
     setColor(): void {
+        this.penService.setColor(this.selectedColor);
         this.drawingRectangleService.setColor(this.selectedColor);
     }
 
@@ -234,17 +239,17 @@ export class GameCreationPageComponent implements OnInit {
             context.drawImage(canvas2, 0, 0);
         }
 
-        return this.createBlob(/* canvas*/);
+        return this.createBlob(canvas);
     }
-    createBlob(/* canvas: HTMLCanvasElement*/): Blob {
-        //     const imageData = canvas.toDataURL('image/bmp');
-        //     const byteString = atob(imageData.split(',')[1]);
-        //     const arrayBuffer = new ArrayBuffer(byteString.length);
-        //     const uint8Array = new Uint8Array(arrayBuffer);
-        //     for (let i = 0; i < byteString.length; i++) {
-        //         uint8Array[i] = byteString.charCodeAt(i);
-        //     }
-        return new Blob([], { type: 'image/bmp' });
+    createBlob(canvas: HTMLCanvasElement): Blob {
+        const imageData = canvas.toDataURL('image/bmp');
+        const byteString = atob(imageData.split(',')[1]);
+        const arrayBuffer = new ArrayBuffer(byteString.length);
+        const uint8Array = new Uint8Array(arrayBuffer);
+        for (let i = 0; i < byteString.length; i++) {
+            uint8Array[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([uint8Array], { type: 'image/bmp' });
     }
 
     async save() {

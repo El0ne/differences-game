@@ -5,6 +5,7 @@ import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angu
 import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
 import { DrawingRectangleService } from '@app/services/drawing-rectangle/drawing-rectangle.service';
+import { FileManipulationService } from '@app/services/file-manipulation/file-manipulation.service';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 import { of } from 'rxjs';
 import { GameCreationPageComponent } from './game-creation-page.component';
@@ -14,6 +15,7 @@ describe('GameCreationPageComponent', () => {
     let fixture: ComponentFixture<GameCreationPageComponent>;
     let canvasOg: HTMLCanvasElement;
     let drawingRectangleService: DrawingRectangleService;
+    let fileManipulationService: FileManipulationService;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -53,7 +55,7 @@ describe('GameCreationPageComponent', () => {
 
         component.ngOnInit();
 
-        tick(50); // ERASER_SIZE
+        tick(50);
 
         expect(component.setObject()).toEqual(component.canvasInformations);
         expect(component.canvasSelectionService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
@@ -107,25 +109,80 @@ describe('GameCreationPageComponent', () => {
         expect(canvasInfo.penSize).toBe(component.penSize);
         expect(canvasInfo.eraserSize).toBe(component.eraserSize);
     });
-    // it('should send alert if not good number of differences', fakeAsync(() => {
-    //     spyOn(window, 'alert');
 
-    //     component.gameTitle = 'My Game';
-    //     component.originalFile = new File([''], 'original.bmp');
-    //     component.differentFile = new File([''], 'different.bmp');
+    it('should call fileManipulationService.clearFile with canvas, id, and file', () => {
+        const canvas = document.createElement('canvas');
+        const id = 'upload-different';
+        const file = new File([], 'filename');
+        spyOn(fileManipulationService, 'clearFile');
+        component.clearFile(canvas, id, file);
+        expect(fileManipulationService.clearFile).toHaveBeenCalledWith(canvas, id, file);
+    });
 
-    //     spyOn(component, 'saveVerification').and.returnValue(true);
-    //     spyOn(component, 'openSaveModal');
+    it('should call fileManipulationService.fileValidation', async () => {
+        const event = new Event('change');
+        spyOn(fileManipulationService, 'fileValidation').and.returnValue(Promise.resolve());
+        await component.fileValidation(event);
+        expect(fileManipulationService.fileValidation).toHaveBeenCalledWith(event);
+    });
 
-    //     const mockServerInfo: ServerGeneratedGameInfo = {
-    //         gameId: '',
-    //         originalImageName: '',
-    //         differenceImageName: '',
-    //         gameDifficulty: '',
-    //         gameDifferenceNumber: 0,
-    //     };
-    //     spyOn(component.gameCardService, 'uploadImages').and.returnValue(of(mockServerInfo));
-    //     component.save();
-    //     expect(window.alert).toHaveBeenCalledWith("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
-    // }));
+    it('should verify and send an alert if the title and both images are missing', () => {
+        component.gameTitle = '';
+        component.originalFile = null;
+        component.differentFile = null;
+        const alertSpy = spyOn(window, 'alert');
+
+        expect(component.saveVerification()).toBeFalse();
+        expect(alertSpy).toHaveBeenCalledWith('Il manque une image et un titre à votre jeu !');
+    });
+
+    it('should verify and send an alert if the title is missing', () => {
+        component.gameTitle = '';
+        component.originalFile = new File([], 'test.png');
+        component.differentFile = new File([], 'test-diff.png');
+        const alertSpy = spyOn(window, 'alert');
+
+        expect(component.saveVerification()).toBeFalse();
+        expect(alertSpy).toHaveBeenCalledWith("N'oubliez pas d'ajouter un titre à votre jeu !");
+    });
+
+    it('should verify and send an alert if one of the images is missing', () => {
+        component.gameTitle = 'Test Game';
+        component.originalFile = null;
+        component.differentFile = new File([], 'test-diff.png');
+
+        expect(component.saveVerification()).toBeFalse();
+
+        component.originalFile = new File([], 'test.png');
+        component.differentFile = null;
+        const alertSpy = spyOn(window, 'alert');
+
+        expect(component.saveVerification()).toBeFalse();
+        expect(alertSpy).toHaveBeenCalledWith('Un jeu de différences sans image est pour ainsi dire... intéressant ? Ajoutez une image.');
+    });
+
+    it('should return true if all conditions are met', () => {
+        component.gameTitle = 'Test Game';
+        component.originalFile = new File([], 'test.png');
+        component.differentFile = new File([], 'test-diff.png');
+
+        expect(component.saveVerification()).toBeTrue();
+    });
+
+    it('should merge two canvases into a blob', () => {
+        const canvas1 = document.createElement('canvas');
+        const canvas2 = document.createElement('canvas');
+        const ctx1 = canvas1.getContext('2d');
+        const ctx2 = canvas2.getContext('2d');
+        if (ctx1) {
+            ctx1.fillStyle = '#FF0000';
+            ctx1.fillRect(0, 0, 50, 50);
+        }
+        if (ctx2) {
+            ctx2.fillStyle = '#00FF00';
+            ctx2.fillRect(25, 25, 50, 50);
+        }
+        const result = component.mergeCanvas(canvas1, canvas2);
+        expect(result).toBeInstanceOf(Blob);
+    });
 });
