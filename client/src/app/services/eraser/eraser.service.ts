@@ -6,7 +6,7 @@ import { CanvasInformations } from '@common/canvas-informations';
 @Injectable({
     providedIn: 'root',
 })
-export class EraserButtonService {
+export class EraserService {
     canvasInformations: CanvasInformations;
 
     constructor(private canvasSelectionService: CanvasSelectionService, private undoRedoService: UndoRedoService) {}

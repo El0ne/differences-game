@@ -11,10 +11,10 @@ import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component'
 import { getFakeCanvasInformations } from '@app/services/canvas-informations.constants';
 import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
 import { DrawManipulationService } from '@app/services/draw-manipulation/draw-manipulation.service';
-import { DrawingRectangleService } from '@app/services/drawing-rectangle/drawing-rectangle.service';
-import { EraserButtonService } from '@app/services/eraser-button/eraser-button.service';
+import { EraserService } from '@app/services/eraser/eraser.service';
 import { FileManipulationService } from '@app/services/file-manipulation/file-manipulation.service';
 import { PenService } from '@app/services/pen-service/pen-service.service';
+import { RectangleService } from '@app/services/rectangle/rectangle.service';
 import { UndoRedoService } from '@app/services/undo-redo/undo-redo.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
@@ -24,11 +24,11 @@ describe('GameCreationPageComponent', () => {
     let component: GameCreationPageComponent;
     let fixture: ComponentFixture<GameCreationPageComponent>;
     let canvasOg: HTMLCanvasElement;
-    let drawingRectangleService: DrawingRectangleService;
+    let rectangleService: RectangleService;
     let fileManipulationService: FileManipulationService;
     let penService: PenService;
     let canvasSelectionService: CanvasSelectionService;
-    let eraserButtonService: EraserButtonService;
+    let eraserService: EraserService;
     let undoRedoService: UndoRedoService;
     let drawManipulationService: DrawManipulationService;
     let router: Router;
@@ -36,13 +36,13 @@ describe('GameCreationPageComponent', () => {
 
     beforeEach(async () => {
         penService = jasmine.createSpyObj('PenService', ['setProperties', 'startPen', 'stopPen', 'writing']);
-        drawingRectangleService = jasmine.createSpyObj('DrawingRectangleService', [
+        rectangleService = jasmine.createSpyObj('RectangleService', [
             'setProperties',
             'startDrawingRectangle',
             'stopDrawingRectangle',
             'paintRectangle',
         ]);
-        eraserButtonService = jasmine.createSpyObj('EraserButtonService', ['setProperties', 'startErase', 'stopErase', 'erasing']);
+        eraserService = jasmine.createSpyObj('EraserButtonService', ['setProperties', 'startErase', 'stopErase', 'erasing']);
         fileManipulationService = jasmine.createSpyObj('FileManipulationService', [
             'setProperties',
             'updateAttributes',
@@ -61,10 +61,10 @@ describe('GameCreationPageComponent', () => {
                 { provide: MatDialog, useValue: { matDialog } },
                 { provide: MatDialogRef, useValue: {} },
                 { provide: PenService, useValue: penService },
-                { provide: DrawingRectangleService, useValue: drawingRectangleService },
+                { provide: RectangleService, useValue: rectangleService },
                 { provide: FileManipulationService, useValue: fileManipulationService },
                 { provide: CanvasSelectionService, useValue: canvasSelectionService },
-                { provide: EraserButtonService, useValue: eraserButtonService },
+                { provide: EraserService, useValue: eraserService },
                 { provide: DrawManipulationService, useValue: drawManipulationService },
                 { provide: UndoRedoService, useValue: undoRedoService },
             ],
@@ -161,18 +161,6 @@ describe('GameCreationPageComponent', () => {
         });
 
         expect(router.navigate).toHaveBeenCalledWith(['/config']);
-
-        // const result = { image: 'testImage' };
-        // spyOn(result, 'image').set;
-        // spyOn(router, 'navigate');
-        // spyOn(matDialog, 'open').and.returnValue({
-        //     afterClosed: () => of(result),
-        // } );
-
-        // component.openSaveModal();
-
-        // expect(result.image.set).toHaveBeenCalledWith('');
-        // expect(router.navigate).toHaveBeenCalledWith(['/config']);
     });
 
     it('should call setDrawing and set the proper value to the canvas Informations', () => {
@@ -309,7 +297,7 @@ describe('GameCreationPageComponent', () => {
 
         component.drawRectangle();
 
-        expect(drawingRectangleService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
+        expect(rectangleService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
 
         expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mousedown', component.rectangleListener[0]);
         expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mouseup', component.rectangleListener[1]);
@@ -326,7 +314,7 @@ describe('GameCreationPageComponent', () => {
 
         component.erase();
 
-        expect(eraserButtonService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
+        expect(eraserService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
 
         expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mousedown', component.eraseListener[0]);
         expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mouseup', component.eraseListener[1]);

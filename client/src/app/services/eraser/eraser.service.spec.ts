@@ -2,17 +2,17 @@
 import { TestBed } from '@angular/core/testing';
 import { getFakeCanvasInformations } from '@app/services/canvas-informations.constants';
 import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
-import { EraserButtonService } from './eraser-button.service';
+import { EraserService } from './eraser.service';
 
 describe('EraserButtonService', () => {
-    let service: EraserButtonService;
+    let service: EraserService;
     const mockCanvasSelectionService = jasmine.createSpyObj(['choseCanvas']);
 
     beforeEach(() => {
         TestBed.configureTestingModule({
             providers: [{ provide: CanvasSelectionService, useValue: mockCanvasSelectionService }],
         });
-        service = TestBed.inject(EraserButtonService);
+        service = TestBed.inject(EraserService);
         const fakeCanvasInfo = getFakeCanvasInformations();
         service.setProperties(fakeCanvasInfo);
     });
