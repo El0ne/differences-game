@@ -2,17 +2,17 @@
 import { TestBed } from '@angular/core/testing';
 import { getFakeCanvasInformations } from '@app/services/canvas-informations.constants';
 import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
-import { DrawingRectangleService } from './drawing-rectangle.service';
+import { RectangleService } from './rectangle.service';
 
 describe('DrawingRectangleService', () => {
-    let service: DrawingRectangleService;
+    let service: RectangleService;
     const mockCanvasSelectionService = jasmine.createSpyObj(['choseCanvas']);
 
     beforeEach(() => {
         TestBed.configureTestingModule({
             providers: [{ provide: CanvasSelectionService, useValue: mockCanvasSelectionService }],
         });
-        service = TestBed.inject(DrawingRectangleService);
+        service = TestBed.inject(RectangleService);
         const fakeCanvasInfo = getFakeCanvasInformations();
         service.setProperties(fakeCanvasInfo);
     });
@@ -119,12 +119,4 @@ describe('DrawingRectangleService', () => {
             height,
         );
     });
-
-    // it('should draw rectangle on canvas 1 and 2', () => {
-    //     spyOn(service.canvasInformations.originalRectangleCanvas, 'addEventListener');
-    //     spyOn(service.canvasInformations.differenceRectangleCanvas, 'addEventListener');
-    //     service.drawRectangle();
-    //     expect(service.canvasInformations.originalRectangleCanvas.addEventListener).toHaveBeenCalledTimes(3);
-    //     expect(service.canvasInformations.differenceRectangleCanvas.addEventListener).toHaveBeenCalledTimes(3);
-    // });
 });

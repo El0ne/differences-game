@@ -6,7 +6,7 @@ import { CanvasInformations } from '@common/canvas-informations';
 @Injectable({
     providedIn: 'root',
 })
-export class DrawingRectangleService {
+export class RectangleService {
     canvasInformations: CanvasInformations;
 
     constructor(private canvasSelectionService: CanvasSelectionService, private undoRedoService: UndoRedoService) {}

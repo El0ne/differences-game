@@ -5,11 +5,11 @@ import { Router } from '@angular/router';
 import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
 import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
 import { DrawManipulationService } from '@app/services/draw-manipulation/draw-manipulation.service';
-import { DrawingRectangleService } from '@app/services/drawing-rectangle/drawing-rectangle.service';
 import { EraserButtonService } from '@app/services/eraser-button/eraser-button.service';
 import { FileManipulationService } from '@app/services/file-manipulation/file-manipulation.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { PenService } from '@app/services/pen-service/pen-service.service';
+import { RectangleService } from '@app/services/rectangle/rectangle.service';
 import { STAGE } from '@app/services/server-routes';
 import { UndoRedoService } from '@app/services/undo-redo/undo-redo.service';
 import { CanvasInformations } from '@common/canvas-informations';
@@ -85,14 +85,14 @@ export class GameCreationPageComponent implements OnInit {
     canvasInformations: CanvasInformations;
 
     eraseListener: ((mouseEvent: MouseEvent) => void)[] = [
-        this.eraserButtonService.startErase.bind(this),
-        this.eraserButtonService.stopErase.bind(this),
-        this.eraserButtonService.erasing.bind(this),
+        this.eraserService.startErase.bind(this),
+        this.eraserService.stopErase.bind(this),
+        this.eraserService.erasing.bind(this),
     ];
     rectangleListener: ((mouseEvent: MouseEvent) => void)[] = [
-        this.drawingRectangleService.startDrawingRectangle.bind(this),
-        this.drawingRectangleService.stopDrawingRectangle.bind(this),
-        this.drawingRectangleService.paintRectangle.bind(this),
+        this.rectangleService.startDrawingRectangle.bind(this),
+        this.rectangleService.stopDrawingRectangle.bind(this),
+        this.rectangleService.paintRectangle.bind(this),
     ];
     penListener: ((mouseEvent: MouseEvent) => void)[] = [
         this.penService.startPen.bind(this),
@@ -109,8 +109,8 @@ export class GameCreationPageComponent implements OnInit {
         private fileManipulationService: FileManipulationService,
         private canvasSelectionService: CanvasSelectionService,
         private penService: PenService,
-        private drawingRectangleService: DrawingRectangleService,
-        private eraserButtonService: EraserButtonService,
+        private rectangleService: RectangleService,
+        private eraserService: EraserButtonService,
         private drawManipulationService: DrawManipulationService,
         private undoRedoService: UndoRedoService,
     ) {}
@@ -293,7 +293,7 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     drawRectangle(): void {
-        this.drawingRectangleService.setProperties(this.canvasInformations);
+        this.rectangleService.setProperties(this.canvasInformations);
 
         this.canvasInformations.originalRectangleCanvas.addEventListener('mousedown', this.rectangleListener[0]);
         this.canvasInformations.differenceRectangleCanvas.addEventListener('mousedown', this.rectangleListener[0]);
@@ -306,7 +306,7 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     erase(): void {
-        this.eraserButtonService.setProperties(this.canvasInformations);
+        this.eraserService.setProperties(this.canvasInformations);
         this.canvasInformations.originalDrawnCanvas.addEventListener('mousedown', this.eraseListener[0]);
         this.canvasInformations.differenceDrawnCanvas.addEventListener('mousedown', this.eraseListener[0]);
 
