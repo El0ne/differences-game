@@ -10,7 +10,6 @@ describe('MatchGateway', () => {
     let gateway: MatchGateway;
     let gameManagerServiceSpy: SinonStubbedInstance<GameManagerService>;
     let socket: SinonStubbedInstance<Socket>;
-    // eslint-disable-next-line no-unused-vars
     let server: SinonStubbedInstance<Server>;
 
     beforeEach(async () => {
@@ -21,7 +20,9 @@ describe('MatchGateway', () => {
 
         server.to.returns({
             // eslint-disable-next-line no-unused-vars
-            emit: (event: string, data: number) => {},
+            emit: (event: string, data: number) => {
+                return;
+            },
         } as BroadcastOperator<unknown, unknown>);
 
         socket.data = {};
