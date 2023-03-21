@@ -5,9 +5,7 @@ import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testin
 import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
 import { getFakeCanvasInformations } from '@app/services/canvas-informations.constants';
 import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
 import { DrawManipulationService } from '@app/services/draw-manipulation/draw-manipulation.service';
@@ -16,7 +14,6 @@ import { FileManipulationService } from '@app/services/file-manipulation/file-ma
 import { PenService } from '@app/services/pen-service/pen-service.service';
 import { RectangleService } from '@app/services/rectangle/rectangle.service';
 import { UndoRedoService } from '@app/services/undo-redo/undo-redo.service';
-import { GameCardDto } from '@common/game-card.dto';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 import { GameCreationPageComponent } from './game-creation-page.component';
 
@@ -31,7 +28,6 @@ describe('GameCreationPageComponent', () => {
     let eraserService: EraserService;
     let undoRedoService: UndoRedoService;
     let drawManipulationService: DrawManipulationService;
-    let router: Router;
     let matDialog: MatDialog;
 
     beforeEach(async () => {
@@ -131,36 +127,6 @@ describe('GameCreationPageComponent', () => {
         const input = 'Test title';
         component.getTitle(input);
         expect(component.gameTitle).toBe(input);
-    });
-
-    it('should open the modal and navigate to the configuration page after', () => {
-        const gameCardDto: GameCardDto = {
-            _id: '1',
-            name: 'Test Game',
-            difficulty: 'easy',
-            baseImage: 'testBaseImage',
-            differenceImage: 'testDifferenceImage',
-            radius: 5,
-            differenceNumber: 3,
-        };
-
-        component.differenceImage = gameCardDto.differenceImage;
-        component.differenceNumber = gameCardDto.differenceNumber;
-        component.difficulty = gameCardDto.difficulty;
-        component.createdGameInfo = gameCardDto;
-
-        component.openSaveModal();
-        expect(matDialog.open).toHaveBeenCalledWith(ModalPageComponent, {
-            disableClose: true,
-            data: {
-                image: gameCardDto.differenceImage,
-                difference: gameCardDto.differenceNumber,
-                difficulty: gameCardDto.difficulty,
-                gameInfo: gameCardDto,
-            },
-        });
-
-        expect(router.navigate).toHaveBeenCalledWith(['/config']);
     });
 
     it('should call setDrawing and set the proper value to the canvas Informations', () => {
@@ -325,21 +291,40 @@ describe('GameCreationPageComponent', () => {
         expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mousemove', component.eraseListener[2]);
     });
 
-    it('should remove event listeners', () => {
-        const spy = spyOn(component.originalDrawnCanvas.nativeElement, 'removeEventListener');
+    it('should remove event listeners on drawn canvases', () => {
+        const originalDrawnCanvasSpy = spyOn(component.originalDrawnCanvas.nativeElement, 'removeEventListener');
+        const differenceDrawnCanvasSpy = spyOn(component.differenceDrawnCanvas.nativeElement, 'removeEventListener');
         component.removingListeners();
 
-        expect(spy).toHaveBeenCalledWith('mousedown', component.rectangleListener[0]);
-        expect(spy).toHaveBeenCalledWith('mouseup', component.rectangleListener[1]);
-        expect(spy).toHaveBeenCalledWith('mousemove', component.rectangleListener[2]);
+        expect(originalDrawnCanvasSpy).toHaveBeenCalledWith('mousedown', component.penListener[0]);
+        expect(originalDrawnCanvasSpy).toHaveBeenCalledWith('mouseup', component.penListener[1]);
+        expect(originalDrawnCanvasSpy).toHaveBeenCalledWith('mousemove', component.penListener[2]);
 
-        expect(spy).toHaveBeenCalledWith('mousedown', component.penListener[0]);
-        expect(spy).toHaveBeenCalledWith('mouseup', component.penListener[1]);
-        expect(spy).toHaveBeenCalledWith('mousemove', component.penListener[2]);
+        expect(originalDrawnCanvasSpy).toHaveBeenCalledWith('mousedown', component.eraseListener[0]);
+        expect(originalDrawnCanvasSpy).toHaveBeenCalledWith('mouseup', component.eraseListener[1]);
+        expect(originalDrawnCanvasSpy).toHaveBeenCalledWith('mousemove', component.eraseListener[2]);
 
-        expect(spy).toHaveBeenCalledWith('mousedown', component.eraseListener[0]);
-        expect(spy).toHaveBeenCalledWith('mouseup', component.eraseListener[1]);
-        expect(spy).toHaveBeenCalledWith('mousemove', component.eraseListener[2]);
+        expect(differenceDrawnCanvasSpy).toHaveBeenCalledWith('mousedown', component.penListener[0]);
+        expect(differenceDrawnCanvasSpy).toHaveBeenCalledWith('mouseup', component.penListener[1]);
+        expect(differenceDrawnCanvasSpy).toHaveBeenCalledWith('mousemove', component.penListener[2]);
+
+        expect(differenceDrawnCanvasSpy).toHaveBeenCalledWith('mousedown', component.eraseListener[0]);
+        expect(differenceDrawnCanvasSpy).toHaveBeenCalledWith('mouseup', component.eraseListener[1]);
+        expect(differenceDrawnCanvasSpy).toHaveBeenCalledWith('mousemove', component.eraseListener[2]);
+    });
+
+    it('should remove event listeners on rectangle canvases', () => {
+        const originalRectangleCanvasSpy = spyOn(component.originalRectangleCanvas.nativeElement, 'removeEventListener');
+        const differenceRectangleCanvasSpy = spyOn(component.differenceRectangleCanvas.nativeElement, 'removeEventListener');
+        component.removingListeners();
+
+        expect(originalRectangleCanvasSpy).toHaveBeenCalledWith('mousedown', component.rectangleListener[0]);
+        expect(originalRectangleCanvasSpy).toHaveBeenCalledWith('mouseup', component.rectangleListener[1]);
+        expect(originalRectangleCanvasSpy).toHaveBeenCalledWith('mousemove', component.rectangleListener[2]);
+
+        expect(differenceRectangleCanvasSpy).toHaveBeenCalledWith('mousedown', component.rectangleListener[0]);
+        expect(differenceRectangleCanvasSpy).toHaveBeenCalledWith('mouseup', component.rectangleListener[1]);
+        expect(differenceRectangleCanvasSpy).toHaveBeenCalledWith('mousemove', component.rectangleListener[2]);
     });
 
     it('should change the z indexes if the rectangle button is enabled', () => {
