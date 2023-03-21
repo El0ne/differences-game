@@ -150,7 +150,6 @@ export class GameCreationPageComponent implements OnInit {
         this.canvasInformations.selectedColor = this.selectedColor;
         this.canvasInformations.penSize = this.penSize;
         this.canvasInformations.eraserSize = this.eraserSize;
-        console.log('this.canvasInformations.eraserSize', this.canvasInformations.eraserSize);
     }
 
     setObject(): CanvasInformations {
