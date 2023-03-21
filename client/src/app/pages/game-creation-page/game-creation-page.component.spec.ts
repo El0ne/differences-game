@@ -175,9 +175,11 @@ describe('GameCreationPageComponent', () => {
         // expect(router.navigate).toHaveBeenCalledWith(['/config']);
     });
 
-    it('should call setColor on drawingRectangleService with selectedColor', () => {
-        component.setColor();
+    it('should call setDrawing and set the proper value to the canvas Informations', () => {
+        component.setDrawingProperty();
         expect(component.canvasInformations.selectedColor).toBe(component.selectedColor);
+        expect(component.canvasInformations.penSize).toBe(component.penSize);
+        expect(component.canvasInformations.eraserSize).toBe(component.eraserSize);
     });
     it('should set objects', () => {
         const canvasInfo = component.setObject();
