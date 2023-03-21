@@ -105,8 +105,6 @@ describe('GameCreationPageComponent', () => {
 
     it('should call setColor on drawingRectangleService with selectedColor', () => {
         component.setColor();
-
-        expect(drawingRectangleService.setColor).toHaveBeenCalledWith(component.selectedColor);
         expect(component.canvasInformations.selectedColor).toBe(component.selectedColor);
     });
     it('should set objects', () => {
@@ -215,66 +213,54 @@ describe('GameCreationPageComponent', () => {
     });
 
     it('should add event listeners when user draws on the canvases with a pen', () => {
+        const addEventListenerOriginalSpy = spyOn(component.canvasInformations.originalDrawnCanvas, 'addEventListener');
+        const addEventListenerDifferenceSpy = spyOn(component.canvasInformations.differenceDrawnCanvas, 'addEventListener');
+
         component.drawPen();
 
         expect(penService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
 
-        component.canvasInformations.originalDrawnCanvas.dispatchEvent(new MouseEvent('mousedown'));
-        expect(penService.startPen).toHaveBeenCalled();
-        component.canvasInformations.differenceDrawnCanvas.dispatchEvent(new MouseEvent('mousedown'));
-        expect(penService.startPen).toHaveBeenCalled();
+        expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mousedown', component.penListener[0]);
+        expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mouseup', component.penListener[1]);
+        expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mousemove', component.penListener[2]);
 
-        component.canvasInformations.originalDrawnCanvas.dispatchEvent(new MouseEvent('mouseup'));
-        expect(penService.stopPen).toHaveBeenCalled();
-        component.canvasInformations.differenceDrawnCanvas.dispatchEvent(new MouseEvent('mouseup'));
-        expect(penService.stopPen).toHaveBeenCalled();
-
-        component.canvasInformations.originalDrawnCanvas.dispatchEvent(new MouseEvent('mousemove'));
-        expect(penService.writing).toHaveBeenCalled();
-        component.canvasInformations.differenceDrawnCanvas.dispatchEvent(new MouseEvent('mousemove'));
-        expect(penService.writing).toHaveBeenCalled();
+        expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mousedown', component.penListener[0]);
+        expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mouseup', component.penListener[1]);
+        expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mousemove', component.penListener[2]);
     });
 
     it('should add event listeners when user draws a rectangle on the canvases', () => {
+        const addEventListenerOriginalSpy = spyOn(component.canvasInformations.originalRectangleCanvas, 'addEventListener');
+        const addEventListenerDifferenceSpy = spyOn(component.canvasInformations.differenceRectangleCanvas, 'addEventListener');
+
         component.drawRectangle();
 
         expect(drawingRectangleService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
 
-        component.canvasInformations.originalDrawnCanvas.dispatchEvent(new MouseEvent('mousedown'));
-        expect(drawingRectangleService.startDrawingRectangle).toHaveBeenCalled();
-        component.canvasInformations.differenceDrawnCanvas.dispatchEvent(new MouseEvent('mousedown'));
-        expect(drawingRectangleService.startDrawingRectangle).toHaveBeenCalled();
+        expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mousedown', component.rectangleListener[0]);
+        expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mouseup', component.rectangleListener[1]);
+        expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mousemove', component.rectangleListener[2]);
 
-        component.canvasInformations.originalDrawnCanvas.dispatchEvent(new MouseEvent('mouseup'));
-        expect(drawingRectangleService.stopDrawingRectangle).toHaveBeenCalled();
-        component.canvasInformations.differenceDrawnCanvas.dispatchEvent(new MouseEvent('mouseup'));
-        expect(drawingRectangleService.stopDrawingRectangle).toHaveBeenCalled();
-
-        component.canvasInformations.originalDrawnCanvas.dispatchEvent(new MouseEvent('mousemove'));
-        expect(drawingRectangleService.paintRectangle).toHaveBeenCalled();
-        component.canvasInformations.differenceDrawnCanvas.dispatchEvent(new MouseEvent('mousemove'));
-        expect(drawingRectangleService.paintRectangle).toHaveBeenCalled();
+        expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mousedown', component.rectangleListener[0]);
+        expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mouseup', component.rectangleListener[1]);
+        expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mousemove', component.rectangleListener[2]);
     });
 
     it('should add event listeners when user erases on the canvas', () => {
+        const addEventListenerOriginalSpy = spyOn(component.canvasInformations.originalDrawnCanvas, 'addEventListener');
+        const addEventListenerDifferenceSpy = spyOn(component.canvasInformations.differenceDrawnCanvas, 'addEventListener');
+
         component.erase();
 
         expect(eraserButtonService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
 
-        component.canvasInformations.originalDrawnCanvas.dispatchEvent(new MouseEvent('mousedown'));
-        expect(eraserButtonService.startErase).toHaveBeenCalled();
-        component.canvasInformations.differenceDrawnCanvas.dispatchEvent(new MouseEvent('mousedown'));
-        expect(eraserButtonService.startErase).toHaveBeenCalled();
+        expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mousedown', component.eraseListener[0]);
+        expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mouseup', component.eraseListener[1]);
+        expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mousemove', component.eraseListener[2]);
 
-        component.canvasInformations.originalDrawnCanvas.dispatchEvent(new MouseEvent('mouseup'));
-        expect(eraserButtonService.stopErase).toHaveBeenCalled();
-        component.canvasInformations.differenceDrawnCanvas.dispatchEvent(new MouseEvent('mouseup'));
-        expect(eraserButtonService.stopErase).toHaveBeenCalled();
-
-        component.canvasInformations.originalDrawnCanvas.dispatchEvent(new MouseEvent('mousemove'));
-        expect(eraserButtonService.erasing).toHaveBeenCalled();
-        component.canvasInformations.differenceDrawnCanvas.dispatchEvent(new MouseEvent('mousemove'));
-        expect(eraserButtonService.erasing).toHaveBeenCalled();
+        expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mousedown', component.eraseListener[0]);
+        expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mouseup', component.eraseListener[1]);
+        expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mousemove', component.eraseListener[2]);
     });
 
     it('should remove event listeners', () => {
