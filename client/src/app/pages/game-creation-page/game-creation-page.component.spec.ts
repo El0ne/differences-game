@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
@@ -327,6 +328,83 @@ describe('GameCreationPageComponent', () => {
 
         expect(component.canvas2ZIndex).toEqual(2);
         expect(component.canvas1ZIndex).toEqual(3);
+    });
+
+    it('should toggle pen state and call drawPen if pen button is clicked', () => {
+        spyOn(component, 'removingListeners');
+        spyOn(component, 'changeZindex');
+        spyOn(component, 'drawPen');
+
+        component.toggleButton('pen');
+
+        expect(component.removingListeners).toHaveBeenCalled();
+        expect(component.changeZindex).toHaveBeenCalled();
+        expect(component.isPenEnabled).toBeTrue();
+        expect(component.isRectangleEnabled).toBeFalse();
+        expect(component.isEraserEnabled).toBeFalse();
+        expect(component.isDuplicateEnabled).toBeFalse();
+        expect(component.isClearEnabled).toBeFalse();
+        expect(component.drawPen).toHaveBeenCalled();
+    });
+
+    it('should toggle rectangle state and call drawRectangle if rectangle button is clicked', () => {
+        spyOn(component, 'removingListeners');
+        spyOn(component, 'changeZindex');
+        spyOn(component, 'drawRectangle');
+
+        component.toggleButton('rectangle');
+
+        expect(component.removingListeners).toHaveBeenCalled();
+        expect(component.changeZindex).toHaveBeenCalled();
+        expect(component.isPenEnabled).toBeFalse();
+        expect(component.isRectangleEnabled).toBeTrue();
+        expect(component.isEraserEnabled).toBeFalse();
+        expect(component.isDuplicateEnabled).toBeFalse();
+        expect(component.isClearEnabled).toBeFalse();
+        expect(component.drawRectangle).toHaveBeenCalled();
+    });
+
+    it('should toggle eraser state and call erase if erase button is clicked', () => {
+        spyOn(component, 'removingListeners');
+        spyOn(component, 'changeZindex');
+        spyOn(component, 'erase');
+
+        component.toggleButton('erase');
+
+        expect(component.removingListeners).toHaveBeenCalled();
+        expect(component.changeZindex).toHaveBeenCalled();
+        expect(component.isPenEnabled).toBeFalse();
+        expect(component.isRectangleEnabled).toBeFalse();
+        expect(component.isEraserEnabled).toBeTrue();
+        expect(component.isDuplicateEnabled).toBeFalse();
+        expect(component.isClearEnabled).toBeFalse();
+        expect(component.erase).toHaveBeenCalled();
+    });
+
+    it('should toggle duplicate state if duplicate button is clicked', () => {
+        spyOn(component, 'removingListeners');
+
+        component.toggleButton('duplicate');
+
+        expect(component.removingListeners).toHaveBeenCalled();
+        expect(component.isPenEnabled).toBeFalse();
+        expect(component.isRectangleEnabled).toBeFalse();
+        expect(component.isEraserEnabled).toBeFalse();
+        expect(component.isDuplicateEnabled).toBeTrue();
+        expect(component.isClearEnabled).toBeFalse();
+    });
+
+    it('should toggle clear state if clear button is clicked', () => {
+        spyOn(component, 'removingListeners');
+
+        component.toggleButton('clear');
+
+        expect(component.removingListeners).toHaveBeenCalled();
+        expect(component.isPenEnabled).toBeFalse();
+        expect(component.isRectangleEnabled).toBeFalse();
+        expect(component.isEraserEnabled).toBeFalse();
+        expect(component.isDuplicateEnabled).toBeFalse();
+        expect(component.isClearEnabled).toBeTrue();
     });
 
     it("should set the drawManipulation service's properties and call the invert method of the service", () => {
