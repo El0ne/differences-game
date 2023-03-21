@@ -92,7 +92,6 @@ export class ClickEventComponent implements OnInit {
         if (!this.endGame) {
             const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
             await this.pixelModificationService.flashEffect(originalContext, currentDifferences);
-            console.log(this.toggleCheatMode);
             if (this.toggleCheatMode) {
                 this.differenceEffect(currentDifferences);
             }

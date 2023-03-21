@@ -13,7 +13,7 @@ export class DifferencesCounterService {
         let numberOfDifferences = 0;
 
         for (const index of differencesArray.keys()) {
-            if (this.isNewAndDifferentPixel(index, differencesArray, visitedPixels)) {
+            if (differencesArray[index] && !this.isAVisitedPixel(index, visitedPixels)) {
                 queue.push(index);
                 visitedPixels.push([index]);
 
@@ -33,11 +33,7 @@ export class DifferencesCounterService {
         return visitedPixels;
     }
 
-    isNewAndDifferentPixel(index: number, differencesArray: boolean[], visitedPixels: number[][]) {
-        return differencesArray[index] && !this.isAVisitedPixel(index, visitedPixels);
-    }
-
-    findPixelDifferenceIndex(pixelIndex: number, visitedPixels: number[][]): number /* usable for the game to find which pixel was clicked*/ {
+    findPixelDifferenceIndex(pixelIndex: number, visitedPixels: number[][]): number {
         for (const differenceIndex of visitedPixels.keys()) {
             if (visitedPixels[differenceIndex].includes(pixelIndex)) {
                 return differenceIndex;

@@ -1,12 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
+import { SocketService } from '@app/services/socket/socket.service';
+import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 
 import { BestTimeComponent } from './best-time.component';
 
 describe('BestTimeComponent', () => {
     let component: BestTimeComponent;
     let fixture: ComponentFixture<BestTimeComponent>;
-    let service: SecondToMinuteService;
+    let service: TimerSoloService;
+    let socket: SocketService;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -17,7 +19,7 @@ describe('BestTimeComponent', () => {
         fixture = TestBed.createComponent(BestTimeComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
-        service = new SecondToMinuteService();
+        service = new TimerSoloService(socket);
         component = new BestTimeComponent(service);
     });
 

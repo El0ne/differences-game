@@ -28,8 +28,6 @@ export class GameCardSelectionComponent implements OnInit {
         this.image = `${STAGE}/image/${this.gameCardInformation.originalImageName}`;
     }
 
-    // TODO: Ajouter la logique pour que les temps de configurations viennent du database pour dynamiquement les loader.
-
     deleteGame(): void {
         this.socketService.send(WAITING_ROOM_EVENTS.DeleteGame, this.gameCardInformation._id);
     }

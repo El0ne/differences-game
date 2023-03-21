@@ -13,14 +13,12 @@ describe('DifferencesCounterService', () => {
     let VISITED_PIXELS_TEST: number[][];
     let DIFFERENT_PIXEL: number;
     let NOT_DIFFERENT_PIXEL: number;
-    let UNVISITED_DIFFERENT_PIXEL: number;
 
     beforeEach(async () => {
         DIFFERENT_PIXELS_LIST = [true, true, true, false, false, true, true, false, true];
         VISITED_PIXELS_TEST = [[0, 1, 2, 5, 8], [6]];
         DIFFERENT_PIXEL = 1;
         NOT_DIFFERENT_PIXEL = 3;
-        UNVISITED_DIFFERENT_PIXEL = 8;
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [DifferencesCounterService, PixelRadiusService, PixelPositionService, ImageDimensionsService],
@@ -52,13 +50,6 @@ describe('DifferencesCounterService', () => {
 
     it('findPixelDifferenceIndex() should return the visitedPixels length if the index is not visited', () => {
         expect(service.findPixelDifferenceIndex(NOT_DIFFERENT_PIXEL, VISITED_PIXELS_TEST)).toEqual(2);
-    });
-
-    it('isNewAndDifferentPixel() should return true only if the the pixel is not visited and is a different pixel', () => {
-        expect(service.isNewAndDifferentPixel(DIFFERENT_PIXEL, DIFFERENT_PIXELS_LIST, VISITED_PIXELS_TEST)).toBeFalsy();
-        expect(service.isNewAndDifferentPixel(NOT_DIFFERENT_PIXEL, DIFFERENT_PIXELS_LIST, VISITED_PIXELS_TEST)).toBeFalsy();
-        VISITED_PIXELS_TEST[0].pop();
-        expect(service.isNewAndDifferentPixel(UNVISITED_DIFFERENT_PIXEL, DIFFERENT_PIXELS_LIST, VISITED_PIXELS_TEST)).toBeTruthy();
     });
 
     it('getDifferencesList() should consider a diagonal pixel as adjacent', () => {
