@@ -146,8 +146,11 @@ export class GameCreationPageComponent implements OnInit {
         }, ONLOAD_DELAY);
     }
 
-    setColor(): void {
+    setDrawingProperty(): void {
         this.canvasInformations.selectedColor = this.selectedColor;
+        this.canvasInformations.penSize = this.penSize;
+        this.canvasInformations.eraserSize = this.eraserSize;
+        console.log('this.canvasInformations.eraserSize', this.canvasInformations.eraserSize);
     }
 
     setObject(): CanvasInformations {
@@ -182,8 +185,8 @@ export class GameCreationPageComponent implements OnInit {
             rectangleInitialY: 0,
 
             selectedColor: '#ff124f',
-            penSize: 10,
-            eraserSize: 50,
+            penSize: PEN_SIZE,
+            eraserSize: ERASER_SIZE,
         };
     }
 
