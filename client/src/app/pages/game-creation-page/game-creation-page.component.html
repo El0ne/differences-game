@@ -74,6 +74,7 @@
                                 value="10"
                                 step="1"
                                 oninput="this.nextElementSibling.value = this.value"
+                                (input)="this.setDrawingProperty()"
                             />
                             <output>{{ penSize }}</output>
                         </div>
@@ -102,6 +103,7 @@
                                 value="50"
                                 step="10"
                                 oninput="this.nextElementSibling.value = this.value"
+                                (input)="this.setDrawingProperty()"
                             />
                             <output>{{ eraserSize }}</output>
                         </div>
@@ -117,7 +119,7 @@
                         <button (click)="duplicate('right')"><mat-icon class="btn-image">arrow_forward</mat-icon></button>
                     </div>
                     <div class="color-container">
-                        <input type="color" [(ngModel)]="selectedColor" id="color-picker" value="#ff124f" (input)="this.setColor()" />
+                        <input type="color" [(ngModel)]="selectedColor" id="color-picker" value="#ff124f" (input)="this.setDrawingProperty()" />
                         <label for="color-picker">Choisir une couleur</label>
                     </div>
                     <div class="diff-range-container">
