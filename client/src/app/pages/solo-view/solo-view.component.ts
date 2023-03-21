@@ -8,14 +8,14 @@ import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
-import { SecondToMinuteService } from '@app/services/second-t o-minute/second-to-minute.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { EndGame } from '@common/chat-dialog-constants';
 import { RoomMessage, Validation } from '@common/chat-gateway-constants';
-import { CHAT_EVENTS, RoomEvent, RoomManagement } from '@common/chat.gateway.events';
+import { CHAT_EVENTS, RoomEvent, RoomManagement } from '@common/chat-gateway-events';
 import { DifferenceInformation, MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
+import { MATCH_EVENTS } from '@common/match-gateway-communication';
 import { Subject } from 'rxjs';
 
 @Component({
@@ -36,11 +36,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     opponent: string;
     messages: RoomMessage[] = [];
     messageContent: string = '';
-    differenceArray: number[][];
     currentScorePlayer: number = 0;
     currentScoreOpponent: number = 0;
     numberOfDifferences: number;
-    currentTime: number;
     currentGameId: string;
     endGame: Subject<void> = new Subject<void>();
     gameCardInfo: GameCardInformation;
@@ -50,7 +48,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     // eslint-disable-next-line max-params
     constructor(
         public timerService: TimerSoloService,
-        private convertService: SecondToMinuteService,
         private gameCardInfoService: GameCardInformationService,
         private foundDifferenceService: FoundDifferenceService,
         private route: ActivatedRoute,
@@ -98,16 +95,16 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             message.message = `${message.message} - ${this.opponent} a abandonné la partie.`;
             this.messages.push(message);
         });
-        this.socketService.listen<PlayerDifference>(CHAT_EVENTS.Difference, (data: PlayerDifference) => {
+        this.socketService.listen<PlayerDifference>(MATCH_EVENTS.Difference, (data: PlayerDifference) => {
             this.effectHandler(data);
         });
-        this.socketService.listen<string>(CHAT_EVENTS.Win, (socketId: string) => {
+        this.socketService.listen<string>(MATCH_EVENTS.Win, (socketId: string) => {
             this.winGame(socketId);
         });
     }
 
     ngOnDestroy(): void {
-        this.timerService.stopTimer();
+        this.timerService.currentTime = 0;
         this.foundDifferenceService.clearDifferenceFound();
         this.socketService.disconnect();
         this.removeCheatMode();
@@ -147,7 +144,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     timesConvertion(time: number): string {
-        return this.convertService.convert(time);
+        return this.timerService.convert(time);
     }
 
     winGame(winnerId: string): void {
@@ -218,7 +215,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 differencesPosition: information.differencesPosition,
                 lastDifferences: information.lastDifferences,
             };
-            this.socketService.send<DifferenceInformation>(CHAT_EVENTS.Difference, multiplayerInformation);
+            this.socketService.send<DifferenceInformation>(MATCH_EVENTS.Difference, multiplayerInformation);
         } else {
             const difference: PlayerDifference = {
                 differencesPosition: information.differencesPosition,
@@ -249,7 +246,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         if (this.isMultiplayer) {
             const endGameVerification = this.numberOfDifferences / 2;
             if (this.currentScorePlayer >= endGameVerification) {
-                this.socketService.send<string>(CHAT_EVENTS.Win, this.currentRoom);
+                this.socketService.send<string>(MATCH_EVENTS.Win, this.currentRoom);
             }
         } else {
             if (this.currentScorePlayer === this.numberOfDifferences) {

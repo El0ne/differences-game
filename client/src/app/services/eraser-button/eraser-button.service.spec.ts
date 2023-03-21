@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { TestBed } from '@angular/core/testing';
-import { getFakeCanvasInformations } from '../canvas-informations.constants';
-import { CanvasSelectionService } from '../canvas-selection/canvas-selection.service';
+import { getFakeCanvasInformations } from '@app/services/canvas-informations.constants';
+import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
 import { EraserButtonService } from './eraser-button.service';
 
 describe('EraserButtonService', () => {

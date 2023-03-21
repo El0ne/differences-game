@@ -1,3 +1,4 @@
+import { MatchGateway } from '@app/gateways/match/match/match.gateway';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { AcceptationInformation, JoinHostInWaitingRequest, PlayerInformations, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
@@ -12,7 +13,7 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
     @WebSocketServer() private server: Server;
     gameHosts: Map<string, string> = new Map<string, string>();
 
-    constructor(private gameManagerService: GameManagerService, private gameCardService: GameCardService) {}
+    constructor(private gameManagerService: GameManagerService, private gameCardService: GameCardService, private matchGateway: MatchGateway) {}
 
     @SubscribeMessage(WAITING_ROOM_EVENTS.ScanForHost)
     scanForHosts(@ConnectedSocket() socket: Socket, @MessageBody() stagesIds: string[]): void {
@@ -58,7 +59,6 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
         const opponentSocket: Socket = this.server.sockets.sockets.get(acceptation.playerSocketId);
         this.clearRooms(socket);
         this.clearRooms(opponentSocket);
-
         const roomId = randomUUID();
         socket.join(roomId);
         socket.data.room = roomId;
@@ -66,8 +66,8 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
         opponentSocket.join(roomId);
         opponentSocket.data.room = roomId;
         opponentSocket.data.stageId = socket.data.stageInHosting;
+        this.matchGateway.timer(roomId);
         this.gameHosts.delete(socket.data.stageInHosting);
-
         this.gameManagerService.addGame(socket.data.stageInHosting, 2);
 
         const acceptationInfo: AcceptationInformation = { playerName: acceptation.playerName, playerSocketId: socket.id, roomId };

@@ -1,5 +1,10 @@
 export const ZERO = 0;
 export const ONE_SEC_IN_MS = 1000;
-export const START_TIME = -1;
 export const TEN_SECONDS = 10;
 export const TEN_SEC_IN_MS = 10000;
+export const SEVENTY_FIVE_SECONDS = 75;
+export const SIXTY_SECONDS = 60;
+export const TWENTY_SECONDS = 20;
+export const SIXTY_SEVEN_SECONDS = 67;
+export const SECONDS_IN_MINUTE = 60;
+export const TEN = 10;
