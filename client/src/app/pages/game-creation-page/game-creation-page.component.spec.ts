@@ -248,13 +248,13 @@ describe('GameCreationPageComponent', () => {
 
         expect(penService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
 
-        expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mousedown', component.rectangleListener[0]);
-        expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mouseup', component.rectangleListener[1]);
-        expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mousemove', component.rectangleListener[2]);
+        expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mousedown', component.penListener[0]);
+        expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mouseup', component.penListener[1]);
+        expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mousemove', component.penListener[2]);
 
-        expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mousedown', component.rectangleListener[0]);
-        expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mouseup', component.rectangleListener[1]);
-        expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mousemove', component.rectangleListener[2]);
+        expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mousedown', component.penListener[0]);
+        expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mouseup', component.penListener[1]);
+        expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mousemove', component.penListener[2]);
     });
 
     it('should add event listeners when user draws a rectangle on the canvases', () => {
@@ -296,17 +296,17 @@ describe('GameCreationPageComponent', () => {
         const differenceDrawnCanvasSpy = spyOn(component.differenceDrawnCanvas.nativeElement, 'removeEventListener');
         component.removingListeners();
 
-        expect(originalDrawnCanvasSpy).toHaveBeenCalledWith('mousedown', component.rectangleListener[0]);
-        expect(originalDrawnCanvasSpy).toHaveBeenCalledWith('mouseup', component.rectangleListener[1]);
-        expect(originalDrawnCanvasSpy).toHaveBeenCalledWith('mousemove', component.rectangleListener[2]);
+        expect(originalDrawnCanvasSpy).toHaveBeenCalledWith('mousedown', component.penListener[0]);
+        expect(originalDrawnCanvasSpy).toHaveBeenCalledWith('mouseup', component.penListener[1]);
+        expect(originalDrawnCanvasSpy).toHaveBeenCalledWith('mousemove', component.penListener[2]);
 
         expect(originalDrawnCanvasSpy).toHaveBeenCalledWith('mousedown', component.eraseListener[0]);
         expect(originalDrawnCanvasSpy).toHaveBeenCalledWith('mouseup', component.eraseListener[1]);
         expect(originalDrawnCanvasSpy).toHaveBeenCalledWith('mousemove', component.eraseListener[2]);
 
-        expect(differenceDrawnCanvasSpy).toHaveBeenCalledWith('mousedown', component.rectangleListener[0]);
-        expect(differenceDrawnCanvasSpy).toHaveBeenCalledWith('mouseup', component.rectangleListener[1]);
-        expect(differenceDrawnCanvasSpy).toHaveBeenCalledWith('mousemove', component.rectangleListener[2]);
+        expect(differenceDrawnCanvasSpy).toHaveBeenCalledWith('mousedown', component.penListener[0]);
+        expect(differenceDrawnCanvasSpy).toHaveBeenCalledWith('mouseup', component.penListener[1]);
+        expect(differenceDrawnCanvasSpy).toHaveBeenCalledWith('mousemove', component.penListener[2]);
 
         expect(differenceDrawnCanvasSpy).toHaveBeenCalledWith('mousedown', component.eraseListener[0]);
         expect(differenceDrawnCanvasSpy).toHaveBeenCalledWith('mouseup', component.eraseListener[1]);
