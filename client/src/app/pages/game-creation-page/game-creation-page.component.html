@@ -84,7 +84,7 @@
                             <mat-icon class="btn-image">clear</mat-icon>
                         </button>
                         <button (click)="toggleButton('erase')" [style.backgroundColor]="isEraserEnabled ? '#ffa012' : '#ff124f'">
-                            <img class="btn-image-src" src="{{ paths.erase }}" />
+                            <img class="btn-image-src" src="assets/eraser.png" />
                         </button>
                     </div>
                     <div *ngIf="isClearEnabled" class="select-duplicate-side">
@@ -112,7 +112,7 @@
                         <button (click)="toggleButton('duplicate')" [style.backgroundColor]="isDuplicateEnabled ? '#ffa012' : '#ff124f'">
                             <mat-icon class="btn-image">content_copy</mat-icon>
                         </button>
-                        <button (click)="invert()"><img class="btn-image-src (clik)" src="{{ paths.invert }}" /></button>
+                        <button (click)="invert()"><img class="btn-image-src (clik)" src="assets/invert-tool.png" /></button>
                     </div>
                     <div *ngIf="isDuplicateEnabled" class="select-duplicate-side">
                         <button (click)="duplicate('left')"><mat-icon class="btn-image">arrow_back</mat-icon></button>
