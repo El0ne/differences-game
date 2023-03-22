@@ -249,8 +249,8 @@ export class GameCreationPageComponent implements OnInit {
         this.differentFile = updatedFiles[1];
         if (this.saveVerification() && this.originalFile && this.differentFile) {
             this.isSaveDisabled = true;
-            const originalBlob = await this.mergeCanvas(this.originalCanvas.nativeElement, this.originalDrawnCanvas.nativeElement);
-            const differenceBlob = await this.mergeCanvas(this.differenceCanvas.nativeElement, this.differenceDrawnCanvas.nativeElement);
+            const originalBlob = this.mergeCanvas(this.originalCanvas.nativeElement, this.originalDrawnCanvas.nativeElement);
+            const differenceBlob = this.mergeCanvas(this.differenceCanvas.nativeElement, this.differenceDrawnCanvas.nativeElement);
             this.gameCardService.uploadImages(originalBlob, differenceBlob, this.differenceRadius).subscribe((data) => {
                 if (data.gameDifferenceNumber) {
                     this.createdGameInfo = {
