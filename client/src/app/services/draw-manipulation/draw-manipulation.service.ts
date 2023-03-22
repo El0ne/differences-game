@@ -46,7 +46,7 @@ export class DrawManipulationService {
         }
     }
 
-    clearPainting(side: string) {
+    clearPainting(side: string): void {
         const differenceDrawingContext = this.canvasInformations.differenceDrawnCanvas.getContext('2d');
         const originalDrawingContext = this.canvasInformations.originalDrawnCanvas.getContext('2d');
 

@@ -20,11 +20,6 @@ export const getFakeCanvasInformations = (): CanvasInformations => ({
     rightArrayPointer: 0,
     isFirstTimeInLeftCanvas: true,
     isFirstTimeInRightCanvas: true,
-    isRectangleEnabled: false,
-    isPenEnabled: false,
-    isEraserEnabled: false,
-    isDuplicateEnabled: false,
-    isClearEnabled: false,
     isUserClicking: false,
 
     penSize: 10,

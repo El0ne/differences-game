@@ -28,16 +28,16 @@ export class UndoRedoService {
     }
 
     undoAction(array: string[], pointer: number): void {
-        const ctx = this.canvasInformations.actionsArray[this.canvasInformations.nbElements]
+        const context = this.canvasInformations.actionsArray[this.canvasInformations.nbElements]
             ? this.canvasInformations.originalDrawnCanvas.getContext('2d')
             : this.canvasInformations.differenceDrawnCanvas.getContext('2d');
 
         const canvasPic = new Image();
         canvasPic.src = array[pointer];
         canvasPic.onload = () => {
-            if (ctx) {
-                ctx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
-                ctx.drawImage(canvasPic, 0, 0);
+            if (context) {
+                context.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+                context.drawImage(canvasPic, 0, 0);
             }
         };
     }
@@ -57,7 +57,7 @@ export class UndoRedoService {
     }
 
     redoAction(array: string[], pointer: number): void {
-        const ctx = this.canvasInformations.actionsArray[this.canvasInformations.nbElements]
+        const context = this.canvasInformations.actionsArray[this.canvasInformations.nbElements]
             ? this.canvasInformations.originalDrawnCanvas.getContext('2d')
             : this.canvasInformations.differenceDrawnCanvas.getContext('2d');
 
@@ -65,9 +65,9 @@ export class UndoRedoService {
         canvasPic.src = array[pointer];
 
         canvasPic.onload = () => {
-            if (ctx) ctx.drawImage(canvasPic, 0, 0);
+            if (context) context.drawImage(canvasPic, 0, 0);
         };
-        if (ctx) ctx.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+        if (context) context.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
     }
 
     redo(): void {

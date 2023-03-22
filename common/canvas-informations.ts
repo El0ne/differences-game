@@ -18,12 +18,6 @@ export interface CanvasInformations {
     rightArrayPointer: number;
     isFirstTimeInRightCanvas: boolean;
     isFirstTimeInLeftCanvas: boolean;
-
-    isRectangleEnabled: boolean;
-    isPenEnabled: boolean;
-    isEraserEnabled: boolean;
-    isDuplicateEnabled: boolean;
-    isClearEnabled: boolean;
     isUserClicking: boolean;
 
     rectangleInitialX: number;

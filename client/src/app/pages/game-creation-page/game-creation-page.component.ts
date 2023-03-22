@@ -173,11 +173,6 @@ export class GameCreationPageComponent implements OnInit {
             rightArrayPointer: this.rightArrayPointer,
             isFirstTimeInLeftCanvas: this.isFirstTimeInLeftCanvas,
             isFirstTimeInRightCanvas: this.isFirstTimeInRightCanvas,
-            isRectangleEnabled: false,
-            isPenEnabled: false,
-            isEraserEnabled: false,
-            isDuplicateEnabled: false,
-            isClearEnabled: false,
             isUserClicking: false,
 
             rectangleInitialX: 0,

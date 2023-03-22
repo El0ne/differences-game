@@ -153,11 +153,6 @@ describe('GameCreationPageComponent', () => {
         expect(canvasInfo.rightArrayPointer).toBe(component.rightArrayPointer);
         expect(canvasInfo.isFirstTimeInLeftCanvas).toBe(component.isFirstTimeInLeftCanvas);
         expect(canvasInfo.isFirstTimeInRightCanvas).toBe(component.isFirstTimeInRightCanvas);
-        expect(canvasInfo.isRectangleEnabled).toBe(false);
-        expect(canvasInfo.isPenEnabled).toBe(false);
-        expect(canvasInfo.isEraserEnabled).toBe(false);
-        expect(canvasInfo.isDuplicateEnabled).toBe(false);
-        expect(canvasInfo.isClearEnabled).toBe(false);
         expect(canvasInfo.isUserClicking).toBe(false);
         expect(canvasInfo.rectangleInitialX).toBe(0);
         expect(canvasInfo.rectangleInitialY).toBe(0);

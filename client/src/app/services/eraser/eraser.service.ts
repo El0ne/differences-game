@@ -14,11 +14,11 @@ export class EraserService {
     setColor(color: string): void {
         this.canvasInformations.selectedColor = color;
     }
-    setProperties(information: CanvasInformations) {
+    setProperties(information: CanvasInformations): void {
         this.canvasInformations = information;
     }
 
-    startErase(mouseEvent: MouseEvent) {
+    startErase(mouseEvent: MouseEvent): void {
         this.canvasInformations.isUserClicking = true;
         const context = this.canvasInformations.drawingCanvas1.getContext('2d');
 
@@ -33,13 +33,13 @@ export class EraserService {
             );
     }
 
-    stopErase() {
+    stopErase(): void {
         this.canvasInformations.isUserClicking = false;
         this.undoRedoService.setProperties(this.canvasInformations);
         this.undoRedoService.pushCanvas(this.canvasInformations.drawingCanvas1);
     }
 
-    erasing(mouseEvent: MouseEvent) {
+    erasing(mouseEvent: MouseEvent): void {
         this.canvasSelectionService.choseCanvas(mouseEvent);
         const context = this.canvasInformations.drawingCanvas1.getContext('2d');
 
