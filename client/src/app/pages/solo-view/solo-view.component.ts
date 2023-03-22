@@ -133,7 +133,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     activateCheatMode(event: KeyboardEvent): void {
         if (event.key === 't') {
             this.invertDifferences();
-            this.left.clickEventService.getDifferences(this.currentGameId).subscribe((data) => {
+            this.left.getDifferences(this.currentGameId).subscribe((data) => {
                 if (this.left.toggleCheatMode) this.handleFlash(this.foundDifferenceService.findPixelsFromDifference(data));
             });
         }
@@ -143,8 +143,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.timerService.startTimer();
     }
 
-    timesConvertion(time: number): string {
-        return this.timerService.convert(time);
+    timesConversion(): string {
+        return this.timerService.convert(this.timerService.currentTime);
     }
 
     winGame(winnerId: string): void {
