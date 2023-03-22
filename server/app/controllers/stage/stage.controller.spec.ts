@@ -161,10 +161,7 @@ describe('StageController', () => {
     });
 
     it('uploadImages() should return 400 if we pass an empty body as a parameter', async () => {
-        const response = await request(httpServer)
-            .post('/stage/image/3')
-            .attach('baseImage', Buffer.from(''))
-            .attach('differenceImage', Buffer.from(''));
+        const response = await request(httpServer).post('/stage/image/3').attach('file', Buffer.from('')).attach('file', Buffer.from(''));
         expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
 

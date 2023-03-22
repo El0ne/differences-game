@@ -3,7 +3,7 @@
         <div class="left-header-container">
             <button id="previous" routerLink="/config">Retour</button>
         </div>
-        <button id="save" [disabled]="isDisabled" (click)="save()"><mat-icon class="save-image">save</mat-icon></button>
+        <button id="save" [disabled]="isSaveDisabled" (click)="save()"><mat-icon class="save-image">save</mat-icon></button>
     </div>
     <div id="title-container">
         <div class="line title">____________</div>
@@ -21,10 +21,26 @@
         <div class="upload-container">
             <div class="original container neon-border">
                 <div class="original image">
-                    <canvas #canvas1 width="640px" height="480px"></canvas>
+                    <canvas #canvas1 width="640px" height="480px" style="z-index: 1"></canvas>
+                    <canvas
+                        #drawingCanvas1
+                        width="640px"
+                        height="480px"
+                        [style.zIndex]="canvas1ZIndex"
+                        style="margin-left: -640px; position: absolute"
+                    ></canvas>
+                    <canvas
+                        #drawingCanvas4
+                        width="640px"
+                        height="480px"
+                        [style.zIndex]="canvas2ZIndex"
+                        style="margin-left: -640px; position: absolute"
+                    ></canvas>
                 </div>
                 <div class="upload-delete">
-                    <button id="reset-original" (click)="clearFirstFile(this.myOgCanvas.nativeElement, 'upload-original')">X</button>
+                    <button id="reset-original" (click)="clearFile(this.originalCanvas.nativeElement, 'upload-original', this.originalFile)">
+                        X
+                    </button>
                     <label for="upload-original">
                         Choisir une image de 640*480 de format bmp
                         <input type="file" id="upload-original" class="photo-upload" (change)="fileValidation($event)" accept="image/bmp" />
@@ -35,19 +51,75 @@
             <div class="middle-container">
                 <div class="tools-container neon-border">
                     <div class="row-tools">
-                        <button><mat-icon class="btn-image">undo</mat-icon></button>
-                        <button><mat-icon class="btn-image">rectangle</mat-icon></button>
+                        <button (click)="undo()"><mat-icon class="btn-image">undo</mat-icon></button>
+                        <button (click)="redo()"><mat-icon class="btn-image">redo</mat-icon></button>
                     </div>
                     <div class="row-tools">
-                        <button><mat-icon class="btn-image">edit</mat-icon></button>
-                        <button><img class="btn-image-src" src="assets/eraser.png" /></button>
+                        <button (click)="toggleButton('pen')" [style.backgroundColor]="isPenEnabled ? '#ffa012' : '#ff124f'">
+                            <mat-icon class="btn-image">edit</mat-icon>
+                        </button>
+                        <button (click)="toggleButton('rectangle')" [style.backgroundColor]="isRectangleEnabled ? '#ffa012' : '#ff124f'">
+                            <mat-icon class="btn-image">rectangle</mat-icon>
+                        </button>
+                    </div>
+                    <div class="pen-enabled" *ngIf="isPenEnabled">
+                        <h1 id="title-pen">Taille du tracé :</h1>
+                        <div class="pen-range">
+                            <input
+                                type="range"
+                                id="radius-range"
+                                [(ngModel)]="penSize"
+                                min="1"
+                                max="50"
+                                value="10"
+                                step="1"
+                                oninput="this.nextElementSibling.value = this.value"
+                                (input)="this.setDrawingProperty()"
+                            />
+                            <output>{{ penSize }}</output>
+                        </div>
                     </div>
                     <div class="row-tools">
-                        <button><mat-icon class="btn-image">content_copy</mat-icon></button>
-                        <button><img class="btn-image-src" src="assets/invert-tool.png" /></button>
+                        <button (click)="toggleButton('clear')" [style.backgroundColor]="isClearEnabled ? '#ffa012' : '#ff124f'">
+                            <mat-icon class="btn-image">clear</mat-icon>
+                        </button>
+                        <button (click)="toggleButton('erase')" [style.backgroundColor]="isEraserEnabled ? '#ffa012' : '#ff124f'">
+                            <img class="btn-image-src" src="{{ paths.erase }}" />
+                        </button>
+                    </div>
+                    <div *ngIf="isClearEnabled" class="select-duplicate-side">
+                        <button (click)="clearPainting('left')"><mat-icon class="btn-image">arrow_back</mat-icon></button>
+                        <button (click)="clearPainting('right')"><mat-icon class="btn-image">arrow_forward</mat-icon></button>
+                    </div>
+                    <div class="eraser-enabled" *ngIf="isEraserEnabled">
+                        <h1 id="title-eraser">Taille de l'efface :</h1>
+                        <div class="eraser-range">
+                            <input
+                                type="range"
+                                id="radius-range"
+                                [(ngModel)]="eraserSize"
+                                min="10"
+                                max="400"
+                                value="50"
+                                step="10"
+                                oninput="this.nextElementSibling.value = this.value"
+                                (input)="this.setDrawingProperty()"
+                            />
+                            <output>{{ eraserSize }}</output>
+                        </div>
+                    </div>
+                    <div class="row-tools">
+                        <button (click)="toggleButton('duplicate')" [style.backgroundColor]="isDuplicateEnabled ? '#ffa012' : '#ff124f'">
+                            <mat-icon class="btn-image">content_copy</mat-icon>
+                        </button>
+                        <button (click)="invert()"><img class="btn-image-src (clik)" src="{{ paths.invert }}" /></button>
+                    </div>
+                    <div *ngIf="isDuplicateEnabled" class="select-duplicate-side">
+                        <button (click)="duplicate('left')"><mat-icon class="btn-image">arrow_back</mat-icon></button>
+                        <button (click)="duplicate('right')"><mat-icon class="btn-image">arrow_forward</mat-icon></button>
                     </div>
                     <div class="color-container">
-                        <input type="color" id="color-picker" value="#ff124f" />
+                        <input type="color" [(ngModel)]="selectedColor" id="color-picker" value="#ff124f" (input)="this.setDrawingProperty()" />
                         <label for="color-picker">Choisir une couleur</label>
                     </div>
                     <div class="diff-range-container">
@@ -55,14 +127,14 @@
                             <input
                                 type="range"
                                 id="radius-range"
-                                [(ngModel)]="radius"
+                                [(ngModel)]="differenceRadius"
                                 min="0"
                                 max="15"
                                 value="3"
                                 step="3"
                                 oninput="this.nextElementSibling.value = this.value"
                             />
-                            <output>3</output>
+                            <output>{{ differenceRadius }}</output>
                         </div>
                         <label for="radius-range">Rayon du détecteur de différence</label>
                     </div>
@@ -77,11 +149,27 @@
 
             <div class="difference container neon-border">
                 <div class="different image">
-                    <canvas #canvas2 width="640px" height="480px"></canvas>
+                    <canvas #canvas2 width="640px" height="480px" style="z-index: 1"></canvas>
+                    <canvas
+                        #drawingCanvas2
+                        width="640px"
+                        height="480px"
+                        [style.zIndex]="canvas1ZIndex"
+                        style="margin-left: -640px; position: absolute"
+                    ></canvas>
+                    <canvas
+                        #drawingCanvas3
+                        width="640px"
+                        height="480px"
+                        [style.zIndex]="canvas2ZIndex"
+                        style="margin-left: -640px; position: absolute"
+                    ></canvas>
                 </div>
                 <div class="upload-delete">
-                    <button id="reset-different" (click)="clearSecondFile(this.myDiffCanvas.nativeElement, 'upload-different')">X</button>
-                    <label for="upload-original">
+                    <button id="reset-different" (click)="clearFile(this.differenceCanvas.nativeElement, 'upload-different', this.differentFile)">
+                        X
+                    </button>
+                    <label for="upload-different">
                         Choisir une image de 640*480 de format bmp
                         <input type="file" id="upload-different" class="photo-upload" (change)="fileValidation($event)" accept="image/bmp" />
                     </label>

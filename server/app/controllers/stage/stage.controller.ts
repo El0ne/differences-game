@@ -7,6 +7,7 @@ import { GameDifficultyService } from '@app/services/game-difficulty/game-diffic
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { ImageUploadDto } from '@common/image-upload.dto';
+import { ImageDto } from '@common/image.dto';
 import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
@@ -79,39 +80,27 @@ export class StageController {
     }
 
     @Post('/image/:radius')
-    @UseInterceptors(
-        FileFieldsInterceptor(
-            [
-                { name: 'baseImage', maxCount: 1 },
-                { name: 'differenceImage', maxCount: 1 },
-            ],
-            { storage },
-        ),
-    )
+    @UseInterceptors(FileFieldsInterceptor([{ name: 'file', maxCount: 2 }], { storage }))
     async uploadImages(@UploadedFiles() files: ImageUploadDto, @Param() param, @Res() res: Response): Promise<void> {
         try {
             if (Object.keys(files).length) {
-                const differencesArray = await this.differenceService.compareImages(
-                    files.baseImage[0].path,
-                    files.differenceImage[0].path,
-                    param.radius,
-                );
-
+                const fileArray: ImageDto[] = files.file;
+                const differencesArray = await this.differenceService.compareImages(fileArray[0].path, fileArray[1].path, param.radius);
                 if (this.gameDifficultyService.isGameValid(differencesArray)) {
                     const differenceObjectId = await this.differenceClickService.createDifferenceArray(differencesArray);
                     const difficulty = this.gameDifficultyService.setGameDifficulty(differencesArray);
 
                     const data: ServerGeneratedGameInfo = {
                         gameId: differenceObjectId,
-                        originalImageName: files.baseImage[0].filename,
-                        differenceImageName: files.differenceImage[0].filename,
+                        originalImageName: fileArray[0].filename,
+                        differenceImageName: fileArray[1].filename,
                         gameDifficulty: difficulty,
                         gameDifferenceNumber: differencesArray.length,
                     };
                     res.status(HttpStatus.CREATED).send(data);
                 } else {
-                    this.imageManagerService.deleteImage(files.baseImage[0].filename);
-                    this.imageManagerService.deleteImage(files.differenceImage[0].filename);
+                    this.imageManagerService.deleteImage(fileArray[0].filename);
+                    this.imageManagerService.deleteImage(fileArray[1].filename);
                     res.status(HttpStatus.OK).send([]);
                 }
             } else res.sendStatus(HttpStatus.BAD_REQUEST);

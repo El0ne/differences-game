@@ -1,38 +1,68 @@
+/* eslint-disable max-lines */
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { HttpClientModule } from '@angular/common/http';
-import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { By } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
-import { GameCardInformation } from '@common/game-card';
+import { getFakeCanvasInformations } from '@app/services/canvas-informations.constants';
+import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
+import { DrawManipulationService } from '@app/services/draw-manipulation/draw-manipulation.service';
+import { EraserService } from '@app/services/eraser/eraser.service';
+import { FileManipulationService } from '@app/services/file-manipulation/file-manipulation.service';
+import { PenService } from '@app/services/pen-service/pen-service.service';
+import { RectangleService } from '@app/services/rectangle/rectangle.service';
+import { UndoRedoService } from '@app/services/undo-redo/undo-redo.service';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
-import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
-import { of } from 'rxjs';
 import { GameCreationPageComponent } from './game-creation-page.component';
 
 describe('GameCreationPageComponent', () => {
     let component: GameCreationPageComponent;
     let fixture: ComponentFixture<GameCreationPageComponent>;
     let canvasOg: HTMLCanvasElement;
+    let rectangleService: RectangleService;
+    let fileManipulationService: FileManipulationService;
+    let penService: PenService;
+    let canvasSelectionService: CanvasSelectionService;
+    let eraserService: EraserService;
+    let undoRedoService: UndoRedoService;
+    let drawManipulationService: DrawManipulationService;
+    let matDialog: MatDialog;
 
     beforeEach(async () => {
+        penService = jasmine.createSpyObj('PenService', ['setProperties', 'startPen', 'stopPen', 'writing']);
+        rectangleService = jasmine.createSpyObj('RectangleService', [
+            'setProperties',
+            'startDrawingRectangle',
+            'stopDrawingRectangle',
+            'paintRectangle',
+        ]);
+        eraserService = jasmine.createSpyObj('EraserButtonService', ['setProperties', 'startErase', 'stopErase', 'erasing']);
+        fileManipulationService = jasmine.createSpyObj('FileManipulationService', [
+            'setProperties',
+            'updateAttributes',
+            'clearFile',
+            'fileValidation',
+        ]);
+        drawManipulationService = jasmine.createSpyObj('DrawManipulationService', ['setProperties', 'invert', 'duplicate', 'clearPainting']);
+        canvasSelectionService = jasmine.createSpyObj('CanvasSelectionService', ['setProperties', 'choseCanvas']);
+        undoRedoService = jasmine.createSpyObj('UndoRedoService', ['setProperties', 'pushCanvas', 'undoAction', 'undo', 'redoAction', 'redo']);
+        matDialog = jasmine.createSpyObj('MatDialog', ['open']);
         await TestBed.configureTestingModule({
             declarations: [GameCreationPageComponent],
             imports: [HttpClientModule, FormsModule, MatDialogModule, RouterTestingModule, MatIconModule],
             providers: [
-                {
-                    provide: MatDialog,
-                    useValue: {
-                        open: () => ({
-                            afterClosed: () => of({}),
-                            // eslint-disable-next-line @typescript-eslint/no-empty-function
-                            close: () => {},
-                        }),
-                    },
-                },
                 { provide: MAT_DIALOG_DATA, useValue: {} },
+                { provide: MatDialog, useValue: { matDialog } },
                 { provide: MatDialogRef, useValue: {} },
+                { provide: PenService, useValue: penService },
+                { provide: RectangleService, useValue: rectangleService },
+                { provide: FileManipulationService, useValue: fileManipulationService },
+                { provide: CanvasSelectionService, useValue: canvasSelectionService },
+                { provide: EraserService, useValue: eraserService },
+                { provide: DrawManipulationService, useValue: drawManipulationService },
+                { provide: UndoRedoService, useValue: undoRedoService },
             ],
         }).compileComponents();
 
@@ -42,10 +72,55 @@ describe('GameCreationPageComponent', () => {
         canvasOg = document.createElement('canvas');
         canvasOg.width = IMAGE_DIMENSIONS.width;
         canvasOg.height = IMAGE_DIMENSIONS.height;
+        component.canvasInformations = getFakeCanvasInformations();
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('should set canvas informations after timeout', fakeAsync(() => {
+        component.ngOnInit();
+
+        tick(50);
+
+        expect(component.setObject()).toEqual(component.canvasInformations);
+        expect(canvasSelectionService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
+        expect(fileManipulationService.updateAttributes).toHaveBeenCalledWith({
+            originalFile: component.originalFile,
+            differenceFile: component.differentFile,
+            originalCanvas: component.originalCanvas.nativeElement,
+            differenceCanvas: component.differenceCanvas.nativeElement,
+        });
+    }));
+
+    it('pressing on ctrl z should call undo method', () => {
+        const keyboardEvent = new KeyboardEvent('keydown', {
+            key: 'z',
+            ctrlKey: true,
+        });
+        const preventDefaultSpy = spyOn(keyboardEvent, 'preventDefault');
+        const undoSpy = spyOn(component, 'undo');
+
+        component.onCtrlZ(keyboardEvent);
+
+        expect(preventDefaultSpy).toHaveBeenCalledTimes(1);
+        expect(undoSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('pressing on ctrl shift z should call undo method', () => {
+        const keyboardEvent = new KeyboardEvent('keydown', {
+            key: 'z',
+            ctrlKey: true,
+            shiftKey: true,
+        });
+        const preventDefaultSpy = spyOn(keyboardEvent, 'preventDefault');
+        const redoSpy = spyOn(component, 'redo');
+
+        component.onCtrlShiftZ(keyboardEvent);
+
+        expect(preventDefaultSpy).toHaveBeenCalledTimes(1);
+        expect(redoSpy).toHaveBeenCalledTimes(1);
     });
 
     it('should get a title', () => {
@@ -54,180 +129,324 @@ describe('GameCreationPageComponent', () => {
         expect(component.gameTitle).toBe(input);
     });
 
-    it('should clear the single file', () => {
-        component.clearSingleFile(canvasOg, 'upload-original');
+    it('should call setDrawing and set the proper value to the canvas Informations', () => {
+        component.setDrawingProperty();
+        expect(component.canvasInformations.selectedColor).toBe(component.selectedColor);
+        expect(component.canvasInformations.penSize).toBe(component.penSize);
+        expect(component.canvasInformations.eraserSize).toBe(component.eraserSize);
+    });
+    it('should set objects', () => {
+        const canvasInfo = component.setObject();
 
-        const context = canvasOg.getContext('2d');
-        let validate = false;
-        if (context) validate = !context.getImageData(0, 0, canvasOg.width, canvasOg.height).data.some((channel: number) => channel !== 0);
-
-        const input = document.getElementById('upload-original') as HTMLInputElement;
-        const bothInput = document.getElementById('upload-both') as HTMLInputElement;
-
-        expect(validate).toBe(true);
-        expect(input.value).toEqual('');
-        expect(bothInput.value).toEqual('');
+        expect(canvasInfo.differenceRectangleCanvas).toBe(component.differenceRectangleCanvas.nativeElement);
+        expect(canvasInfo.differenceDrawnCanvas).toBe(component.differenceDrawnCanvas.nativeElement);
+        expect(canvasInfo.originalRectangleCanvas).toBe(component.originalRectangleCanvas.nativeElement);
+        expect(canvasInfo.originalDrawnCanvas).toBe(component.originalDrawnCanvas.nativeElement);
+        expect(canvasInfo.drawingCanvas1).toBe(component.drawingCanvas1);
+        expect(canvasInfo.drawingCanvas2).toBe(component.drawingCanvas2);
+        expect(canvasInfo.isInOriginalCanvas).toBe(component.isInOriginalCanvas);
+        expect(canvasInfo.rightCanvasArray).toBe(component.rightCanvasArray);
+        expect(canvasInfo.leftCanvasArray).toBe(component.leftCanvasArray);
+        expect(canvasInfo.actionsArray).toBe(component.actionsArray);
+        expect(canvasInfo.nbElements).toBe(component.nbElements);
+        expect(canvasInfo.leftArrayPointer).toBe(component.leftArrayPointer);
+        expect(canvasInfo.rightArrayPointer).toBe(component.rightArrayPointer);
+        expect(canvasInfo.isFirstTimeInLeftCanvas).toBe(component.isFirstTimeInLeftCanvas);
+        expect(canvasInfo.isFirstTimeInRightCanvas).toBe(component.isFirstTimeInRightCanvas);
+        expect(canvasInfo.isUserClicking).toBe(false);
+        expect(canvasInfo.rectangleInitialX).toBe(0);
+        expect(canvasInfo.rectangleInitialY).toBe(0);
+        expect(canvasInfo.selectedColor).toBe(component.selectedColor);
+        expect(canvasInfo.penSize).toBe(component.penSize);
+        expect(canvasInfo.eraserSize).toBe(component.eraserSize);
     });
 
-    it('should clear the first file', () => {
-        component.originalFile = new File([], 'test.bmp', { type: 'image/bmp' });
-        component.clearFirstFile(canvasOg, 'upload-original');
-        expect(component.originalFile).toBeNull();
+    it('should call the clearFile method of the fileManipulation service', () => {
+        const canvas = document.createElement('canvas');
+        const id = 'upload-different';
+        const file = new File([], 'filename');
+        component.clearFile(canvas, id, file);
+        expect(fileManipulationService.clearFile).toHaveBeenCalledWith(canvas, id, file);
     });
 
-    it('should clear the second file', () => {
-        component.differentFile = new File([], 'test.bmp', { type: 'image/bmp' });
-        component.clearSecondFile(canvasOg, 'upload-different');
-        expect(component.differentFile).toBeNull();
-    });
-
-    it('should validate the file', () => {
-        spyOn(component, 'uploadImage');
-
-        const file = new File([new ArrayBuffer(IMAGE_DIMENSIONS.size)], 'testImage.bmp', { type: 'image/bmp' });
-
-        const input = fixture.debugElement.query(By.css('input[type="file"]')).nativeElement as HTMLInputElement;
+    it('should call the fileValidation of the fileManipulation service', async () => {
         const event = new Event('change');
-        Object.defineProperty(event, 'target', { value: { files: [file] } });
-        input.dispatchEvent(event);
-
-        component.fileValidation(event);
-
-        expect(component.uploadImage).toHaveBeenCalled();
+        await component.fileValidation(event);
+        expect(fileManipulationService.fileValidation).toHaveBeenCalledWith(event);
     });
 
-    it('should send an alert if picture is the wrong size', () => {
-        spyOn(window, 'alert');
+    it('should verify and send an alert if the title and both images are missing', () => {
+        component.gameTitle = '';
+        component.originalFile = null;
+        component.differentFile = null;
+        const alertSpy = spyOn(window, 'alert');
 
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        const file = new File([new ArrayBuffer(123456)], 'testImage.bmp', { type: 'image/bmp' });
-
-        const input = fixture.debugElement.query(By.css('input[type="file"]')).nativeElement as HTMLInputElement;
-        const event = new Event('change');
-        Object.defineProperty(event, 'target', { value: { files: [file] } });
-        input.dispatchEvent(event);
-
-        component.fileValidation(event);
-
-        expect(window.alert).toHaveBeenCalledWith('wrong size or file type please choose again');
-        expect(input.value).toBe('');
+        expect(component.saveVerification()).toBeFalse();
+        expect(alertSpy).toHaveBeenCalledWith('Il manque une image et un titre à votre jeu !');
     });
 
-    it('should send an alert if picture is the wrong type', () => {
-        spyOn(window, 'alert');
+    it('should verify and send an alert if the title is missing', () => {
+        component.gameTitle = '';
+        component.originalFile = new File([], 'test.png');
+        component.differentFile = new File([], 'test-diff.png');
+        const alertSpy = spyOn(window, 'alert');
 
-        const file = new File([new ArrayBuffer(IMAGE_DIMENSIONS.size)], 'testImage.jpg', { type: 'image/jpg' });
-
-        const input = fixture.debugElement.query(By.css('input[type="file"]')).nativeElement as HTMLInputElement;
-        const event = new Event('change');
-        Object.defineProperty(event, 'target', { value: { files: [file] } });
-        input.dispatchEvent(event);
-
-        component.fileValidation(event);
-
-        expect(window.alert).toHaveBeenCalledWith('wrong size or file type please choose again');
-        expect(input.value).toBe('');
+        expect(component.saveVerification()).toBeFalse();
+        expect(alertSpy).toHaveBeenCalledWith("N'oubliez pas d'ajouter un titre à votre jeu !");
     });
 
-    it('should send an alert if both title and canvas are empty', () => {
-        spyOn(window, 'alert');
-        component.saveVerification();
-        expect(window.alert).toHaveBeenCalledWith('Il manque une image et un titre à votre jeu !');
+    it('should verify and send an alert if one of the images is missing', () => {
+        component.gameTitle = 'Test Game';
+        component.originalFile = null;
+        component.differentFile = new File([], 'test-diff.png');
+
+        expect(component.saveVerification()).toBeFalse();
+
+        component.originalFile = new File([], 'test.png');
+        component.differentFile = null;
+        const alertSpy = spyOn(window, 'alert');
+
+        expect(component.saveVerification()).toBeFalse();
+        expect(alertSpy).toHaveBeenCalledWith('Un jeu de différences sans image est pour ainsi dire... intéressant ? Ajoutez une image.');
     });
 
-    it('should send  an alert if only the title is missing', () => {
-        spyOn(window, 'alert');
+    it('should return true if all conditions are met', () => {
+        component.gameTitle = 'Test Game';
+        component.originalFile = new File([], 'test.png');
+        component.differentFile = new File([], 'test-diff.png');
 
-        component.originalFile = new File([], 'test.bmp', { type: 'image/bmp' });
-        component.saveVerification();
-        expect(window.alert).toHaveBeenCalledWith("N'oubliez pas d'ajouter un titre à votre jeu !");
+        expect(component.saveVerification()).toBeTrue();
     });
 
-    it('should send an alert if at least one of the canvas is empty', () => {
-        spyOn(window, 'alert');
-
-        const input = 'Test title';
-        component.getTitle(input);
-        component.saveVerification();
-        expect(window.alert).toHaveBeenCalledWith('Un jeu de différences sans image est pour ainsi dire... intéressant ? Ajoutez une image.');
+    it('should merge two canvases into a blob', () => {
+        const canvas1 = document.createElement('canvas');
+        const canvas2 = document.createElement('canvas');
+        const ctx1 = canvas1.getContext('2d');
+        const ctx2 = canvas2.getContext('2d');
+        if (ctx1) {
+            ctx1.fillStyle = '#FF0000';
+            ctx1.fillRect(0, 0, 50, 50);
+        }
+        if (ctx2) {
+            ctx2.fillStyle = '#00FF00';
+            ctx2.fillRect(25, 25, 50, 50);
+        }
+        const result = component.mergeCanvas(canvas1, canvas2);
+        expect(result).toBeInstanceOf(Blob);
     });
 
-    it('should return true if all the verifications are good', () => {
-        component.gameTitle = 'My Game';
-        component.originalFile = new File([''], 'original.bmp');
-        component.differentFile = new File([''], 'different.bmp');
+    it('should add event listeners when user draws on the canvases with a pen', () => {
+        const addEventListenerOriginalSpy = spyOn(component.canvasInformations.originalDrawnCanvas, 'addEventListener');
+        const addEventListenerDifferenceSpy = spyOn(component.canvasInformations.differenceDrawnCanvas, 'addEventListener');
 
-        component.saveVerification();
+        component.drawPen();
 
-        expect(component.saveVerification).toBeTruthy();
+        expect(penService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
+
+        expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mousedown', component.penListener[0]);
+        expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mouseup', component.penListener[1]);
+        expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mousemove', component.penListener[2]);
+
+        expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mousedown', component.penListener[0]);
+        expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mouseup', component.penListener[1]);
+        expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mousemove', component.penListener[2]);
     });
 
-    it('should open modal page and save information if saveVerification is true', fakeAsync(() => {
-        spyOn(window, 'alert');
+    it('should add event listeners when user draws a rectangle on the canvases', () => {
+        const addEventListenerOriginalSpy = spyOn(component.canvasInformations.originalRectangleCanvas, 'addEventListener');
+        const addEventListenerDifferenceSpy = spyOn(component.canvasInformations.differenceRectangleCanvas, 'addEventListener');
 
-        component.gameTitle = 'My Game';
-        component.originalFile = new File([''], 'original.bmp');
-        component.differentFile = new File([''], 'different.bmp');
+        component.drawRectangle();
 
-        spyOn(component, 'saveVerification').and.returnValue(true);
-        spyOn(component, 'openModal');
+        expect(rectangleService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
 
-        const mockServerInfo: ServerGeneratedGameInfo = {
-            gameId: '',
-            originalImageName: '',
-            differenceImageName: '',
-            gameDifficulty: '',
-            gameDifferenceNumber: 5,
-        };
-        spyOn(component.gameCardService, 'uploadImages').and.returnValue(of(mockServerInfo));
+        expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mousedown', component.rectangleListener[0]);
+        expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mouseup', component.rectangleListener[1]);
+        expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mousemove', component.rectangleListener[2]);
 
-        const mockGameCardInfo: GameCardInformation = {
-            _id: '',
-            name: '',
-            difficulty: '',
-            originalImageName: '',
-            differenceImageName: '',
-            differenceNumber: 0,
-            soloTimes: [],
-            multiTimes: [],
-        };
-        spyOn(component.gameCardService, 'createGame').and.returnValue(of(mockGameCardInfo));
-        spyOn(component.gameCardService, 'getGameCardInfoFromId').and.returnValue(of(mockGameCardInfo));
+        expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mousedown', component.rectangleListener[0]);
+        expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mouseup', component.rectangleListener[1]);
+        expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mousemove', component.rectangleListener[2]);
+    });
 
-        component.gameTitle = 'My Game';
-        component.originalFile = new File([''], 'original.bmp');
-        component.differentFile = new File([''], 'different.bmp');
+    it('should add event listeners when user erases on the canvas', () => {
+        const addEventListenerOriginalSpy = spyOn(component.canvasInformations.originalDrawnCanvas, 'addEventListener');
+        const addEventListenerDifferenceSpy = spyOn(component.canvasInformations.differenceDrawnCanvas, 'addEventListener');
 
-        component.save();
+        component.erase();
 
-        expect(component.saveVerification).toHaveBeenCalled();
-        expect(component.gameCardService.uploadImages).toHaveBeenCalledWith(
-            new File([''], 'original.bmp'),
-            new File([''], 'different.bmp'),
-            component.radius,
-        );
-        expect(component.openModal).toHaveBeenCalled();
-    }));
+        expect(eraserService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
 
-    it('should send alert if not good number of differences', fakeAsync(() => {
-        spyOn(window, 'alert');
+        expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mousedown', component.eraseListener[0]);
+        expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mouseup', component.eraseListener[1]);
+        expect(addEventListenerOriginalSpy).toHaveBeenCalledWith('mousemove', component.eraseListener[2]);
 
-        component.gameTitle = 'My Game';
-        component.originalFile = new File([''], 'original.bmp');
-        component.differentFile = new File([''], 'different.bmp');
+        expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mousedown', component.eraseListener[0]);
+        expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mouseup', component.eraseListener[1]);
+        expect(addEventListenerDifferenceSpy).toHaveBeenCalledWith('mousemove', component.eraseListener[2]);
+    });
 
-        spyOn(component, 'saveVerification').and.returnValue(true);
-        spyOn(component, 'openModal');
+    it('should remove event listeners on drawn canvases', () => {
+        const originalDrawnCanvasSpy = spyOn(component.originalDrawnCanvas.nativeElement, 'removeEventListener');
+        const differenceDrawnCanvasSpy = spyOn(component.differenceDrawnCanvas.nativeElement, 'removeEventListener');
+        component.removingListeners();
 
-        const mockServerInfo: ServerGeneratedGameInfo = {
-            gameId: '',
-            originalImageName: '',
-            differenceImageName: '',
-            gameDifficulty: '',
-            gameDifferenceNumber: 0,
-        };
-        spyOn(component.gameCardService, 'uploadImages').and.returnValue(of(mockServerInfo));
-        component.save();
-        expect(window.alert).toHaveBeenCalledWith("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
-    }));
+        expect(originalDrawnCanvasSpy).toHaveBeenCalledWith('mousedown', component.penListener[0]);
+        expect(originalDrawnCanvasSpy).toHaveBeenCalledWith('mouseup', component.penListener[1]);
+        expect(originalDrawnCanvasSpy).toHaveBeenCalledWith('mousemove', component.penListener[2]);
+
+        expect(originalDrawnCanvasSpy).toHaveBeenCalledWith('mousedown', component.eraseListener[0]);
+        expect(originalDrawnCanvasSpy).toHaveBeenCalledWith('mouseup', component.eraseListener[1]);
+        expect(originalDrawnCanvasSpy).toHaveBeenCalledWith('mousemove', component.eraseListener[2]);
+
+        expect(differenceDrawnCanvasSpy).toHaveBeenCalledWith('mousedown', component.penListener[0]);
+        expect(differenceDrawnCanvasSpy).toHaveBeenCalledWith('mouseup', component.penListener[1]);
+        expect(differenceDrawnCanvasSpy).toHaveBeenCalledWith('mousemove', component.penListener[2]);
+
+        expect(differenceDrawnCanvasSpy).toHaveBeenCalledWith('mousedown', component.eraseListener[0]);
+        expect(differenceDrawnCanvasSpy).toHaveBeenCalledWith('mouseup', component.eraseListener[1]);
+        expect(differenceDrawnCanvasSpy).toHaveBeenCalledWith('mousemove', component.eraseListener[2]);
+    });
+
+    it('should remove event listeners on rectangle canvases', () => {
+        const originalRectangleCanvasSpy = spyOn(component.originalRectangleCanvas.nativeElement, 'removeEventListener');
+        const differenceRectangleCanvasSpy = spyOn(component.differenceRectangleCanvas.nativeElement, 'removeEventListener');
+        component.removingListeners();
+
+        expect(originalRectangleCanvasSpy).toHaveBeenCalledWith('mousedown', component.rectangleListener[0]);
+        expect(originalRectangleCanvasSpy).toHaveBeenCalledWith('mouseup', component.rectangleListener[1]);
+        expect(originalRectangleCanvasSpy).toHaveBeenCalledWith('mousemove', component.rectangleListener[2]);
+
+        expect(differenceRectangleCanvasSpy).toHaveBeenCalledWith('mousedown', component.rectangleListener[0]);
+        expect(differenceRectangleCanvasSpy).toHaveBeenCalledWith('mouseup', component.rectangleListener[1]);
+        expect(differenceRectangleCanvasSpy).toHaveBeenCalledWith('mousemove', component.rectangleListener[2]);
+    });
+
+    it('should change the z indexes if the rectangle button is enabled', () => {
+        component.isRectangleEnabled = true;
+        component.changeZindex();
+
+        expect(component.canvas2ZIndex).toEqual(3);
+        expect(component.canvas1ZIndex).toEqual(2);
+    });
+
+    it('should change the z indexes if the rectangle button is disabled', () => {
+        component.isRectangleEnabled = false;
+        component.changeZindex();
+
+        expect(component.canvas2ZIndex).toEqual(2);
+        expect(component.canvas1ZIndex).toEqual(3);
+    });
+
+    it('should toggle pen state and call drawPen if pen button is clicked', () => {
+        spyOn(component, 'removingListeners');
+        spyOn(component, 'changeZindex');
+        spyOn(component, 'drawPen');
+
+        component.toggleButton('pen');
+
+        expect(component.removingListeners).toHaveBeenCalled();
+        expect(component.changeZindex).toHaveBeenCalled();
+        expect(component.isPenEnabled).toBeTrue();
+        expect(component.isRectangleEnabled).toBeFalse();
+        expect(component.isEraserEnabled).toBeFalse();
+        expect(component.isDuplicateEnabled).toBeFalse();
+        expect(component.isClearEnabled).toBeFalse();
+        expect(component.drawPen).toHaveBeenCalled();
+    });
+
+    it('should toggle rectangle state and call drawRectangle if rectangle button is clicked', () => {
+        spyOn(component, 'removingListeners');
+        spyOn(component, 'changeZindex');
+        spyOn(component, 'drawRectangle');
+
+        component.toggleButton('rectangle');
+
+        expect(component.removingListeners).toHaveBeenCalled();
+        expect(component.changeZindex).toHaveBeenCalled();
+        expect(component.isPenEnabled).toBeFalse();
+        expect(component.isRectangleEnabled).toBeTrue();
+        expect(component.isEraserEnabled).toBeFalse();
+        expect(component.isDuplicateEnabled).toBeFalse();
+        expect(component.isClearEnabled).toBeFalse();
+        expect(component.drawRectangle).toHaveBeenCalled();
+    });
+
+    it('should toggle eraser state and call erase if erase button is clicked', () => {
+        spyOn(component, 'removingListeners');
+        spyOn(component, 'changeZindex');
+        spyOn(component, 'erase');
+
+        component.toggleButton('erase');
+
+        expect(component.removingListeners).toHaveBeenCalled();
+        expect(component.changeZindex).toHaveBeenCalled();
+        expect(component.isPenEnabled).toBeFalse();
+        expect(component.isRectangleEnabled).toBeFalse();
+        expect(component.isEraserEnabled).toBeTrue();
+        expect(component.isDuplicateEnabled).toBeFalse();
+        expect(component.isClearEnabled).toBeFalse();
+        expect(component.erase).toHaveBeenCalled();
+    });
+
+    it('should toggle duplicate state if duplicate button is clicked', () => {
+        spyOn(component, 'removingListeners');
+
+        component.toggleButton('duplicate');
+
+        expect(component.removingListeners).toHaveBeenCalled();
+        expect(component.isPenEnabled).toBeFalse();
+        expect(component.isRectangleEnabled).toBeFalse();
+        expect(component.isEraserEnabled).toBeFalse();
+        expect(component.isDuplicateEnabled).toBeTrue();
+        expect(component.isClearEnabled).toBeFalse();
+    });
+
+    it('should toggle clear state if clear button is clicked', () => {
+        spyOn(component, 'removingListeners');
+
+        component.toggleButton('clear');
+
+        expect(component.removingListeners).toHaveBeenCalled();
+        expect(component.isPenEnabled).toBeFalse();
+        expect(component.isRectangleEnabled).toBeFalse();
+        expect(component.isEraserEnabled).toBeFalse();
+        expect(component.isDuplicateEnabled).toBeFalse();
+        expect(component.isClearEnabled).toBeTrue();
+    });
+
+    it("should set the drawManipulation service's properties and call the invert method of the service", () => {
+        component.invert();
+
+        expect(drawManipulationService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
+        expect(drawManipulationService.invert).toHaveBeenCalled();
+    });
+
+    it("should set the drawManipulation service's properties and call the duplicate method of the service", () => {
+        component.duplicate('left');
+
+        expect(drawManipulationService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
+        expect(drawManipulationService.duplicate).toHaveBeenCalled();
+    });
+
+    it("should set the drawManipulation service's properties and call the clearPainting method of the service", () => {
+        component.clearPainting('left');
+
+        expect(drawManipulationService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
+        expect(drawManipulationService.clearPainting).toHaveBeenCalled();
+    });
+
+    it("should set the undoRedo service's properties and call the undo method of the service", () => {
+        component.undo();
+
+        expect(undoRedoService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
+        expect(undoRedoService.undo).toHaveBeenCalled();
+    });
+
+    it("should set the undoRedo service's properties and call the redo method of the service", () => {
+        component.redo();
+
+        expect(undoRedoService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
+        expect(undoRedoService.redo).toHaveBeenCalled();
+    });
 });
