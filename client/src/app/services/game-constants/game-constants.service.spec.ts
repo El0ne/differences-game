@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-restricted-imports */
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
@@ -28,6 +29,18 @@ describe('GameConstantsService', () => {
 
         service.getGameConstants();
         req.flush(FAKE_GAME_CONSTANTS);
+    });
+
+    it('updateGameConstants should call put on httpManager', () => {
+        const newConstants = FAKE_GAME_CONSTANTS;
+        newConstants.countDown = 200;
+        service.updateGameConstants(newConstants).subscribe(() => {
+            expect().nothing();
+        });
+
+        const req = httpController.expectOne(`${GAME_CONSTANTS}`);
+        expect(req.request.body).toEqual(newConstants);
+        req.flush(null);
     });
 });
 
