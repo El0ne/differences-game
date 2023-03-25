@@ -85,6 +85,12 @@ app-game-card-selection {
     width: 16rem;
 }
 
+.save-button {
+    margin-top: 30px;
+    height: 6rem;
+    width: 25rem;
+}
+
 .normal-button:disabled,
 .normal-button[disabled] {
     border: 1px solid #999999;
@@ -92,6 +98,10 @@ app-game-card-selection {
     color: #666666;
 }
 
-#create-a-stage-button {
+button {
     font-size: x-large;
+}
+
+input[type='number'] {
+    font-size: 20px;
 }
