@@ -1,21 +1,21 @@
 <div class="game-constants-container">
     <div class="game-constants">
-        Pénalité l'utilisation d'un indice :
-        <input type="number" (keyup)="hintTimeNumber = checkNumber($event, 0, 10)" [(ngModel)]="hintTimeNumber" [min]="0" [max]="10" />
+        Pénalité l'utilisation d'un indice (entre 0 et 10 secondes):
+        <input type="number" (blur)="hintTimeNumber = checkNumber($event, 0, 10)" [(ngModel)]="hintTimeNumber" [min]="0" [max]="10" />
         secondes
     </div>
     <div class="game-constants">
-        Durée du compte à rebours :
-        <input type="number" [(ngModel)]="countdownTimeNumber" [min]="10" [max]="60" (keyup)="countdownTimeNumber = checkNumber($event, 10, 60)" />
+        Durée du compte à rebours (entre 10 et 60 secondes):
+        <input type="number" [(ngModel)]="countdownTimeNumber" [min]="10" [max]="60" (blur)="countdownTimeNumber = checkNumber($event, 10, 60)" />
         secondes
     </div>
 
     <div class="game-constants">
-        Temps gagné avec la découverte d'une différence :
+        Temps gagné avec la découverte d'une différence (entre 0 et 10 secondes):
         <input
             type="number"
             [(ngModel)]="differenceFoundTimeNumber"
-            (keyup)="differenceFoundTimeNumber = checkNumber($event, 0, 10)"
+            (blur)="differenceFoundTimeNumber = checkNumber($event, 0, 10)"
             [min]="0"
             [max]="10"
         />

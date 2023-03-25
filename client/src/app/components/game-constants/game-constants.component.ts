@@ -31,7 +31,7 @@ export class GameConstantsComponent implements OnInit {
         this.gameConstantsService.updateGameConstants(gameConstants).subscribe();
     }
 
-    checkNumber(event: KeyboardEvent, minValue: number, maxValue: number): number {
+    checkNumber(event: FocusEvent, minValue: number, maxValue: number): number {
         const inputValue = parseInt((event.target as HTMLInputElement).value, 10);
         if (inputValue < minValue) {
             (event.target as HTMLInputElement).value = minValue.toString();
