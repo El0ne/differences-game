@@ -1,0 +1,16 @@
+<div class="game-constants-container">
+    <div class="game-constants">
+        Pénalité l'utilisation d'un indice :
+        <input type="number" [(ngModel)]="hintTimeNumber" [min]="0" [max]="14" />
+        secondes
+    </div>
+    <div class="game-constants">
+        Durée du compte à rebours : <input type="number" [(ngModel)]="countdownTimeNumber" [min]="10" [max]="60" /> secondes
+    </div>
+
+    <div class="game-constants">
+        Temps gagné avec la découverte d'une différence :
+        <input type="number" [(ngModel)]="differenceFoundTimeNumber" [min]="0" [max]="10" /> secondes
+    </div>
+    <button type="button" class="normal-button save-button" (click)="updateGameConstants()">Sauvegarder les constantes de parties</button>
+</div>

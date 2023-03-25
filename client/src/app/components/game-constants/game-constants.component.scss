@@ -1,0 +1,28 @@
+.game-constants-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 8%;
+}
+
+.game-constants {
+    color: white;
+    margin-bottom: 30px;
+    width: 100%;
+    font-size: 20px;
+    text-align: center;
+}
+
+.save-button {
+    margin-top: 30px;
+    height: 6rem;
+    width: 25rem;
+}
+
+input[type='number'] {
+    font-size: 20px;
+}
+
+button {
+    font-size: x-large;
+}

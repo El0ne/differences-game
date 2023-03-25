@@ -8,20 +8,6 @@ body {
     height: 10%;
 }
 
-.game-properties {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 8%;
-}
-.game-constants {
-    color: white;
-    margin-bottom: 30px;
-    width: 100%;
-    font-size: 20px;
-    text-align: center;
-}
-
 app-game-card-selection {
     margin-bottom: 40px;
     scale: 0.9;
@@ -85,12 +71,6 @@ app-game-card-selection {
     width: 16rem;
 }
 
-.save-button {
-    margin-top: 30px;
-    height: 6rem;
-    width: 25rem;
-}
-
 .normal-button:disabled,
 .normal-button[disabled] {
     border: 1px solid #999999;
@@ -100,8 +80,4 @@ app-game-card-selection {
 
 button {
     font-size: x-large;
-}
-
-input[type='number'] {
-    font-size: 20px;
 }
