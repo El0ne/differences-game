@@ -1,11 +1,13 @@
 <div class="game-constants-container">
     <div class="game-constants">
         Pénalité l'utilisation d'un indice :
-        <input type="number" [(ngModel)]="hintTimeNumber" [min]="0" [max]="14" />
+        <!-- <input type="number" formControlName="hintTimeNumber" [min]="0" [max]="14" /> -->
+        <input type="number" (keyup)="checkHint($event, 0, 14)" [(ngModel)]="hintTimeNumber" [min]="0" [max]="14" />
         secondes
     </div>
     <div class="game-constants">
-        Durée du compte à rebours : <input type="number" [(ngModel)]="countdownTimeNumber" [min]="10" [max]="60" /> secondes
+        Durée du compte à rebours :
+        <input type="number" [(ngModel)]="countdownTimeNumber" [min]="10" [max]="60" (keyup)="test(countdownTimeNumber, 10, 60)" /> secondes
     </div>
 
     <div class="game-constants">
