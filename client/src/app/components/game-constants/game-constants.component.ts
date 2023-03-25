@@ -15,7 +15,11 @@ export class GameConstantsComponent implements OnInit {
     constructor(private gameConstantsService: GameConstantsService) {}
 
     ngOnInit(): void {
-        this.gameConstantsService.getGameConstants().subscribe();
+        this.gameConstantsService.getGameConstants().subscribe((gameConstants: GameConstants) => {
+            this.countdownTimeNumber = gameConstants.countDown;
+            this.differenceFoundTimeNumber = gameConstants.difference;
+            this.hintTimeNumber = gameConstants.hint;
+        });
     }
 
     updateGameConstants(): void {

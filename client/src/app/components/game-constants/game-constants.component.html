@@ -1,7 +1,6 @@
 <div class="game-constants-container">
     <div class="game-constants">
         Pénalité l'utilisation d'un indice :
-        <!-- <input type="number" formControlName="hintTimeNumber" [min]="0" [max]="14" /> -->
         <input type="number" (keyup)="hintTimeNumber = checkNumber($event, 0, 10)" [(ngModel)]="hintTimeNumber" [min]="0" [max]="10" />
         secondes
     </div>

@@ -10,8 +10,8 @@ import { Observable } from 'rxjs';
 export class GameConstantsService {
     constructor(private http: HttpClient) {}
 
-    getGameConstants(): Observable<GameConstants[]> {
-        return this.http.get<GameConstants[]>(GAME_CONSTANTS);
+    getGameConstants(): Observable<GameConstants> {
+        return this.http.get<GameConstants>(GAME_CONSTANTS);
     }
 
     updateGameConstants(gameConstants: GameConstants): Observable<void> {

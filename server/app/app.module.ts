@@ -13,6 +13,7 @@ import { StageWaitingRoomGateway } from './gateways/waitingRoom/stage-waiting-ro
 import { DifferenceClickService } from './services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from './services/difference-detection/difference-detection.service';
 import { DifferencesCounterService } from './services/differences-counter/differences-counter.service';
+import { GameConstantService } from './services/game-constant/game-constant.service';
 import { GameDifficultyService } from './services/game-difficulty/game-difficulty.service';
 import { GameManagerService } from './services/game-manager/game-manager.service';
 import { ImageDimensionsService } from './services/image-dimensions/image-dimensions.service';
@@ -51,6 +52,7 @@ import { PixelRadiusService } from './services/pixel-radius/pixel-radius.service
         ImageManagerService,
         GameManagerService,
         MatchGateway,
+        GameConstantService,
     ],
 })
 export class AppModule {}
