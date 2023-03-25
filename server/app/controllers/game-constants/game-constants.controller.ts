@@ -8,13 +8,11 @@ export class GameConstantsController {
 
     @Get('/')
     getGameConstants(): GameConstants {
-        console.log('terry cruz');
         return this.gameConstantService.getGameConstants();
     }
 
     @Put('/')
     updateGameConstants(@Body() gameConstants: GameConstants): void {
-        console.log('gameConstants', gameConstants);
         this.gameConstantService.updateGameConstants(gameConstants);
     }
 }
