@@ -11,7 +11,6 @@ import { GameConstantsController } from './game-constants.controller';
 describe('GameConstantsController', () => {
     let httpServer: unknown;
     let controller: GameConstantsController;
-    // let gameConstantServiceStub;
     let gameConstantService: GameConstantService;
     let getGameConstantsStub;
     let updateGameConstantsStub;
@@ -26,7 +25,6 @@ describe('GameConstantsController', () => {
         await app.init();
         httpServer = app.getHttpServer();
         controller = module.get<GameConstantsController>(GameConstantsController);
-        // gameConstantServiceStub = createStubInstance(GameConstantService);
         gameConstantService = module.get<GameConstantService>(GameConstantService);
         getGameConstantsStub = stub(gameConstantService, 'getGameConstants');
         updateGameConstantsStub = stub(gameConstantService, 'updateGameConstants');
