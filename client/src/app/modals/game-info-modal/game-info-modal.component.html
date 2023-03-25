@@ -3,23 +3,12 @@
     <div class="info-container">
         <h1 class="neon">
             Difficulté :
-            <h2>
-                {{ data.gameCardInfo.difficulty }}
-            </h2>
+            {{ data.gameCardInfo.difficulty }}
         </h1>
-        <h1 class="neon">
-            Joueurs présents :
-            <h2>1</h2>
-        </h1>
+        <h1 class="neon">Joueurs présents : {{ data.numberOfPlayers }}</h1>
         <h1 class="neon">
             Nombre de différences :
-            <h2>
-                {{ data.numberOfDifferences }}
-            </h2>
-        </h1>
-        <h1 class="neon">
-            Temps perdu par indice/gagné par différence :
-            <h2>x</h2>
+            {{ data.numberOfDifferences }}
         </h1>
     </div>
 </div>

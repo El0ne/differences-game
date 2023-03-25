@@ -64,7 +64,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.isMultiplayer = this.router.url.includes('multiplayer');
         this.gameConstantsService.getGameConstants().subscribe((gameConstants: GameConstants) => {
             this.gameConstants = gameConstants;
-            console.log('this.gameConstants', this.gameConstants);
         });
 
         if (!this.socketService.liveSocket()) {
@@ -185,6 +184,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             data: {
                 gameCardInfo: this.gameCardInfo,
                 numberOfDifferences: this.numberOfDifferences,
+                numberOfPlayers: this.isMultiplayer ? 2 : 1,
             },
         });
     }
