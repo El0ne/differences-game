@@ -24,7 +24,7 @@ export class GameConstantsComponent implements OnInit {
             hint: this.hintTimeNumber,
             difference: this.differenceFoundTimeNumber,
         };
-        this.gameConstantsService.updateGameConstants(gameConstants).subscribe(() => {});
+        this.gameConstantsService.updateGameConstants(gameConstants).subscribe();
     }
 
     checkNumber(event: KeyboardEvent, minValue: number, maxValue: number): number {
