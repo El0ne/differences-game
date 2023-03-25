@@ -5,7 +5,7 @@ import * as path from 'path';
 
 @Injectable()
 export class GameConstantService {
-    readonly jsonPath = path.join(process.cwd(), 'app/dataBase/game-constants.json');
+    jsonPath = path.join(process.cwd(), 'app/dataBase/game-constants.json');
 
     getGameConstants(): GameConstants {
         const content = fs.readFileSync(this.jsonPath, 'utf8');
