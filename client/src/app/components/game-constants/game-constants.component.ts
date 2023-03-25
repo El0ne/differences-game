@@ -46,11 +46,6 @@ export class GameConstantsComponent implements OnInit {
         }
     }
 
-    checkHint(event: KeyboardEvent, minValue: number, maxValue: number): void {
-        this.hintTimeNumber = this.checkNumber(event, minValue, maxValue);
-        console.log('this.hintTimeNumber', this.hintTimeNumber);
-    }
-
     // checkHint(event: KeyboardEvent, minValue: number, maxValue: number): void {
     //     console.log('this.hintTimeNumber', event);
     //     console.log(typeof event);
