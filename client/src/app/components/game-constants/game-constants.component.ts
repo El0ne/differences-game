@@ -8,7 +8,6 @@ import { GameConstants } from '@common/game-constants';
     styleUrls: ['./game-constants.component.scss'],
 })
 export class GameConstantsComponent implements OnInit {
-    // hintTimeNumber: number;
     countdownTimeNumber: number;
     differenceFoundTimeNumber: number;
     hintTimeNumber: number;
@@ -20,17 +19,12 @@ export class GameConstantsComponent implements OnInit {
     }
 
     updateGameConstants(): void {
-        // this.countdownTimeNumber = 25;
         const gameConstants: GameConstants = {
             countDown: this.countdownTimeNumber,
             hint: this.hintTimeNumber,
             difference: this.differenceFoundTimeNumber,
         };
-        console.log('gameConstants', gameConstants);
-        this.gameConstantsService.updateGameConstants(gameConstants).subscribe(() => {
-            console.log('work');
-        });
-        console.log('rgerg');
+        this.gameConstantsService.updateGameConstants(gameConstants).subscribe(() => {});
     }
 
     checkNumber(event: KeyboardEvent, minValue: number, maxValue: number): number {
@@ -43,32 +37,6 @@ export class GameConstantsComponent implements OnInit {
             return maxValue;
         } else {
             return inputValue;
-        }
-    }
-
-    // checkHint(event: KeyboardEvent, minValue: number, maxValue: number): void {
-    //     console.log('this.hintTimeNumber', event);
-    //     console.log(typeof event);
-    // }
-
-    //  checkNumber(inputValue: number, minValue: number, maxValue: number): number {
-    //     // const inputValue = parseInt((event.target as HTMLInputElement).value, 10);
-    //     // console.log('inputValue', inputValue);
-    //     if (inputValue < minValue) {
-    //         inputValue = minValue;
-    //         return minValue;
-    //     } else if (inputValue > maxValue) {
-    //         inputValue = maxValue;
-    //         return maxValue;
-    //     }
-    //     return 0;
-    // }
-
-    test(value: number, minValue: number, maxValue: number) {
-        if (value < minValue) {
-            value = minValue;
-        } else if (value > maxValue) {
-            value = maxValue;
         }
     }
 }
