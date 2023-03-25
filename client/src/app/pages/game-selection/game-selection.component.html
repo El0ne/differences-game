@@ -26,16 +26,16 @@
             </div>
         </div>
         <div *ngIf="isConfig" class="game-properties">
-            <div class="game-constants" [(ngModel)]="hintTimeNumber">
-                Pénalité l'utilisation d'un indice : <input type="number" [min]="0" [max]="10" [value]="hintTimeNumber" /> secondes
+            <div class="game-constants">
+                Pénalité l'utilisation d'un indice : <input type="number" [(ngModel)]="hintTimeNumber" [min]="0" [max]="10" /> secondes
             </div>
-            <div class="game-constants" [(ngModel)]="countdownTimeNumber">
-                Durée du compte à rebours : <input type="number" [min]="10" [max]="60" [value]="countdownTimeNumber" /> secondes
+            <div class="game-constants">
+                Durée du compte à rebours : <input type="number" [(ngModel)]="countdownTimeNumber" [min]="10" [max]="60" /> secondes
             </div>
 
-            <div class="game-constants" [(ngModel)]="differenceFoundTimeNumber">
+            <div class="game-constants">
                 Temps gagné avec la découverte d'une différence :
-                <input type="number" [min]="0" [max]="10" [value]="differenceFoundTimeNumber" /> secondes
+                <input type="number" [(ngModel)]="differenceFoundTimeNumber" [min]="0" [max]="10" /> secondes
             </div>
             <button type="button" *ngIf="isConfig" class="normal-button navigate-cards-buttons save-button" (click)="updateGameConstants()">
                 Sauvegarder les constantes de parties
