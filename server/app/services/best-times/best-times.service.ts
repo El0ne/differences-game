@@ -9,15 +9,17 @@ export class BestTimesService {
     constructor(@InjectModel(GameCard.name) private gameCardModel: Model<GameCardDocument>) {}
     async resetAllGameCards(): Promise<void> {
         console.log('first');
-        const test = await (
-            await this.gameCardModel.find({})
-        ).forEach(async (gameCard) => {
-            await this.gameCardModel.updateOne(
-                { _id: gameCard._id },
-                { $set: { soloTimes: this.generateBestTimes(), multiTimes: this.generateBestTimes() } },
-            );
+        (await this.gameCardModel.find({})).forEach(async (gameCard) => {
+            await this.resetGameCard(gameCard);
         });
         console.log('first');
+    }
+
+    async resetGameCard(gameCard: GameCard) {
+        await this.gameCardModel.updateOne(
+            { _id: gameCard._id },
+            { $set: { soloTimes: this.generateBestTimes(), multiTimes: this.generateBestTimes() } },
+        );
     }
 
     generateBestTimes(): RankingBoard[] {
