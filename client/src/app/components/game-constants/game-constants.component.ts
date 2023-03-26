@@ -26,12 +26,15 @@ export class GameConstantsComponent implements OnInit {
     }
 
     updateGameConstants(): void {
+        console.log(this.gameConstants);
         this.gameConstantsService.updateGameConstants(this.gameConstants).subscribe();
     }
 
     resetGameConstants(): void {
         this.gameConstants = DEFAULT_CONSTANTS;
-        this.updateGameConstants();
+        setTimeout(() => {
+            this.updateGameConstants();
+        }, 50);
     }
 
     resetBestTimes(): void {
