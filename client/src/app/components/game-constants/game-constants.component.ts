@@ -20,19 +20,18 @@ export class GameConstantsComponent implements OnInit {
         });
     }
 
-    updateGameConstants(gameConstants: GameConstants): void {
-        this.gameConstantsService.updateGameConstants(gameConstants).subscribe();
+    updateGameConstants(): void {
+        this.gameConstantsService.updateGameConstants(this.gameConstants).subscribe();
     }
 
     resetGameConstants(): void {
-        const defaultConstants: GameConstants = {
+        this.gameConstants = {
             countDown: 30,
             hint: 5,
             difference: 5,
         };
 
-        this.updateGameConstants(defaultConstants);
-        this.gameConstants = defaultConstants;
+        this.updateGameConstants();
     }
 
     resetBestTimes(): void {
