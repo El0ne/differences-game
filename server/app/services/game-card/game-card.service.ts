@@ -43,6 +43,22 @@ export class GameCardService {
         this.imageManagerService.deleteImage(deletedGameCard.differenceImageName);
     }
 
+    async resetAllGameCards(): Promise<void> {
+        console.log('first');
+        const test = await (
+            await this.gameCardModel.find({})
+        ).forEach(async (gameCard) => {
+            // console.log('gameCard', gameCard);
+            await this.gameCardModel.updateOne(
+                { _id: gameCard._id },
+                { $set: { soloTimes: this.generateBestTimes(), multiTimes: this.generateBestTimes() } },
+            );
+        });
+        // await this.gameCardModel.updateMany({}, { $set: { soloTimes: this.generateBestTimes(), multiTimes: this.generateBestTimes() } });
+        // console.log('test', test);
+        console.log('first');
+    }
+
     generateGameCard(game: GameCardDto): GameCard {
         return {
             _id: new ObjectId(game._id),
@@ -51,15 +67,15 @@ export class GameCardService {
             differenceNumber: game.differenceNumber,
             originalImageName: game.baseImage,
             differenceImageName: game.differenceImage,
-            soloTimes: this.generateBestScores(),
-            multiTimes: this.generateBestScores(),
+            soloTimes: this.generateBestTimes(),
+            multiTimes: this.generateBestTimes(),
         };
     }
 
-    generateBestScores(): RankingBoard[] {
+    generateBestTimes(): RankingBoard[] {
         const bestScores = [];
         for (let i = 0; i < 3; i++) {
-            bestScores.push(this.generateScore());
+            bestScores.push(this.generateBestTime());
         }
 
         bestScores.sort((a: RankingBoard, b: RankingBoard) => {
@@ -69,7 +85,7 @@ export class GameCardService {
         return bestScores;
     }
 
-    generateScore(): RankingBoard {
+    generateBestTime(): RankingBoard {
         const maxGameTime = 200;
         return {
             time: Math.floor(Math.random() * maxGameTime),

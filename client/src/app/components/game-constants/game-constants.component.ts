@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
 import { GameConstants } from '@common/game-constants';
 
@@ -15,7 +16,7 @@ export class GameConstantsComponent implements OnInit {
     differenceFoundTimeNumber: number;
     hintTimeNumber: number;
 
-    constructor(private gameConstantsService: GameConstantsService) {}
+    constructor(private gameConstantsService: GameConstantsService, private gameCardService: GameCardInformationService) {}
 
     ngOnInit(): void {
         this.gameConstantsService.getGameConstants().subscribe((gameConstants: GameConstants) => {
@@ -39,6 +40,10 @@ export class GameConstantsComponent implements OnInit {
         this.hintTimeNumber = DEFAULT_HINT_TIME;
         this.differenceFoundTimeNumber = DEFAULT_DIFFERENCE_FOUND_TIME;
         this.updateGameConstants();
+    }
+
+    resetBestTimes(): void {
+        this.gameCardService.resetBestTimes().subscribe();
     }
 
     checkNumber(event: FocusEvent, minValue: number, maxValue: number): number {
