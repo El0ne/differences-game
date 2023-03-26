@@ -2,8 +2,8 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { FAKE_GAME_CONSTANTS } from '@app/mock/game-constants';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
+import { FAKE_GAME_CONSTANTS } from '@common/mock/game-constants-mock';
 import { of } from 'rxjs';
 
 import { GameConstantsComponent } from './game-constants.component';
@@ -42,17 +42,13 @@ describe('GameConstantsComponent', () => {
 
         fixture.detectChanges();
 
-        expect(component.countdownTimeNumber).toEqual(FAKE_GAME_CONSTANTS.countDown);
-        expect(component.differenceFoundTimeNumber).toEqual(FAKE_GAME_CONSTANTS.difference);
-        expect(component.hintTimeNumber).toEqual(FAKE_GAME_CONSTANTS.hint);
+        expect(component.gameConstants).toEqual(FAKE_GAME_CONSTANTS);
     });
 
     it('updateGameConstants() should call updateGameConstants from the service', () => {
         spyOn(gameConstantsService, 'updateGameConstants').and.returnValue(of(undefined));
 
-        component.countdownTimeNumber = FAKE_GAME_CONSTANTS.countDown;
-        component.hintTimeNumber = FAKE_GAME_CONSTANTS.hint;
-        component.differenceFoundTimeNumber = FAKE_GAME_CONSTANTS.difference;
+        component.gameConstants = FAKE_GAME_CONSTANTS;
         component.updateGameConstants();
 
         expect(gameConstantsService.updateGameConstants).toHaveBeenCalledWith(FAKE_GAME_CONSTANTS);
