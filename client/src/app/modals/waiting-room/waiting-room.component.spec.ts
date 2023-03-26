@@ -27,7 +27,7 @@ describe('WaitingRoomComponent', () => {
             providers: [
                 { provide: MatDialogRef, useValue: matDialogSpy },
                 { provide: SocketService, useValue: socketServiceSpy },
-                { provide: MAT_DIALOG_DATA, useValue: { stageId: '123', isHost: true } as WaitingRoomDataPassing },
+                { provide: MAT_DIALOG_DATA, useValue: { stageId: '123', isHost: true, limitedTime: false } as WaitingRoomDataPassing },
                 { provide: Router, useValue: routerSpy },
             ],
         }).compileComponents();
@@ -39,7 +39,7 @@ describe('WaitingRoomComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
-        expect((component.waitingRoomInfo = { stageId: '123', isHost: true }));
+        expect(component.waitingRoomInfo).toEqual({ stageId: '123', isHost: true, limitedTime: false });
     });
 
     it('all listeners should be removed at the destor of the dialog', () => {

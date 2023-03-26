@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { GameCreationPageComponent } from '@app/pages/game-creation-page/game-creation-page.component';
 import { GameSelectionComponent } from '@app/pages/game-selection/game-selection.component';
 import { HomePageComponent } from '@app/pages/home-page/home-page.component';
+import { LimitedTimeComponent } from '@app/pages/limited-time/limited-time.component';
 import { SoloViewComponent } from '@app/pages/solo-view/solo-view.component';
 
 const routes: Routes = [
@@ -13,6 +14,7 @@ const routes: Routes = [
     { path: 'config', component: GameSelectionComponent },
     { path: 'solo/:stageId', component: SoloViewComponent },
     { path: 'multiplayer/:stageId', component: SoloViewComponent },
+    { path: 'limited-time', component: LimitedTimeComponent },
     { path: '**', redirectTo: '/home' },
 ];
 

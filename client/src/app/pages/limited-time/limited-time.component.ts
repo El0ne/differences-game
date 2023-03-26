@@ -1,47 +1,46 @@
-/* eslint-disable no-underscore-dangle */
-/* Required to allow for mongoDB unique _id to be reused in our database */
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { WaitingRoomComponent, WaitingRoomDataPassing } from '@app/modals/waiting-room/waiting-room.component';
-import { STAGE } from '@app/services/server-routes';
 import { SocketService } from '@app/services/socket/socket.service';
-import { GameCardInformation } from '@common/game-card';
 import { MATCH_EVENTS } from '@common/match-gateway-communication';
 import { JoinHostInWaitingRequest, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 
+const LIMITED_TIME_MODE_ID = 'limitedTimeMode';
+
 @Component({
-    selector: 'app-game-card-selection',
-    templateUrl: './game-card-selection.component.html',
-    styleUrls: ['./game-card-selection.component.scss'],
+    selector: 'app-limited-time',
+    templateUrl: './limited-time.component.html',
+    styleUrls: ['./limited-time.component.scss'],
 })
-export class GameCardSelectionComponent implements OnInit {
-    @Input() gameCardInformation: GameCardInformation;
-    @Input() isConfig: boolean | null;
-    @Output() gameDeleted = new EventEmitter<void>();
-    image: string = '';
+export class LimitedTimeComponent implements OnInit {
     createGameButton: boolean = true;
-
     constructor(private socketService: SocketService, private dialog: MatDialog, private router: Router) {}
-    ngOnInit(): void {
-        this.image = `${STAGE}/image/${this.gameCardInformation.originalImageName}`;
-    }
 
-    deleteGame(): void {
-        this.socketService.send(WAITING_ROOM_EVENTS.DeleteGame, this.gameCardInformation._id);
+    ngOnInit(): void {
+        this.socketService.connect();
+        this.socketService.listen(WAITING_ROOM_EVENTS.MatchCreated, () => {
+            this.createGameButton = false;
+        });
+
+        this.socketService.listen(WAITING_ROOM_EVENTS.MatchDeleted, () => {
+            this.createGameButton = true;
+        });
+
+        this.socketService.send(WAITING_ROOM_EVENTS.ScanForHost, [LIMITED_TIME_MODE_ID]);
     }
 
     hostOrJoinGame(): void {
         if (this.createGameButton) {
-            this.socketService.send<string>(WAITING_ROOM_EVENTS.HostGame, this.gameCardInformation._id);
+            this.socketService.send<string>(WAITING_ROOM_EVENTS.HostGame, LIMITED_TIME_MODE_ID);
         } else {
             this.socketService.send<JoinHostInWaitingRequest>(WAITING_ROOM_EVENTS.JoinHost, {
-                stageId: this.gameCardInformation._id,
+                stageId: LIMITED_TIME_MODE_ID,
                 playerName: this.socketService.names.get(this.socketService.socketId) as string,
             });
         }
-        const data: WaitingRoomDataPassing = { stageId: this.gameCardInformation._id, isHost: this.createGameButton, limitedTime: false };
+        const data: WaitingRoomDataPassing = { stageId: LIMITED_TIME_MODE_ID, isHost: this.createGameButton, limitedTime: true };
         this.dialog.open(WaitingRoomComponent, { disableClose: true, data });
     }
 
@@ -50,8 +49,8 @@ export class GameCardSelectionComponent implements OnInit {
         dialogRef.afterClosed().subscribe(() => {
             if (isSoloGame) {
                 this.socketService.gameRoom = this.socketService.socketId;
-                this.socketService.send(MATCH_EVENTS.createSoloGame, this.gameCardInformation._id);
-                this.router.navigate(['/solo/' + this.gameCardInformation._id]);
+                this.socketService.send(MATCH_EVENTS.createSoloGame, LIMITED_TIME_MODE_ID);
+                this.router.navigate(['/solo/' + LIMITED_TIME_MODE_ID]);
             } else this.hostOrJoinGame();
         });
     }

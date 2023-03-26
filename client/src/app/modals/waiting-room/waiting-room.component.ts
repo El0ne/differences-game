@@ -7,6 +7,7 @@ import { AcceptationInformation, PlayerInformations, WAITING_ROOM_EVENTS } from 
 export interface WaitingRoomDataPassing {
     stageId: string;
     isHost: boolean;
+    limitedTime: boolean;
 }
 
 @Component({
@@ -32,6 +33,9 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         if (this.waitingRoomInfo.isHost) {
             this.socket.listen<PlayerInformations>(WAITING_ROOM_EVENTS.RequestMatch, (opponentInformations: PlayerInformations) => {
+                if (this.waitingRoomInfo.limitedTime) {
+                    this.acceptOpponent(opponentInformations.playerSocketId);
+                }
                 this.clientsInWaitingRoom.set(opponentInformations.playerSocketId, opponentInformations.playerName);
             });
 
