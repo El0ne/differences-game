@@ -11,6 +11,8 @@ import { Model } from 'mongoose';
 
 @Injectable()
 export class GameCardService {
+    // we need 3 services and one model for this service
+    // eslint-disable-next-line max-params
     constructor(
         @InjectModel(GameCard.name) private gameCardModel: Model<GameCardDocument>,
         private imageManagerService: ImageManagerService,
@@ -53,7 +55,6 @@ export class GameCardService {
         const allGameCards = await this.gameCardModel.find({});
         allGameCards.forEach(async (gameCard) => {
             await this.deleteGameCard(gameCard._id);
-            // console.log('gameCard._id', gameCard._id.toString());
             await this.gameManagerService.deleteGame(gameCard._id.toString());
         });
     }

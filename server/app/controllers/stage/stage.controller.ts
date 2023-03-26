@@ -174,7 +174,4 @@ export class StageController {
             res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    // await this.gameCardService.deleteGameCard(stageId);
-    //     await this.gameManagerService.deleteGame(stageId);
 }
