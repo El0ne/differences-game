@@ -47,4 +47,8 @@ export class GameCardInformationService {
     resetBestTimes(): Observable<void> {
         return this.http.put<void>(`${STAGE}/best-times`, null);
     }
+
+    resetBestTime(id: string): Observable<void> {
+        return this.http.put<void>(`${STAGE}/best-times/${id}`, null);
+    }
 }

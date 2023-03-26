@@ -1,7 +1,11 @@
+// using _id property
+/* eslint-disable no-underscore-dangle */
+
 import { GameCard, GameCardDocument } from '@app/schemas/game-cards.schemas';
 import { RankingBoard } from '@common/ranking-board';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { ObjectId } from 'mongodb';
 import { Model } from 'mongoose';
 
 const MAX_GENERATED_TIME = 200;
@@ -13,15 +17,13 @@ export class BestTimesService {
     async resetAllGameCards(): Promise<void> {
         const test = await this.gameCardModel.find({});
         test.forEach(async (gameCard) => {
-            await this.resetGameCard(gameCard);
+            await this.resetGameCard(gameCard._id);
         });
     }
 
-    async resetGameCard(gameCard: GameCard): Promise<void> {
+    async resetGameCard(_id: string): Promise<void> {
         await this.gameCardModel.updateOne(
-            // using _id property
-            // eslint-disable-next-line no-underscore-dangle
-            { _id: gameCard._id },
+            { _id: new ObjectId(_id) },
             { $set: { soloTimes: this.generateBestTimes(), multiTimes: this.generateBestTimes() } },
         );
     }

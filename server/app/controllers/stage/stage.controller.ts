@@ -148,7 +148,17 @@ export class StageController {
     @Put('/best-times')
     async resetBestTimes(@Res() res: Response): Promise<void> {
         try {
-            this.bestTimesService.resetAllGameCards();
+            await this.bestTimesService.resetAllGameCards();
+            res.status(HttpStatus.NO_CONTENT).send();
+        } catch (err) {
+            res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Put('/best-times/:id')
+    async resetBestTime(@Param('id') id: string, @Res() res: Response): Promise<void> {
+        try {
+            await this.bestTimesService.resetGameCard(id);
             res.status(HttpStatus.NO_CONTENT).send();
         } catch (err) {
             res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
