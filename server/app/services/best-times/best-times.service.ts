@@ -2,7 +2,6 @@ import { GameCard, GameCardDocument } from '@app/schemas/game-cards.schemas';
 import { RankingBoard } from '@common/ranking-board';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { ObjectId } from 'mongodb';
 import { Model } from 'mongoose';
 
 const MAX_GENERATED_TIME = 200;
@@ -13,8 +12,7 @@ export class BestTimesService {
     constructor(@InjectModel(GameCard.name) private gameCardModel: Model<GameCardDocument>) {}
     async resetAllGameCards(): Promise<void> {
         const test = await this.gameCardModel.find({});
-        test.forEach(async (gameCard, index) => {
-            console.log('before', gameCard.soloTimes[0]);
+        test.forEach(async (gameCard) => {
             await this.resetGameCard(gameCard);
         });
     }
@@ -26,18 +24,6 @@ export class BestTimesService {
             { _id: gameCard._id },
             { $set: { soloTimes: this.generateBestTimes(), multiTimes: this.generateBestTimes() } },
         );
-        setTimeout(async () => {
-            const after = await this.gameCardModel.findById(new ObjectId(gameCard._id));
-            console.log('after', after.soloTimes[0]);
-        }, 10);
-
-        //     const test = async (): Promise<GameCard> =>
-        //         new Promise((res) => {
-        //             setTimeout(async () => {
-        //                 res(await this.gameCardModel.findById(new ObjectId(gameCard._id)));
-        //             }, 100);
-        //         });
-        //     return Promise.resolve(test);
     }
 
     generateBestTimes(): RankingBoard[] {
