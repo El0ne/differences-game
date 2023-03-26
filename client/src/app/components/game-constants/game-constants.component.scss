@@ -25,3 +25,10 @@ input[type='number'] {
 button {
     font-size: x-large;
 }
+
+.normal-button:disabled,
+.normal-button[disabled] {
+    border: 1px solid #999999;
+    background-color: #cccccc;
+    color: #666666;
+}

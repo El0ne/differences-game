@@ -2,7 +2,7 @@
 /* eslint-disable no-restricted-imports */
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { FAKE_GAME_CONSTANTS } from '@app/mock/game-constants';
+import { FAKE_GAME_CONSTANTS } from '@common/mock/game-constants-mock';
 import { GAME_CONSTANTS } from '../server-routes';
 import { GameConstantsService } from './game-constants.service';
 

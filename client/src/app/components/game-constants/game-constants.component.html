@@ -1,12 +1,18 @@
 <div class="game-constants-container">
     <div class="game-constants">
         Pénalité l'utilisation d'un indice (entre 0 et 10 secondes):
-        <input type="number" (blur)="hintTimeNumber = checkNumber($event, 0, 10)" [(ngModel)]="hintTimeNumber" [min]="0" [max]="10" />
+        <input type="number" (blur)="gameConstants.hint = checkNumber($event, 0, 10)" [(ngModel)]="gameConstants.hint" [min]="0" [max]="10" />
         secondes
     </div>
     <div class="game-constants">
         Durée du compte à rebours (entre 10 et 60 secondes):
-        <input type="number" [(ngModel)]="countdownTimeNumber" [min]="10" [max]="60" (blur)="countdownTimeNumber = checkNumber($event, 10, 60)" />
+        <input
+            type="number"
+            [(ngModel)]="gameConstants.countDown"
+            [min]="10"
+            [max]="60"
+            (blur)="gameConstants.countDown = checkNumber($event, 10, 60)"
+        />
         secondes
     </div>
 
@@ -14,14 +20,16 @@
         Temps gagné avec la découverte d'une différence (entre 0 et 10 secondes):
         <input
             type="number"
-            [(ngModel)]="differenceFoundTimeNumber"
-            (blur)="differenceFoundTimeNumber = checkNumber($event, 0, 10)"
+            [(ngModel)]="gameConstants.difference"
+            (blur)="gameConstants.difference = checkNumber($event, 0, 10)"
             [min]="0"
             [max]="10"
         />
         secondes
     </div>
-    <button type="button" class="normal-button save-button" (click)="updateGameConstants()">Sauvegarder les constantes de parties</button>
+    <button type="button" class="normal-button save-button" (click)="updateGameConstants()" [disabled]="isConstantNull()">
+        Sauvegarder les constantes de parties
+    </button>
     <button type="button" class="normal-button save-button" (click)="resetGameConstants()">Réinitialiser les constantes de parties</button>
     <button type="button" class="normal-button save-button" (click)="resetBestTimes()">Réinitialiser les meilleurs temps</button>
     <!-- <button type="button" class="normal-button save-button">Consulter l'historique de parties</button> -->

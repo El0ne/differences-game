@@ -3,9 +3,11 @@ import { GameCardInformationService } from '@app/services/game-card-information-
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
 import { GameConstants } from '@common/game-constants';
 
-const DEFAULT_COUNTDOWN_TIME = 30;
-const DEFAULT_HINT_TIME = 5;
-const DEFAULT_DIFFERENCE_FOUND_TIME = 5;
+const DEFAULT_CONSTANTS: GameConstants = {
+    countDown: 30,
+    hint: 5,
+    difference: 5,
+};
 @Component({
     selector: 'app-game-constants',
     templateUrl: './game-constants.component.html',
@@ -13,33 +15,22 @@ const DEFAULT_DIFFERENCE_FOUND_TIME = 5;
 })
 export class GameConstantsComponent implements OnInit {
     @Output() bestTimeReset = new EventEmitter<void>();
-    countdownTimeNumber: number;
-    differenceFoundTimeNumber: number;
-    hintTimeNumber: number;
+    gameConstants: GameConstants;
 
     constructor(private gameConstantsService: GameConstantsService, private gameCardService: GameCardInformationService) {}
 
     ngOnInit(): void {
         this.gameConstantsService.getGameConstants().subscribe((gameConstants: GameConstants) => {
-            this.countdownTimeNumber = gameConstants.countDown;
-            this.differenceFoundTimeNumber = gameConstants.difference;
-            this.hintTimeNumber = gameConstants.hint;
+            this.gameConstants = gameConstants;
         });
     }
 
     updateGameConstants(): void {
-        const gameConstants: GameConstants = {
-            countDown: this.countdownTimeNumber,
-            hint: this.hintTimeNumber,
-            difference: this.differenceFoundTimeNumber,
-        };
-        this.gameConstantsService.updateGameConstants(gameConstants).subscribe();
+        this.gameConstantsService.updateGameConstants(this.gameConstants).subscribe();
     }
 
     resetGameConstants(): void {
-        this.countdownTimeNumber = DEFAULT_COUNTDOWN_TIME;
-        this.hintTimeNumber = DEFAULT_HINT_TIME;
-        this.differenceFoundTimeNumber = DEFAULT_DIFFERENCE_FOUND_TIME;
+        this.gameConstants = DEFAULT_CONSTANTS;
         this.updateGameConstants();
     }
 
@@ -66,5 +57,9 @@ export class GameConstantsComponent implements OnInit {
         } else {
             return inputValue;
         }
+    }
+
+    isConstantNull(): boolean {
+        return !this.gameConstants.countDown || !this.gameConstants.difference || !this.gameConstants.hint;
     }
 }
