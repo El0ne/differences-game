@@ -49,6 +49,12 @@ export class GameConstantsComponent implements OnInit {
         });
     }
 
+    deleteAllGames(): void {
+        this.gameCardService.deleteAllGames().subscribe(() => {
+            this.bestTimeReset.emit();
+        });
+    }
+
     checkNumber(event: FocusEvent, minValue: number, maxValue: number): number {
         const inputValue = parseInt((event.target as HTMLInputElement).value, 10);
         if (inputValue < minValue) {

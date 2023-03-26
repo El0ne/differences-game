@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */ // need it because the id_ attribute from MongoDb
 import { GameCard, GameCardDocument } from '@app/schemas/game-cards.schemas';
 import { BestTimesService } from '@app/services/best-times/best-times.service';
+import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { Injectable } from '@nestjs/common';
@@ -14,6 +15,7 @@ export class GameCardService {
         @InjectModel(GameCard.name) private gameCardModel: Model<GameCardDocument>,
         private imageManagerService: ImageManagerService,
         private bestTimesService: BestTimesService,
+        private gameManagerService: GameManagerService,
     ) {}
 
     async getAllGameCards(): Promise<GameCard[]> {
@@ -45,6 +47,15 @@ export class GameCardService {
         const deletedGameCard = await this.gameCardModel.findByIdAndDelete(new ObjectId(id));
         this.imageManagerService.deleteImage(deletedGameCard.originalImageName);
         this.imageManagerService.deleteImage(deletedGameCard.differenceImageName);
+    }
+
+    async deleteAllGameCards(): Promise<void> {
+        const allGameCards = await this.gameCardModel.find({});
+        allGameCards.forEach(async (gameCard) => {
+            await this.deleteGameCard(gameCard._id);
+            // console.log('gameCard._id', gameCard._id.toString());
+            await this.gameManagerService.deleteGame(gameCard._id.toString());
+        });
     }
 
     generateGameCard(game: GameCardDto): GameCard {
