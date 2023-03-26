@@ -1,7 +1,7 @@
 <div class="game-constants-container">
     <div class="game-constants">
-        Pénalité l'utilisation d'un indice (entre 0 et 10 secondes):
-        <input type="number" (blur)="gameConstants.hint = checkNumber($event, 0, 10)" [(ngModel)]="gameConstants.hint" [min]="0" [max]="10" />
+        Pénalité l'utilisation d'un indice (entre 5 et 10 secondes):
+        <input type="number" (blur)="gameConstants.hint = checkNumber($event, 5, 10)" [(ngModel)]="gameConstants.hint" [min]="5" [max]="10" />
         secondes
     </div>
     <div class="game-constants">
@@ -17,12 +17,12 @@
     </div>
 
     <div class="game-constants">
-        Temps gagné avec la découverte d'une différence (entre 0 et 10 secondes):
+        Temps gagné avec la découverte d'une différence (entre 5 et 10 secondes):
         <input
             type="number"
             [(ngModel)]="gameConstants.difference"
-            (blur)="gameConstants.difference = checkNumber($event, 0, 10)"
-            [min]="0"
+            (blur)="gameConstants.difference = checkNumber($event, 5, 10)"
+            [min]="5"
             [max]="10"
         />
         secondes
