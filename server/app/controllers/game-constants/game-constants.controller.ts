@@ -20,7 +20,7 @@ export class GameConstantsController {
     updateGameConstants(@Body() gameConstants: GameConstants, @Res() res: Response): void {
         try {
             this.gameConstantService.updateGameConstants(gameConstants);
-            res.status(HttpStatus.NO_CONTENT);
+            res.status(HttpStatus.NO_CONTENT).send();
         } catch {
             throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
         }
