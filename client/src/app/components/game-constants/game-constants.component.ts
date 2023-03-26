@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
 import { GameConstants } from '@common/game-constants';
 
+const DEFAULT_COUNTDOWN_TIME = 30;
+const DEFAULT_HINT_TIME = 5;
+const DEFAULT_DIFFERENCE_FOUND_TIME = 5;
 @Component({
     selector: 'app-game-constants',
     templateUrl: './game-constants.component.html',
@@ -29,6 +32,13 @@ export class GameConstantsComponent implements OnInit {
             difference: this.differenceFoundTimeNumber,
         };
         this.gameConstantsService.updateGameConstants(gameConstants).subscribe();
+    }
+
+    resetGameConstants(): void {
+        this.countdownTimeNumber = DEFAULT_COUNTDOWN_TIME;
+        this.hintTimeNumber = DEFAULT_HINT_TIME;
+        this.differenceFoundTimeNumber = DEFAULT_DIFFERENCE_FOUND_TIME;
+        this.updateGameConstants();
     }
 
     checkNumber(event: FocusEvent, minValue: number, maxValue: number): number {
