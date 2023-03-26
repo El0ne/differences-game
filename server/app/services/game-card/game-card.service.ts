@@ -2,6 +2,7 @@
 import { GameCard, GameCardDocument } from '@app/schemas/game-cards.schemas';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { GameCardDto } from '@common/game-card.dto';
+import { RankingBoard } from '@common/ranking-board';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
@@ -50,16 +51,42 @@ export class GameCardService {
             differenceNumber: game.differenceNumber,
             originalImageName: game.baseImage,
             differenceImageName: game.differenceImage,
-            soloTimes: [
-                { time: 0, name: '--' },
-                { time: 0, name: '--' },
-                { time: 0, name: '--' },
-            ],
-            multiTimes: [
-                { time: 0, name: '--' },
-                { time: 0, name: '--' },
-                { time: 0, name: '--' },
-            ],
+            soloTimes: this.generateBestScores(),
+            multiTimes: this.generateBestScores(),
         };
+    }
+
+    generateBestScores(): RankingBoard[] {
+        const bestScores = [];
+        for (let i = 0; i < 3; i++) {
+            bestScores.push(this.generateScore());
+        }
+
+        bestScores.sort((a: RankingBoard, b: RankingBoard) => {
+            return a.time - b.time;
+        });
+
+        return bestScores;
+    }
+
+    generateScore(): RankingBoard {
+        const maxGameTime = 200;
+        return {
+            time: Math.floor(Math.random() * maxGameTime),
+            name: this.generateRandomName(),
+        };
+    }
+
+    generateRandomName() {
+        const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+        let word = '';
+
+        const nameLength = 10;
+        for (let i = 0; i < nameLength; i++) {
+            const index = Math.floor(Math.random() * alphabet.length);
+            word += alphabet[index];
+        }
+
+        return word;
     }
 }
