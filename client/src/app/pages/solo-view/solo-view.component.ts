@@ -147,6 +147,21 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         return this.timerService.convert(this.timerService.currentTime);
     }
 
+    notifyNewBestTime(winnerId: string): void {
+        for (const value of this.isMultiplayer ? this.gameCardInfo.multiTimes : this.gameCardInfo.soloTimes) {
+            if (this.timerService.currentTime < value.time) {
+                const index: number = (this.isMultiplayer ? this.gameCardInfo.multiTimes : this.gameCardInfo.soloTimes).indexOf(value);
+                this.socketService.send(CHAT_EVENTS.BestTime, {
+                    winner: this.socketService.names.get(winnerId),
+                    position: index + 1,
+                    gameName: this.gameCardInfo.name,
+                    mode: this.isMultiplayer ? 'multijoueur' : 'solo',
+                });
+                break;
+            }
+        }
+    }
+
     winGame(winnerId: string): void {
         if (!this.left.endGame) {
             this.timerService.stopTimer();
@@ -247,10 +262,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             const endGameVerification = this.numberOfDifferences / 2;
             if (this.currentScorePlayer >= endGameVerification) {
                 this.socketService.send<string>(MATCH_EVENTS.Win, this.currentRoom);
+                this.notifyNewBestTime(this.socketService.socketId);
             }
         } else {
             if (this.currentScorePlayer === this.numberOfDifferences) {
                 this.winGame(this.socketService.socketId);
+                this.notifyNewBestTime(this.socketService.socketId);
             }
         }
     }

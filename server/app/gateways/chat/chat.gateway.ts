@@ -1,3 +1,4 @@
+import { bestTimeInformation } from '@common/best-time';
 import { RoomMessage } from '@common/chat-gateway-constants';
 import { CHAT_EVENTS, MESSAGE_MAX_LENGTH, Room, RoomEvent, RoomManagement } from '@common/chat-gateway-events';
 import { Injectable } from '@nestjs/common';
@@ -45,7 +46,7 @@ export class ChatGateway implements OnGatewayDisconnect {
             const dateFormatted = `${date} - Indice utilisé.`;
             this.server
                 .to(room)
-                .emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message: dateFormatted, event: 'notification' } as RoomMessage);
+                .emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message: dateFormatted, event: 'abandon' } as RoomMessage);
         }
     }
 
@@ -57,6 +58,14 @@ export class ChatGateway implements OnGatewayDisconnect {
                 .to(message.room)
                 .emit(CHAT_EVENTS.RoomMessage, { socketId: socket.id, message: transformedMessage, event: 'message' } as RoomMessage);
         }
+    }
+
+    @SubscribeMessage(CHAT_EVENTS.BestTime)
+    bestTime(socket: Socket, data: bestTimeInformation) {
+        const date = this.dateCreator();
+        const message = `${date} - ${data.winner} obtient la ${data.position} place dans les meilleurs temps du jeu ${data.gameName} en 
+        ${data.mode}.`;
+        this.server.emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message, event: 'abandon' } as RoomMessage);
     }
 
     handleDisconnect(socket: Socket): void {
