@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
 import { GameConstants } from '@common/game-constants';
@@ -12,6 +12,7 @@ const DEFAULT_DIFFERENCE_FOUND_TIME = 5;
     styleUrls: ['./game-constants.component.scss'],
 })
 export class GameConstantsComponent implements OnInit {
+    @Output() bestTimeReset = new EventEmitter<void>();
     countdownTimeNumber: number;
     differenceFoundTimeNumber: number;
     hintTimeNumber: number;
@@ -43,7 +44,9 @@ export class GameConstantsComponent implements OnInit {
     }
 
     resetBestTimes(): void {
-        this.gameCardService.resetBestTimes().subscribe();
+        this.gameCardService.resetBestTimes().subscribe(() => {
+            this.bestTimeReset.emit();
+        });
     }
 
     checkNumber(event: FocusEvent, minValue: number, maxValue: number): number {

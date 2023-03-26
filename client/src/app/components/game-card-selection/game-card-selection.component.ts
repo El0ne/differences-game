@@ -30,6 +30,7 @@ export class GameCardSelectionComponent implements OnInit {
 
     deleteGame(): void {
         this.socketService.send(WAITING_ROOM_EVENTS.DeleteGame, this.gameCardInformation._id);
+        // TODO find out where the emit went
     }
 
     hostOrJoinGame(): void {

@@ -26,7 +26,7 @@
             </div>
         </div>
         <div *ngIf="isConfig" class="game-properties">
-            <app-game-constants></app-game-constants>
+            <app-game-constants (bestTimeReset)="refreshGameCards()"></app-game-constants>
         </div>
         <div class="card-container">
             <div

@@ -48,14 +48,11 @@ export class GameCardService {
         const test = await (
             await this.gameCardModel.find({})
         ).forEach(async (gameCard) => {
-            // console.log('gameCard', gameCard);
             await this.gameCardModel.updateOne(
                 { _id: gameCard._id },
                 { $set: { soloTimes: this.generateBestTimes(), multiTimes: this.generateBestTimes() } },
             );
         });
-        // await this.gameCardModel.updateMany({}, { $set: { soloTimes: this.generateBestTimes(), multiTimes: this.generateBestTimes() } });
-        // console.log('test', test);
         console.log('first');
     }
 
@@ -102,7 +99,6 @@ export class GameCardService {
             const index = Math.floor(Math.random() * alphabet.length);
             word += alphabet[index];
         }
-
         return word;
     }
 }
