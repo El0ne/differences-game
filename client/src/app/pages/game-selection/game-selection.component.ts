@@ -8,6 +8,7 @@ import { GameCardInformation } from '@common/game-card';
 import { WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
 
+const DELAY_BEFORE_REFRESH = 100;
 @Component({
     selector: 'app-game-selection',
     templateUrl: './game-selection.component.html',
@@ -76,10 +77,12 @@ export class GameSelectionComponent implements OnInit {
     }
 
     refreshGameCards(): void {
-        this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
-            this.numberOfGameInformations = data;
-            this.selectGameCards();
-        });
+        setTimeout(() => {
+            this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
+                this.numberOfGameInformations = data;
+                this.selectGameCards();
+            });
+        }, DELAY_BEFORE_REFRESH);
     }
 
     setGameCardCreateOrJoin(isCreate: boolean, stageId: string) {
