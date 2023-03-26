@@ -1,5 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 // using _id property causes linting warning
+import { BestTimesService } from '@app/services/best-times/best-times.service';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
 import { GameCardService } from '@app/services/game-card/game-card.service';
@@ -50,6 +51,7 @@ export class StageController {
         private imageManagerService: ImageManagerService,
         private differenceService: DifferenceDetectionService,
         private differenceClickService: DifferenceClickService,
+        private bestTimesService: BestTimesService,
     ) {}
 
     @Get('/')
@@ -146,7 +148,7 @@ export class StageController {
     @Put('/best-times')
     async resetBestTimes(@Res() res: Response): Promise<void> {
         try {
-            this.gameCardService.resetAllGameCards();
+            this.bestTimesService.resetAllGameCards();
             res.status(HttpStatus.NO_CONTENT).send();
         } catch (err) {
             res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
