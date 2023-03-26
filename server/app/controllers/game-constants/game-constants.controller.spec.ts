@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { FAKE_GAME_CONSTANTS } from '@app/mock/game-constants';
 import { GameConstantService } from '@app/services/game-constant/game-constant.service';
+import { FAKE_GAME_CONSTANTS } from '@common/mock/game-constants-mock';
 import { HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { assert } from 'console';

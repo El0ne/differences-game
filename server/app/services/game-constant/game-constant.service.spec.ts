@@ -1,4 +1,4 @@
-import { FAKE_GAME_CONSTANTS } from '@app/mock/game-constants';
+import { FAKE_GAME_CONSTANTS } from '@common/mock/game-constants-mock';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as path from 'path';
 import { GameConstantService } from './game-constant.service';
