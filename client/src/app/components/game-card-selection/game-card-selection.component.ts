@@ -20,7 +20,7 @@ import { JoinHostInWaitingRequest, WAITING_ROOM_EVENTS } from '@common/waiting-r
 export class GameCardSelectionComponent implements OnInit {
     @Input() gameCardInformation: GameCardInformation;
     @Input() isConfig: boolean | null;
-    @Output() gameDeleted = new EventEmitter<void>();
+    @Output() refreshGameCard = new EventEmitter<void>();
     image: string = '';
     createGameButton: boolean = true;
 
@@ -43,7 +43,7 @@ export class GameCardSelectionComponent implements OnInit {
 
     resetBestTimes(): void {
         this.gameCardService.resetBestTime(this.gameCardInformation._id).subscribe(() => {
-            this.gameDeleted.emit();
+            this.refreshGameCard.emit();
         });
     }
 
