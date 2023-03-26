@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
+import { FAKE_GAME_CONSTANTS } from '@app/mock/game-constants';
 import { GameConstantService } from '@app/services/game-constant/game-constant.service';
-import { GameConstants } from '@common/game-constants';
 import { HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { assert } from 'console';
@@ -61,9 +61,3 @@ describe('GameConstantsController', () => {
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 });
-
-const FAKE_GAME_CONSTANTS: GameConstants = {
-    countDown: 30,
-    hint: 5,
-    difference: 5,
-};

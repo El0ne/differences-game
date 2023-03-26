@@ -2,7 +2,7 @@
 /* eslint-disable no-restricted-imports */
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { GameConstants } from '@common/game-constants';
+import { FAKE_GAME_CONSTANTS } from '@app/mock/game-constants';
 import { GAME_CONSTANTS } from '../server-routes';
 import { GameConstantsService } from './game-constants.service';
 
@@ -43,9 +43,3 @@ describe('GameConstantsService', () => {
         req.flush(null);
     });
 });
-
-const FAKE_GAME_CONSTANTS: GameConstants = {
-    countDown: 30,
-    hint: 5,
-    difference: 5,
-};

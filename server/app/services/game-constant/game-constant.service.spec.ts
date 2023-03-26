@@ -1,8 +1,9 @@
-import { GameConstants } from '@common/game-constants';
+import { FAKE_GAME_CONSTANTS } from '@app/mock/game-constants';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as path from 'path';
 import { GameConstantService } from './game-constant.service';
 import * as gameConstantsJson from './game-constants-test.json';
+
 describe('GameConstantService', () => {
     let service: GameConstantService;
 
@@ -29,9 +30,3 @@ describe('GameConstantService', () => {
         expect(FAKE_GAME_CONSTANTS).toStrictEqual(gameConstantsJson);
     });
 });
-
-const FAKE_GAME_CONSTANTS: GameConstants = {
-    countDown: 32,
-    hint: 7,
-    difference: 2,
-};
