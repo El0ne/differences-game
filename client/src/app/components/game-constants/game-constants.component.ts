@@ -8,27 +8,26 @@ import { GameConstants } from '@common/game-constants';
     styleUrls: ['./game-constants.component.scss'],
 })
 export class GameConstantsComponent implements OnInit {
-    countdownTimeNumber: number;
-    differenceFoundTimeNumber: number;
-    hintTimeNumber: number;
+    // countdownTimeNumber: number;
+    // differenceFoundTimeNumber: number;
+    // hintTimeNumber: number;
+    gameConstants: GameConstants;
 
     constructor(private gameConstantsService: GameConstantsService) {}
 
     ngOnInit(): void {
         this.gameConstantsService.getGameConstants().subscribe((gameConstants: GameConstants) => {
-            this.countdownTimeNumber = gameConstants.countDown;
-            this.differenceFoundTimeNumber = gameConstants.difference;
-            this.hintTimeNumber = gameConstants.hint;
+            this.gameConstants = gameConstants;
         });
     }
 
     updateGameConstants(): void {
-        const gameConstants: GameConstants = {
-            countDown: this.countdownTimeNumber,
-            hint: this.hintTimeNumber,
-            difference: this.differenceFoundTimeNumber,
-        };
-        this.gameConstantsService.updateGameConstants(gameConstants).subscribe();
+        // const gameConstants: GameConstants = {
+        //     countDown: this.countdownTimeNumber,
+        //     hint: this.hintTimeNumber,
+        //     difference: this.differenceFoundTimeNumber,
+        // };
+        this.gameConstantsService.updateGameConstants(this.gameConstants).subscribe();
     }
 
     checkNumber(event: FocusEvent, minValue: number, maxValue: number): number {
