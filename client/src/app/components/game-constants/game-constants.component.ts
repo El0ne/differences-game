@@ -3,11 +3,6 @@ import { GameCardInformationService } from '@app/services/game-card-information-
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
 import { GameConstants } from '@common/game-constants';
 
-const DEFAULT_CONSTANTS: GameConstants = {
-    countDown: 30,
-    hint: 5,
-    difference: 5,
-};
 @Component({
     selector: 'app-game-constants',
     templateUrl: './game-constants.component.html',
@@ -30,8 +25,14 @@ export class GameConstantsComponent implements OnInit {
     }
 
     resetGameConstants(): void {
-        this.updateGameConstants(DEFAULT_CONSTANTS);
-        this.gameConstants = DEFAULT_CONSTANTS;
+        const defaultConstants: GameConstants = {
+            countDown: 30,
+            hint: 5,
+            difference: 5,
+        };
+
+        this.updateGameConstants(defaultConstants);
+        this.gameConstants = defaultConstants;
     }
 
     resetBestTimes(): void {
