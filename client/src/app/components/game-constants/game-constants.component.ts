@@ -42,4 +42,8 @@ export class GameConstantsComponent implements OnInit {
             return inputValue;
         }
     }
+
+    isConstantNull(): boolean {
+        return !this.gameConstants.countDown || !this.gameConstants.difference || !this.gameConstants.hint;
+    }
 }
