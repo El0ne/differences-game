@@ -1,4 +1,4 @@
-export interface BestTimeInformation {
+export interface bestTimeInformation {
     winner: string;
     position: number;
     gameName: string;
