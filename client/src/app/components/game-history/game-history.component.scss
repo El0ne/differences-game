@@ -1,5 +1,11 @@
-table {
+#table-wrapper {
     width: 50%;
+    height: 600px;
+    overflow: auto;
+}
+
+table {
+    width: 100%;
 }
 
 .abandon {
