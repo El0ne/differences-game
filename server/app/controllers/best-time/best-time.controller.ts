@@ -1,19 +1,19 @@
-import { BestTimeService } from '@app/services/best-time';
-import { Controller, HttpException, HttpStatus, Query, Res } from '@nestjs/common';
+// import { BestTimeService } from '@app/services/best-time/best-time.service';
+// import { Controller, Get, HttpException, HttpStatus, Query, Res } from '@nestjs/common';
 
-@Controller('best-time')
-export class BestTimeController {
-    constructor(private bestTimeServive: BestTimeService) {}
+// @Controller('best-time')
+// export class BestTimeController {
+//     constructor(private bestTimeService: BestTimeService) {}
 
-    @Get('/')
-    async getBestTimes(@Query('index') index: number, @Query('endIndex') endIndex: number, @Res() res: Response): Promise<void> {
-        try {
-            const bestTimes = await this.bestTimeService.getBestTimes(index, endIndex);
-            res.status(HttpStatus.OK).send(bestTimes);
-        } catch (error) {
-            throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+//     @Get('/')
+//     async getBestTimes(@Query('index') index: number, @Query('endIndex') endIndex: number, @Res() res: Response): Promise<void> {
+//         try {
+//             const bestTimes = await this.bestTimeService.getBestTimes(index, endIndex);
+//             res.status(HttpStatus.OK).send(bestTimes);
+//         } catch (error) {
+//             throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);
+//         }
+//     }
 
     // ******** TO BE POSTED THROUGH THE POST METHOD !!!!!!!!!!!!!!!!!!!!
     // defaultBestTimes(newGameName: string, gameMode: string): void {
