@@ -9,20 +9,22 @@ export class DifferencesCounterService {
 
     getDifferencesList(differencesArray: boolean[]): number[][] {
         const visitedPixels: number[][] = [];
+        const visitedDifferences: boolean[] = new Array(differencesArray.length).fill(false);
         const queue: number[] = [];
         let numberOfDifferences = 0;
 
         for (const index of differencesArray.keys()) {
-            if (differencesArray[index] && !this.isAVisitedPixel(index, visitedPixels)) {
+            if (differencesArray[index] && !visitedDifferences[index]) {
                 queue.push(index);
                 visitedPixels.push([index]);
 
                 while (queue.length !== 0) {
                     const currentPos = queue.shift();
                     for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(currentPos, ADJACENT_PIXELS_RADIUS, false)) {
-                        if (differencesArray[adjacentPixel] && !visitedPixels[numberOfDifferences].includes(adjacentPixel)) {
+                        if (differencesArray[adjacentPixel] && !visitedDifferences[adjacentPixel]) {
                             visitedPixels[numberOfDifferences].push(adjacentPixel);
                             queue.push(adjacentPixel);
+                            visitedDifferences[adjacentPixel] = true;
                         }
                     }
                 }
