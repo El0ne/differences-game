@@ -45,6 +45,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     gameCardInfo: GameCardInformation;
     currentRoom: string;
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
+    boundGetRandomDifference: (event: KeyboardEvent) => void = this.getRandomDifference.bind(this);
 
     // eslint-disable-next-line max-params
     constructor(
@@ -106,6 +107,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        this.gameHintService.hintsRemaining = 3;
         this.timerService.currentTime = 0;
         this.foundDifferenceService.clearDifferenceFound();
         this.socketService.disconnect();
@@ -119,10 +121,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     removeCheatMode(): void {
         document.removeEventListener('keydown', this.boundActivateCheatMode);
+        document.removeEventListener('keydown', this.boundGetRandomDifference);
     }
 
     addCheatMode(): void {
         document.addEventListener('keydown', this.boundActivateCheatMode);
+        document.addEventListener('keydown', this.boundGetRandomDifference);
     }
 
     resetDifferences(event: KeyboardEvent): void {
@@ -141,14 +145,26 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         }
     }
 
-    getRandomDifference(): void {
-        this.left.hintPosX = '120px';
-        this.left.getDifferences(this.currentGameId).subscribe((data) => {
-            const pixelArray = this.foundDifferenceService.findPixelsFromDifference(data);
-            const randomPixel = pixelArray[Math.floor(Math.random() * pixelArray.length)];
-            const randomPixelPosition = this.gameHintService.getPercentages(this.left.convertPosToPixel(randomPixel));
-            return randomPixelPosition;
-        });
+    getDiffFromClick(): void {
+        const keyEvent: KeyboardEvent = new KeyboardEvent('keydown', { key: 'i' });
+        this.getRandomDifference(keyEvent);
+    }
+
+    getRandomDifference(event: KeyboardEvent | null): void {
+        if (event?.key === 'i') {
+            if (this.gameHintService.hintsRemaining > 0) this.socketService.send(CHAT_EVENTS.Hint, this.currentRoom);
+            this.left.getDifferences(this.currentGameId).subscribe((data) => {
+                const pixelArray = this.foundDifferenceService.findPixelsFromDifference(data);
+                const randomPixel = pixelArray[Math.floor(Math.random() * pixelArray.length)];
+                const randomPixelPosition = this.gameHintService.getPercentages(this.left.convertPosToPixel(randomPixel));
+                this.left.hintPosX = (randomPixelPosition[1] * 480).toString();
+                this.left.hintPosY = (randomPixelPosition[0] * 640).toString();
+                this.right.hintPosX = this.left.hintPosX;
+                this.right.hintPosY = this.left.hintPosY;
+                this.left.firstHint = this.gameHintService.hintsRemaining === 2;
+                this.left.secondHint = this.gameHintService.hintsRemaining === 1;
+            });
+        }
     }
 
     showTime(): void {

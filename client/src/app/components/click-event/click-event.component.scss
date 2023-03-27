@@ -12,6 +12,7 @@
 
 .hint-boxes {
     position: absolute;
+    pointer-events: none;
     border-style: solid;
     border-color: #00e6f6;
     z-index: 1;
@@ -22,4 +23,9 @@
 .small-box {
     width: 160px;
     height: 120px;
+}
+
+.big-box {
+    width: 320px;
+    height: 240px;
 }

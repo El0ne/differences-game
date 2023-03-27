@@ -33,7 +33,10 @@ export class ClickEventComponent implements OnInit {
     endGame: boolean;
     foundDifferences: number[];
     toggleCheatMode: boolean;
+    firstHint: boolean;
+    secondHint: boolean;
     hintPosX: string;
+    hintPosY: string;
 
     constructor(
         private clickEventService: ClickEventService,
@@ -45,6 +48,8 @@ export class ClickEventComponent implements OnInit {
         this.toggleCheatMode = false;
         this.timeout = false;
         this.endGame = false;
+        this.firstHint = false;
+        this.secondHint = false;
         this.foundDifferences = [];
 
         const image = new Image();
@@ -78,6 +83,9 @@ export class ClickEventComponent implements OnInit {
                     this.differenceData.isADifference &&
                     !this.foundDifferenceService.foundDifferences.includes(this.differenceData.differencesPosition)
                 ) {
+                    // TODO : Verify that difference is inside of hint
+                    this.firstHint = false;
+                    this.secondHint = false;
                     this.differenceDetected.emit({
                         differencesPosition: this.differenceData.differencesPosition,
                         lastDifferences: this.differenceData.differenceArray,
