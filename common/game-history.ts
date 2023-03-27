@@ -1,4 +1,4 @@
-export interface gameHistory {
+export interface GameHistory {
     id: string;
     winnerName: string;
     loserName: string;
