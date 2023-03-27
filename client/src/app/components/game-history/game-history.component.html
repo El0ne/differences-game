@@ -15,13 +15,32 @@
     </ng-container>
 
     <ng-container matColumnDef="player1">
-        <th mat-header-cell *matHeaderCellDef>Joueur 1</th>
-        <td mat-cell *matCellDef="let element" [style.width]="'20%'">{{ element.winnerName }}</td>
+        <th mat-header-cell *matHeaderCellDef>Joueur</th>
+        <td
+            *matCellDef="let element"
+            [ngClass]="{
+                winner1v1: element.player1Name === element.winnerName && element.player2Name,
+                abandon: element.player1Name !== element.winnerName && element.isAbandon
+            }"
+            [style.width]="'20%'"
+        >
+            {{ element.player1Name }}
+        </td>
     </ng-container>
 
     <ng-container matColumnDef="player2">
-        <th mat-header-cell *matHeaderCellDef>Joueur 2</th>
-        <td mat-cell *matCellDef="let element" [style.width]="'20%'">{{ element.loserName }}</td>
+        <th mat-header-cell *matHeaderCellDef>Joueur</th>
+        <td
+            mat-cell
+            *matCellDef="let element"
+            [ngClass]="{
+                winner1v1: element.player2Name === element.winnerName && element.player1Name,
+                abandon: element.player2Name !== element.winnerName && element.isAbandon
+            }"
+            [style.width]="'20%'"
+        >
+            {{ element.player2Name }}
+        </td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

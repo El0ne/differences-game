@@ -1,7 +1,8 @@
 export interface GameHistory {
     id: string;
     winnerName: string;
-    loserName: string;
+    player1Name: string;
+    player2Name: string;
     gameName: string;
     gameMode: string;
     gameDuration: number;

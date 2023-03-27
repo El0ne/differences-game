@@ -11,7 +11,8 @@ export class GameHistoryComponent implements OnInit {
         {
             id: 'gameID',
             winnerName: 'jo',
-            loserName: 'seph',
+            player1Name: 'jo',
+            player2Name: 'seph',
             gameName: 'game-name',
             gameMode: 'game-mode',
             gameDuration: 170, // timerservice convert
@@ -21,8 +22,9 @@ export class GameHistoryComponent implements OnInit {
         },
         {
             id: 'gameID',
-            winnerName: 'jo',
-            loserName: 'seph',
+            winnerName: 'seph',
+            player1Name: 'jo',
+            player2Name: 'seph',
             gameName: 'game-name',
             gameMode: 'game-mode',
             gameDuration: 170, // timerservice convert
@@ -32,19 +34,45 @@ export class GameHistoryComponent implements OnInit {
         },
         {
             id: 'gameID',
-            winnerName: 'jo',
-            loserName: 'seph',
+            winnerName: 'seph',
+            player1Name: 'jo',
+            player2Name: 'seph',
             gameName: 'game-name',
             gameMode: 'game-mode',
             gameDuration: 170, // timerservice convert
             startTime: '27/03/2023 13:09:07',
             isMultiplayer: true,
-            isAbandon: false,
+            isAbandon: true,
         },
         {
             id: 'gameID',
             winnerName: 'jo',
-            loserName: 'seph',
+            player1Name: 'jo',
+            player2Name: 'seph',
+            gameName: 'game-name',
+            gameMode: 'game-mode',
+            gameDuration: 170, // timerservice convert
+            startTime: '27/03/2023 13:09:07',
+            isMultiplayer: true,
+            isAbandon: true,
+        },
+        {
+            id: 'gameID',
+            winnerName: '',
+            player1Name: 'jo',
+            player2Name: '',
+            gameName: 'game-name',
+            gameMode: 'game-mode',
+            gameDuration: 170, // timerservice convert
+            startTime: '27/03/2023 13:09:07',
+            isMultiplayer: true,
+            isAbandon: true,
+        },
+        {
+            id: 'gameID',
+            winnerName: 'jo',
+            player1Name: 'jo',
+            player2Name: '',
             gameName: 'game-name',
             gameMode: 'game-mode',
             gameDuration: 170, // timerservice convert
