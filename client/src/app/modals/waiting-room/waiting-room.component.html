@@ -1,20 +1,26 @@
-<div>
-    <button (click)="handleCancel()">Annuler</button>
+<body class="modal-page">
+    <button class="normal-button" (click)="handleCancel()">Annuler</button>
     <div *ngIf="waitingRoomInfo.isHost;else clientView">
         <div *ngIf="clientsInWaitingRoom.size === 0;else opponents">
-            En attente d'opposants
+            <h1 class="neon">
+                En attente d'opposants
+            </h1>
         </div>
     </div>
-</div>
+</body>
 
 <ng-template #opponents>
     <div *ngFor="let opponentId of clientsInWaitingRoom.keys()" class="opponents-container">
-        NOM : {{clientsInWaitingRoom.get(opponentId)}}
+        <h2 class="neon">
+            NOM : {{clientsInWaitingRoom.get(opponentId)}}
+        </h2>
         <button (click)="acceptOpponent(opponentId)" class="normal-button">Accept</button>
         <button (click)="declineOpponent(opponentId)" class="normal-button">Decline</button>
     </div>
 </ng-template>
 
 <ng-template #clientView>
-    En attente de la confirmation de l'hôte
+    <h1 class="neon">
+        En attente de la confirmation de l'hôte
+    </h1>
 </ng-template>
