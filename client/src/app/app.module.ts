@@ -47,8 +47,8 @@ import { SoloViewComponent } from './pages/solo-view/solo-view.component';
         GameInfoModalComponent,
         QuitGameModalComponent,
         GameWinModalComponent,
-        GameConstantsComponent,
         GameHistoryComponent,
+        GameConstantsComponent,
     ],
     entryComponents: [ModalPageComponent],
     imports: [
