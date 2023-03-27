@@ -47,12 +47,14 @@ export class GameCardSelectionComponent implements OnInit {
 
     selectPlayerName(isSoloGame: boolean): void {
         const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true });
-        dialogRef.afterClosed().subscribe(() => {
-            if (isSoloGame) {
-                this.socketService.gameRoom = this.socketService.socketId;
-                this.socketService.send(MATCH_EVENTS.createSoloGame, this.gameCardInformation._id);
-                this.router.navigate(['/solo/' + this.gameCardInformation._id]);
-            } else this.hostOrJoinGame();
+        dialogRef.afterClosed().subscribe((isNameEntered: boolean) => {
+            if (isNameEntered) {
+                if (isSoloGame) {
+                    this.socketService.gameRoom = this.socketService.socketId;
+                    this.socketService.send(MATCH_EVENTS.createSoloGame, this.gameCardInformation._id);
+                    this.router.navigate(['/solo/' + this.gameCardInformation._id]);
+                } else this.hostOrJoinGame();
+            }
         });
     }
 }

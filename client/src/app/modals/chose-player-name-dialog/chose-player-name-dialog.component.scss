@@ -1,11 +1,8 @@
-.info-card {
-    display: flex;
-    flex-direction: column;
-    width: 23rem;
-    height: 15rem;
-    font-size: xx-large;
+.container {
+    width: 600px;
+    height: 300px;
+    justify-content: space-around;
     align-items: center;
-    justify-content: space-evenly;
 }
 
 .input {
@@ -14,7 +11,12 @@
 }
 
 .name-field {
-    width: 11rem;
-    height: 3rem;
+    width: 10em;
+    height: 2em;
     font-size: x-large;
+}
+
+.normal-button {
+    justify-content: center;
+    width: 60px;
 }

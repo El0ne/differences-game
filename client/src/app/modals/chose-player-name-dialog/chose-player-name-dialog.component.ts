@@ -21,9 +21,13 @@ export class ChosePlayerNameDialogComponent {
         const testName = this.playerName;
         if (testName.replace(/\s/g, '') !== '') {
             this.socketService.names.set(this.socketService.socketId, testName);
-            this.dialogRef.close();
+            this.dialogRef.close(true);
         } else {
             this.showNameErrorMessage = true;
         }
+    }
+
+    cancelNameInput(): void {
+        this.dialogRef.close(false);
     }
 }

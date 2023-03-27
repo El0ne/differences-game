@@ -30,7 +30,7 @@ describe('GameCardSelectionComponent', () => {
     beforeEach(async () => {
         modalSpy = jasmine.createSpyObj('MatDialog', ['open']);
         choseNameAfterClosedSpy = jasmine.createSpyObj('MatDialogRef<ChosePlayerNameDialogComponent>', ['afterClosed']);
-        choseNameAfterClosedSpy.afterClosed = () => of(undefined);
+        choseNameAfterClosedSpy.afterClosed = () => of(true);
 
         waitingRoomAfterClosedSpy = jasmine.createSpyObj('MatDialogRef<WaitingRoomComponent>', ['afterClosed']);
         waitingRoomAfterClosedSpy.afterClosed = () => of();
@@ -65,6 +65,14 @@ describe('GameCardSelectionComponent', () => {
     it('deleteGame should call gameCardService.deleteGame and gameDeleted.emit', () => {
         component.deleteGame();
         expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.DeleteGame, '123');
+    });
+
+    it('selectPlayerName should do nothing afterClose if isNameEntered is false', () => {
+        choseNameAfterClosedSpy.afterClosed = () => of(false);
+        modalSpy.open = () => choseNameAfterClosedSpy;
+        const routerSpy = spyOn(TestBed.inject(Router), 'navigate');
+        component.selectPlayerName(true);
+        expect(routerSpy).not.toHaveBeenCalled();
     });
 
     it('selectPlayerName should redirect to solo view after opening the modal if in soloGame', () => {
