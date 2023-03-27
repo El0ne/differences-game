@@ -17,6 +17,7 @@ export class DifferencesCounterService {
             if (differencesArray[index] && !visitedDifferences[index]) {
                 queue.push(index);
                 visitedPixels.push([index]);
+                visitedDifferences[index] = true;
 
                 while (queue.length !== 0) {
                     const currentPos = queue.shift();
@@ -42,9 +43,5 @@ export class DifferencesCounterService {
             }
         }
         return visitedPixels.length;
-    }
-
-    isAVisitedPixel(pixelIndex: number, visitedPixels: number[][]): boolean {
-        return this.findPixelDifferenceIndex(pixelIndex, visitedPixels) !== visitedPixels.length;
     }
 }
