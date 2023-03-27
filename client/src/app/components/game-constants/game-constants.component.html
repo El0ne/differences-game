@@ -27,7 +27,12 @@
         />
         secondes
     </div>
-    <button type="button" class="normal-button save-button" (click)="updateGameConstants()" [disabled]="isConstantNull()">
+    <button
+        type="button"
+        class="normal-button save-button"
+        (click)="updateGameConstants()"
+        [disabled]="!this.gameConstants.countDown || !this.gameConstants.difference || !this.gameConstants.hint"
+    >
         Sauvegarder les constantes de parties
     </button>
 </div>

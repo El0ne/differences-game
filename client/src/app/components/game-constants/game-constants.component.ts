@@ -8,9 +8,6 @@ import { GameConstants } from '@common/game-constants';
     styleUrls: ['./game-constants.component.scss'],
 })
 export class GameConstantsComponent implements OnInit {
-    // countdownTimeNumber: number;
-    // differenceFoundTimeNumber: number;
-    // hintTimeNumber: number;
     gameConstants: GameConstants;
 
     constructor(private gameConstantsService: GameConstantsService) {}
@@ -22,11 +19,6 @@ export class GameConstantsComponent implements OnInit {
     }
 
     updateGameConstants(): void {
-        // const gameConstants: GameConstants = {
-        //     countDown: this.countdownTimeNumber,
-        //     hint: this.hintTimeNumber,
-        //     difference: this.differenceFoundTimeNumber,
-        // };
         this.gameConstantsService.updateGameConstants(this.gameConstants).subscribe();
     }
 
@@ -41,9 +33,5 @@ export class GameConstantsComponent implements OnInit {
         } else {
             return inputValue;
         }
-    }
-
-    isConstantNull(): boolean {
-        return !this.gameConstants.countDown || !this.gameConstants.difference || !this.gameConstants.hint;
     }
 }
