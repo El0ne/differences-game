@@ -8,6 +8,7 @@ import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { GameHintService } from '@app/services/game-hint/game-hint.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { EndGame } from '@common/chat-dialog-constants';
@@ -54,6 +55,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private dialog: MatDialog,
         private router: Router,
         public socketService: SocketService,
+        private gameHintService: GameHintService,
     ) {}
 
     ngOnInit(): void {
@@ -137,6 +139,16 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 if (this.left.toggleCheatMode) this.handleFlash(this.foundDifferenceService.findPixelsFromDifference(data));
             });
         }
+    }
+
+    getRandomDifference(): void {
+        this.left.hintPosX = '120px';
+        this.left.getDifferences(this.currentGameId).subscribe((data) => {
+            const pixelArray = this.foundDifferenceService.findPixelsFromDifference(data);
+            const randomPixel = pixelArray[Math.floor(Math.random() * pixelArray.length)];
+            const randomPixelPosition = this.gameHintService.getPercentages(this.left.convertPosToPixel(randomPixel));
+            return randomPixelPosition;
+        });
     }
 
     showTime(): void {

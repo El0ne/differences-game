@@ -9,3 +9,17 @@
     top: 0px;
     left: 0px;
 }
+
+.hint-boxes {
+    position: absolute;
+    border-style: solid;
+    border-color: #00e6f6;
+    z-index: 1;
+    top: 0px;
+    left: 0px;
+}
+
+.small-box {
+    width: 160px;
+    height: 120px;
+}

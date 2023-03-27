@@ -33,6 +33,7 @@ export class ClickEventComponent implements OnInit {
     endGame: boolean;
     foundDifferences: number[];
     toggleCheatMode: boolean;
+    hintPosX: string;
 
     constructor(
         private clickEventService: ClickEventService,
@@ -62,6 +63,10 @@ export class ClickEventComponent implements OnInit {
     getCoordInImage(mouseEvent: MouseEvent): number[] {
         const rect = this.modification.nativeElement.getBoundingClientRect();
         return this.pixelModificationService.getCoordInImage(mouseEvent, rect);
+    }
+
+    convertPosToPixel(toTransform: number): number[] {
+        return this.pixelModificationService.positionToPixel(toTransform);
     }
 
     isDifferent(mouseEvent: MouseEvent): void {

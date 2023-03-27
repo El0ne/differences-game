@@ -1,4 +1,5 @@
 <div id="container">
+    <div class="hint-boxes small-box" [ngStyle]="{ top: hintPosX }"></div>
     <canvas #picture [attr.id]="id" class="canvas" width="640" height="480"></canvas>
-    <canvas #modification [attr.id]="original" class="canvas" width="640" height="480" (click)="isDifferent($event)"></canvas>
+    <canvas #modification [attr.id]="original" class="canvas" width="640" height="480" (click)="isDifferent($event)"> </canvas>
 </div>
