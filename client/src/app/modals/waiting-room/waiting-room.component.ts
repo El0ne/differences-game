@@ -33,10 +33,10 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         if (this.waitingRoomInfo.isHost) {
             this.socket.listen<PlayerInformations>(WAITING_ROOM_EVENTS.RequestMatch, (opponentInformations: PlayerInformations) => {
+                this.clientsInWaitingRoom.set(opponentInformations.playerSocketId, opponentInformations.playerName);
                 if (this.waitingRoomInfo.limitedTime) {
                     this.acceptOpponent(opponentInformations.playerSocketId);
                 }
-                this.clientsInWaitingRoom.set(opponentInformations.playerSocketId, opponentInformations.playerName);
             });
 
             this.socket.listen(WAITING_ROOM_EVENTS.UnrequestMatch, (opponentId: string) => {
