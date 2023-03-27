@@ -1,6 +1,7 @@
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
+
 import { Injectable } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
