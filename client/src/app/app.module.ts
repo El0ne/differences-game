@@ -2,6 +2,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTableModule } from '@angular/material/table';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from '@app/modules/app-routing.module';
@@ -12,6 +13,7 @@ import { BestTimeComponent } from './components/best-time/best-time.component';
 import { ClickEventComponent } from './components/click-event/click-event.component';
 import { GameCardSelectionComponent } from './components/game-card-selection/game-card-selection.component';
 import { GameConstantsComponent } from './components/game-constants/game-constants.component';
+import { GameHistoryComponent } from './components/game-history/game-history.component';
 import { ChosePlayerNameDialogComponent } from './modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { GameInfoModalComponent } from './modals/game-info-modal/game-info-modal.component';
 import { GameWinModalComponent } from './modals/game-win-modal/game-win-modal.component';
@@ -46,9 +48,19 @@ import { SoloViewComponent } from './pages/solo-view/solo-view.component';
         QuitGameModalComponent,
         GameWinModalComponent,
         GameConstantsComponent,
+        GameHistoryComponent,
     ],
     entryComponents: [ModalPageComponent],
-    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, MatIconModule],
+    imports: [
+        AppMaterialModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        BrowserModule,
+        FormsModule,
+        HttpClientModule,
+        MatIconModule,
+        MatTableModule,
+    ],
     providers: [],
     bootstrap: [AppComponent],
 })

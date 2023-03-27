@@ -3,6 +3,7 @@ export interface GameHistory {
     winnerName: string;
     loserName: string;
     gameName: string;
+    gameMode: string;
     gameDuration: number;
     startTime: string;
     isMultiplayer: boolean;
