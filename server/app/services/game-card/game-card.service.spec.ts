@@ -3,8 +3,10 @@
 /* eslint-disable no-underscore-dangle */
 import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
 import { GameCard, GameCardDocument, gameCardSchema } from '@app/schemas/game-cards.schemas';
+import { BestTimesService } from '@app/services/best-times/best-times.service';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
+import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
@@ -25,6 +27,7 @@ describe('GameCardService', () => {
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
     let imageManagerService: ImageManagerService;
+    let bestTimesService: BestTimesService;
 
     beforeEach(async () => {
         mongoServer = await MongoMemoryServer.create();
@@ -49,11 +52,14 @@ describe('GameCardService', () => {
                 ImageDimensionsService,
                 PixelRadiusService,
                 PixelPositionService,
+                BestTimesService,
+                GameManagerService,
             ],
         }).compile();
 
         service = module.get<GameCardService>(GameCardService);
         imageManagerService = module.get<ImageManagerService>(ImageManagerService);
+        bestTimesService = module.get<BestTimesService>(BestTimesService);
         gameCardModel = module.get<Model<GameCardDocument>>(getModelToken(GameCard.name));
         connection = await module.get(getConnectionToken());
         await gameCardModel.deleteMany({});
@@ -134,8 +140,16 @@ describe('GameCardService', () => {
         expect(imageManagerServiceMock).toHaveBeenCalledWith(gameCard.originalImageName);
         expect(imageManagerServiceMock).toHaveBeenCalledWith(gameCard.differenceImageName);
     });
+
     it('generateGameCard should create a game card from a game informations', async () => {
         const gameCard = getFakeGameCard();
+        jest.spyOn(bestTimesService, 'generateBestTimes').mockImplementation(() => {
+            return [
+                { time: 0, name: '--' },
+                { time: 0, name: '--' },
+                { time: 0, name: '--' },
+            ];
+        });
         gameCard._id = new ObjectId('00000000773db8b853265f32');
         gameCard.name = 'game.name';
         expect(await service.createGameCard(FAKE_GAME_INFO)).toEqual(expect.objectContaining(gameCard));

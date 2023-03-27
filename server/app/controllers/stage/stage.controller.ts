@@ -146,7 +146,7 @@ export class StageController {
     }
 
     @Put('/best-times')
-    async resetBestTimes(@Res() res: Response): Promise<void> {
+    async resetAllBestTimes(@Res() res: Response): Promise<void> {
         try {
             await this.bestTimesService.resetAllGameCards();
             res.status(HttpStatus.NO_CONTENT).send();
@@ -156,7 +156,7 @@ export class StageController {
     }
 
     @Put('/best-times/:id')
-    async resetBestTime(@Param('id') id: string, @Res() res: Response): Promise<void> {
+    async resetBestTimes(@Param('id') id: string, @Res() res: Response): Promise<void> {
         try {
             await this.bestTimesService.resetGameCard(id);
             res.status(HttpStatus.NO_CONTENT).send();

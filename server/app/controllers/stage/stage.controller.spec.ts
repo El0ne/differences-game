@@ -3,6 +3,7 @@
 
 import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
 import { GameCard, gameCardSchema } from '@app/schemas/game-cards.schemas';
+import { BestTimesService } from '@app/services/best-times/best-times.service';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
@@ -38,6 +39,7 @@ describe('StageController', () => {
     let getGameCardByIdStub;
     let gameCardService: GameCardService;
     let imageManagerService: ImageManagerService;
+    let bestTimesService: BestTimesService;
 
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
@@ -64,6 +66,7 @@ describe('StageController', () => {
                 PixelPositionService,
                 DifferenceClickService,
                 GameManagerService,
+                BestTimesService,
             ],
         }).compile();
 
@@ -73,6 +76,7 @@ describe('StageController', () => {
         controller = module.get<StageController>(StageController);
         gameCardService = module.get<GameCardService>(GameCardService);
         imageManagerService = module.get<ImageManagerService>(ImageManagerService);
+        bestTimesService = module.get<BestTimesService>(BestTimesService);
         connection = await module.get(getConnectionToken());
         getGameCardStub = stub(gameCardService, 'getGameCards');
         getGameCardsNumberStub = stub(gameCardService, 'getGameCardsNumber');
@@ -223,6 +227,40 @@ describe('StageController', () => {
 
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
         expect(imageManagerService.deleteImage).toHaveBeenCalledWith(wrongImage);
+    });
+
+    it('resetAllBestTimes() should call resetAllGameCards', async () => {
+        const resetMock = jest.spyOn(bestTimesService, 'resetAllGameCards');
+        const response = await request(httpServer).put('/stage/best-times');
+
+        expect(resetMock).toHaveBeenCalled();
+        expect(response.status).toBe(HttpStatus.NO_CONTENT);
+    });
+
+    it('resetAllBestTimes() should return 500 if the request is invalid', async () => {
+        jest.spyOn(bestTimesService, 'resetAllGameCards').mockImplementationOnce(() => {
+            throw new Error();
+        });
+        const response = await request(httpServer).put('/stage/best-times');
+
+        expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    });
+
+    it('resetBestTimes() should call resetGameCard', async () => {
+        const resetMock = jest.spyOn(bestTimesService, 'resetGameCard').mockImplementation();
+        const response = await request(httpServer).put('/stage/best-times/5');
+
+        expect(resetMock).toHaveBeenCalled();
+        expect(response.status).toBe(HttpStatus.NO_CONTENT);
+    });
+
+    it('resetBestTimes() should return 500 if the request is invalid', async () => {
+        jest.spyOn(bestTimesService, 'resetGameCard').mockImplementationOnce(() => {
+            throw new Error();
+        });
+        const response = await request(httpServer).put('/stage/best-times/4');
+
+        expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 });
 
