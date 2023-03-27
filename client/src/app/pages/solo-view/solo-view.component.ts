@@ -15,6 +15,7 @@ import { RoomMessage, Validation } from '@common/chat-gateway-constants';
 import { CHAT_EVENTS, RoomEvent, RoomManagement } from '@common/chat-gateway-events';
 import { DifferenceInformation, MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
+import { gameHistory } from '@common/game-history';
 import { MATCH_EVENTS } from '@common/match-gateway-communication';
 import { Subject } from 'rxjs';
 
@@ -43,6 +44,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     endGame: Subject<void> = new Subject<void>();
     gameCardInfo: GameCardInformation;
     currentRoom: string;
+    startTime: string;
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
 
     // eslint-disable-next-line max-params
@@ -74,6 +76,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.player = this.socketService.names.get(this.socketService.socketId) as string;
         this.opponent = this.socketService.names.get(this.socketService.opponentSocket) as string;
         this.currentRoom = this.socketService.gameRoom;
+        this.startTime = new Date().toLocaleString('fr-FR');
         this.showTime();
         this.addCheatMode();
         this.configureSocketReactions();
@@ -92,6 +95,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         });
         this.socketService.listen<RoomMessage>(CHAT_EVENTS.Abandon, (message: RoomMessage) => {
             this.winGame(this.socketService.socketId);
+            this.notifyNewBestTime(this.socketService.socketId, true, 'classique');
             message.message = `${message.message} - ${this.opponent} a abandonné la partie.`;
             this.messages.push(message);
         });
@@ -147,19 +151,20 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         return this.timerService.convert(this.timerService.currentTime);
     }
 
-    notifyNewBestTime(winnerId: string): void {
-        for (const value of this.isMultiplayer ? this.gameCardInfo.multiTimes : this.gameCardInfo.soloTimes) {
-            if (this.timerService.currentTime < value.time) {
-                const index: number = (this.isMultiplayer ? this.gameCardInfo.multiTimes : this.gameCardInfo.soloTimes).indexOf(value);
-                this.socketService.send(CHAT_EVENTS.BestTime, {
-                    winner: this.socketService.names.get(winnerId),
-                    position: index + 1,
-                    gameName: this.gameCardInfo.name,
-                    mode: this.isMultiplayer ? 'multijoueur' : 'solo',
-                });
-                break;
-            }
-        }
+    notifyNewBestTime(winnerId: string, isAbandon: boolean, mode: string): void {
+        const winnerName: string = this.socketService.names.get(winnerId) as string;
+        const loserName: string = winnerName === this.player ? this.opponent : this.player;
+        this.socketService.send<gameHistory>(CHAT_EVENTS.BestTime, {
+            id: this.currentGameId,
+            winnerName,
+            loserName,
+            gameName: this.gameCardInfo.name,
+            gameDuration: this.timerService.currentTime,
+            startTime: this.startTime,
+            isMultiplayer: this.isMultiplayer,
+            isAbandon,
+            mode,
+        });
     }
 
     winGame(winnerId: string): void {
@@ -262,12 +267,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             const endGameVerification = this.numberOfDifferences / 2;
             if (this.currentScorePlayer >= endGameVerification) {
                 this.socketService.send<string>(MATCH_EVENTS.Win, this.currentRoom);
-                this.notifyNewBestTime(this.socketService.socketId);
+                this.notifyNewBestTime(this.socketService.socketId, false, 'classique');
             }
         } else {
             if (this.currentScorePlayer === this.numberOfDifferences) {
                 this.winGame(this.socketService.socketId);
-                this.notifyNewBestTime(this.socketService.socketId);
+                this.notifyNewBestTime(this.socketService.socketId, false, 'classique');
             }
         }
     }

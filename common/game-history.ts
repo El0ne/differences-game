@@ -7,4 +7,5 @@ export interface gameHistory {
     startTime: string;
     isMultiplayer: boolean;
     isAbandon: boolean;
+    mode: string;
 }

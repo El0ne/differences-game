@@ -57,6 +57,7 @@ export class MatchGateway implements OnGatewayDisconnect {
     async handleDisconnect(socket: Socket): Promise<void> {
         if (socket.data.stageId) {
             await this.gameManagerService.endGame(socket.data.stageId);
+            this.stopTimer(socket, socket.data.room);
         }
     }
 }

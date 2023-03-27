@@ -321,7 +321,7 @@ describe('SoloViewComponent', () => {
         spyOn(component, 'winGame');
         component.endGameVerification();
         expect(component.winGame).toHaveBeenCalled();
-        expect(sendSpy).not.toHaveBeenCalled();
+        expect(sendSpy).toHaveBeenCalled();
     });
 
     it('winGame should set all end game related boolean and open gameWin modal with true to multiplayer and winner name in multiplayer', () => {
@@ -395,6 +395,52 @@ describe('SoloViewComponent', () => {
 
         component.activateCheatMode(keyboardEvent);
         expect(flashSpy).toHaveBeenCalledWith([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    });
+
+    it('notifyNewBestTime should call socket send service in order to validate time', () => {
+        component.currentGameId = '0';
+        component.opponent = 'loser';
+        component.player = 'player';
+        component.timerService.currentTime = 10;
+        component.gameCardInfo = SERVICE_MOCK_GAME_CARD;
+        component.startTime = '11/10/2022 11:11:11';
+        const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
+        component.notifyNewBestTime('playerId', true, 'classique');
+        expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.BestTime, {
+            // eslint-disable-next-line no-underscore-dangle
+            id: SERVICE_MOCK_GAME_CARD._id,
+            winnerName: 'player',
+            loserName: 'loser',
+            gameName: SERVICE_MOCK_GAME_CARD.name,
+            gameDuration: 10,
+            startTime: component.startTime,
+            isMultiplayer: true,
+            isAbandon: true,
+            mode: 'classique',
+        });
+    });
+
+    it('notifyNewBestTime should call socket send service in order to validate time', () => {
+        component.currentGameId = '0';
+        component.opponent = 'loser';
+        component.player = 'player';
+        component.timerService.currentTime = 10;
+        component.gameCardInfo = SERVICE_MOCK_GAME_CARD;
+        component.startTime = '11/10/2022 11:11:11';
+        const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
+        component.notifyNewBestTime('opponentId', true, 'classique');
+        expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.BestTime, {
+            // eslint-disable-next-line no-underscore-dangle
+            id: SERVICE_MOCK_GAME_CARD._id,
+            winnerName: 'opponent',
+            loserName: 'player',
+            gameName: SERVICE_MOCK_GAME_CARD.name,
+            gameDuration: 10,
+            startTime: component.startTime,
+            isMultiplayer: true,
+            isAbandon: true,
+            mode: 'classique',
+        });
     });
 });
 
