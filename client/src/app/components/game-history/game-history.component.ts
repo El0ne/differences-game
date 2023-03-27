@@ -19,6 +19,39 @@ export class GameHistoryComponent implements OnInit {
             isMultiplayer: true,
             isAbandon: false,
         },
+        {
+            id: 'gameID',
+            winnerName: 'jo',
+            loserName: 'seph',
+            gameName: 'game-name',
+            gameMode: 'game-mode',
+            gameDuration: 170, // timerservice convert
+            startTime: '27/03/2023 13:09:07',
+            isMultiplayer: true,
+            isAbandon: false,
+        },
+        {
+            id: 'gameID',
+            winnerName: 'jo',
+            loserName: 'seph',
+            gameName: 'game-name',
+            gameMode: 'game-mode',
+            gameDuration: 170, // timerservice convert
+            startTime: '27/03/2023 13:09:07',
+            isMultiplayer: true,
+            isAbandon: false,
+        },
+        {
+            id: 'gameID',
+            winnerName: 'jo',
+            loserName: 'seph',
+            gameName: 'game-name',
+            gameMode: 'game-mode',
+            gameDuration: 170, // timerservice convert
+            startTime: '27/03/2023 13:09:07',
+            isMultiplayer: true,
+            isAbandon: false,
+        },
     ];
     dataSource = this.gameHistory;
     displayedColumns: string[] = ['date', 'duration', 'mode', 'player1', 'player2'];
