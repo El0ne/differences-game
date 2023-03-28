@@ -27,11 +27,16 @@
         />
         secondes
     </div>
-    <button type="button" class="normal-button save-button" (click)="updateGameConstants()" [disabled]="isConstantNull()">
+    <button
+        type="button"
+        class="normal-button save-button"
+        (click)="updateGameConstants()"
+        [disabled]="!this.gameConstants.countDown || !this.gameConstants.difference || !this.gameConstants.hint"
+    >
         Sauvegarder les constantes de parties
     </button>
     <button type="button" class="normal-button save-button" (click)="resetGameConstants()">Réinitialiser les constantes de parties</button>
-    <button type="button" class="normal-button save-button" (click)="resetBestTimes()">Réinitialiser les meilleurs temps</button>
+    <button type="button" class="normal-button save-button" (click)="resetAllBestTimes()">Réinitialiser les meilleurs temps</button>
     <!-- <button type="button" class="normal-button save-button">Consulter l'historique de parties</button> -->
     <!-- <button type="button" class="normal-button save-button">Supprimer l'historique de parties</button> -->
     <button type="button" class="normal-button save-button" (click)="deleteAllGames()">Supprimer toutes les parties</button>
