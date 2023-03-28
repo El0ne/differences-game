@@ -162,6 +162,8 @@ export class GameConstantsComponent implements OnInit {
     @Output() bestTimeReset = new EventEmitter<void>();
     gameConstants: GameConstants;
 
+    // need more than 3 services and dialog
+    // eslint-disable-next-line max-params
     constructor(
         private gameConstantsService: GameConstantsService,
         private gameCardService: GameCardInformationService,
@@ -222,7 +224,7 @@ export class GameConstantsComponent implements OnInit {
         return !this.gameConstants.countDown || !this.gameConstants.difference || !this.gameConstants.hint;
     }
 
-    openGameHistory() {
+    openGameHistory(): void {
         this.dialog.open(GameHistoryComponent);
     }
 
