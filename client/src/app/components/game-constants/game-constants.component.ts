@@ -225,4 +225,8 @@ export class GameConstantsComponent implements OnInit {
     openGameHistory() {
         this.dialog.open(GameHistoryComponent);
     }
+
+    deleteGameHistory(): void {
+        this.gameHistoryService.deleteGameHistory().subscribe();
+    }
 }
