@@ -82,7 +82,7 @@
                     <input type="text" (keydown.enter)="sendMessage()" class="input-field"
                         placeholder="Entrez votre message" [(ngModel)]="messageContent" (click)="removeCheatMode()"
                         (blur)="addCheatMode()" />
-                    <button class="send-button" (click)="sendMessage()"></button>
+                    <button class="send-button" (click)="sendMessage()"><mat-icon>send</mat-icon></button>
                 </div>
             </div>
         </div>
