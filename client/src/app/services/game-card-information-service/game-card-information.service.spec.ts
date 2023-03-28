@@ -90,7 +90,7 @@ describe('GameCardInformationService', () => {
         req.flush(null);
     });
 
-    it('resetBestTime() should reset best times of all the game cards', () => {
+    it('resetBestTime() should reset the best times of the game card with the id passed in the request', () => {
         const id = '4';
         service.resetBestTime(id).subscribe(() => {
             expect().nothing();
@@ -101,7 +101,7 @@ describe('GameCardInformationService', () => {
         req.flush(null);
     });
 
-    it('deleteAllGames() should reset best times of all the game cards', () => {
+    it('deleteAllGames() should delete all the game cards', () => {
         service.deleteAllGames().subscribe(() => {
             expect().nothing();
         });
