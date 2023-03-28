@@ -8,7 +8,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
 import { Model } from 'mongoose';
 
-const MAX_GENERATED_TIME = 200;
+const TIME_MULTIPLIER = 200;
+const MINIMUM_GENERATED_TIME = 30;
 const GENERATED_NAME_LENGTH = 10;
 
 @Injectable()
@@ -43,7 +44,7 @@ export class BestTimesService {
 
     generateBestTime(): RankingBoard {
         return {
-            time: Math.floor(Math.random() * MAX_GENERATED_TIME),
+            time: Math.floor(Math.random() * TIME_MULTIPLIER) + MINIMUM_GENERATED_TIME,
             name: this.generateRandomName(),
         };
     }
