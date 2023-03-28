@@ -18,7 +18,7 @@ export class GameHistoryController {
     }
 
     @Post('/')
-    async createGame(@Body() gameHistory: GameHistoryDTO, @Res() res: Response): Promise<void> {
+    async createHistory(@Body() gameHistory: GameHistoryDTO, @Res() res: Response): Promise<void> {
         try {
             if (Object.keys(gameHistory).length) {
                 const newGame = await this.gameHistoryService.addGameToHistory(gameHistory);

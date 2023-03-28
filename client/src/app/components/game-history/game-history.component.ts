@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { GameHistoryDTO } from '@common/game-history.dto';
 
 @Component({
@@ -7,157 +8,18 @@ import { GameHistoryDTO } from '@common/game-history.dto';
     styleUrls: ['./game-history.component.scss'],
 })
 export class GameHistoryComponent implements OnInit {
-    gameHistory: GameHistoryDTO[] = [
-        {
-            id: 'gameID',
-            winnerName: 'jo',
-            player1Name: 'jo',
-            player2Name: 'seph',
-            gameName: 'game-name',
-            gameMode: 'game-mode',
-            gameDuration: 170, // timerservice convert
-            startTime: '27/03/2023 13:09:07',
-            isMultiplayer: true,
-            isAbandon: false,
-        },
-        {
-            id: 'gameID',
-            winnerName: 'seph',
-            player1Name: 'jo',
-            player2Name: 'seph',
-            gameName: 'game-name',
-            gameMode: 'game-mode',
-            gameDuration: 170, // timerservice convert
-            startTime: '27/03/2023 13:09:07',
-            isMultiplayer: true,
-            isAbandon: false,
-        },
-        {
-            id: 'gameID',
-            winnerName: 'seph',
-            player1Name: 'jo',
-            player2Name: 'seph',
-            gameName: 'game-name',
-            gameMode: 'game-mode',
-            gameDuration: 170, // timerservice convert
-            startTime: '27/03/2023 13:09:07',
-            isMultiplayer: true,
-            isAbandon: true,
-        },
-        {
-            id: 'gameID',
-            winnerName: 'jo',
-            player1Name: 'jo',
-            player2Name: 'seph',
-            gameName: 'game-name',
-            gameMode: 'game-mode',
-            gameDuration: 170, // timerservice convert
-            startTime: '27/03/2023 13:09:07',
-            isMultiplayer: true,
-            isAbandon: true,
-        },
-        {
-            id: 'gameID',
-            winnerName: '',
-            player1Name: 'jo',
-            player2Name: '',
-            gameName: 'game-name',
-            gameMode: 'game-mode',
-            gameDuration: 170, // timerservice convert
-            startTime: '27/03/2023 13:09:07',
-            isMultiplayer: true,
-            isAbandon: true,
-        },
-        {
-            id: 'gameID',
-            winnerName: 'jo',
-            player1Name: 'jo',
-            player2Name: '',
-            gameName: 'game-name',
-            gameMode: 'game-mode',
-            gameDuration: 170, // timerservice convert
-            startTime: '27/03/2023 13:09:07',
-            isMultiplayer: true,
-            isAbandon: false,
-        },
-        {
-            id: 'gameID',
-            winnerName: 'jo',
-            player1Name: 'jo',
-            player2Name: 'seph',
-            gameName: 'game-name',
-            gameMode: 'game-mode',
-            gameDuration: 170, // timerservice convert
-            startTime: '27/03/2023 13:09:07',
-            isMultiplayer: true,
-            isAbandon: false,
-        },
-        {
-            id: 'gameID',
-            winnerName: 'seph',
-            player1Name: 'jo',
-            player2Name: 'seph',
-            gameName: 'game-name',
-            gameMode: 'game-mode',
-            gameDuration: 170, // timerservice convert
-            startTime: '27/03/2023 13:09:07',
-            isMultiplayer: true,
-            isAbandon: false,
-        },
-        {
-            id: 'gameID',
-            winnerName: 'seph',
-            player1Name: 'jo',
-            player2Name: 'seph',
-            gameName: 'game-name',
-            gameMode: 'game-mode',
-            gameDuration: 170, // timerservice convert
-            startTime: '27/03/2023 13:09:07',
-            isMultiplayer: true,
-            isAbandon: true,
-        },
-        {
-            id: 'gameID',
-            winnerName: 'jo',
-            player1Name: 'jo',
-            player2Name: 'seph',
-            gameName: 'game-name',
-            gameMode: 'game-mode',
-            gameDuration: 170, // timerservice convert
-            startTime: '27/03/2023 13:09:07',
-            isMultiplayer: true,
-            isAbandon: true,
-        },
-        {
-            id: 'gameID',
-            winnerName: '',
-            player1Name: 'jo',
-            player2Name: '',
-            gameName: 'game-name',
-            gameMode: 'Classique',
-            gameDuration: 170, // timerservice convert
-            startTime: '27/03/2023 13:09:07',
-            isMultiplayer: true,
-            isAbandon: true,
-        },
-        {
-            id: 'gameID',
-            winnerName: 'jo',
-            player1Name: 'jo',
-            player2Name: '',
-            gameName: 'Temps limité',
-            gameMode: 'Temps limité',
-            gameDuration: 170, // timerservice convert
-            startTime: '27/03/2023 13:09:07',
-            isMultiplayer: true,
-            isAbandon: false,
-        },
-    ];
+    gameHistory: GameHistoryDTO[]; // = FAKE_DATA;
 
-    dataSource = this.gameHistory;
+    // dataSource: GameHistoryDTO[]; // = this.gameHistory;
     displayedColumns: string[] = ['date', 'duration', 'mode', 'player1', 'player2'];
 
-    constructor() {}
+    constructor(private gameHistoryService: GameHistoryService) {}
 
-    ngOnInit(): void {}
+    ngOnInit(): void {
+        this.gameHistoryService.getGameHistory().subscribe((gameHistory) => {
+            this.gameHistory = gameHistory;
+            // TODO remove dataSource later
+            // this.dataSource = this.gameHistory;
+        });
+    }
 }
