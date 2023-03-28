@@ -1,4 +1,4 @@
-export interface GameHistory {
+export interface GameHistoryDTO {
     id: string;
     winnerName: string;
     player1Name: string;

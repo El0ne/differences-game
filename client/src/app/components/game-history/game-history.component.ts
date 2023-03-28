@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { GameHistory } from '@common/game-history';
+import { GameHistoryDTO } from '@common/game-history.dto';
 
 @Component({
     selector: 'app-game-history',
@@ -7,7 +7,7 @@ import { GameHistory } from '@common/game-history';
     styleUrls: ['./game-history.component.scss'],
 })
 export class GameHistoryComponent implements OnInit {
-    gameHistory: GameHistory[] = [
+    gameHistory: GameHistoryDTO[] = [
         {
             id: 'gameID',
             winnerName: 'jo',
