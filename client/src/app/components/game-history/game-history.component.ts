@@ -134,7 +134,7 @@ export class GameHistoryComponent implements OnInit {
             player1Name: 'jo',
             player2Name: '',
             gameName: 'game-name',
-            gameMode: 'game-mode',
+            gameMode: 'Classique',
             gameDuration: 170, // timerservice convert
             startTime: '27/03/2023 13:09:07',
             isMultiplayer: true,
@@ -145,8 +145,8 @@ export class GameHistoryComponent implements OnInit {
             winnerName: 'jo',
             player1Name: 'jo',
             player2Name: '',
-            gameName: 'game-name',
-            gameMode: 'game-mode',
+            gameName: 'Temps limité',
+            gameMode: 'Temps limité',
             gameDuration: 170, // timerservice convert
             startTime: '27/03/2023 13:09:07',
             isMultiplayer: true,

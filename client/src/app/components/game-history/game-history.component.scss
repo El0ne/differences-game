@@ -1,7 +1,13 @@
 #table-wrapper {
     width: 50%;
     height: 600px;
+    width: 1200px;
     overflow: auto;
+}
+
+.mat-cell,
+.mat-header-cell {
+    font-size: 26px;
 }
 
 table {

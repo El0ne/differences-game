@@ -2,28 +2,29 @@
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
         <ng-container matColumnDef="date">
             <th mat-header-cell *matHeaderCellDef>Date</th>
-            <td mat-cell *matCellDef="let element" [style.width]="'25%'">{{ element.startTime }}</td>
+            <td mat-cell *matCellDef="let element" [style.width]="'30%'">{{ element.startTime }}</td>
         </ng-container>
 
         <ng-container matColumnDef="duration">
             <th mat-header-cell *matHeaderCellDef>Durée</th>
-            <td mat-cell *matCellDef="let element" [style.width]="'15%'">{{ element.gameDuration }}</td>
+            <td mat-cell *matCellDef="let element" [style.width]="'10%'">{{ element.gameDuration }}</td>
         </ng-container>
 
         <ng-container matColumnDef="mode">
             <th mat-header-cell *matHeaderCellDef>Mode de Jeu</th>
-            <td mat-cell *matCellDef="let element" [style.width]="'20%'">{{ element.gameMode }}</td>
+            <td mat-cell *matCellDef="let element" [style.width]="'16%'">{{ element.gameMode }}</td>
         </ng-container>
 
         <ng-container matColumnDef="player1">
             <th mat-header-cell *matHeaderCellDef>Joueur</th>
             <td
+                mat-cell
                 *matCellDef="let element"
                 [ngClass]="{
                     winner1v1: element.player1Name === element.winnerName && element.player2Name,
                     abandon: element.player1Name !== element.winnerName && element.isAbandon
                 }"
-                [style.width]="'20%'"
+                [style.width]="'22%'"
             >
                 {{ element.player1Name }}
             </td>
@@ -38,7 +39,7 @@
                     winner1v1: element.player2Name === element.winnerName && element.player1Name,
                     abandon: element.player2Name !== element.winnerName && element.isAbandon
                 }"
-                [style.width]="'20%'"
+                [style.width]="'22%'"
             >
                 {{ element.player2Name }}
             </td>
