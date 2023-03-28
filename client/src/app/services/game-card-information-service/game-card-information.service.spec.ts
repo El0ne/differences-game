@@ -77,4 +77,13 @@ describe('GameCardInformationService', () => {
         service.deleteImage('');
         expect(deleteSpy).toHaveBeenCalled();
     });
+
+    it('resetAllBestTimes() should reset best times of all the game cards', () => {
+        service.resetAllBestTimes().subscribe(() => {
+            expect().nothing();
+        });
+
+        const req = httpController.expectOne(`${STAGE}/best-times`);
+        req.flush(null);
+    });
 });

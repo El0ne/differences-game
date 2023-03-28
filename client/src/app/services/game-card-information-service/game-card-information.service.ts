@@ -44,7 +44,7 @@ export class GameCardInformationService {
         return this.http.delete<void>(`${STAGE}/image/${image}`);
     }
 
-    resetBestTimes(): Observable<void> {
+    resetAllBestTimes(): Observable<void> {
         return this.http.put<void>(`${STAGE}/best-times`, null);
     }
 

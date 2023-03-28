@@ -35,7 +35,7 @@ export class GameConstantsComponent implements OnInit {
     }
 
     resetBestTimes(): void {
-        this.gameCardService.resetBestTimes().subscribe(() => {
+        this.gameCardService.resetAllBestTimes().subscribe(() => {
             this.bestTimeReset.emit();
         });
     }
