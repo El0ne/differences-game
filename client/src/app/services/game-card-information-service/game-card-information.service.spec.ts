@@ -86,4 +86,23 @@ describe('GameCardInformationService', () => {
         const req = httpController.expectOne(`${STAGE}/best-times`);
         req.flush(null);
     });
+
+    it('resetBestTime() should reset best times of all the game cards', () => {
+        const id = '4';
+        service.resetBestTime(id).subscribe(() => {
+            expect().nothing();
+        });
+
+        const req = httpController.expectOne(`${STAGE}/best-times/${id}`);
+        req.flush(null);
+    });
+
+    it('deleteAllGames() should reset best times of all the game cards', () => {
+        service.deleteAllGames().subscribe(() => {
+            expect().nothing();
+        });
+
+        const req = httpController.expectOne(`${STAGE}`);
+        req.flush(null);
+    });
 });
