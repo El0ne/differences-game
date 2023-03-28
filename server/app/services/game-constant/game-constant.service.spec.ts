@@ -1,4 +1,4 @@
-import { FAKE_GAME_CONSTANTS } from '@common/mock/game-constants-mock';
+import { DEFAULT_GAME_CONSTANTS } from '@common/game-constants';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as path from 'path';
 import { GameConstantService } from './game-constant.service';
@@ -26,7 +26,7 @@ describe('GameConstantService', () => {
     });
 
     it('createGameCard should add a game card to the list of game cards', () => {
-        service.updateGameConstants(FAKE_GAME_CONSTANTS);
-        expect(FAKE_GAME_CONSTANTS).toStrictEqual(gameConstantsJson);
+        service.updateGameConstants(DEFAULT_GAME_CONSTANTS);
+        expect(DEFAULT_GAME_CONSTANTS).toStrictEqual(gameConstantsJson);
     });
 });
