@@ -1,12 +1,12 @@
+import { PlayerGameInfo } from '@common/player-game-info';
+
 export interface GameHistoryDTO {
-    id: string;
-    winnerName: string;
-    player1Name: string;
-    player2Name: string;
+    gameId: string;
     gameName: string;
     gameMode: string;
     gameDuration: number;
     startTime: string;
     isMultiplayer: boolean;
-    isAbandon: boolean;
+    player1: PlayerGameInfo;
+    player2?: PlayerGameInfo;
 }

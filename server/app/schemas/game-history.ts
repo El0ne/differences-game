@@ -1,3 +1,4 @@
+import { PlayerGameInfo } from '@common/player-game-info';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
@@ -6,16 +7,7 @@ export type GameHistoryDocument = GameHistory & Document;
 @Schema()
 export class GameHistory {
     @Prop()
-    id: string;
-
-    @Prop()
-    winnerName: string;
-
-    @Prop()
-    player1Name: string;
-
-    @Prop()
-    player2Name: string;
+    gameId: string;
 
     @Prop()
     gameName: string;
@@ -32,8 +24,11 @@ export class GameHistory {
     @Prop()
     isMultiplayer: boolean;
 
-    @Prop()
-    isAbandon: boolean;
+    @Prop(PlayerGameInfo)
+    player1: PlayerGameInfo;
+
+    @Prop(PlayerGameInfo)
+    player2?: PlayerGameInfo;
 }
 
 export const gameHistorySchema = SchemaFactory.createForClass(GameHistory);

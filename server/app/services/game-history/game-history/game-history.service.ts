@@ -13,6 +13,7 @@ export class GameHistoryService {
     }
 
     async addGameToHistory(gameHistory: GameHistoryDTO): Promise<GameHistory> {
+        console.log('gameHistory', gameHistory);
         const newGameHistory = new this.gameCardModel(gameHistory);
         return newGameHistory.save();
     }

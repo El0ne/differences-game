@@ -19,6 +19,7 @@ import { GameCardInformation } from '@common/game-card';
 import { GameConstants } from '@common/game-constants';
 import { GameHistoryDTO } from '@common/game-history.dto';
 import { MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
+import { PlayerGameInfo } from '@common/player-game-info';
 import { Subject } from 'rxjs';
 
 @Component({
@@ -85,18 +86,22 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.gameCardInfo = gameCardData;
                 this.numberOfDifferences = this.gameCardInfo.differenceNumber;
                 if (!this.isMultiplayer) {
+                    // TODO change object implementation
+                    // abandon solo
                     const gameHistory: GameHistoryDTO = {
-                        id: this.currentGameId,
-                        winnerName: this.opponent,
-                        player1Name: this.player,
-                        player2Name: this.opponent,
+                        gameId: this.currentGameId,
                         gameName: this.gameCardInfo.name,
                         gameMode: 'classique',
                         gameDuration: 0,
                         startTime: this.startTime,
                         isMultiplayer: this.isMultiplayer,
-                        isAbandon: true,
+                        player1: {
+                            name: this.player,
+                            hasAbandon: true,
+                            hasWon: false,
+                        },
                     };
+                    console.log('here');
                     this.socketService.send<GameHistoryDTO>(MATCH_EVENTS.SoloGameInformation, gameHistory);
                     this.soloTimer = setInterval(() => {
                         this.socketService.send<number>(MATCH_EVENTS.Time, this.timerService.currentTime);
@@ -185,18 +190,32 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     notifyNewBestTime(winnerId: string, isAbandon: boolean, mode: string): void {
         const winnerName: string = this.socketService.names.get(winnerId) as string;
-        this.socketService.send<GameHistoryDTO>(CHAT_EVENTS.BestTime, {
-            id: this.currentGameId,
-            winnerName,
-            player1Name: this.player,
-            player2Name: this.opponent,
+        const player1: PlayerGameInfo = {
+            name: winnerName,
+            hasAbandon: false,
+            hasWon: true,
+        };
+
+        const gameHistory: GameHistoryDTO = {
+            gameId: this.currentGameId,
             gameName: this.gameCardInfo.name,
             gameMode: mode,
             gameDuration: this.timerService.currentTime,
             startTime: this.startTime,
             isMultiplayer: this.isMultiplayer,
-            isAbandon,
-        });
+            player1,
+        };
+        if (this.isMultiplayer) {
+            const loserName = winnerName === this.player ? this.opponent : this.player;
+            const player2: PlayerGameInfo = {
+                name: loserName,
+                hasAbandon: isAbandon,
+                hasWon: false,
+            };
+            gameHistory.player2 = player2;
+        }
+        console.log('notify');
+        this.socketService.send<GameHistoryDTO>(CHAT_EVENTS.BestTime, gameHistory);
     }
 
     winGame(winnerId: string): void {
