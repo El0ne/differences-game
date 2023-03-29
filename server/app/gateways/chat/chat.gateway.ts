@@ -1,3 +1,4 @@
+import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameHistoryService } from '@app/services/game-history/game-history/game-history.service';
 import { RoomMessage } from '@common/chat-gateway-constants';
 import { CHAT_EVENTS, MESSAGE_MAX_LENGTH, Room, RoomEvent, RoomManagement } from '@common/chat-gateway-events';
@@ -12,7 +13,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
 
     private waitingRoom: Room[] = [];
-    constructor(private gameHistoryService: GameHistoryService, private logger: Logger) {}
+    constructor(private gameHistoryService: GameHistoryService, private logger: Logger, private gameCardService: GameCardService) {}
 
     @SubscribeMessage(CHAT_EVENTS.Validate)
     validate(socket: Socket, message: string): void {
@@ -63,7 +64,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     }
 
     @SubscribeMessage(CHAT_EVENTS.BestTime)
-    bestTime(socket: Socket, data: GameHistoryDTO) {
+    async bestTime(socket: Socket, data: GameHistoryDTO) {
         if (!(data.player1.hasAbandon || data.player2?.hasAbandon)) {
             const date = this.dateCreator();
             // const position = this.gameCardService.updateTime();
@@ -74,7 +75,10 @@ export class ChatGateway implements OnGatewayDisconnect {
             this.server.emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message, event: 'abandon' } as RoomMessage);
         }
         socket.data.isSolo = false;
-        this.gameHistoryService.addGameToHistory(data);
+
+        if (await this.gameCardService.getGameCardById(data.gameId)) {
+            this.gameHistoryService.addGameToHistory(data);
+        }
     }
 
     handleDisconnect(socket: Socket): void {
