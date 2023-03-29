@@ -99,6 +99,11 @@
                     <button class="send-button" (click)="sendMessage()"></button>
                 </div>
             </div>
+            <div class="hint-button">
+                <button class="hint" type="button" (click)="getDiffFromClick()">
+                    <mat-icon>search</mat-icon>
+                </button>
+            </div>
         </div>
 
         <div class="image-container neon-border">
@@ -113,11 +118,6 @@
                 (cheatModeHandler)="resetDifferences($event)"
                 *ngIf="this.gameCardInfo"
             ></app-click-event>
-        </div>
-        <div class="hint-button">
-            <button class="hint" type="button" (click)="getDiffFromClick()">
-                <mat-icon class="hint-button">search</mat-icon>
-            </button>
         </div>
     </div>
 </body>

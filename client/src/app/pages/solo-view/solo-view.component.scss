@@ -191,15 +191,17 @@ app-click-event {
     letter-spacing: 1px;
 }
 
-.hint-button {
-    position: absolute;
-    bottom: -1%;
-    right: 10px;
+.hint {
+    padding-top: 10px;
+    transform: scale(3);
+    border-style: hidden;
     justify-content: center;
     margin: 1rem;
+    background-color: rgba(255, 255, 255, 0);
 }
-.hint {
-    transform: scale(1.5);
+.hint-button :hover {
+    cursor: pointer;
+    transform: scale(2);
     border-style: hidden;
     align-self: end;
     background-color: rgba(255, 255, 255, 0);
