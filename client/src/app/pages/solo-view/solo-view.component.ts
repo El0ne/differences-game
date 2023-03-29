@@ -44,6 +44,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     endGame: Subject<void> = new Subject<void>();
     gameCardInfo: GameCardInformation;
     currentRoom: string;
+    thirdHint: boolean;
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
     boundGetRandomDifference: (event: KeyboardEvent) => void = this.getRandomDifference.bind(this);
 
@@ -60,6 +61,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit(): void {
+        this.thirdHint = false;
         const gameId = this.route.snapshot.paramMap.get('stageId');
         this.isMultiplayer = this.router.url.includes('multiplayer');
         if (!this.socketService.liveSocket()) {
@@ -159,6 +161,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.left.currentPixelHint = randomPixel;
                 this.right.currentPixelHint = this.left.currentPixelHint;
                 const randomPixelPosition = this.gameHintService.getPercentages(this.left.convertPosToPixel(randomPixel));
+                if (randomPixelPosition.length === 0) {
+                    this.activateThirdHint();
+                }
                 this.left.hintPosX = (randomPixelPosition[1] * 480).toString();
                 this.left.hintPosY = (randomPixelPosition[0] * 640).toString();
                 this.right.hintPosX = this.left.hintPosX;
@@ -167,6 +172,10 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.left.secondHint = this.gameHintService.hintsRemaining === 1;
             });
         }
+    }
+
+    activateThirdHint(): void {
+        this.thirdHint = true;
     }
 
     showTime(): void {

@@ -27,13 +27,12 @@ export class GameHintService {
                     corners.push(this.roundDown(position));
                     break;
                 }
-                case 0:
-                    {
-                        corners.push(this.roundDown(position));
-                        // TODO: Replace with third hint when implemented
-                        // No default
-                    }
+                case 0: {
+                    // corners.push(this.roundDown(position));
+                    // TODO: Replace with third hint when implemented
+                    // No default
                     break;
+                }
             }
         }
         return corners;

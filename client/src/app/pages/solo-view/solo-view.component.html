@@ -99,12 +99,13 @@
                     <button class="send-button" (click)="sendMessage()"></button>
                 </div>
             </div>
-            <div>
+            <div *ngIf="this.thirdHint === false">
                 <button class="hint hint-button" type="button" (click)="getDiffFromClick()">
                     <mat-icon>search</mat-icon>
                 </button>
                 <div class="playerName">{{ hintsRemaining() }}</div>
             </div>
+            <div *ngIf="this.thirdHint !== false" class="third-hint-box neon-border"></div>
         </div>
 
         <div class="image-container neon-border">

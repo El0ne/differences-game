@@ -94,7 +94,6 @@ export class ClickEventComponent implements OnInit {
                     !this.foundDifferenceService.foundDifferences.includes(this.differenceData.differencesPosition)
                 ) {
                     if (this.isClickInHint(data.differenceArray)) {
-                        console.log('here');
                         this.firstHint = false;
                         this.secondHint = false;
                     }
