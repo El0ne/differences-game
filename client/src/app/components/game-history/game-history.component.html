@@ -22,7 +22,8 @@
                 *matCellDef="let element"
                 [ngClass]="{
                     winner1v1: element.player1Name === element.winnerName && element.player2Name,
-                    abandon: element.player1Name !== element.winnerName && element.isAbandon
+                    abandon: element.player1Name !== element.winnerName && element.isAbandon,
+                    winnerSolo: element.player1Name === element.winnerName
                 }"
                 [style.width]="'22%'"
             >

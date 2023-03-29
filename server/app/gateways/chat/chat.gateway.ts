@@ -72,14 +72,19 @@ export class ChatGateway implements OnGatewayDisconnect {
             ${data.gameMode}.`;
             this.server.emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message, event: 'abandon' } as RoomMessage);
         }
+        socket.data.isSolo = false;
         this.gameHistoryService.addGameToHistory(data);
     }
 
     handleDisconnect(socket: Socket): void {
-        if (socket.data.room)
+        if (socket.data.room) {
             this.server
                 .to(socket.data.room)
                 .emit(CHAT_EVENTS.Abandon, { socketId: socket.id, message: this.dateCreator(), event: 'abandon' } as RoomMessage);
+        }
+        if (socket.data.isSolo) {
+            this.bestTime(socket, socket.data.soloGame);
+        }
     }
 
     dateCreator(): string {
