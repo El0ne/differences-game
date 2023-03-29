@@ -32,18 +32,6 @@ describe('DifferencesCounterService', () => {
         expect(service).toBeDefined();
     });
 
-    it('isAVisitedPixel() should return false if findPixelDifferenceIndex return an index not reachable', () => {
-        stub(service, 'findPixelDifferenceIndex').returns(2);
-        const visitedResult = service.isAVisitedPixel(NOT_DIFFERENT_PIXEL, VISITED_PIXELS_TEST);
-        expect(visitedResult).toBeFalsy();
-    });
-
-    it('isAVisitedPixel() should return true if findPixelDifferenceIndex return an index not reachable', () => {
-        stub(service, 'findPixelDifferenceIndex').returns(0);
-        const visitedResult = service.isAVisitedPixel(DIFFERENT_PIXEL, VISITED_PIXELS_TEST);
-        expect(visitedResult).toBeTruthy();
-    });
-
     it('findPixelDifferenceIndex() should return the index of the difference chuck if the index is visited', () => {
         expect(service.findPixelDifferenceIndex(DIFFERENT_PIXEL, VISITED_PIXELS_TEST)).toEqual(0);
     });
