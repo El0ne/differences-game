@@ -2,6 +2,7 @@
     <div class="game-constants">
         Pénalité l'utilisation d'un indice (entre 5 et 10 secondes):
         <input type="number" (blur)="gameConstants.hint = checkNumber($event, 5, 10)" [(ngModel)]="gameConstants.hint" [min]="5" [max]="10" />
+        secondes
     </div>
     <div class="game-constants">
         Durée du compte à rebours (entre 10 et 60 secondes):
@@ -26,13 +27,7 @@
         />
         secondes
     </div>
-
-    <button
-        type="button"
-        class="normal-button save-button"
-        (click)="updateGameConstants()"
-        [disabled]="!this.gameConstants.countDown || !this.gameConstants.difference || !this.gameConstants.hint"
-    >
+    <button type="button" class="normal-button save-button" (click)="updateGameConstants()" [disabled]="isConstantNull()">
         Sauvegarder les constantes de parties
     </button>
     <button type="button" class="normal-button save-button" (click)="resetGameConstants()">Réinitialiser les constantes de parties</button>

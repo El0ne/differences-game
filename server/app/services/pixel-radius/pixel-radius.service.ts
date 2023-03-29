@@ -18,10 +18,13 @@ export class PixelRadiusService {
 
         for (let i = upExtremity; i <= downExtremity; i++) {
             for (let j = leftExtremity; j <= rightExtremity; j++) {
-                if (roundRadius && (j - pixelCoordinateX) ** 2 + (i - pixelCoordinateY) ** 2 > radius * radius) {
-                    continue;
+                if (roundRadius) {
+                    if (Math.pow(j - pixelCoordinateX, 2) + Math.pow(i - pixelCoordinateY, 2) <= Math.pow(radius, 2)) {
+                        adjacentPixels.push(i * this.imageDimensionsService.getWidth() + j);
+                    }
+                } else {
+                    adjacentPixels.push(i * this.imageDimensionsService.getWidth() + j);
                 }
-                adjacentPixels.push(i * this.imageDimensionsService.getWidth() + j);
             }
         }
         return adjacentPixels;
