@@ -153,9 +153,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.getRandomDifference(keyEvent);
     }
 
-    setColor(color: string): void {
-        console.log('here');
-        this.hintColor = color;
+    setColor(clickPosition: number[]): void {
+        this.hintColor = this.gameHintService.setColor(clickPosition, this.left.convertPosToPixel(this.left.currentPixelHint));
+        console.log(this.hintColor);
     }
 
     getRandomDifference(event: KeyboardEvent | null): void {

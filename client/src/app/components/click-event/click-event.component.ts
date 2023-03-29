@@ -23,7 +23,7 @@ export class ClickEventComponent implements OnInit {
     @Output() differenceDetected: EventEmitter<DifferenceInformation> = new EventEmitter<DifferenceInformation>();
     @Output() mistake: EventEmitter<void> = new EventEmitter<void>();
     @Output() cheatModeHandler: EventEmitter<KeyboardEvent> = new EventEmitter<KeyboardEvent>();
-    @Output() color: EventEmitter<string> = new EventEmitter<string>();
+    @Output() color: EventEmitter<number[]> = new EventEmitter<number[]>();
     @ViewChild('picture', { static: true })
     picture: ElementRef<HTMLCanvasElement>;
     @ViewChild('modification', { static: true })
@@ -98,8 +98,7 @@ export class ClickEventComponent implements OnInit {
                         this.firstHint = false;
                         this.secondHint = false;
                     } else {
-                        const string = '#000000';
-                        this.color.emit(string);
+                        this.color.emit([this.getCoordInImage(mouseEvent)[0], this.getCoordInImage(mouseEvent)[1]]);
                     }
                     this.differenceDetected.emit({
                         differencesPosition: this.differenceData.differencesPosition,
@@ -111,8 +110,7 @@ export class ClickEventComponent implements OnInit {
                     }
                 } else {
                     this.displayError(mouseEvent);
-                    const string = '#000000';
-                    this.color.emit(string);
+                    this.color.emit([this.getCoordInImage(mouseEvent)[0], this.getCoordInImage(mouseEvent)[1]]);
                 }
             });
     }

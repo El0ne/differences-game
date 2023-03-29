@@ -106,7 +106,7 @@
                 </button>
                 <div class="playerName">{{ hintsRemaining() }}</div>
             </div>
-            <div *ngIf="this.thirdHint !== false" class="third-hint-box neon-border" [ngStyle]="{ 'background-color': hintColor }"></div>
+            <div *ngIf="this.thirdHint !== false" class="third-hint-box neon-border" [ngStyle]="{ 'background-color': this.hintColor }"></div>
         </div>
 
         <div class="image-container neon-border">

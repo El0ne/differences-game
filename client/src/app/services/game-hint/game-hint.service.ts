@@ -57,4 +57,16 @@ export class GameHintService {
             return 0.5;
         }
     }
+
+    setColor(clickPosition: number[], hintPosition: number[]): string {
+        const radius = Math.sqrt((clickPosition[0] - hintPosition[0]) ** 2 + (clickPosition[1] - hintPosition[1]) ** 2);
+        console.log(radius);
+        if (radius < 25) {
+            return '#881901';
+        } else if (radius < 75) return '#FF2D00';
+        else if (radius < 125) return '#FF8EBC';
+        else if (radius < 175) return '#A5D7FF';
+        else if (radius < 225) return '#4575FF';
+        else return '#0042FF';
+    }
 }
