@@ -155,7 +155,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     setColor(clickPosition: number[]): void {
         this.hintColor = this.gameHintService.setColor(clickPosition, this.left.convertPosToPixel(this.left.currentPixelHint));
-        console.log(this.hintColor);
+        // TODO: Add way to remove box after third hint is found
     }
 
     getRandomDifference(event: KeyboardEvent | null): void {
