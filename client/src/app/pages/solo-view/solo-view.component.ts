@@ -177,6 +177,10 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         return this.timerService.convert(this.timerService.currentTime);
     }
 
+    hintsRemaining(): number {
+        return this.gameHintService.hintsRemaining;
+    }
+
     winGame(winnerId: string): void {
         if (!this.left.endGame) {
             this.timerService.stopTimer();

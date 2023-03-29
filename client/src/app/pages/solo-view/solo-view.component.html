@@ -99,10 +99,11 @@
                     <button class="send-button" (click)="sendMessage()"></button>
                 </div>
             </div>
-            <div class="hint-button">
-                <button class="hint" type="button" (click)="getDiffFromClick()">
+            <div>
+                <button class="hint hint-button" type="button" (click)="getDiffFromClick()">
                     <mat-icon>search</mat-icon>
                 </button>
+                <div class="playerName">{{ hintsRemaining() }}</div>
             </div>
         </div>
 
