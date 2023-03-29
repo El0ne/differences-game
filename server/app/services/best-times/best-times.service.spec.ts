@@ -12,6 +12,8 @@ describe('BestTimesService', () => {
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
 
+    let FAKE_RANKING_BOARD: RankingBoard[];
+
     beforeEach(async () => {
         mongoServer = await MongoMemoryServer.create();
 
@@ -29,6 +31,21 @@ describe('BestTimesService', () => {
 
         service = module.get<BestTimesService>(BestTimesService);
         connection = await module.get(getConnectionToken());
+
+        FAKE_RANKING_BOARD = [
+            {
+                name: 'Yvon Gagné',
+                time: 15,
+            },
+            {
+                name: 'Pierre Laroche',
+                time: 20,
+            },
+            {
+                name: 'Jean Laporte',
+                time: 25,
+            },
+        ];
     });
 
     const DELAY_BEFORE_CLOSING_CONNECTION = 200;
@@ -45,33 +62,27 @@ describe('BestTimesService', () => {
         expect(service).toBeDefined();
     });
 
-    it('updateBestTimes should return a ranking board with the updated best times for a solo game', () => {
+    it('updateBestTimes should return a ranking board with the updated best times', () => {
         const updatedRankingBoard = service.updateBestTimes(FAKE_RANKING_BOARD, FAKE_WINNER_BOARD);
-        expect(updatedRankingBoard[0].name).toBe(FAKE_WINNER_BOARD.name);
-        expect(updatedRankingBoard[0].time).toBe(FAKE_WINNER_BOARD.time);
-        expect(updatedRankingBoard[1].name).toBe('Yvon Gagné');
-        expect(updatedRankingBoard[1].time).toBe(15);
-        expect(updatedRankingBoard[2].name).toBe('Pierre Laroche');
-        expect(updatedRankingBoard[2].time).toBe(20);
+        expect(updatedRankingBoard[0]).toBe(FAKE_WINNER_BOARD);
+        expect(updatedRankingBoard[1]).toBe(FAKE_RANKING_BOARD[0]);
+        expect(updatedRankingBoard[2]).toBe(FAKE_RANKING_BOARD[1]);
     });
 
-    const FAKE_RANKING_BOARD: RankingBoard[] = [
-        {
-            name: 'Yvon Gagné',
-            time: 15,
-        },
-        {
-            name: 'Pierre Laroche',
-            time: 20,
-        },
-        {
-            name: 'Jean Laporte',
-            time: 25,
-        },
-    ];
+    it('updateBestTimes should return a ranking board with the same best times if the newTime is not in the top 3', () => {
+        const updatedRankingBoard = service.updateBestTimes(FAKE_RANKING_BOARD, FAKE_LOSER_BOARD);
+        expect(updatedRankingBoard[0]).toBe(FAKE_RANKING_BOARD[0]);
+        expect(updatedRankingBoard[1]).toBe(FAKE_RANKING_BOARD[1]);
+        expect(updatedRankingBoard[2]).toBe(FAKE_RANKING_BOARD[2]);
+    });
 });
 
 const FAKE_WINNER_BOARD: RankingBoard = {
     name: 'Victoria Lavictoire',
     time: 10,
+};
+
+const FAKE_LOSER_BOARD: RankingBoard = {
+    name: 'Louis-Philippe Ladéfaite',
+    time: 60,
 };

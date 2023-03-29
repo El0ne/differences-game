@@ -60,11 +60,12 @@ export class BestTimesService {
     }
 
     updateBestTimes(initialRankingBoard: RankingBoard[], winnerBoard: RankingBoard): RankingBoard[] {
-        initialRankingBoard.push(winnerBoard);
-        const sortedRankingBoard = initialRankingBoard.sort((a, b) => {
+        // copy necessary to avoid mutating the initialRankingBoard, which causes considerable issues
+        const initialRankingBoardCopy = initialRankingBoard.slice();
+        initialRankingBoardCopy.push(winnerBoard);
+        const updatedRankingBoard = initialRankingBoardCopy.sort((a, b) => {
             return a.time - b.time;
         });
-        const updatedRankingBoard = sortedRankingBoard.slice(0, 3);
-        return updatedRankingBoard;
+        return updatedRankingBoard.slice(0, 3);
     }
 }
