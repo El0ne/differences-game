@@ -101,7 +101,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                             hasWon: false,
                         },
                     };
-                    console.log('here');
                     this.socketService.send<GameHistoryDTO>(MATCH_EVENTS.SoloGameInformation, gameHistory);
                     this.soloTimer = setInterval(() => {
                         this.socketService.send<number>(MATCH_EVENTS.Time, this.timerService.currentTime);
@@ -214,7 +213,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             };
             gameHistory.player2 = player2;
         }
-        console.log('notify');
         this.socketService.send<GameHistoryDTO>(CHAT_EVENTS.BestTime, gameHistory);
     }
 
