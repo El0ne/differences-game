@@ -156,6 +156,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.left.getDifferences(this.currentGameId).subscribe((data) => {
                 const pixelArray = this.foundDifferenceService.findPixelsFromDifference(data);
                 const randomPixel = pixelArray[Math.floor(Math.random() * pixelArray.length)];
+                this.left.currentPixelHint = randomPixel;
+                this.right.currentPixelHint = this.left.currentPixelHint;
                 const randomPixelPosition = this.gameHintService.getPercentages(this.left.convertPosToPixel(randomPixel));
                 this.left.hintPosX = (randomPixelPosition[1] * 480).toString();
                 this.left.hintPosY = (randomPixelPosition[0] * 640).toString();

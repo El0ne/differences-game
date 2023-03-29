@@ -37,6 +37,7 @@ export class ClickEventComponent implements OnInit {
     secondHint: boolean;
     hintPosX: string;
     hintPosY: string;
+    currentPixelHint: number;
 
     constructor(
         private clickEventService: ClickEventService,
@@ -74,6 +75,15 @@ export class ClickEventComponent implements OnInit {
         return this.pixelModificationService.positionToPixel(toTransform);
     }
 
+    isClickInHint(differenceClicked: number[]): boolean {
+        for (const pixel of differenceClicked) {
+            if (pixel === this.currentPixelHint) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     isDifferent(mouseEvent: MouseEvent): void {
         this.clickEventService
             .isADifference(this.getCoordInImage(mouseEvent)[0], this.getCoordInImage(mouseEvent)[1], this.gameCardId)
@@ -83,9 +93,11 @@ export class ClickEventComponent implements OnInit {
                     this.differenceData.isADifference &&
                     !this.foundDifferenceService.foundDifferences.includes(this.differenceData.differencesPosition)
                 ) {
-                    // TODO : Verify that difference is inside of hint
-                    this.firstHint = false;
-                    this.secondHint = false;
+                    if (this.isClickInHint(data.differenceArray)) {
+                        console.log('here');
+                        this.firstHint = false;
+                        this.secondHint = false;
+                    }
                     this.differenceDetected.emit({
                         differencesPosition: this.differenceData.differencesPosition,
                         lastDifferences: this.differenceData.differenceArray,
