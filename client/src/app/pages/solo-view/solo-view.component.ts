@@ -153,17 +153,17 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     notifyNewBestTime(winnerId: string, isAbandon: boolean, mode: string): void {
         const winnerName: string = this.socketService.names.get(winnerId) as string;
-        const loserName: string = winnerName === this.player ? this.opponent : this.player;
         this.socketService.send<gameHistory>(CHAT_EVENTS.BestTime, {
             id: this.currentGameId,
             winnerName,
-            loserName,
+            player1Name: this.player,
+            player2Name: this.opponent,
             gameName: this.gameCardInfo.name,
+            gameMode: mode,
             gameDuration: this.timerService.currentTime,
             startTime: this.startTime,
             isMultiplayer: this.isMultiplayer,
             isAbandon,
-            mode,
         });
     }
 
