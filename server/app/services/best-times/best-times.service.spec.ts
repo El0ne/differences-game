@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { GameCard, gameCardSchema } from '@app/schemas/game-cards.schemas';
 import { RankingBoard } from '@common/ranking-board';
-import { MongooseModule } from '@nestjs/mongoose';
+import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import { Connection } from 'mongoose';
 import { BestTimesService } from './best-times.service';
 
 describe('BestTimesService', () => {
     let service: BestTimesService;
     let mongoServer: MongoMemoryServer;
+    let connection: Connection;
 
     beforeEach(async () => {
         mongoServer = await MongoMemoryServer.create();
@@ -26,6 +28,17 @@ describe('BestTimesService', () => {
         }).compile();
 
         service = module.get<BestTimesService>(BestTimesService);
+        connection = await module.get(getConnectionToken());
+    });
+
+    const DELAY_BEFORE_CLOSING_CONNECTION = 200;
+
+    afterEach((done) => {
+        setTimeout(async () => {
+            await connection.close();
+            await mongoServer.stop();
+            done();
+        }, DELAY_BEFORE_CLOSING_CONNECTION);
     });
 
     it('should be defined', () => {
