@@ -8,6 +8,7 @@ import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { EndGame } from '@common/chat-dialog-constants';
@@ -15,6 +16,7 @@ import { RoomMessage, Validation } from '@common/chat-gateway-constants';
 import { CHAT_EVENTS, RoomEvent, RoomManagement } from '@common/chat-gateway-events';
 import { DifferenceInformation, MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
+import { GameConstants } from '@common/game-constants';
 import { MATCH_EVENTS } from '@common/match-gateway-communication';
 import { Subject } from 'rxjs';
 
@@ -44,7 +46,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     gameCardInfo: GameCardInformation;
     currentRoom: string;
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
-
+    gameConstants: GameConstants;
     // eslint-disable-next-line max-params
     constructor(
         public timerService: TimerSoloService,
@@ -54,11 +56,16 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private dialog: MatDialog,
         private router: Router,
         public socketService: SocketService,
+        private gameConstantsService: GameConstantsService,
     ) {}
 
     ngOnInit(): void {
         const gameId = this.route.snapshot.paramMap.get('stageId');
         this.isMultiplayer = this.router.url.includes('multiplayer');
+        this.gameConstantsService.getGameConstants().subscribe((gameConstants: GameConstants) => {
+            this.gameConstants = gameConstants;
+        });
+
         if (!this.socketService.liveSocket()) {
             this.router.navigate(['/home']);
             return;
@@ -177,6 +184,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             data: {
                 gameCardInfo: this.gameCardInfo,
                 numberOfDifferences: this.numberOfDifferences,
+                numberOfPlayers: this.isMultiplayer ? 2 : 1,
             },
         });
     }

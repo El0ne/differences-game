@@ -2,44 +2,70 @@
     <div class="header">
         <button id="previous" routerLink="/home">Retour</button>
     </div>
-    <div class="game-cards-container" [ngClass]="{
+    <div
+        class="game-cards-container"
+        [ngClass]="{
             config: isConfig,
             selection: !isConfig
-        }">
+        }"
+    >
         <div class="card-container">
-            <div *ngFor="let gameCardInformation of gameCardInformations; let even = even" [ngClass]="{
+            <div
+                *ngFor="let gameCardInformation of gameCardInformations; let even = even"
+                [ngClass]="{
                     card: even
-                }">
-                <app-game-card-selection #stages *ngIf="even" [gameCardInformation]="gameCardInformation"
-                    [isConfig]="isConfig" (gameDeleted)="refreshGameCards()"></app-game-card-selection>
+                }"
+            >
+                <app-game-card-selection
+                    #stages
+                    *ngIf="even"
+                    [gameCardInformation]="gameCardInformation"
+                    [isConfig]="isConfig"
+                    (gameDeleted)="refreshGameCards()"
+                ></app-game-card-selection>
             </div>
         </div>
         <div *ngIf="isConfig" class="game-properties">
-            <div class="game-constants">Pénalité l'utilisation d'un indice : 5 secondes</div>
-            <div class="game-constants">Durée du compte à rebours : 30 secondes</div>
-            <div class="game-constants">Temps gagné avec la découverte d'une différence : 5 secondes</div>
+            <app-game-constants></app-game-constants>
         </div>
         <div class="card-container">
-            <div *ngFor="let gameCardInformation of gameCardInformations; let odd = odd" [ngClass]="{
+            <div
+                *ngFor="let gameCardInformation of gameCardInformations; let odd = odd"
+                [ngClass]="{
                     card: odd
-                }">
-                <app-game-card-selection #stages *ngIf="odd" [gameCardInformation]="gameCardInformation"
-                    [isConfig]="isConfig" (gameDeleted)="refreshGameCards()"></app-game-card-selection>
+                }"
+            >
+                <app-game-card-selection
+                    #stages
+                    *ngIf="odd"
+                    [gameCardInformation]="gameCardInformation"
+                    [isConfig]="isConfig"
+                    (gameDeleted)="refreshGameCards()"
+                ></app-game-card-selection>
             </div>
         </div>
     </div>
 
     <div class="navigate-cards-container">
-        <button type="button" (click)="previousCards()" id="show-previous-cards-button"
-            class="normal-button navigate-cards-buttons navigate-button" [disabled]="isShowingFirstCard()">
+        <button
+            type="button"
+            (click)="previousCards()"
+            id="show-previous-cards-button"
+            class="normal-button navigate-cards-buttons navigate-button"
+            [disabled]="isShowingFirstCard()"
+        >
             <mat-icon>arrow_back</mat-icon>
         </button>
-        <button type="button" *ngIf="isConfig" id="create-a-stage-button"
-            class="normal-button navigate-cards-buttons navigate-button" [routerLink]="['/creatingGame']">
+        <button type="button" *ngIf="isConfig" class="normal-button navigate-cards-buttons navigate-button" [routerLink]="['/creatingGame']">
             Créer une partie
         </button>
-        <button type=" button" (click)="nextCards()" id="show-next-cards-button"
-            class="normal-button navigate-cards-buttons navigate-button" [disabled]="isShowingLastCard()">
+        <button
+            type=" button"
+            (click)="nextCards()"
+            id="show-next-cards-button"
+            class="normal-button navigate-cards-buttons navigate-button"
+            [disabled]="isShowingLastCard()"
+        >
             <mat-icon>arrow_forward</mat-icon>
         </button>
     </div>

@@ -1,12 +1,13 @@
 .info {
-    width: 900px;
-    height: 800px;
+    width: 600px;
+    height: 400px;
 }
 
 .info-container {
     display: flex;
     flex-direction: column;
     justify-self: unset;
+    align-items: center;
 }
 
 .title {

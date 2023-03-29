@@ -11,6 +11,7 @@ import { MaterialPageComponent } from '@app/pages/material-page/material-page.co
 import { BestTimeComponent } from './components/best-time/best-time.component';
 import { ClickEventComponent } from './components/click-event/click-event.component';
 import { GameCardSelectionComponent } from './components/game-card-selection/game-card-selection.component';
+import { GameConstantsComponent } from './components/game-constants/game-constants.component';
 import { ChosePlayerNameDialogComponent } from './modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { GameInfoModalComponent } from './modals/game-info-modal/game-info-modal.component';
 import { GameWinModalComponent } from './modals/game-win-modal/game-win-modal.component';
@@ -44,6 +45,7 @@ import { SoloViewComponent } from './pages/solo-view/solo-view.component';
         GameInfoModalComponent,
         QuitGameModalComponent,
         GameWinModalComponent,
+        GameConstantsComponent,
     ],
     entryComponents: [ModalPageComponent],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, MatIconModule],
