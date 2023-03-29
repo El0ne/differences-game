@@ -50,12 +50,11 @@ describe('GameConstantsController', () => {
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 
-    // TODO fix test
-    // it('updateGameConstants() should call GameConstantService.updateGameConstants() with the body as a parameter', async () => {
-    //     const response = await request(httpServer).put('/game-constants').send(FAKE_GAME_CONSTANTS);
-    //     assert(updateGameConstantsStub.called);
-    //     expect(response.status).toBe(HttpStatus.NO_CONTENT);
-    // });
+    it('updateGameConstants() should call GameConstantService.updateGameConstants() with the body as a parameter', async () => {
+        const response = await request(httpServer).put('/game-constants').send(DEFAULT_GAME_CONSTANTS);
+        assert(updateGameConstantsStub.called);
+        expect(response.status).toBe(HttpStatus.NO_CONTENT);
+    });
     it('updateGameConstants() should return 500 if there is an error', async () => {
         updateGameConstantsStub.throws(new Error('test'));
         const response = await request(httpServer).put('/game-constants').send(DEFAULT_GAME_CONSTANTS);
