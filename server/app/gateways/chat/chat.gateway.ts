@@ -2,7 +2,7 @@ import { GameHistoryService } from '@app/services/game-history/game-history/game
 import { RoomMessage } from '@common/chat-gateway-constants';
 import { CHAT_EVENTS, MESSAGE_MAX_LENGTH, Room, RoomEvent, RoomManagement } from '@common/chat-gateway-events';
 import { GameHistoryDTO } from '@common/game-history.dto';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
@@ -12,7 +12,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
 
     private waitingRoom: Room[] = [];
-    constructor(private gameHistoryService: GameHistoryService) {}
+    constructor(private gameHistoryService: GameHistoryService, private logger: Logger) {}
 
     @SubscribeMessage(CHAT_EVENTS.Validate)
     validate(socket: Socket, message: string): void {
@@ -64,6 +64,7 @@ export class ChatGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage(CHAT_EVENTS.BestTime)
     bestTime(socket: Socket, data: GameHistoryDTO) {
+        this.logger.log('ergerg');
         if (!data.isAbandon) {
             const date = this.dateCreator();
             // const position = this.gameCardService.updateTime();
