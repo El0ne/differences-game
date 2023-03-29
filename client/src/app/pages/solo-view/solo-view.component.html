@@ -38,7 +38,7 @@
                     <!-- référence : https://codepen.io/Vivekp1118/pen/YzLOOVG -->
                     <div class="container neon-border">
                         <div class="row">
-                            <div class="col col-heading neon">
+                            <div class="col col-heading">
                                 <div class="playerName">SCORE</div>
                             </div>
                             <div class="col col-display" id="scoreHome">{{ currentScorePlayer }}</div>
@@ -52,7 +52,7 @@
                     <!-- référence : https://codepen.io/Vivekp1118/pen/YzLOOVG -->
                     <div class="container neon-border">
                         <div class="row">
-                            <div class="col col-heading neon">
+                            <div class="col col-heading">
                                 <div class="playerName">SCORE</div>
                             </div>
                             <div class="col col-display" id="scoreHome">{{ currentScoreOpponent }}</div>
@@ -93,9 +93,9 @@
                         class="input-field"
                         placeholder="Entrez votre message"
                         [(ngModel)]="messageContent"
-                        (click)="removeCheatMode()"
-                        (blur)="addCheatMode()"
+                        (ngModelChange)="inputIsChanging()"
                     />
+                    (click)="removeCheatMode()" (blur)="addCheatMode()" />
                     <button class="send-button" (click)="sendMessage()"></button>
                 </div>
             </div>

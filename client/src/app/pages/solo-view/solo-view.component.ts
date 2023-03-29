@@ -8,6 +8,7 @@ import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { Invoker, SendMessageCommand } from '@app/services/replay-game/replay-events-handler';
 import { SocketService } from '@app/services/socket/socket.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { EndGame } from '@common/chat-dialog-constants';
@@ -44,7 +45,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     gameCardInfo: GameCardInformation;
     currentRoom: string;
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
+    inputElement = document.querySelector('input');
 
+    private invoker: Invoker;
     // eslint-disable-next-line max-params
     constructor(
         public timerService: TimerSoloService,
@@ -54,7 +57,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private dialog: MatDialog,
         private router: Router,
         public socketService: SocketService,
-    ) {}
+    ) {
+        this.invoker = new Invoker();
+    }
 
     ngOnInit(): void {
         const gameId = this.route.snapshot.paramMap.get('stageId');
@@ -187,8 +192,15 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         });
     }
 
+    inputIsChanging(): void {
+        console.log(this.messageContent);
+    }
+
     sendMessage(): void {
         this.socketService.send<string>(CHAT_EVENTS.Validate, this.messageContent);
+        const sendMessageCommand = new SendMessageCommand();
+        console.log(sendMessageCommand, this.timerService.currentTime);
+        this.invoker.addCommand(sendMessageCommand, this.timerService.currentTime);
         this.messageContent = '';
     }
 
@@ -204,10 +216,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     hint(): void {
         this.socketService.send<string>(CHAT_EVENTS.Hint, this.currentRoom);
     }
+
     handleFlash(currentDifferences: number[]): void {
         this.left.differenceEffect(currentDifferences);
         this.right.differenceEffect(currentDifferences);
     }
+
     differenceHandler(information: DifferenceInformation): void {
         if (this.isMultiplayer) {
             const multiplayerInformation: MultiplayerDifferenceInformation = {

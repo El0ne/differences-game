@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
-import {} from ;
 
 @Injectable({
     providedIn: 'root',

@@ -1,16 +1,13 @@
 /* eslint-disable max-classes-per-file */
+
+/* eslint-disable max-classes-per-file */
 export interface Command {
     execute(): void;
 }
 
-export class CanvasClickHandler implements Command {
+export class ClickCommand implements Command {
     private x: number;
     private y: number;
-    private canvas: HTMLCanvasElement;
-
-    constructor(canvas: HTMLCanvasElement) {
-        this.canvas = canvas;
-    }
 
     setCoordinates(x: number, y: number): void {
         this.x = x;
@@ -22,11 +19,11 @@ export class CanvasClickHandler implements Command {
             clientX: this.x,
             clientY: this.y,
         });
-        this.canvas.dispatchEvent(event);
+        document.dispatchEvent(event);
     }
 }
 
-export class WriteMessageHandler implements Command {
+export class WriteMessageCommand implements Command {
     private currentMessage: string;
     private input: HTMLInputElement;
 
@@ -41,31 +38,45 @@ export class WriteMessageHandler implements Command {
     }
 }
 
-export class SendMessageHandler implements Command {
+export class SendMessageCommand implements Command {
     execute(): void {
         window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
     }
 }
-export class CheatModeHandler implements Command {
+export class CheatModeCommand implements Command {
     execute(): void {
         window.dispatchEvent(new KeyboardEvent('keydown', { key: 't' }));
     }
 }
 
-export class ClueHandler implements Command {
+export class ClueCommand implements Command {
     execute(): void {
         window.dispatchEvent(new KeyboardEvent('keydown', { key: 'i' }));
     }
 }
 
 export class Invoker {
-    private commands: Command[] = [];
+    private commands = new Array();
+    private time: number;
 
-    addCommand(command: Command): void {
-        this.commands.push(command);
+    addCommand(command: Command, time: number): void {
+        this.commands.push({ action: command, time });
+
+        console.log(this.commands);
+    }
+
+    getTimer(time: number): number {
+        this.time = time;
+        return this.time;
     }
 
     run(): void {
-        this.commands.forEach((command) => command.execute());
+        this.commands.forEach((command) => {
+            setTimeout(() => {
+                if (command.time === this.time) {
+                    command.action.execute();
+                }
+            });
+        });
     }
 }
