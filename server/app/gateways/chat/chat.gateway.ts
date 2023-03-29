@@ -1,6 +1,7 @@
-import { bestTimeInformation } from '@common/best-time';
+import { GameHistoryService } from '@app/services/game-history/game-history/game-history.service';
 import { RoomMessage } from '@common/chat-gateway-constants';
 import { CHAT_EVENTS, MESSAGE_MAX_LENGTH, Room, RoomEvent, RoomManagement } from '@common/chat-gateway-events';
+import { GameHistoryDTO } from '@common/game-history.dto';
 import { Injectable } from '@nestjs/common';
 import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -11,6 +12,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
 
     private waitingRoom: Room[] = [];
+    constructor(private gameHistoryService: GameHistoryService) {}
 
     @SubscribeMessage(CHAT_EVENTS.Validate)
     validate(socket: Socket, message: string): void {
@@ -61,11 +63,16 @@ export class ChatGateway implements OnGatewayDisconnect {
     }
 
     @SubscribeMessage(CHAT_EVENTS.BestTime)
-    bestTime(socket: Socket, data: bestTimeInformation) {
-        const date = this.dateCreator();
-        const message = `${date} - ${data.winner} obtient la ${data.position} place dans les meilleurs temps du jeu ${data.gameName} en 
-        ${data.mode}.`;
-        this.server.emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message, event: 'abandon' } as RoomMessage);
+    bestTime(socket: Socket, data: GameHistoryDTO) {
+        if (!data.isAbandon) {
+            const date = this.dateCreator();
+            // const position = this.gameCardService.updateTime();
+            // if (position);
+            const message = `${date} - ${data.winnerName} obtient la ${data.gameDuration} place dans les meilleurs temps du jeu ${data.gameName} en
+            ${data.gameMode}.`;
+            this.server.emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message, event: 'abandon' } as RoomMessage);
+        }
+        this.gameHistoryService.addGameToHistory(data);
     }
 
     handleDisconnect(socket: Socket): void {
