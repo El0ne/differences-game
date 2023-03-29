@@ -6,12 +6,14 @@ import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GameClickController } from './controllers/game-click/game-click.controller';
+import { GameConstantsController } from './controllers/game-constants/game-constants.controller';
 import { StageController } from './controllers/stage/stage.controller';
 import { MatchGateway } from './gateways/match/match/match.gateway';
 import { StageWaitingRoomGateway } from './gateways/waitingRoom/stage-waiting-room.gateway';
 import { DifferenceClickService } from './services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from './services/difference-detection/difference-detection.service';
 import { DifferencesCounterService } from './services/differences-counter/differences-counter.service';
+import { GameConstantService } from './services/game-constant/game-constant.service';
 import { GameDifficultyService } from './services/game-difficulty/game-difficulty.service';
 import { GameManagerService } from './services/game-manager/game-manager.service';
 import { ImageDimensionsService } from './services/image-dimensions/image-dimensions.service';
@@ -34,7 +36,7 @@ import { PixelRadiusService } from './services/pixel-radius/pixel-radius.service
             { name: GameCard.name, schema: gameCardSchema },
         ]),
     ],
-    controllers: [GameClickController, StageController],
+    controllers: [GameClickController, StageController, GameConstantsController],
     providers: [
         ChatGateway,
         StageWaitingRoomGateway,
@@ -50,6 +52,7 @@ import { PixelRadiusService } from './services/pixel-radius/pixel-radius.service
         ImageManagerService,
         GameManagerService,
         MatchGateway,
+        GameConstantService,
     ],
 })
 export class AppModule {}
