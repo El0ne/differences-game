@@ -61,81 +61,30 @@ export class BestTimesService {
     }
 
     updateBestTimes(gameCardInfo: GameCardInformation, winnerBoard: RankingBoard, isMultiplayer: boolean): GameCardInformation {
-        let winnerPosition = 3;
+        const resultBoardSolo = gameCardInfo.soloTimes;
+        resultBoardSolo.push(winnerBoard);
+
+        const resultBoardMultiplayer = gameCardInfo.multiTimes;
+        resultBoardMultiplayer.push(winnerBoard);
+
+        const sortedBoardSolo = resultBoardSolo.sort((a, b) => (a.time < b.time ? -1 : 1));
+        const newResultBoardSolo = sortedBoardSolo.slice(0, 3);
+
+        const sortedBoardMultiplayer = resultBoardMultiplayer.sort((a, b) => (a.time < b.time ? -1 : 1));
+        const newResultBoardMultiplayer = sortedBoardMultiplayer.slice(0, 3);
+
         if (!isMultiplayer) {
-            // eslint-disable-next-line @typescript-eslint/prefer-for-of
-            for (let i = 0; i < gameCardInfo.soloTimes.length; i++) {
-                if (winnerBoard.time < gameCardInfo.soloTimes[i].time) {
-                    winnerPosition = i;
-                    break;
-                }
+            for (let k = 0; k < 3; k++) {
+                gameCardInfo.soloTimes[k].name = newResultBoardSolo[k].name;
+                gameCardInfo.soloTimes[k].time = newResultBoardSolo[k].time;
             }
-            switch (winnerPosition) {
-                case 0: {
-                    gameCardInfo.soloTimes[2].name = gameCardInfo.soloTimes[1].name;
-                    gameCardInfo.soloTimes[1].name = gameCardInfo.soloTimes[0].name;
-                    gameCardInfo.soloTimes[0].name = winnerBoard.name;
-
-                    gameCardInfo.soloTimes[2].time = gameCardInfo.soloTimes[1].time;
-                    gameCardInfo.soloTimes[1].time = gameCardInfo.soloTimes[0].time;
-                    gameCardInfo.soloTimes[0].time = winnerBoard.time;
-
-                    break;
-                }
-                case 1: {
-                    gameCardInfo.soloTimes[2].name = gameCardInfo.soloTimes[1].name;
-                    gameCardInfo.soloTimes[1].name = winnerBoard.name;
-
-                    gameCardInfo.soloTimes[2].time = gameCardInfo.soloTimes[1].time;
-                    gameCardInfo.soloTimes[1].time = winnerBoard.time;
-
-                    break;
-                }
-                case 2: {
-                    gameCardInfo.soloTimes[2].name = winnerBoard.name;
-
-                    gameCardInfo.soloTimes[2].time = winnerBoard.time;
-
-                    break;
-                }
-            }
+            gameCardInfo.soloTimes.pop();
         } else {
-            // eslint-disable-next-line @typescript-eslint/prefer-for-of
-            for (let i = 0; i < gameCardInfo.multiTimes.length; i++) {
-                if (winnerBoard.time < gameCardInfo.multiTimes[i].time) {
-                    winnerPosition = i;
-                    break;
-                }
+            for (let k = 0; k < 3; k++) {
+                gameCardInfo.multiTimes[k].name = newResultBoardMultiplayer[k].name;
+                gameCardInfo.multiTimes[k].time = newResultBoardMultiplayer[k].time;
             }
-            switch (winnerPosition) {
-                case 0: {
-                    gameCardInfo.multiTimes[2].name = gameCardInfo.multiTimes[1].name;
-                    gameCardInfo.multiTimes[1].name = gameCardInfo.multiTimes[0].name;
-                    gameCardInfo.multiTimes[0].name = winnerBoard.name;
-
-                    gameCardInfo.multiTimes[2].time = gameCardInfo.multiTimes[1].time;
-                    gameCardInfo.multiTimes[1].time = gameCardInfo.multiTimes[0].time;
-                    gameCardInfo.multiTimes[0].time = winnerBoard.time;
-
-                    break;
-                }
-                case 1: {
-                    gameCardInfo.multiTimes[2].name = gameCardInfo.multiTimes[1].name;
-                    gameCardInfo.multiTimes[1].name = winnerBoard.name;
-
-                    gameCardInfo.multiTimes[2].time = gameCardInfo.multiTimes[1].time;
-                    gameCardInfo.multiTimes[1].time = winnerBoard.time;
-
-                    break;
-                }
-                case 2: {
-                    gameCardInfo.multiTimes[2].name = winnerBoard.name;
-
-                    gameCardInfo.multiTimes[2].time = winnerBoard.time;
-
-                    break;
-                }
-            }
+            gameCardInfo.multiTimes.pop();
         }
         return gameCardInfo;
     }
