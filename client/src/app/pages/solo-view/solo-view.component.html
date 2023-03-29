@@ -26,6 +26,7 @@
                 (differenceDetected)="differenceHandler($event)"
                 (mistake)="handleMistake()"
                 (cheatModeHandler)="resetDifferences($event)"
+                (color)="setColor($event)"
                 *ngIf="this.gameCardInfo"
             ></app-click-event>
         </div>
@@ -105,7 +106,7 @@
                 </button>
                 <div class="playerName">{{ hintsRemaining() }}</div>
             </div>
-            <div *ngIf="this.thirdHint !== false" class="third-hint-box neon-border"></div>
+            <div *ngIf="this.thirdHint !== false" class="third-hint-box neon-border" [ngStyle]="{ 'background-color': hintColor }"></div>
         </div>
 
         <div class="image-container neon-border">
@@ -118,6 +119,7 @@
                 (differenceDetected)="differenceHandler($event)"
                 (mistake)="handleMistake()"
                 (cheatModeHandler)="resetDifferences($event)"
+                (color)="setColor($event)"
                 *ngIf="this.gameCardInfo"
             ></app-click-event>
         </div>

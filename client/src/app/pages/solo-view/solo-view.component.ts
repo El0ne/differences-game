@@ -45,6 +45,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     gameCardInfo: GameCardInformation;
     currentRoom: string;
     thirdHint: boolean;
+    hintColor: string;
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
     boundGetRandomDifference: (event: KeyboardEvent) => void = this.getRandomDifference.bind(this);
 
@@ -150,6 +151,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     getDiffFromClick(): void {
         const keyEvent: KeyboardEvent = new KeyboardEvent('keydown', { key: 'i' });
         this.getRandomDifference(keyEvent);
+    }
+
+    setColor(color: string): void {
+        console.log('here');
+        this.hintColor = color;
     }
 
     getRandomDifference(event: KeyboardEvent | null): void {

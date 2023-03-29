@@ -23,6 +23,7 @@ export class ClickEventComponent implements OnInit {
     @Output() differenceDetected: EventEmitter<DifferenceInformation> = new EventEmitter<DifferenceInformation>();
     @Output() mistake: EventEmitter<void> = new EventEmitter<void>();
     @Output() cheatModeHandler: EventEmitter<KeyboardEvent> = new EventEmitter<KeyboardEvent>();
+    @Output() color: EventEmitter<string> = new EventEmitter<string>();
     @ViewChild('picture', { static: true })
     picture: ElementRef<HTMLCanvasElement>;
     @ViewChild('modification', { static: true })
@@ -96,6 +97,9 @@ export class ClickEventComponent implements OnInit {
                     if (this.isClickInHint(data.differenceArray)) {
                         this.firstHint = false;
                         this.secondHint = false;
+                    } else {
+                        const string = '#000000';
+                        this.color.emit(string);
                     }
                     this.differenceDetected.emit({
                         differencesPosition: this.differenceData.differencesPosition,
@@ -107,6 +111,8 @@ export class ClickEventComponent implements OnInit {
                     }
                 } else {
                     this.displayError(mouseEvent);
+                    const string = '#000000';
+                    this.color.emit(string);
                 }
             });
     }
