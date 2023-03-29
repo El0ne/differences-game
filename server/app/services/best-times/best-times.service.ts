@@ -67,9 +67,11 @@ export class BestTimesService {
         const resultBoardMultiplayer = gameCardInfo.multiTimes;
         resultBoardMultiplayer.push(winnerBoard);
 
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const sortedBoardSolo = resultBoardSolo.sort((a, b) => (a.time < b.time ? -1 : 1));
         const newResultBoardSolo = sortedBoardSolo.slice(0, 3);
 
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const sortedBoardMultiplayer = resultBoardMultiplayer.sort((a, b) => (a.time < b.time ? -1 : 1));
         const newResultBoardMultiplayer = sortedBoardMultiplayer.slice(0, 3);
 
