@@ -2,7 +2,6 @@
 /* eslint-disable no-underscore-dangle */
 
 import { GameCard, GameCardDocument } from '@app/schemas/game-cards.schemas';
-import { GameCardInformation } from '@common/game-card';
 import { RankingBoard } from '@common/ranking-board';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -60,34 +59,12 @@ export class BestTimesService {
         return word;
     }
 
-    updateBestTimes(gameCardInfo: GameCardInformation, winnerBoard: RankingBoard, isMultiplayer: boolean): GameCardInformation {
-        const resultBoardSolo = gameCardInfo.soloTimes;
-        resultBoardSolo.push(winnerBoard);
-
-        const resultBoardMultiplayer = gameCardInfo.multiTimes;
-        resultBoardMultiplayer.push(winnerBoard);
-
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        const sortedBoardSolo = resultBoardSolo.sort((a, b) => (a.time < b.time ? -1 : 1));
-        const newResultBoardSolo = sortedBoardSolo.slice(0, 3);
-
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        const sortedBoardMultiplayer = resultBoardMultiplayer.sort((a, b) => (a.time < b.time ? -1 : 1));
-        const newResultBoardMultiplayer = sortedBoardMultiplayer.slice(0, 3);
-
-        if (!isMultiplayer) {
-            for (let k = 0; k < 3; k++) {
-                gameCardInfo.soloTimes[k].name = newResultBoardSolo[k].name;
-                gameCardInfo.soloTimes[k].time = newResultBoardSolo[k].time;
-            }
-            gameCardInfo.soloTimes.pop();
-        } else {
-            for (let k = 0; k < 3; k++) {
-                gameCardInfo.multiTimes[k].name = newResultBoardMultiplayer[k].name;
-                gameCardInfo.multiTimes[k].time = newResultBoardMultiplayer[k].time;
-            }
-            gameCardInfo.multiTimes.pop();
-        }
-        return gameCardInfo;
+    updateBestTimes(initialRankingBoard: RankingBoard[], winnerBoard: RankingBoard): RankingBoard[] {
+        initialRankingBoard.push(winnerBoard);
+        const sortedRankingBoard = initialRankingBoard.sort((a, b) => {
+            return a.time - b.time;
+        });
+        const updatedRankingBoard = sortedRankingBoard.slice(0, 3);
+        return updatedRankingBoard;
     }
 }
