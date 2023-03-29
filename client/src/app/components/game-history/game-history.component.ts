@@ -8,7 +8,7 @@ import { GameHistoryDTO } from '@common/game-history.dto';
     styleUrls: ['./game-history.component.scss'],
 })
 export class GameHistoryComponent implements OnInit {
-    gameHistory: GameHistoryDTO[]; // = FAKE_DATA;
+    gameHistory: GameHistoryDTO[];
 
     displayedColumns: string[] = ['date', 'duration', 'mode', 'player1', 'player2'];
 

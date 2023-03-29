@@ -32,7 +32,7 @@ export class GameHistoryController {
     @Delete('/')
     async deleteHistory(@Res() res: Response): Promise<void> {
         try {
-            await this.gameHistoryService.deleteGameHistory();
+            await this.gameHistoryService.deleteAllGameHistory();
             res.status(HttpStatus.NO_CONTENT).send();
         } catch (err) {
             res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
