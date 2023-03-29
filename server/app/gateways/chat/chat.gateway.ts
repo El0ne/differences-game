@@ -65,18 +65,18 @@ export class ChatGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage(CHAT_EVENTS.BestTime)
     async bestTime(socket: Socket, data: GameHistoryDTO) {
-        if (!(data.player1.hasAbandon || data.player2?.hasAbandon)) {
-            const date = this.dateCreator();
-            // const position = this.gameCardService.updateTime();
-            // if (position);
-            // TODO add solo or multi in message
-            const message = `${date} - ${data.player1.name} obtient la ${data.gameDuration} place dans les meilleurs temps du jeu ${data.gameName} en
-            ${data.gameMode}.`;
-            this.server.emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message, event: 'abandon' } as RoomMessage);
-        }
-        socket.data.isSolo = false;
-
         if (await this.gameCardService.getGameCardById(data.gameId)) {
+            if (!(data.player1.hasAbandon || data.player2?.hasAbandon)) {
+                const date = this.dateCreator();
+                // const position = this.gameCardService.updateTime();
+                // if (position);
+                // TODO add solo or multi in message
+                const message = `${date} - ${data.player1.name} obtient la ${data.gameDuration} place dans les meilleurs temps du
+                jeu ${data.gameName} en ${data.gameMode}.`;
+                this.server.emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message, event: 'abandon' } as RoomMessage);
+            }
+            socket.data.isSolo = false;
+
             this.gameHistoryService.addGameToHistory(data);
         }
     }
