@@ -1,4 +1,4 @@
-<div class="game-constants-container">
+<div class="game-constants-container" *ngIf="gameConstants">
     <div class="game-constants">
         Pénalité l'utilisation d'un indice (entre 0 et 10 secondes):
         <input type="number" (blur)="gameConstants.hint = checkNumber($event, 0, 10)" [(ngModel)]="gameConstants.hint" [min]="0" [max]="10" />
