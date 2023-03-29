@@ -30,3 +30,7 @@ export interface JoinHostInWaitingRequest {
     stageId: string;
     playerName: string;
 }
+
+export interface AcceptOpponentInformation extends PlayerInformations {
+    isLimitedTimeMode: boolean;
+}

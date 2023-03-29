@@ -6,6 +6,7 @@ import { ClickEventComponent } from '@app/components/click-event/click-event.com
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
 import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal.component';
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
+import { LIMITED_TIME_MODE_ID } from '@app/pages/limited-time/limited-time.component';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { SocketService } from '@app/services/socket/socket.service';
@@ -29,6 +30,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     @ViewChild('right')
     right: ClickEventComponent;
     isMultiplayer: boolean;
+    isLimitedTimeMode: boolean;
     showErrorMessage: boolean = false;
     showTextBox: boolean = false;
     showNavBar: boolean = true;
@@ -58,6 +60,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         const gameId = this.route.snapshot.paramMap.get('stageId');
+        this.isLimitedTimeMode = gameId === LIMITED_TIME_MODE_ID;
         this.isMultiplayer = this.router.url.includes('multiplayer');
         if (!this.socketService.liveSocket()) {
             this.router.navigate(['/home']);

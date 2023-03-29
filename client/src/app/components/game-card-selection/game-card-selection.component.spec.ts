@@ -10,7 +10,6 @@ import { GAMES } from '@app/mock/game-cards';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { WaitingRoomComponent, WaitingRoomDataPassing } from '@app/modals/waiting-room/waiting-room.component';
 import { SocketService } from '@app/services/socket/socket.service';
-import { GameCardInformation } from '@common/game-card';
 import { MATCH_EVENTS } from '@common/match-gateway-communication';
 import { JoinHostInWaitingRequest, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 import { of } from 'rxjs';
@@ -53,7 +52,6 @@ describe('GameCardSelectionComponent', () => {
 
         fixture = TestBed.createComponent(GameCardSelectionComponent);
         component = fixture.componentInstance;
-        component.gameCardInformation = new GameCardInformation();
         component.gameCardInformation = GAMES[0];
         fixture.detectChanges();
     });

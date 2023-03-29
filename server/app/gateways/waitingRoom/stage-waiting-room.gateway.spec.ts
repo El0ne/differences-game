@@ -105,7 +105,9 @@ describe('StageWaitingRoomGateway', () => {
         expect(socket.data.stageInWaiting).toBe(null);
     });
 
-    it('accept opponent should set the 2 players in the same room, send a matchAccepted to the opponent and a matchConfirmed its socket', () => {
+    it(`accept opponent should set the 2 players in the same room, 
+    send a matchAccepted to the opponent and a matchConfirmed its socket 
+    when not in limited-time-game-mode`, () => {
         const opponentSocket = createStubInstance<Socket>(Socket);
         Object.defineProperty(opponentSocket, 'id', { value: 'opponentId' });
         opponentSocket.data = {};
@@ -117,7 +119,7 @@ describe('StageWaitingRoomGateway', () => {
             // eslint-disable-next-line @typescript-eslint/no-empty-function, no-unused-vars
             emit: (event: string) => {},
         } as BroadcastOperator<unknown, unknown>);
-        gateway.acceptOpponent(socket, { playerName: 'host1', playerSocketId: 'opponentId' });
+        gateway.acceptOpponent(socket, { playerName: 'host1', playerSocketId: 'opponentId', isLimitedTimeMode: true });
         expect(socket.to.calledWith('stage1')).toBeTruthy();
         expect(socket.emit.calledWith(WAITING_ROOM_EVENTS.DeclineOpponent, 'randomRoomId'));
         expect(socket.data.stageInHosting).toEqual(null);

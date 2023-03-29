@@ -1,6 +1,7 @@
 import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
+import { GameCardService } from '@app/services/game-card/game-card.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
@@ -8,17 +9,22 @@ import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection } from 'mongoose';
+import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { GameManagerService } from './game-manager.service';
 
 describe('GameManagerService', () => {
     let service: GameManagerService;
-    let differenceClickService;
+    let differenceClickService: DifferenceClickService;
+    // eslint-disable-next-line no-unused-vars
+    let gameCardService: SinonStubbedInstance<GameCardService>;
     const id = '63fe6fb0b9546f9126a1811e';
 
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
 
     beforeEach(async () => {
+        gameCardService = createStubInstance<GameCardService>(GameCardService);
+
         mongoServer = await MongoMemoryServer.create();
         const module: TestingModule = await Test.createTestingModule({
             imports: [
@@ -36,6 +42,7 @@ describe('GameManagerService', () => {
                 ImageDimensionsService,
                 PixelRadiusService,
                 PixelPositionService,
+                { provide: GameCardService, useValue: gameCardService },
             ],
         }).compile();
 

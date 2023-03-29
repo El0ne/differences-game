@@ -1,7 +1,13 @@
 import { MatchGateway } from '@app/gateways/match/match/match.gateway';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
-import { AcceptationInformation, JoinHostInWaitingRequest, PlayerInformations, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
+import {
+    AcceptationInformation,
+    AcceptOpponentInformation,
+    JoinHostInWaitingRequest,
+    PlayerInformations,
+    WAITING_ROOM_EVENTS,
+} from '@common/waiting-room-socket-communication';
 import { Injectable } from '@nestjs/common/decorators';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { randomUUID } from 'crypto';
@@ -55,7 +61,7 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
     }
 
     @SubscribeMessage(WAITING_ROOM_EVENTS.AcceptOpponent)
-    acceptOpponent(@ConnectedSocket() socket: Socket, @MessageBody() acceptation: PlayerInformations): void {
+    acceptOpponent(@ConnectedSocket() socket: Socket, @MessageBody() acceptation: AcceptOpponentInformation): void {
         const opponentSocket: Socket = this.server.sockets.sockets.get(acceptation.playerSocketId);
         this.clearRooms(socket);
         this.clearRooms(opponentSocket);
@@ -66,15 +72,21 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
         opponentSocket.join(roomId);
         opponentSocket.data.room = roomId;
         opponentSocket.data.stageId = socket.data.stageInHosting;
-        this.matchGateway.timer(roomId);
         this.gameHosts.delete(socket.data.stageInHosting);
-        this.gameManagerService.addGame(socket.data.stageInHosting, 2);
 
         const acceptationInfo: AcceptationInformation = { playerName: acceptation.playerName, playerSocketId: socket.id, roomId };
         socket.to(acceptation.playerSocketId).emit(WAITING_ROOM_EVENTS.MatchAccepted, acceptationInfo);
-        socket.emit(WAITING_ROOM_EVENTS.MatchConfirmed, roomId);
-        socket.to(socket.data.stageInHosting).emit(WAITING_ROOM_EVENTS.MatchRefused, "l'hôte a trouvé un autre adversaire");
         socket.to(socket.data.stageInHosting).emit(WAITING_ROOM_EVENTS.MatchDeleted, socket.data.stageInHosting);
+        socket.emit(WAITING_ROOM_EVENTS.MatchConfirmed, roomId);
+
+        if (acceptation.isLimitedTimeMode) {
+            this.matchGateway.timer(roomId);
+            this.gameManagerService.startLimitedTimeGame(roomId, 2);
+        } else {
+            socket.to(socket.data.stageInHosting).emit(WAITING_ROOM_EVENTS.MatchRefused, "l'hôte a trouvé un autre adversaire");
+            this.matchGateway.timer(roomId);
+            this.gameManagerService.addGame(socket.data.stageInHosting, 2);
+        }
 
         socket.data.stageInHosting = null;
         opponentSocket.data.stageInWaiting = null;

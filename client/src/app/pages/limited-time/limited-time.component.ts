@@ -7,7 +7,7 @@ import { SocketService } from '@app/services/socket/socket.service';
 import { MATCH_EVENTS } from '@common/match-gateway-communication';
 import { JoinHostInWaitingRequest, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 
-const LIMITED_TIME_MODE_ID = 'limitedTimeMode';
+export const LIMITED_TIME_MODE_ID = 'limitedTimeMode';
 
 @Component({
     selector: 'app-limited-time',
