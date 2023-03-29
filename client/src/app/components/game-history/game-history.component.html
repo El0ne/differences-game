@@ -21,13 +21,12 @@
                 mat-cell
                 *matCellDef="let element"
                 [ngClass]="{
-                    winner1v1: element.player1Name === element.winnerName && element.player2Name,
-                    abandon: element.player1Name !== element.winnerName && element.isAbandon,
-                    winnerSolo: element.player1Name === element.winnerName
+                    winner: element.player1.hasWon,
+                    abandon: element.player1.hasAbandon
                 }"
                 [style.width]="'22%'"
             >
-                {{ element.player1Name }}
+                {{ element.player1.name }}
             </td>
         </ng-container>
 
@@ -37,12 +36,11 @@
                 mat-cell
                 *matCellDef="let element"
                 [ngClass]="{
-                    winner1v1: element.player2Name === element.winnerName && element.player1Name,
-                    abandon: element.player2Name !== element.winnerName && element.isAbandon
+                    abandon: element.player2?.hasAbandon
                 }"
                 [style.width]="'22%'"
             >
-                {{ element.player2Name }}
+                {{ element.player2?.name }}
             </td>
         </ng-container>
 

@@ -10,7 +10,6 @@ import { GameHistoryDTO } from '@common/game-history.dto';
 export class GameHistoryComponent implements OnInit {
     gameHistory: GameHistoryDTO[]; // = FAKE_DATA;
 
-    // dataSource: GameHistoryDTO[]; // = this.gameHistory;
     displayedColumns: string[] = ['date', 'duration', 'mode', 'player1', 'player2'];
 
     constructor(private gameHistoryService: GameHistoryService) {}
@@ -18,8 +17,6 @@ export class GameHistoryComponent implements OnInit {
     ngOnInit(): void {
         this.gameHistoryService.getGameHistory().subscribe((gameHistory) => {
             this.gameHistory = gameHistory;
-            // TODO remove dataSource later
-            // this.dataSource = this.gameHistory;
         });
     }
 }
