@@ -1,7 +1,9 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { SoloViewComponent } from '@app/pages/solo-view/solo-view.component';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { PixelModificationService } from '@app/services/pixel-modification/pixel-modification.service';
+import { ClickCommand } from '@app/services/replay-game/replay-events-handler';
 import { STAGE } from '@app/services/server-routes';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { DifferenceInformation } from '@common/difference-information';
@@ -33,11 +35,11 @@ export class ClickEventComponent implements OnInit {
     endGame: boolean;
     foundDifferences: number[];
     toggleCheatMode: boolean;
-
     constructor(
         private clickEventService: ClickEventService,
         private foundDifferenceService: FoundDifferenceService,
         private pixelModificationService: PixelModificationService,
+        private soloView: SoloViewComponent,
     ) {}
 
     async ngOnInit(): Promise<void> {
@@ -61,7 +63,10 @@ export class ClickEventComponent implements OnInit {
 
     getCoordInImage(mouseEvent: MouseEvent): number[] {
         const rect = this.modification.nativeElement.getBoundingClientRect();
-        return this.pixelModificationService.getCoordInImage(mouseEvent, rect);
+        const coordinates = this.pixelModificationService.getCoordInImage(mouseEvent, rect);
+        const clickCommand = new ClickCommand(coordinates[0], coordinates[1]);
+        this.soloView.invoker.addCommand(clickCommand, this.soloView.timerService.currentTime);
+        return coordinates;
     }
 
     isDifferent(mouseEvent: MouseEvent): void {

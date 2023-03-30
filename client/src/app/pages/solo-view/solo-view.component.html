@@ -88,6 +88,7 @@
                 </div>
                 <div class="answer-area" *ngIf="isMultiplayer">
                     <input
+                        #inputField
                         type="text"
                         (keydown.enter)="sendMessage()"
                         class="input-field"

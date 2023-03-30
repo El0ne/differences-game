@@ -9,7 +9,7 @@ export class ClickCommand implements Command {
     private x: number;
     private y: number;
 
-    setCoordinates(x: number, y: number): void {
+    constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
     }

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
@@ -8,7 +8,7 @@ import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
-import { Invoker, SendMessageCommand } from '@app/services/replay-game/replay-events-handler';
+import { Invoker, SendMessageCommand, WriteMessageCommand } from '@app/services/replay-game/replay-events-handler';
 import { SocketService } from '@app/services/socket/socket.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { EndGame } from '@common/chat-dialog-constants';
@@ -29,6 +29,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     left: ClickEventComponent;
     @ViewChild('right')
     right: ClickEventComponent;
+
+    @ViewChild('inputField') inputChat: ElementRef<HTMLInputElement>;
+
     isMultiplayer: boolean;
     showErrorMessage: boolean = false;
     showTextBox: boolean = false;
@@ -47,7 +50,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
     inputElement = document.querySelector('input');
 
-    private invoker: Invoker;
+    invoker: Invoker;
     // eslint-disable-next-line max-params
     constructor(
         public timerService: TimerSoloService,
@@ -194,12 +197,13 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     inputIsChanging(): void {
         console.log(this.messageContent);
+        const writeMessageCommand = new WriteMessageCommand(this.inputChat.nativeElement, this.messageContent);
+        this.invoker.addCommand(writeMessageCommand, this.timerService.currentTime);
     }
 
     sendMessage(): void {
         this.socketService.send<string>(CHAT_EVENTS.Validate, this.messageContent);
         const sendMessageCommand = new SendMessageCommand();
-        console.log(sendMessageCommand, this.timerService.currentTime);
         this.invoker.addCommand(sendMessageCommand, this.timerService.currentTime);
         this.messageContent = '';
     }
