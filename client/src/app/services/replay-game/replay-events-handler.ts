@@ -1,5 +1,8 @@
 /* eslint-disable max-classes-per-file */
 
+import { MatDialogRef } from '@angular/material/dialog';
+import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
+
 /* eslint-disable max-classes-per-file */
 export interface Command {
     execute(): void;
@@ -52,6 +55,30 @@ export class CheatModeCommand implements Command {
 export class ClueCommand implements Command {
     execute(): void {
         window.dispatchEvent(new KeyboardEvent('keydown', { key: 'i' }));
+    }
+}
+
+export class ButtonPressCommand implements Command {
+    private button: HTMLButtonElement;
+
+    constructor(button: HTMLButtonElement) {
+        this.button = button;
+    }
+
+    execute(): void {
+        this.button.click();
+    }
+}
+
+export class ModalCloseCommand implements Command {
+    private modal: MatDialogRef<GameInfoModalComponent>;
+
+    constructor(modal: MatDialogRef<GameInfoModalComponent>) {
+        this.modal = modal;
+    }
+
+    execute(): void {
+        this.modal.close();
     }
 }
 

@@ -8,7 +8,13 @@ import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
-import { Invoker, SendMessageCommand, WriteMessageCommand } from '@app/services/replay-game/replay-events-handler';
+import {
+    ButtonPressCommand,
+    Invoker,
+    ModalCloseCommand,
+    SendMessageCommand,
+    WriteMessageCommand,
+} from '@app/services/replay-game/replay-events-handler';
 import { SocketService } from '@app/services/socket/socket.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { EndGame } from '@common/chat-dialog-constants';
@@ -50,6 +56,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
     inputElement = document.querySelector('input');
 
+    buttonPressCommand: ButtonPressCommand;
+    modalCloseCommand: ModalCloseCommand;
+
     invoker: Invoker;
     // eslint-disable-next-line max-params
     constructor(
@@ -59,6 +68,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private dialog: MatDialog,
         private router: Router,
+        private elementRef: ElementRef,
         public socketService: SocketService,
     ) {
         this.invoker = new Invoker();
@@ -181,11 +191,18 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     openInfoModal(): void {
-        this.dialog.open(GameInfoModalComponent, {
+        const infoButton = this.elementRef.nativeElement.querySelector('#infoButton');
+        this.buttonPressCommand = new ButtonPressCommand(infoButton);
+        const dialogRef = this.dialog.open(GameInfoModalComponent, {
             data: {
                 gameCardInfo: this.gameCardInfo,
                 numberOfDifferences: this.numberOfDifferences,
             },
+        });
+        this.invoker.addCommand(this.buttonPressCommand, this.timerService.currentTime);
+        dialogRef.afterClosed().subscribe(() => {
+            this.modalCloseCommand = new ModalCloseCommand(dialogRef);
+            this.invoker.addCommand(this.modalCloseCommand, this.timerService.currentTime);
         });
     }
 
