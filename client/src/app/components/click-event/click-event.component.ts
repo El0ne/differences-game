@@ -64,12 +64,13 @@ export class ClickEventComponent implements OnInit {
     getCoordInImage(mouseEvent: MouseEvent): number[] {
         const rect = this.modification.nativeElement.getBoundingClientRect();
         const coordinates = this.pixelModificationService.getCoordInImage(mouseEvent, rect);
-        const clickCommand = new ClickCommand(coordinates[0], coordinates[1]);
-        this.soloView.invoker.addCommand(clickCommand, this.soloView.timerService.currentTime);
+        // const clickCommand = new ClickCommand(coordinates[0], coordinates[1]);
+        // this.soloView.invoker.addCommand(clickCommand, this.soloView.timerService.currentTime);
         return coordinates;
     }
 
     isDifferent(mouseEvent: MouseEvent): void {
+        const clickCommand = new ClickCommand(this.getCoordInImage(mouseEvent)[0], this.getCoordInImage(mouseEvent)[0]);
         this.clickEventService
             .isADifference(this.getCoordInImage(mouseEvent)[0], this.getCoordInImage(mouseEvent)[1], this.gameCardId)
             .subscribe((data) => {
@@ -90,6 +91,7 @@ export class ClickEventComponent implements OnInit {
                     this.displayError(mouseEvent);
                 }
             });
+        this.soloView.invoker.addCommand(clickCommand, this.soloView.timerService.currentTime);
     }
 
     async clearEffect(): Promise<void> {
