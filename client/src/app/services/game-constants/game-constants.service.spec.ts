@@ -2,7 +2,7 @@
 /* eslint-disable no-restricted-imports */
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { FAKE_GAME_CONSTANTS } from '@common/mock/game-constants-mock';
+import { DEFAULT_GAME_CONSTANTS } from '@common/game-constants';
 import { GAME_CONSTANTS } from '../server-routes';
 import { GameConstantsService } from './game-constants.service';
 
@@ -22,17 +22,17 @@ describe('GameConstantsService', () => {
 
     it('getGameConstants should call get on httpManager', () => {
         service.getGameConstants().subscribe((gameConstants) => {
-            expect(gameConstants).toEqual(FAKE_GAME_CONSTANTS);
+            expect(gameConstants).toEqual(DEFAULT_GAME_CONSTANTS);
         });
 
         const req = httpController.expectOne(`${GAME_CONSTANTS}`);
 
         service.getGameConstants();
-        req.flush(FAKE_GAME_CONSTANTS);
+        req.flush(DEFAULT_GAME_CONSTANTS);
     });
 
     it('updateGameConstants should call put on httpManager', () => {
-        const newConstants = FAKE_GAME_CONSTANTS;
+        const newConstants = DEFAULT_GAME_CONSTANTS;
         newConstants.countDown = 200;
         service.updateGameConstants(newConstants).subscribe(() => {
             expect().nothing();

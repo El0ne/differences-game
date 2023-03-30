@@ -17,7 +17,7 @@ import { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing/test';
 import { ObjectId } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { Connection, Model } from 'mongoose';
+import { Connection, Model, Query } from 'mongoose';
 import { stub } from 'sinon';
 import { GameCardService } from './game-card.service';
 
@@ -27,6 +27,7 @@ describe('GameCardService', () => {
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
     let imageManagerService: ImageManagerService;
+    let gameManagerService: GameManagerService;
     let bestTimesService: BestTimesService;
 
     beforeEach(async () => {
@@ -59,6 +60,7 @@ describe('GameCardService', () => {
 
         service = module.get<GameCardService>(GameCardService);
         imageManagerService = module.get<ImageManagerService>(ImageManagerService);
+        gameManagerService = module.get<GameManagerService>(GameManagerService);
         bestTimesService = module.get<BestTimesService>(BestTimesService);
         gameCardModel = module.get<Model<GameCardDocument>>(getModelToken(GameCard.name));
         connection = await module.get(getConnectionToken());
@@ -139,6 +141,25 @@ describe('GameCardService', () => {
 
         expect(imageManagerServiceMock).toHaveBeenCalledWith(gameCard.originalImageName);
         expect(imageManagerServiceMock).toHaveBeenCalledWith(gameCard.differenceImageName);
+    });
+
+    it('deleteAllGameCards should delete all the gameCards, and call game manager delete game for each game cards', async () => {
+        const fakeGameCardArray: GameCard[] = [];
+
+        jest.spyOn(service, 'deleteGameCard').mockImplementation();
+        jest.spyOn(gameManagerService, 'deleteGame').mockImplementation();
+
+        for (let i = 0; i < 5; i++) {
+            fakeGameCardArray.push(getFakeGameCard());
+        }
+        jest.spyOn(gameCardModel, 'find').mockReturnValueOnce(
+            Promise.resolve(fakeGameCardArray) as unknown as Query<unknown[] | null, GameCardDocument>,
+        );
+        await service.deleteAllGameCards();
+
+        expect(gameCardModel.find).toBeCalled();
+        expect(service.deleteGameCard).toBeCalledTimes(fakeGameCardArray.length);
+        expect(gameManagerService.deleteGame).toBeCalledTimes(fakeGameCardArray.length);
     });
 
     it('generateGameCard should create a game card from a game informations', async () => {

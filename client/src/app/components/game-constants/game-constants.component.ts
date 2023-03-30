@@ -30,12 +30,11 @@ export class GameConstantsComponent implements OnInit {
             hint: 5,
             difference: 5,
         };
-
         this.updateGameConstants();
     }
 
-    resetBestTimes(): void {
-        this.gameCardService.resetBestTimes().subscribe(() => {
+    resetAllBestTimes(): void {
+        this.gameCardService.resetAllBestTimes().subscribe(() => {
             this.bestTimeReset.emit();
         });
     }
@@ -57,9 +56,5 @@ export class GameConstantsComponent implements OnInit {
         } else {
             return inputValue;
         }
-    }
-
-    isConstantNull(): boolean {
-        return !this.gameConstants.countDown || !this.gameConstants.difference || !this.gameConstants.hint;
     }
 }

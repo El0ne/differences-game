@@ -26,6 +26,7 @@ describe('GameCardInformationService', () => {
         });
 
         const req = httpController.expectOne(`${STAGE}/info`);
+        expect(req.request.method).toBe('GET');
         req.flush(GAMES.length);
     });
 
@@ -35,6 +36,7 @@ describe('GameCardInformationService', () => {
         });
 
         const req = httpController.expectOne(`${STAGE}?index=0&endIndex=4`);
+        expect(req.request.method).toBe('GET');
         req.flush(GAMES.slice(0, GAME_CARDS_TO_DISPLAY));
     });
 
@@ -76,5 +78,36 @@ describe('GameCardInformationService', () => {
 
         service.deleteImage('');
         expect(deleteSpy).toHaveBeenCalled();
+    });
+
+    it('resetAllBestTimes() should reset best times of all the game cards', () => {
+        service.resetAllBestTimes().subscribe(() => {
+            expect().nothing();
+        });
+
+        const req = httpController.expectOne(`${STAGE}/best-times`);
+        expect(req.request.method).toBe('PUT');
+        req.flush(null);
+    });
+
+    it('resetBestTime() should reset the best times of the game card with the id passed in the request', () => {
+        const id = '4';
+        service.resetBestTime(id).subscribe(() => {
+            expect().nothing();
+        });
+
+        const req = httpController.expectOne(`${STAGE}/best-times/${id}`);
+        expect(req.request.method).toBe('PUT');
+        req.flush(null);
+    });
+
+    it('deleteAllGames() should delete all the game cards', () => {
+        service.deleteAllGames().subscribe(() => {
+            expect().nothing();
+        });
+
+        const req = httpController.expectOne(`${STAGE}`);
+        expect(req.request.method).toBe('DELETE');
+        req.flush(null);
     });
 });
