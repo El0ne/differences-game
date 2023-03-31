@@ -70,7 +70,7 @@ describe('SoloViewComponent', () => {
         socketServiceMock.sio = jasmine.createSpyObj('Socket', ['on', 'emit', 'disconnect']);
         socketServiceMock.names = new Map<string, string>();
         socketServiceMock.names.set('playerId', 'player').set('opponentId', 'opponent');
-        socketServiceMock.gameRoom = 'game';
+        socketServiceMock.gameRoom = 'room';
         socketServiceMock.opponentSocket = 'opponentId';
         socketServiceMock.liveSocket = () => true;
 
@@ -123,7 +123,6 @@ describe('SoloViewComponent', () => {
         expect(component.numberOfDifferences).toEqual(SERVICE_MOCK_GAME_CARD.differenceNumber);
         expect(component.player).toEqual('player');
         expect(component.opponent).toEqual('opponent');
-        expect(component.currentRoom).toEqual('game');
         expect(showTimeSpy).toHaveBeenCalled();
         expect(configureSocketReactionsSpy).toHaveBeenCalled();
     });
@@ -171,17 +170,15 @@ describe('SoloViewComponent', () => {
     });
 
     it('handleMistake should send an event called event to socket server with extra information', () => {
-        component.currentRoom = 'room';
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.handleMistake();
-        expect(sendSpy).toHaveBeenCalledWith('event', { room: component.currentRoom, isMultiplayer: true, event: 'Erreur' });
+        expect(sendSpy).toHaveBeenCalledWith('event', { room: 'room', isMultiplayer: true, event: 'Erreur' });
     });
 
     it('hint should send a hint event to socket server with the room information', () => {
-        component.currentRoom = 'room';
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.hint();
-        expect(sendSpy).toHaveBeenCalledWith('hint', component.currentRoom);
+        expect(sendSpy).toHaveBeenCalledWith('hint', 'room');
     });
 
     it('sendMessage should validate message on the server', () => {
@@ -272,24 +269,22 @@ describe('SoloViewComponent', () => {
     });
 
     it('difference handler should send event when a difference detected and emitsound in multiplayer mode', () => {
-        component.currentRoom = 'room';
         spyOn(component.left, 'emitSound').and.callFake((difference: boolean) => {
             return difference;
         });
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.differenceHandler(MOCK_INFORMATION);
         expect(sendSpy).toHaveBeenCalledWith(MATCH_EVENTS.Difference, {
-            room: component.currentRoom,
+            room: 'room',
             lastDifferences: [0, 1, 2, 3],
             differencesPosition: 2,
         });
-        expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.Event, { room: component.currentRoom, isMultiplayer: true, event: 'Différence trouvée' });
+        expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.Event, { room: 'room', isMultiplayer: true, event: 'Différence trouvée' });
         expect(component.left.emitSound).toHaveBeenCalledWith(false);
     });
 
     it('difference handler should call the effect handler and send a general event when difference detected', () => {
         component.isMultiplayer = false;
-        component.currentRoom = 'room';
         Object.defineProperty(socketServiceMock, 'socketId', { value: 'mockSocket' });
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         spyOn(component.left, 'emitSound').and.callFake((difference: boolean) => {
@@ -297,7 +292,7 @@ describe('SoloViewComponent', () => {
         });
         spyOn(component, 'effectHandler');
         component.differenceHandler(MOCK_INFORMATION);
-        expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.Event, { room: component.currentRoom, isMultiplayer: false, event: 'Différence trouvée' });
+        expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.Event, { room: 'room', isMultiplayer: false, event: 'Différence trouvée' });
         expect(component.left.emitSound).toHaveBeenCalledWith(false);
         const information: PlayerDifference = { lastDifferences: [0, 1, 2, 3], differencesPosition: 2, socket: socketServiceMock.socketId };
         expect(component.effectHandler).toHaveBeenCalledWith(information);
@@ -307,10 +302,9 @@ describe('SoloViewComponent', () => {
     of the number of differences in multiplayer and send a win event if so', () => {
         component.numberOfDifferences = 4;
         component.currentScorePlayer = 2;
-        component.currentRoom = 'win';
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.endGameVerification();
-        expect(sendSpy).toHaveBeenCalledWith(MATCH_EVENTS.Win, component.currentRoom);
+        expect(sendSpy).toHaveBeenCalledWith(MATCH_EVENTS.Win, 'room');
     });
 
     it('endGameVerification should call winGame if currentScore of player is equal to number of differences', () => {

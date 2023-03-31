@@ -44,7 +44,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     currentGameId: string;
     endGame: Subject<void> = new Subject<void>();
     gameCardInfo: GameCardInformation;
-    currentRoom: string;
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
 
     // eslint-disable-next-line max-params
@@ -79,7 +78,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
             this.player = this.socketService.names.get(this.socketService.socketId) as string;
             this.opponent = this.socketService.names.get(this.socketService.opponentSocket) as string;
-            this.currentRoom = this.socketService.gameRoom;
             this.showTime();
             this.addCheatMode();
             this.configureSocketReactions();
@@ -89,7 +87,10 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     configureSocketReactions(): void {
         this.socketService.listen<Validation>(CHAT_EVENTS.WordValidated, (validation: Validation) => {
             if (validation.isValidated) {
-                this.socketService.send<RoomManagement>(CHAT_EVENTS.RoomMessage, { room: this.currentRoom, message: validation.originalMessage });
+                this.socketService.send<RoomManagement>(CHAT_EVENTS.RoomMessage, {
+                    room: this.socketService.gameRoom,
+                    message: validation.originalMessage,
+                });
             } else {
                 this.messages.push({ socketId: this.socketService.socketId, message: validation.originalMessage, event: 'notification' });
             }
@@ -205,11 +206,15 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     handleMistake(): void {
-        this.socketService.send<RoomEvent>(CHAT_EVENTS.Event, { room: this.currentRoom, isMultiplayer: this.isMultiplayer, event: 'Erreur' });
+        this.socketService.send<RoomEvent>(CHAT_EVENTS.Event, {
+            room: this.socketService.gameRoom,
+            isMultiplayer: this.isMultiplayer,
+            event: 'Erreur',
+        });
     }
 
     hint(): void {
-        this.socketService.send<string>(CHAT_EVENTS.Hint, this.currentRoom);
+        this.socketService.send<string>(CHAT_EVENTS.Hint, this.socketService.gameRoom);
     }
 
     handleFlash(currentDifferences: number[]): void {
@@ -220,7 +225,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     differenceHandler(information: DifferenceInformation): void {
         if (this.isMultiplayer) {
             const multiplayerInformation: MultiplayerDifferenceInformation = {
-                room: this.currentRoom,
+                room: this.socketService.gameRoom,
                 differencesPosition: information.differencesPosition,
                 lastDifferences: information.lastDifferences,
             };
@@ -235,7 +240,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         }
         this.left.emitSound(false);
         this.socketService.send<RoomEvent>(CHAT_EVENTS.Event, {
-            room: this.currentRoom,
+            room: this.socketService.gameRoom,
             isMultiplayer: this.isMultiplayer,
             event: 'Différence trouvée',
         });
@@ -255,7 +260,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         if (this.isMultiplayer) {
             const endGameVerification = this.numberOfDifferences / 2;
             if (this.currentScorePlayer >= endGameVerification) {
-                this.socketService.send<string>(MATCH_EVENTS.Win, this.currentRoom);
+                this.socketService.send<string>(MATCH_EVENTS.Win, this.socketService.gameRoom);
             }
         } else {
             if (this.currentScorePlayer === this.numberOfDifferences) {
