@@ -1,27 +1,31 @@
 import { GameHistory, gameHistorySchema } from '@app/schemas/game-history';
-import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection } from 'mongoose';
-import { GameHistoryController } from './game-history.controller';
+import { GameHistoryService } from './game-history.service';
 
-describe('GameHistoryController', () => {
-    let controller: GameHistoryController;
+describe('GameHistoryService', () => {
+    let service: GameHistoryService;
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
 
     beforeEach(async () => {
         mongoServer = await MongoMemoryServer.create();
-        const mongoUri = mongoServer.getUri();
 
         const module: TestingModule = await Test.createTestingModule({
-            imports: [MongooseModule.forRoot(mongoUri), MongooseModule.forFeature([{ name: GameHistory.name, schema: gameHistorySchema }])],
-            controllers: [GameHistoryController],
+            imports: [
+                MongooseModule.forRootAsync({
+                    useFactory: () => ({
+                        uri: mongoServer.getUri(),
+                    }),
+                }),
+                MongooseModule.forFeature([{ name: GameHistory.name, schema: gameHistorySchema }]),
+            ],
             providers: [GameHistoryService],
         }).compile();
 
-        controller = module.get<GameHistoryController>(GameHistoryController);
+        service = module.get<GameHistoryService>(GameHistoryService);
         connection = await module.get(getConnectionToken());
     });
 
@@ -36,6 +40,6 @@ describe('GameHistoryController', () => {
     });
 
     it('should be defined', () => {
-        expect(controller).toBeDefined();
+        expect(service).toBeDefined();
     });
 });

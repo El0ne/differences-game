@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
+import { GameCardService } from '@app/services/game-card/game-card.service';
+import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { RoomMessage } from '@common/chat-gateway-constants';
 import { CHAT_EVENTS } from '@common/chat-gateway-events';
 import { Logger } from '@nestjs/common';
@@ -13,8 +15,12 @@ describe('ChatGateway', () => {
     let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
     const TEST_ROOM_ID = 'test';
+    let gameHistoryServiceSpy: SinonStubbedInstance<GameHistoryService>;
+    let gameCardServiceSpy: SinonStubbedInstance<GameCardService>;
 
     beforeEach(async () => {
+        gameHistoryServiceSpy = createStubInstance<GameHistoryService>(GameHistoryService);
+        gameCardServiceSpy = createStubInstance<GameCardService>(GameCardService);
         logger = createStubInstance(Logger);
         socket = createStubInstance<Socket>(Socket);
         server = createStubInstance<Server>(Server);
@@ -26,6 +32,14 @@ describe('ChatGateway', () => {
                 {
                     provide: Logger,
                     useValue: logger,
+                },
+                {
+                    provide: GameHistoryService,
+                    useValue: gameHistoryServiceSpy,
+                },
+                {
+                    provide: GameCardService,
+                    useValue: gameCardServiceSpy,
                 },
             ],
         }).compile();

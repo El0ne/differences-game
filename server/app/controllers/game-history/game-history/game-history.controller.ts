@@ -1,4 +1,4 @@
-import { GameHistoryService } from '@app/services/game-history/game-history/game-history.service';
+import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { GameHistoryDTO } from '@common/game-history.dto';
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
