@@ -9,6 +9,7 @@ import { DifferencesCounterService } from '@app/services/differences-counter/dif
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
+import { getFakeGameCard } from '@app/services/mock/fake-game-card';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { GameCardDto } from '@common/game-card.dto';
@@ -20,7 +21,6 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection, Model, Query } from 'mongoose';
 import { stub } from 'sinon';
 import { GameCardService } from './game-card.service';
-
 describe('GameCardService', () => {
     let service: GameCardService;
     let gameCardModel: Model<GameCardDocument>;
@@ -186,22 +186,3 @@ const FAKE_GAME_INFO: GameCardDto = {
     radius: 3,
     differenceNumber: 6,
 };
-
-const getFakeGameCard = (): GameCard => ({
-    _id: new ObjectId(),
-    name: (Math.random() + 1).toString(36).substring(2),
-    difficulty: 'Facile',
-    differenceNumber: 6,
-    originalImageName: 'game.baseImage',
-    differenceImageName: 'game.differenceImage',
-    soloTimes: [
-        { time: 0, name: '--' },
-        { time: 0, name: '--' },
-        { time: 0, name: '--' },
-    ],
-    multiTimes: [
-        { time: 0, name: '--' },
-        { time: 0, name: '--' },
-        { time: 0, name: '--' },
-    ],
-});

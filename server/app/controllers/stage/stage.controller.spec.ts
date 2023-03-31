@@ -230,7 +230,7 @@ describe('StageController', () => {
     });
 
     it('resetAllBestTimes() should call resetAllGameCards', async () => {
-        const resetMock = jest.spyOn(bestTimesService, 'resetAllGameCards');
+        const resetMock = jest.spyOn(bestTimesService, 'resetAllBestTimes');
         const response = await request(httpServer).put('/stage/best-times');
 
         expect(resetMock).toHaveBeenCalled();
@@ -238,7 +238,7 @@ describe('StageController', () => {
     });
 
     it('resetAllBestTimes() should return 500 if the request is invalid', async () => {
-        jest.spyOn(bestTimesService, 'resetAllGameCards').mockImplementationOnce(() => {
+        jest.spyOn(bestTimesService, 'resetAllBestTimes').mockImplementationOnce(() => {
             throw new Error();
         });
         const response = await request(httpServer).put('/stage/best-times');
@@ -247,7 +247,7 @@ describe('StageController', () => {
     });
 
     it('resetBestTimes() should call resetGameCard', async () => {
-        const resetMock = jest.spyOn(bestTimesService, 'resetGameCard').mockImplementation();
+        const resetMock = jest.spyOn(bestTimesService, 'resetBestTimes').mockImplementation();
         const response = await request(httpServer).put('/stage/best-times/5');
 
         expect(resetMock).toHaveBeenCalled();
@@ -255,7 +255,7 @@ describe('StageController', () => {
     });
 
     it('resetBestTimes() should return 500 if the request is invalid', async () => {
-        jest.spyOn(bestTimesService, 'resetGameCard').mockImplementationOnce(() => {
+        jest.spyOn(bestTimesService, 'resetBestTimes').mockImplementationOnce(() => {
             throw new Error();
         });
         const response = await request(httpServer).put('/stage/best-times/4');
