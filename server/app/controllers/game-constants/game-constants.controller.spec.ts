@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { GameConstantService } from '@app/services/game-constant/game-constant.service';
-import { DEFAULT_GAME_CONSTANTS } from '@common/game-constants';
+import { getDefaultGameConstants } from '@common/game-constants';
 import { HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { assert } from 'console';
@@ -36,12 +36,12 @@ describe('GameConstantsController', () => {
 
     it('getGameConstants() should call getGameConstants method from service', async () => {
         getGameConstantsStub.callsFake(() => {
-            return DEFAULT_GAME_CONSTANTS;
+            return getDefaultGameConstants();
         });
         const response = await request(httpServer).get('/game-constants');
         assert(getGameConstantsStub.called);
         expect(response.status).toBe(HttpStatus.OK);
-        expect(response.body).toEqual(DEFAULT_GAME_CONSTANTS);
+        expect(response.body).toEqual(getDefaultGameConstants());
     });
 
     it('getGameConstants() should return 500 if there is an error', async () => {
@@ -51,13 +51,13 @@ describe('GameConstantsController', () => {
     });
 
     it('updateGameConstants() should call GameConstantService.updateGameConstants() with the body as a parameter', async () => {
-        const response = await request(httpServer).put('/game-constants').send(DEFAULT_GAME_CONSTANTS);
+        const response = await request(httpServer).put('/game-constants').send(getDefaultGameConstants());
         assert(updateGameConstantsStub.called);
         expect(response.status).toBe(HttpStatus.NO_CONTENT);
     });
     it('updateGameConstants() should return 500 if there is an error', async () => {
         updateGameConstantsStub.throws(new Error('test'));
-        const response = await request(httpServer).put('/game-constants').send(DEFAULT_GAME_CONSTANTS);
+        const response = await request(httpServer).put('/game-constants').send(getDefaultGameConstants());
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 });

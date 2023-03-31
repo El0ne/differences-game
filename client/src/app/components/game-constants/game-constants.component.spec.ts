@@ -4,7 +4,7 @@ import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
-import { DEFAULT_GAME_CONSTANTS } from '@common/game-constants';
+import { getDefaultGameConstants } from '@common/game-constants';
 import { Observable, of } from 'rxjs';
 
 import { GameConstantsComponent } from './game-constants.component';
@@ -18,7 +18,7 @@ describe('GameConstantsComponent', () => {
     beforeEach(async () => {
         gameConstantsService = jasmine.createSpyObj('GameConstantsService', ['getGameConstants', 'updateGameConstants']);
         gameConstantsService.getGameConstants = () => {
-            return of(DEFAULT_GAME_CONSTANTS);
+            return of(getDefaultGameConstants());
         };
         gameConstantsService.updateGameConstants = () => {
             return of();
@@ -55,20 +55,20 @@ describe('GameConstantsComponent', () => {
     });
 
     it('it should set the game constants on ngOnInit', () => {
-        spyOn(gameConstantsService, 'getGameConstants').and.returnValue(of(DEFAULT_GAME_CONSTANTS));
+        spyOn(gameConstantsService, 'getGameConstants').and.returnValue(of(getDefaultGameConstants()));
 
         fixture.detectChanges();
 
-        expect(component.gameConstants).toEqual(DEFAULT_GAME_CONSTANTS);
+        expect(component.gameConstants).toEqual(getDefaultGameConstants());
     });
 
     it('updateGameConstants() should call updateGameConstants from the service', () => {
         spyOn(gameConstantsService, 'updateGameConstants').and.returnValue(of(undefined));
 
-        component.gameConstants = DEFAULT_GAME_CONSTANTS;
+        component.gameConstants = getDefaultGameConstants();
         component.updateGameConstants();
 
-        expect(gameConstantsService.updateGameConstants).toHaveBeenCalledWith(DEFAULT_GAME_CONSTANTS);
+        expect(gameConstantsService.updateGameConstants).toHaveBeenCalledWith(getDefaultGameConstants());
     });
 
     it('resetGameConstants() should reset gameConstants call updateGameConstants ', () => {
@@ -81,7 +81,7 @@ describe('GameConstantsComponent', () => {
         };
         component.resetGameConstants();
 
-        expect(component.gameConstants).toEqual(DEFAULT_GAME_CONSTANTS);
+        expect(component.gameConstants).toEqual(getDefaultGameConstants());
         expect(component.updateGameConstants).toHaveBeenCalled();
     });
 

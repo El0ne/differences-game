@@ -31,6 +31,7 @@ export class GameConstantsComponent implements OnInit {
             difference: 5,
         };
         this.updateGameConstants();
+        console.log(this.gameCardService);
     }
 
     resetAllBestTimes(): void {
