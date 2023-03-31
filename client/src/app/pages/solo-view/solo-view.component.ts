@@ -60,7 +60,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         const gameId = this.route.snapshot.paramMap.get('stageId');
-        this.isLimitedTimeMode = gameId === LIMITED_TIME_MODE_ID;
         this.isMultiplayer = this.router.url.includes('multiplayer');
         if (!this.socketService.liveSocket()) {
             this.router.navigate(['/home']);
@@ -69,17 +68,22 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
         if (gameId) {
             this.currentGameId = gameId;
-            this.gameCardInfoService.getGameCardInfoFromId(this.currentGameId).subscribe((gameCardData) => {
-                this.gameCardInfo = gameCardData;
-                this.numberOfDifferences = this.gameCardInfo.differenceNumber;
-            });
+            this.isLimitedTimeMode = this.currentGameId === LIMITED_TIME_MODE_ID;
+
+            if (!this.isLimitedTimeMode) {
+                this.gameCardInfoService.getGameCardInfoFromId(this.currentGameId).subscribe((gameCardData) => {
+                    this.gameCardInfo = gameCardData;
+                    this.numberOfDifferences = this.gameCardInfo.differenceNumber;
+                });
+            }
+
+            this.player = this.socketService.names.get(this.socketService.socketId) as string;
+            this.opponent = this.socketService.names.get(this.socketService.opponentSocket) as string;
+            this.currentRoom = this.socketService.gameRoom;
+            this.showTime();
+            this.addCheatMode();
+            this.configureSocketReactions();
         }
-        this.player = this.socketService.names.get(this.socketService.socketId) as string;
-        this.opponent = this.socketService.names.get(this.socketService.opponentSocket) as string;
-        this.currentRoom = this.socketService.gameRoom;
-        this.showTime();
-        this.addCheatMode();
-        this.configureSocketReactions();
     }
 
     configureSocketReactions(): void {
@@ -207,10 +211,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     hint(): void {
         this.socketService.send<string>(CHAT_EVENTS.Hint, this.currentRoom);
     }
+
     handleFlash(currentDifferences: number[]): void {
         this.left.differenceEffect(currentDifferences);
         this.right.differenceEffect(currentDifferences);
     }
+
     differenceHandler(information: DifferenceInformation): void {
         if (this.isMultiplayer) {
             const multiplayerInformation: MultiplayerDifferenceInformation = {

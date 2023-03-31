@@ -46,12 +46,14 @@ export class LimitedTimeComponent implements OnInit {
 
     selectPlayerName(isSoloGame: boolean): void {
         const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true });
-        dialogRef.afterClosed().subscribe(() => {
-            if (isSoloGame) {
-                this.socketService.gameRoom = this.socketService.socketId;
-                this.socketService.send(MATCH_EVENTS.createSoloGame, LIMITED_TIME_MODE_ID);
-                this.router.navigate(['/solo/' + LIMITED_TIME_MODE_ID]);
-            } else this.hostOrJoinGame();
+        dialogRef.afterClosed().subscribe((isNameEntered: boolean) => {
+            if (isNameEntered) {
+                if (isSoloGame) {
+                    this.socketService.gameRoom = this.socketService.socketId;
+                    this.socketService.send(MATCH_EVENTS.createSoloGame, LIMITED_TIME_MODE_ID);
+                    this.router.navigate(['/solo/' + LIMITED_TIME_MODE_ID]);
+                } else this.hostOrJoinGame();
+            }
         });
     }
 }
