@@ -94,7 +94,7 @@ describe('GameCardSelectionComponent', () => {
         expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.HostGame, '123');
         expect(modalSpy.open).toHaveBeenCalledWith(WaitingRoomComponent, {
             disableClose: true,
-            data: { stageId: '123', isHost: true, limitedTime: false } as WaitingRoomDataPassing,
+            data: { stageId: '123', isHost: true, isLimitedTimeMode: false } as WaitingRoomDataPassing,
         });
     });
 
@@ -109,7 +109,7 @@ describe('GameCardSelectionComponent', () => {
         } as JoinHostInWaitingRequest);
         expect(modalSpy.open).toHaveBeenCalledWith(WaitingRoomComponent, {
             disableClose: true,
-            data: { stageId: '123', isHost: false, limitedTime: false } as WaitingRoomDataPassing,
+            data: { stageId: '123', isHost: false, isLimitedTimeMode: false } as WaitingRoomDataPassing,
         });
     });
 });

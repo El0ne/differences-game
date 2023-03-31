@@ -1,6 +1,6 @@
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
-import { MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
+import { MATCH_EVENTS, ONE_SECOND, SoloGameCreation } from '@common/match-gateway-communication';
 import { Injectable } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -13,10 +13,14 @@ export class MatchGateway implements OnGatewayDisconnect {
     constructor(private gameManagerService: GameManagerService) {}
 
     @SubscribeMessage(MATCH_EVENTS.createSoloGame)
-    createSoloGame(@ConnectedSocket() socket: Socket, @MessageBody() stageId: string): void {
-        socket.data.stageId = stageId;
-        this.timer(socket.id);
-        this.gameManagerService.addGame(stageId, 1);
+    createSoloGame(@ConnectedSocket() socket: Socket, @MessageBody() gameInfo: SoloGameCreation): void {
+        socket.data.stageId = gameInfo.stageId;
+        if (gameInfo.isLimitedTimeMode) {
+            this.gameManagerService.startLimitedTimeGame(socket.id, 1);
+        } else {
+            this.timer(socket.id);
+            this.gameManagerService.addGame(gameInfo.stageId, 1);
+        }
     }
 
     @SubscribeMessage(MATCH_EVENTS.EndTime)

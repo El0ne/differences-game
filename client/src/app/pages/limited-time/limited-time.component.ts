@@ -40,7 +40,7 @@ export class LimitedTimeComponent implements OnInit {
                 playerName: this.socketService.names.get(this.socketService.socketId) as string,
             });
         }
-        const data: WaitingRoomDataPassing = { stageId: LIMITED_TIME_MODE_ID, isHost: this.createGameButton, limitedTime: true };
+        const data: WaitingRoomDataPassing = { stageId: LIMITED_TIME_MODE_ID, isHost: this.createGameButton, isLimitedTimeMode: true };
         this.dialog.open(WaitingRoomComponent, { disableClose: true, data });
     }
 

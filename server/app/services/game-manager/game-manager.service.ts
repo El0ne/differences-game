@@ -60,16 +60,19 @@ export class GameManagerService {
     async startLimitedTimeGame(room: string, numberOfPlayers: number): Promise<void> {
         const gameCards: GameCard[] = await this.gameCardService.getAllGameCards();
         const stageInformations: StageInformation[] = gameCards.map((gameCard) => {
+            const stageId = gameCard._id.toString();
+
+            this.addGame(stageId, numberOfPlayers);
             return {
-                _id: gameCard._id.toString(),
+                _id: stageId,
                 originalImageName: gameCard.originalImageName,
                 differenceImageName: gameCard.differenceImageName,
-            } as StageInformation;
+            };
         });
         this.limitedTimeModeGames.set(room, {
             stageInfo: stageInformations,
             playersInGame: numberOfPlayers,
             stagesUsed: gameCards.map((stage) => stage._id.toString()),
-        } as LimitedTimeGameInfo);
+        });
     }
 }

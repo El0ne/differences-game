@@ -8,3 +8,8 @@ export enum MATCH_EVENTS {
 }
 
 export const ONE_SECOND = 1000;
+
+export interface SoloGameCreation {
+    stageId: string;
+    isLimitedTimeMode: boolean;
+}

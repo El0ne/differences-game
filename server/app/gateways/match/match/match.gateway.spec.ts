@@ -3,7 +3,7 @@ import { GameManagerService } from '@app/services/game-manager/game-manager.serv
 import { PlayerDifference } from '@common/difference-information';
 import { MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
 import { Test, TestingModule } from '@nestjs/testing';
-import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
+import { SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { BroadcastOperator, Server, Socket } from 'socket.io';
 import { MatchGateway } from './match.gateway';
 
@@ -77,11 +77,18 @@ describe('MatchGateway', () => {
         expect(server.to.called).toBeFalsy();
     });
 
-    it('createSoloGame should call gameManagerService.addGame', async () => {
+    it('createSoloGame should call gameManagerService.addGame or startLimitedTimeGame depending on isLimitedTimeMode', async () => {
         const createGameSpy = jest.spyOn(gameManagerServiceSpy, 'addGame');
-        gateway.createSoloGame(socket, 'stageId');
+        Object.defineProperty(socket, 'id', { value: '123' });
+
+        gateway.createSoloGame(socket, { stageId: 'stageId', isLimitedTimeMode: false });
         expect(createGameSpy).toHaveBeenCalledWith('stageId', 1);
         expect(socket.data.stageId).toEqual('stageId');
+
+        const createLimitedTimeGameSpy = jest.spyOn(gameManagerServiceSpy, 'startLimitedTimeGame');
+        gateway.createSoloGame(socket, { stageId: 'stageId1', isLimitedTimeMode: true });
+        expect(createLimitedTimeGameSpy).toHaveBeenCalledWith('123', 1);
+        expect(socket.data.stageId).toEqual('stageId1');
     });
 
     it('handleDisconnect should call gameManagerService.endgame only if its a socket that wasa playing before', async () => {

@@ -1,10 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SocketService } from '@app/services/socket/socket.service';
-import { AcceptationInformation, PlayerInformations, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
+import {
+    AcceptOpponentInformation,
+    AcceptationInformation,
+    PlayerInformations,
+    WAITING_ROOM_EVENTS,
+} from '@common/waiting-room-socket-communication';
 import { WaitingRoomComponent, WaitingRoomDataPassing } from './waiting-room.component';
 
 describe('WaitingRoomComponent', () => {
@@ -27,7 +32,7 @@ describe('WaitingRoomComponent', () => {
             providers: [
                 { provide: MatDialogRef, useValue: matDialogSpy },
                 { provide: SocketService, useValue: socketServiceSpy },
-                { provide: MAT_DIALOG_DATA, useValue: { stageId: '123', isHost: true, limitedTime: false } as WaitingRoomDataPassing },
+                { provide: MAT_DIALOG_DATA, useValue: { stageId: '123', isHost: true, isLimitedTimeMode: false } as WaitingRoomDataPassing },
                 { provide: Router, useValue: routerSpy },
             ],
         }).compileComponents();
@@ -39,7 +44,7 @@ describe('WaitingRoomComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
-        expect(component.waitingRoomInfo).toEqual({ stageId: '123', isHost: true, limitedTime: false });
+        expect(component.waitingRoomInfo).toEqual({ stageId: '123', isHost: true, isLimitedTimeMode: false });
     });
 
     it('all listeners should be removed at the destor of the dialog', () => {
@@ -77,7 +82,7 @@ describe('WaitingRoomComponent', () => {
         Object.defineProperty(socketServiceSpy, 'socketId', { value: 'socketId' });
         component.acceptOpponent('opponentId');
         expect(socketServiceSpy.names.set).toHaveBeenCalledWith('opponentId', 'testName');
-        const expectedAcceptRequest: PlayerInformations = { playerName: 'myName', playerSocketId: 'opponentId' };
+        const expectedAcceptRequest: AcceptOpponentInformation = { playerName: 'myName', playerSocketId: 'opponentId', isLimitedTimeMode: false };
         expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.AcceptOpponent, expectedAcceptRequest);
     });
 

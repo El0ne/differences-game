@@ -41,7 +41,7 @@ export class GameCardSelectionComponent implements OnInit {
                 playerName: this.socketService.names.get(this.socketService.socketId) as string,
             });
         }
-        const data: WaitingRoomDataPassing = { stageId: this.gameCardInformation._id, isHost: this.createGameButton, limitedTime: false };
+        const data: WaitingRoomDataPassing = { stageId: this.gameCardInformation._id, isHost: this.createGameButton, isLimitedTimeMode: false };
         this.dialog.open(WaitingRoomComponent, { disableClose: true, data });
     }
 
