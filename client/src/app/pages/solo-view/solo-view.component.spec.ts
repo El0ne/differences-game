@@ -45,7 +45,10 @@ describe('SoloViewComponent', () => {
         clickEventServiceSpy = jasmine.createSpyObj<ClickEventService>('ClickEventService', ['getDifferences', 'isADifference', 'getDifferences']);
         clickEventServiceSpy.getDifferences = () => of([[1, 2, 3], [4, 5], [6], [], [7, 8, 9]]);
 
-        gameHintServiceMock = jasmine.createSpyObj<GameHintService>('GameHintService', ['setColor']);
+        gameHintServiceMock = jasmine.createSpyObj<GameHintService>('GameHintService', ['setColor', 'getPercentages']);
+        gameHintServiceMock.getPercentages = () => {
+            return [0.25, 0.25];
+        };
 
         mockRouter = jasmine.createSpyObj<Router>('Router', ['navigate'], ['url']);
         Object.defineProperty(mockRouter, 'url', { value: 'multiplayer/234' });
@@ -411,6 +414,21 @@ describe('SoloViewComponent', () => {
     it('setColor should call setColor from gameHintService', () => {
         component.setColor([]);
         expect(gameHintServiceMock.setColor).toHaveBeenCalled();
+    });
+
+    it('should set hint positions and hintsRemaining on left component', () => {
+        const mockDifference = [[1], [2], [3]];
+        spyOn(component.left, 'getDifferences').and.returnValue(of(mockDifference));
+        spyOn(foundDifferenceServiceSpy, 'findPixelsFromDifference').and.returnValue([4, 5, 6]);
+        spyOn(gameHintServiceMock, 'getPercentages').and.returnValue([0.25, 0.25]);
+
+        component.getRandomDifference({ key: 'i' } as KeyboardEvent);
+
+        expect(component.right.currentPixelHint).toBe(component.left.currentPixelHint);
+        expect(component.right.hintPosX).toBe(component.left.hintPosX);
+        expect(component.right.hintPosY).toBe(component.left.hintPosY);
+        expect(component.left.hintPosX).toBe('120');
+        expect(component.left.hintPosY).toBe('160');
     });
 });
 
