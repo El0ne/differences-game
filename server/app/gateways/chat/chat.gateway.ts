@@ -72,7 +72,7 @@ export class ChatGateway implements OnGatewayDisconnect {
                 // if (position);
                 // TODO add solo or multi in message
                 const message = `${date} - ${data.player1.name} obtient la ${data.gameDuration} place dans les meilleurs temps du
-                jeu ${data.gameName} en ${data.gameMode}.`;
+                jeu ${data.gameName} en ${data.isMultiplayer ? 'multijoueur' : 'solo'}.`;
                 this.server.emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message, event: 'abandon' } as RoomMessage);
             }
             socket.data.isSolo = false;
