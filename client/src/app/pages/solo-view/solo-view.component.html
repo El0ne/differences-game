@@ -27,6 +27,7 @@
                 (mistake)="handleMistake()"
                 (cheatModeHandler)="resetDifferences($event)"
                 (color)="setColor($event)"
+                (thirdHint)="turnOffHints($event)"
                 *ngIf="this.gameCardInfo"
             ></app-click-event>
         </div>
@@ -100,13 +101,13 @@
                     <button class="send-button" (click)="sendMessage()"></button>
                 </div>
             </div>
-            <div *ngIf="this.thirdHint === false">
+            <div *ngIf="this.hintFlag === true">
                 <button class="hint hint-button" type="button" (click)="getDiffFromClick()">
                     <mat-icon>search</mat-icon>
                 </button>
                 <div class="playerName">{{ hintsRemaining() }}</div>
             </div>
-            <div *ngIf="this.thirdHint !== false" class="third-hint-box neon-border" [ngStyle]="{ 'background-color': this.hintColor }"></div>
+            <div *ngIf="this.thirdHint === true" class="third-hint-box neon-border" [ngStyle]="{ 'background-color': this.hintColor }"></div>
         </div>
 
         <div class="image-container neon-border">
@@ -120,6 +121,7 @@
                 (mistake)="handleMistake()"
                 (cheatModeHandler)="resetDifferences($event)"
                 (color)="setColor($event)"
+                (thirdHint)="turnOffHints($event)"
                 *ngIf="this.gameCardInfo"
             ></app-click-event>
         </div>

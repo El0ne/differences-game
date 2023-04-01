@@ -44,6 +44,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     endGame: Subject<void> = new Subject<void>();
     gameCardInfo: GameCardInformation;
     currentRoom: string;
+    hintFlag: boolean;
     thirdHint: boolean;
     hintColor: string;
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
@@ -63,6 +64,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.thirdHint = false;
+        this.hintFlag = true;
         const gameId = this.route.snapshot.paramMap.get('stageId');
         this.isMultiplayer = this.router.url.includes('multiplayer');
         if (!this.socketService.liveSocket()) {
@@ -155,12 +157,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     setColor(clickPosition: number[]): void {
         this.hintColor = this.gameHintService.setColor(clickPosition, this.left.convertPosToPixel(this.left.currentPixelHint));
-        // TODO: Add way to remove box after third hint is found
     }
 
     getRandomDifference(event: KeyboardEvent | null): void {
         if (event?.key === 'i') {
-            if (this.gameHintService.hintsRemaining > 0) this.socketService.send(CHAT_EVENTS.Hint, this.currentRoom);
+            if (this.hintsRemaining() > 0) this.socketService.send(CHAT_EVENTS.Hint, this.currentRoom);
             this.left.getDifferences(this.currentGameId).subscribe((data) => {
                 const pixelArray = this.foundDifferenceService.findPixelsFromDifference(data);
                 const randomPixel = pixelArray[Math.floor(Math.random() * pixelArray.length)];
@@ -182,6 +183,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     activateThirdHint(): void {
         this.thirdHint = true;
+        this.hintFlag = false;
+    }
+
+    turnOffHints(flag: boolean): void {
+        this.thirdHint = flag;
     }
 
     showTime(): void {

@@ -27,12 +27,6 @@ export class GameHintService {
                     corners.push(this.roundDown(position));
                     break;
                 }
-                case 0: {
-                    // corners.push(this.roundDown(position));
-                    // TODO: Replace with third hint when implemented
-                    // No default
-                    break;
-                }
             }
         }
         return corners;
@@ -60,12 +54,12 @@ export class GameHintService {
 
     setColor(clickPosition: number[], hintPosition: number[]): string {
         const radius = Math.sqrt((clickPosition[0] - hintPosition[0]) ** 2 + (clickPosition[1] - hintPosition[1]) ** 2);
-        if (radius < 25) {
+        if (radius < 50) {
             return '#881901';
-        } else if (radius < 75) return '#FF2D00';
-        else if (radius < 125) return '#FF8EBC';
-        else if (radius < 175) return '#A5D7FF';
-        else if (radius < 225) return '#4575FF';
+        } else if (radius < 100) return '#FF2D00';
+        else if (radius < 150) return '#FF8EBC';
+        else if (radius < 200) return '#A5D7FF';
+        else if (radius < 250) return '#4575FF';
         else return '#0042FF';
     }
 }

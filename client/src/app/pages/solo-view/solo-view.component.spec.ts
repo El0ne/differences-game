@@ -19,6 +19,7 @@ import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-mo
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { GameHintService } from '@app/services/game-hint/game-hint.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { CHAT_EVENTS } from '@common/chat-gateway-events';
 import { DifferenceInformation, PlayerDifference } from '@common/difference-information';
@@ -33,6 +34,7 @@ describe('SoloViewComponent', () => {
     let mockService: GameCardInformationService;
     let socketServiceMock: SocketService;
     let foundDifferenceServiceSpy: FoundDifferenceService;
+    let gameHintServiceMock: GameHintService;
     let modalSpy: MatDialog;
     let clickEventServiceSpy: ClickEventService;
 
@@ -42,6 +44,8 @@ describe('SoloViewComponent', () => {
     beforeEach(async () => {
         clickEventServiceSpy = jasmine.createSpyObj<ClickEventService>('ClickEventService', ['getDifferences', 'isADifference', 'getDifferences']);
         clickEventServiceSpy.getDifferences = () => of([[1, 2, 3], [4, 5], [6], [], [7, 8, 9]]);
+
+        gameHintServiceMock = jasmine.createSpyObj<GameHintService>('GameHintService', ['setColor']);
 
         mockRouter = jasmine.createSpyObj<Router>('Router', ['navigate'], ['url']);
         Object.defineProperty(mockRouter, 'url', { value: 'multiplayer/234' });
@@ -92,6 +96,7 @@ describe('SoloViewComponent', () => {
                 { provide: SocketService, useValue: socketServiceMock },
                 { provide: FoundDifferenceService, useValue: foundDifferenceServiceSpy },
                 { provide: MatDialog, useValue: modalSpy },
+                { provide: GameHintService, useValue: gameHintServiceMock },
             ],
             teardown: { destroyAfterEach: false },
         }).compileComponents();
@@ -395,6 +400,17 @@ describe('SoloViewComponent', () => {
 
         component.activateCheatMode(keyboardEvent);
         expect(flashSpy).toHaveBeenCalledWith([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    });
+
+    it('getDiffFromClick should call getRandomDifference', () => {
+        const getRandomDifferenceSpy = spyOn(component, 'getRandomDifference');
+        component.getDiffFromClick();
+        expect(getRandomDifferenceSpy).toHaveBeenCalled();
+    });
+
+    it('setColor should call setColor from gameHintService', () => {
+        component.setColor([]);
+        expect(gameHintServiceMock.setColor).toHaveBeenCalled();
     });
 });
 

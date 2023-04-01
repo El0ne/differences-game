@@ -24,6 +24,7 @@ export class ClickEventComponent implements OnInit {
     @Output() mistake: EventEmitter<void> = new EventEmitter<void>();
     @Output() cheatModeHandler: EventEmitter<KeyboardEvent> = new EventEmitter<KeyboardEvent>();
     @Output() color: EventEmitter<number[]> = new EventEmitter<number[]>();
+    @Output() thirdHint: EventEmitter<boolean> = new EventEmitter<boolean>();
     @ViewChild('picture', { static: true })
     picture: ElementRef<HTMLCanvasElement>;
     @ViewChild('modification', { static: true })
@@ -97,6 +98,7 @@ export class ClickEventComponent implements OnInit {
                     if (this.isClickInHint(data.differenceArray)) {
                         this.firstHint = false;
                         this.secondHint = false;
+                        this.thirdHint.emit(false);
                     } else {
                         this.color.emit([this.getCoordInImage(mouseEvent)[0], this.getCoordInImage(mouseEvent)[1]]);
                     }
