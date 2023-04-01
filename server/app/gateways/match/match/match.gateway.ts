@@ -1,9 +1,12 @@
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
-import { MATCH_EVENTS, ONE_SECOND, SoloGameCreation } from '@common/match-gateway-communication';
+import { StageInformation } from '@common/game-card';
+import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND, SoloGameCreation } from '@common/match-gateway-communication';
 import { Injectable } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+
+const LAST_ARRAY_ELEMENT = -1;
 
 @WebSocketGateway({ cors: true })
 @Injectable()
@@ -15,6 +18,7 @@ export class MatchGateway implements OnGatewayDisconnect {
     @SubscribeMessage(MATCH_EVENTS.createSoloGame)
     createSoloGame(@ConnectedSocket() socket: Socket, @MessageBody() gameInfo: SoloGameCreation): void {
         socket.data.stageId = gameInfo.stageId;
+        socket.data.room = socket.id;
         if (gameInfo.isLimitedTimeMode) {
             this.gameManagerService.startLimitedTimeGame(socket.id, 1);
         } else {
@@ -37,7 +41,7 @@ export class MatchGateway implements OnGatewayDisconnect {
     }
 
     @SubscribeMessage(MATCH_EVENTS.Difference)
-    difference(socket: Socket, data: MultiplayerDifferenceInformation) {
+    difference(socket: Socket, data: MultiplayerDifferenceInformation): void {
         if (socket.rooms.has(data.room)) {
             const differenceInformation: PlayerDifference = {
                 differencesPosition: data.differencesPosition,
@@ -45,6 +49,14 @@ export class MatchGateway implements OnGatewayDisconnect {
                 socket: socket.id,
             };
             this.server.to(data.room).emit(MATCH_EVENTS.Difference, differenceInformation);
+        }
+    }
+
+    @SubscribeMessage(LIMITED_TIME_MODE_EVENTS.GetFirstStageInformation)
+    getFirstStageInformation(socket: Socket): void {
+        if (this.gameManagerService.limitedTimeModeGames.has(socket.data.room)) {
+            const stagesInfo: StageInformation[] = this.gameManagerService.limitedTimeModeGames.get(socket.data.room).stageInfo;
+            socket.emit(LIMITED_TIME_MODE_EVENTS.GetFirstStageInformation, stagesInfo[LAST_ARRAY_ELEMENT]);
         }
     }
 

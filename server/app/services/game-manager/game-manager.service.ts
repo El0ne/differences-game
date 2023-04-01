@@ -71,11 +71,12 @@ export class GameManagerService {
         });
 
         // randomize gameCards
-        for (let i = gameCards.length - 1; i > 0; i--) {
+        for (let i = stageInformations.length - 1; i > 0; i--) {
+            // TODO test if no gameCArds are in bd when starting game
             const j = Math.floor(Math.random() * (i + 1));
-            const temp = gameCards[i];
-            gameCards[i] = gameCards[j];
-            gameCards[j] = temp;
+            const temp: StageInformation = stageInformations[i];
+            stageInformations[i] = stageInformations[j];
+            stageInformations[j] = temp;
         }
 
         this.limitedTimeModeGames.set(room, {

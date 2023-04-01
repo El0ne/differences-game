@@ -15,8 +15,8 @@ import { EndGame } from '@common/chat-dialog-constants';
 import { RoomMessage, Validation } from '@common/chat-gateway-constants';
 import { CHAT_EVENTS, RoomEvent, RoomManagement } from '@common/chat-gateway-events';
 import { DifferenceInformation, MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
-import { GameCardInformation } from '@common/game-card';
-import { MATCH_EVENTS } from '@common/match-gateway-communication';
+import { GameCardInformation, StageInformation } from '@common/game-card';
+import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS } from '@common/match-gateway-communication';
 import { Subject } from 'rxjs';
 
 @Component({
@@ -70,6 +70,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.isLimitedTimeMode = this.currentGameId === LIMITED_TIME_MODE_ID;
 
             if (!this.isLimitedTimeMode) {
+                this.socketService.listen(LIMITED_TIME_MODE_EVENTS.NewStageInformation, (newStageInfo: StageInformation) => {
+                    Object.assign(this.gameCardInfo, newStageInfo);
+                });
+                this.socketService.send(LIMITED_TIME_MODE_EVENTS.GetFirstStageInformation);
+            } else {
                 this.gameCardInfoService.getGameCardInfoFromId(this.currentGameId).subscribe((gameCardData) => {
                     this.gameCardInfo = gameCardData;
                     this.numberOfDifferences = this.gameCardInfo.differenceNumber;

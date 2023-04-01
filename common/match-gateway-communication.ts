@@ -7,6 +7,11 @@ export enum MATCH_EVENTS {
     Win = 'Win',
 }
 
+export enum LIMITED_TIME_MODE_EVENTS {
+    GetFirstStageInformation = 'getFirstStageInformation',
+    NewStageInformation = 'newStageInformation',
+}
+
 export const ONE_SECOND = 1000;
 
 export interface SoloGameCreation {
