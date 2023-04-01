@@ -100,7 +100,7 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
     @SubscribeMessage(WAITING_ROOM_EVENTS.DeleteGame)
     async deleteGame(@MessageBody() stageId: string): Promise<void> {
         await this.gameCardService.deleteGameCard(stageId);
-        await this.gameManagerService.deleteGame(stageId);
+        await this.gameManagerService.deleteGameFromDb(stageId);
 
         this.gameHosts.delete(stageId);
 

@@ -13,7 +13,7 @@ interface MapGameInfo {
 interface LimitedTimeGameInfo {
     stageInfo: StageInformation[];
     playersInGame: number;
-    stagesUsed: string[];
+    readonly stagesUsed: string[];
 }
 
 @Injectable()
@@ -48,7 +48,7 @@ export class GameManagerService {
         }
     }
 
-    async deleteGame(stageId: string): Promise<void> {
+    async deleteGameFromDb(stageId: string): Promise<void> {
         const currentMapGameInfo = this.gamePlayedInformation.get(stageId);
         if (currentMapGameInfo) {
             currentMapGameInfo.isDeleted = true;
@@ -69,10 +69,47 @@ export class GameManagerService {
                 differenceImageName: gameCard.differenceImageName,
             };
         });
+
+        // randomize gameCards
+        for (let i = gameCards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            const temp = gameCards[i];
+            gameCards[i] = gameCards[j];
+            gameCards[j] = temp;
+        }
+
         this.limitedTimeModeGames.set(room, {
             stageInfo: stageInformations,
             playersInGame: numberOfPlayers,
             stagesUsed: gameCards.map((stage) => stage._id.toString()),
         });
+    }
+
+    giveNextLimitedTimeStage(room: string): StageInformation {
+        const gameInfo: LimitedTimeGameInfo = this.limitedTimeModeGames.get(room);
+        let randomStageInfo;
+        if (gameInfo) {
+            randomStageInfo = gameInfo.stageInfo.pop();
+            // if array is empty
+            if (!randomStageInfo) {
+                for (let i = 0; i < gameInfo.playersInGame; i++) {
+                    this.removePlayerFromLimitedTimeGame(room);
+                }
+            }
+        }
+        return randomStageInfo; // if returns undefined, means game is finished
+    }
+
+    removePlayerFromLimitedTimeGame(room: string): void {
+        const gameInfo: LimitedTimeGameInfo = this.limitedTimeModeGames.get(room);
+        if (gameInfo) {
+            gameInfo.playersInGame -= 1;
+            if (gameInfo.playersInGame === 0) {
+                gameInfo.stagesUsed.forEach((stageId: string) => {
+                    this.endGame(stageId);
+                });
+                this.limitedTimeModeGames.delete(room);
+            }
+        }
     }
 }

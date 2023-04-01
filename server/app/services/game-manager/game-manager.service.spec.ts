@@ -5,11 +5,11 @@ import { GameCardService } from '@app/services/game-card/game-card.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
-import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
+import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection } from 'mongoose';
-import { createStubInstance, SinonStubbedInstance } from 'sinon';
+import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { GameManagerService } from './game-manager.service';
 
 describe('GameManagerService', () => {
@@ -70,7 +70,7 @@ describe('GameManagerService', () => {
         const deleteDifferencesMock = jest.spyOn(differenceClickService, 'deleteDifferences');
 
         service.addGame(id, 1);
-        await service.deleteGame(id);
+        await service.deleteGameFromDb(id);
         await service.endGame(id);
         expect(deleteMock).toBeCalledWith(id);
         expect(deleteMock).toBeCalledTimes(1);
@@ -82,7 +82,7 @@ describe('GameManagerService', () => {
         const numberOfPlayer = 5;
         service.addGame(id, numberOfPlayer);
 
-        await service.deleteGame(id);
+        await service.deleteGameFromDb(id);
         await service.endGame(id);
         expect(service.gamePlayedInformation.get(id).numberOfPlayers).toBe(numberOfPlayer - 1);
     });
@@ -96,14 +96,14 @@ describe('GameManagerService', () => {
 
     it('deleteGame should delete the game if no one is playing it', async () => {
         const deleteDifferenceMock = jest.spyOn(differenceClickService, 'deleteDifferences');
-        await service.deleteGame(id);
+        await service.deleteGameFromDb(id);
         expect(deleteDifferenceMock).toBeCalledWith(id);
     });
 
     it('deleteGame should set the isDeleted property of the game to true if someone is playing it', async () => {
         service.addGame(id, 1);
         expect(service.gamePlayedInformation.get(id).isDeleted).toBe(false);
-        await service.deleteGame(id);
+        await service.deleteGameFromDb(id);
         expect(service.gamePlayedInformation.get(id).isDeleted).toBe(true);
     });
 });
