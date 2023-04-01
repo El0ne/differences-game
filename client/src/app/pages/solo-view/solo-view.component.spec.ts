@@ -430,6 +430,22 @@ describe('SoloViewComponent', () => {
         expect(component.left.hintPosX).toBe('120');
         expect(component.left.hintPosY).toBe('160');
     });
+
+    it('activateThirdHint should set hintFlag to false and thirdHint to true', () => {
+        component.activateThirdHint();
+        expect(component.thirdHint).toBeTrue();
+        expect(component.hintFlag).toBeFalse();
+    });
+
+    it('turnOffHints should set thirdHint to false', () => {
+        component.turnOffHints(false);
+        expect(component.thirdHint).toBeFalse();
+    });
+
+    it('turnOffHints should set thirdHint to true', () => {
+        component.turnOffHints(true);
+        expect(component.thirdHint).toBeTrue();
+    });
 });
 
 const MOCK_INFORMATION: DifferenceInformation = {
