@@ -1,5 +1,5 @@
 import { GameCardService } from '@app/services/game-card/game-card.service';
-import { GameHistoryService } from '@app/services/game-history/game-history/game-history.service';
+import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { RoomMessage } from '@common/chat-gateway-constants';
 import { CHAT_EVENTS, MESSAGE_MAX_LENGTH, Room, RoomEvent, RoomManagement } from '@common/chat-gateway-events';
 import { GameHistoryDTO } from '@common/game-history.dto';

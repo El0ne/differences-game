@@ -1,6 +1,8 @@
 import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
+import { GameHistory, gameHistorySchema } from '@app/schemas/game-history';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
+import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
@@ -13,6 +15,7 @@ import { GameManagerService } from './game-manager.service';
 describe('GameManagerService', () => {
     let service: GameManagerService;
     let differenceClickService;
+    let gameHistoryService;
     const id = '63fe6fb0b9546f9126a1811e';
 
     let mongoServer: MongoMemoryServer;
@@ -28,6 +31,7 @@ describe('GameManagerService', () => {
                     }),
                 }),
                 MongooseModule.forFeature([{ name: Differences.name, schema: differencesSchema }]),
+                MongooseModule.forFeature([{ name: GameHistory.name, schema: gameHistorySchema }]),
             ],
             providers: [
                 GameManagerService,
@@ -36,11 +40,13 @@ describe('GameManagerService', () => {
                 ImageDimensionsService,
                 PixelRadiusService,
                 PixelPositionService,
+                GameHistoryService,
             ],
         }).compile();
 
         service = module.get<GameManagerService>(GameManagerService);
         differenceClickService = module.get<DifferenceClickService>(DifferenceClickService);
+        gameHistoryService = module.get<GameHistoryService>(GameHistoryService);
         connection = await module.get(getConnectionToken());
     });
 
@@ -89,8 +95,10 @@ describe('GameManagerService', () => {
 
     it('deleteGame should delete the game if no one is playing it', async () => {
         const deleteDifferenceMock = jest.spyOn(differenceClickService, 'deleteDifferences');
+        const deleteGameHistoryMock = jest.spyOn(gameHistoryService, 'deleteGameHistory');
         await service.deleteGame(id);
         expect(deleteDifferenceMock).toBeCalledWith(id);
+        expect(deleteGameHistoryMock).toBeCalledWith(id);
     });
 
     it('deleteGame should set the isDeleted property of the game to true if someone is playing it', async () => {

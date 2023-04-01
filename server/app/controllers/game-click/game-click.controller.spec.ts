@@ -28,7 +28,7 @@ describe('GameClickController', () => {
 
     beforeEach(async () => {
         mongoServer = await MongoMemoryServer.create();
-        const mongoUri = await mongoServer.getUri();
+        const mongoUri = mongoServer.getUri();
         const module: TestingModule = await Test.createTestingModule({
             imports: [
                 MongooseModule.forRoot(mongoUri),

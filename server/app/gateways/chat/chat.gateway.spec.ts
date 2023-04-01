@@ -12,7 +12,7 @@ import { DifferencesCounterService } from '@app/services/differences-counter/dif
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameConstantService } from '@app/services/game-constant/game-constant.service';
 import { GameDifficultyService } from '@app/services/game-difficulty/game-difficulty.service';
-import { GameHistoryService } from '@app/services/game-history/game-history/game-history.service';
+import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';

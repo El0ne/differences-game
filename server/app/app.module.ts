@@ -18,7 +18,7 @@ import { DifferenceDetectionService } from './services/difference-detection/diff
 import { DifferencesCounterService } from './services/differences-counter/differences-counter.service';
 import { GameConstantService } from './services/game-constant/game-constant.service';
 import { GameDifficultyService } from './services/game-difficulty/game-difficulty.service';
-import { GameHistoryService } from './services/game-history/game-history/game-history.service';
+import { GameHistoryService } from './services/game-history/game-history.service';
 import { GameManagerService } from './services/game-manager/game-manager.service';
 import { ImageDimensionsService } from './services/image-dimensions/image-dimensions.service';
 import { ImageManagerService } from './services/image-manager/image-manager.service';

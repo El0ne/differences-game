@@ -1,4 +1,4 @@
-import { GameHistoryService } from '@app/services/game-history/game-history/game-history.service';
+import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { GameHistoryDTO } from '@common/game-history.dto';
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
@@ -8,7 +8,7 @@ export class GameHistoryController {
     constructor(private gameHistoryService: GameHistoryService) {}
 
     @Get('/')
-    async getStages(@Res() res: Response): Promise<void> {
+    async getGameHistory(@Res() res: Response): Promise<void> {
         try {
             const gameHistory = await this.gameHistoryService.getGameHistory();
             res.status(HttpStatus.OK).send(gameHistory);
@@ -18,11 +18,11 @@ export class GameHistoryController {
     }
 
     @Post('/')
-    async createHistory(@Body() gameHistory: GameHistoryDTO, @Res() res: Response): Promise<void> {
+    async addToHistory(@Body() gameHistory: GameHistoryDTO, @Res() res: Response): Promise<void> {
         try {
             if (Object.keys(gameHistory).length) {
-                const newGame = await this.gameHistoryService.addGameToHistory(gameHistory);
-                res.status(HttpStatus.CREATED).send(newGame);
+                const addedGameHistory = await this.gameHistoryService.addGameToHistory(gameHistory);
+                res.status(HttpStatus.CREATED).send(addedGameHistory);
             } else res.sendStatus(HttpStatus.BAD_REQUEST);
         } catch (err) {
             throw new HttpException('Error', HttpStatus.INTERNAL_SERVER_ERROR);

@@ -1,5 +1,5 @@
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
-import { GameHistoryService } from '@app/services/game-history/game-history/game-history.service';
+import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { Injectable } from '@nestjs/common';
 
 interface MapGameInfo {
@@ -44,7 +44,6 @@ export class GameManagerService {
         } else {
             await this.differenceClickService.deleteDifferences(stageId);
         }
-        // TODO delete the game history for the game and find a way to not add game to history if the game has been deleted
         await this.gameHistoryService.deleteGameHistory(stageId);
     }
 }
