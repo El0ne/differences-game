@@ -149,18 +149,73 @@ describe('ChatGateway', () => {
         const getGameCardSpy = jest.spyOn(gameCardService, 'getGameCardById').mockReturnValue(true);
         const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockReturnValue(true);
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
+        const sendSpy = jest.spyOn(server, 'emit');
         server.to.returns({
             emit: (event: string, data) => {
                 expect(event).toEqual(CHAT_EVENTS.RoomMessage);
                 expect(data.event).toEqual('abandon');
                 expect(data.socketId).toEqual(CHAT_EVENTS.Event);
-                expect(data.message.includes(FAKE_GAME_HISTORY_DTO.gameMode));
+                expect(data.message.includes(FAKE_GAME_HISTORY_DTO.gameMode)).toBeTruthy();
+                expect(data.message.includes('solo').toBeTruthy());
             },
         } as any);
         await gateway.bestTime(socket, FAKE_GAME_HISTORY_DTO);
         expect(getGameCardSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_DTO.gameId);
         expect(socket.data.isSolo).toBe(false);
         expect(addGameSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_DTO);
+        expect(sendSpy).toHaveBeenCalled();
+    });
+
+    it('best time message should include solo or multiplayer depending on game mode', async () => {
+        socket.data.isSolo = true;
+        FAKE_GAME_HISTORY_DTO.isMultiplayer = true;
+        const getGameCardSpy = jest.spyOn(gameCardService, 'getGameCardById').mockReturnValue(true);
+        const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockReturnValue(true);
+        stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
+        const sendSpy = jest.spyOn(server, 'emit');
+        server.to.returns({
+            emit: (event: string, data) => {
+                expect(event).toEqual(CHAT_EVENTS.RoomMessage);
+                expect(data.event).toEqual('abandon');
+                expect(data.socketId).toEqual(CHAT_EVENTS.Event);
+                expect(data.message.includes(FAKE_GAME_HISTORY_DTO.gameMode)).toBeTruthy();
+                expect(data.message.includes('multiplayer').toBeTruthy());
+            },
+        } as any);
+        await gateway.bestTime(socket, FAKE_GAME_HISTORY_DTO);
+        expect(getGameCardSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_DTO.gameId);
+        expect(socket.data.isSolo).toBe(false);
+        expect(addGameSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_DTO);
+        expect(sendSpy).toHaveBeenCalled();
+    });
+
+    it('best time should ignore the emit to chat if a player has abandoned the game', async () => {
+        socket.data.isSolo = true;
+        FAKE_GAME_HISTORY_DTO.player1.hasAbandon = true;
+        FAKE_GAME_HISTORY_DTO.player2.hasAbandon = false;
+        const getGameCardSpy = jest.spyOn(gameCardService, 'getGameCardById').mockReturnValue(true);
+        const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockReturnValue(true);
+        const sendSpy = jest.spyOn(server, 'emit');
+        await gateway.bestTime(socket, FAKE_GAME_HISTORY_DTO);
+        expect(getGameCardSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_DTO.gameId);
+        expect(socket.data.isSolo).toBe(false);
+        expect(addGameSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_DTO);
+        expect(sendSpy).not.toHaveBeenCalled();
+
+        FAKE_GAME_HISTORY_DTO.player1.hasAbandon = false;
+        FAKE_GAME_HISTORY_DTO.player2.hasAbandon = true;
+        await gateway.bestTime(socket, FAKE_GAME_HISTORY_DTO);
+        expect(getGameCardSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_DTO.gameId);
+        expect(socket.data.isSolo).toBe(false);
+        expect(addGameSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_DTO);
+        expect(sendSpy).not.toHaveBeenCalled();
+
+        FAKE_GAME_HISTORY_DTO.player1.hasAbandon = true;
+        await gateway.bestTime(socket, FAKE_GAME_HISTORY_DTO);
+        expect(getGameCardSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_DTO.gameId);
+        expect(socket.data.isSolo).toBe(false);
+        expect(addGameSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_DTO);
+        expect(sendSpy).not.toHaveBeenCalled();
     });
 
     it('event() should emit RoomMessage and return a string containing event and par when multiplayer', () => {
