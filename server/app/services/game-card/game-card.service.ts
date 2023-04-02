@@ -73,16 +73,15 @@ export class GameCardService {
         };
     }
 
-    updateGameCard(game: GameCard, winnerBoard: RankingBoard): GameCard {
-        return {
-            _id: new ObjectId(game._id),
-            name: game.name,
-            difficulty: game.difficulty,
-            differenceNumber: game.differenceNumber,
-            originalImageName: game.originalImageName,
-            differenceImageName: game.differenceImageName,
-            soloTimes: this.bestTimesService.updateBestTimes(game.soloTimes, winnerBoard),
-            multiTimes: this.bestTimesService.updateBestTimes(game.multiTimes, winnerBoard),
-        };
+    async updateGameCard(game: GameCard, winnerBoard: RankingBoard, isMultiplayer: boolean): Promise<void> {
+        console.log(game);
+        console.log(winnerBoard);
+        console.log(isMultiplayer);
+        if (isMultiplayer) {
+            game.multiTimes = this.bestTimesService.updateBestTimes(game.multiTimes, winnerBoard);
+        } else {
+            game.soloTimes = this.bestTimesService.updateBestTimes(game.soloTimes, winnerBoard);
+        }
+        await this.gameCardModel.findOneAndReplace({ _id: game._id }, game);
     }
 }

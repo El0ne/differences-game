@@ -9,7 +9,6 @@ import { ImageManagerService } from '@app/services/image-manager/image-manager.s
 import { GameCardDto } from '@common/game-card.dto';
 import { ImageUploadDto } from '@common/image-upload.dto';
 import { ImageDto } from '@common/image.dto';
-import { RankingBoard } from '@common/ranking-board';
 import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
 import {
     Body,
@@ -160,17 +159,6 @@ export class StageController {
     async resetBestTimes(@Param('id') id: string, @Res() res: Response): Promise<void> {
         try {
             await this.bestTimesService.resetGameCard(id);
-            res.status(HttpStatus.NO_CONTENT).send();
-        } catch (err) {
-            res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @Put('/best-times/:id')
-    async updateBestTimes(@Param('id') id: string, @Body() playerRankingBoard: RankingBoard, @Res() res: Response): Promise<void> {
-        try {
-            const gameCard = await this.gameCardService.getGameCardById(id);
-            this.gameCardService.updateGameCard(gameCard, playerRankingBoard);
             res.status(HttpStatus.NO_CONTENT).send();
         } catch (err) {
             res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);

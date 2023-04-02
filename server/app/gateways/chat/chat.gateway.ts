@@ -2,7 +2,8 @@ import { GameCardService } from '@app/services/game-card/game-card.service';
 import { RoomMessage } from '@common/chat-gateway-constants';
 import { CHAT_EVENTS, MESSAGE_MAX_LENGTH, Room, RoomEvent, RoomManagement } from '@common/chat-gateway-events';
 import { gameHistory } from '@common/game-history';
-import { Injectable } from '@nestjs/common';
+import { RankingBoard } from '@common/ranking-board';
+import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
@@ -12,7 +13,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
 
     private waitingRoom: Room[] = [];
-    constructor(private gameCardService: GameCardService) {}
+    constructor(private gameCardService: GameCardService, private logger: Logger) {}
 
     @SubscribeMessage(CHAT_EVENTS.Validate)
     validate(socket: Socket, message: string): void {
@@ -63,11 +64,18 @@ export class ChatGateway implements OnGatewayDisconnect {
     }
 
     @SubscribeMessage(CHAT_EVENTS.BestTime)
-    bestTime(socket: Socket, data: gameHistory) {
+    async bestTime(socket: Socket, data: gameHistory) {
+        this.logger.log(data);
         if (!data.isAbandon) {
             const date = this.dateCreator();
             // const position = this.gameCardService.updateTime();
             // if (position);
+            const gameCard = await this.gameCardService.getGameCardById(data.id);
+            const playerRankingBoard: RankingBoard = {
+                name: data.winnerName,
+                time: data.gameDuration,
+            };
+            this.gameCardService.updateGameCard(gameCard, playerRankingBoard, data.isMultiplayer);
             const message = `${date} - ${data.winnerName} obtient la ${data.gameDuration} place dans les meilleurs temps du jeu ${data.gameName} en 
             ${data.gameMode}.`;
             this.server.emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message, event: 'abandon' } as RoomMessage);
