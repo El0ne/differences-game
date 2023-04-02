@@ -13,6 +13,7 @@ export class GameInfoModalComponent {
         public data: {
             gameCardInfo: GameCardInformation;
             numberOfDifferences: number;
+            numberOfPlayers: number;
         },
         public matDialogRef: MatDialogRef<GameInfoModalComponent>,
     ) {}
