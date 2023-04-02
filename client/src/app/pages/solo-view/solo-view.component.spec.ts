@@ -221,11 +221,13 @@ describe('SoloViewComponent', () => {
     });
 
     it('should open the game info modal with the correct data', () => {
+        component.isMultiplayer = true;
         component.openInfoModal();
         expect(modalSpy.open).toHaveBeenCalledWith(GameInfoModalComponent, {
             data: {
                 gameCardInfo: component.gameCardInfo,
                 numberOfDifferences: component.numberOfDifferences,
+                numberOfPlayers: 2,
             },
         });
     });

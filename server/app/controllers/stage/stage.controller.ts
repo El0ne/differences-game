@@ -1,5 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 // using _id property causes linting warning
+import { BestTimesService } from '@app/services/best-times/best-times.service';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
 import { GameCardService } from '@app/services/game-card/game-card.service';
@@ -8,8 +9,23 @@ import { ImageManagerService } from '@app/services/image-manager/image-manager.s
 import { GameCardDto } from '@common/game-card.dto';
 import { ImageUploadDto } from '@common/image-upload.dto';
 import { ImageDto } from '@common/image.dto';
+import { RankingBoard } from '@common/ranking-board';
 import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpException,
+    HttpStatus,
+    Param,
+    Post,
+    Put,
+    Query,
+    Res,
+    UploadedFiles,
+    UseInterceptors,
+} from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { diskStorage } from 'multer';
@@ -36,6 +52,7 @@ export class StageController {
         private imageManagerService: ImageManagerService,
         private differenceService: DifferenceDetectionService,
         private differenceClickService: DifferenceClickService,
+        private bestTimesService: BestTimesService,
     ) {}
 
     @Get('/')
@@ -124,6 +141,47 @@ export class StageController {
         try {
             this.imageManagerService.deleteImage(param.imageName);
             res.status(HttpStatus.NO_CONTENT).send([]);
+        } catch (err) {
+            res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Put('/best-times')
+    async resetAllBestTimes(@Res() res: Response): Promise<void> {
+        try {
+            await this.bestTimesService.resetAllGameCards();
+            res.status(HttpStatus.NO_CONTENT).send();
+        } catch (err) {
+            res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Put('/best-times/:id')
+    async resetBestTimes(@Param('id') id: string, @Res() res: Response): Promise<void> {
+        try {
+            await this.bestTimesService.resetGameCard(id);
+            res.status(HttpStatus.NO_CONTENT).send();
+        } catch (err) {
+            res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Put('/best-times/:id')
+    async updateBestTimes(@Param('id') id: string, @Body() playerRankingBoard: RankingBoard, @Res() res: Response): Promise<void> {
+        try {
+            const gameCard = await this.gameCardService.getGameCardById(id);
+            this.gameCardService.updateGameCard(gameCard, playerRankingBoard);
+            res.status(HttpStatus.NO_CONTENT).send();
+        } catch (err) {
+            res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Delete('/')
+    async deleteAllGames(@Res() res: Response): Promise<void> {
+        try {
+            await this.gameCardService.deleteAllGameCards();
+            res.status(HttpStatus.NO_CONTENT).send();
         } catch (err) {
             res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         }

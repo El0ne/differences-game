@@ -1,0 +1,34 @@
+.game-constants-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.game-constants {
+    color: white;
+    margin-bottom: 30px;
+    width: 100%;
+    font-size: 20px;
+    text-align: center;
+}
+
+.save-button {
+    margin-top: 30px;
+    height: 6rem;
+    width: 25rem;
+}
+
+input[type='number'] {
+    font-size: 20px;
+}
+
+button {
+    font-size: x-large;
+}
+
+.normal-button:disabled,
+.normal-button[disabled] {
+    border: 1px solid #999999;
+    background-color: #cccccc;
+    color: #666666;
+}
