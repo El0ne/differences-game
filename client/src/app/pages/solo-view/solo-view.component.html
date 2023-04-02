@@ -1,7 +1,7 @@
 <body>
     <div class="nav-bar">
         <div class="options" *ngIf="showNavBar">
-            <button class="normal-button home-button option-buttons" type="button" routerLink="/home">
+            <button id="homeButton" class="normal-button home-button option-buttons" type="button" routerLink="/home" (click)="returnHome()">
                 <mat-icon class="icon">home</mat-icon>
             </button>
             <button id="infoButton" class="normal-button option-buttons" type="button" (click)="openInfoModal()">
@@ -9,7 +9,7 @@
             </button>
         </div>
         <div class="info-option" *ngIf="showNavBar">
-            <button class="normal-button option-buttons" type="button" (click)="quitGame()">
+            <button id="quitGame" class="normal-button option-buttons" type="button" (click)="quitGame()">
                 <mat-icon class="icon">logout</mat-icon>
             </button>
         </div>
@@ -95,8 +95,9 @@
                         placeholder="Entrez votre message"
                         [(ngModel)]="messageContent"
                         (ngModelChange)="inputIsChanging()"
+                        (click)="removeCheatMode()"
+                        (blur)="addCheatMode()"
                     />
-                    (click)="removeCheatMode()" (blur)="addCheatMode()" />
                     <button class="send-button" (click)="sendMessage()"></button>
                 </div>
             </div>

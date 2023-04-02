@@ -206,10 +206,19 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         });
     }
 
+    returnHome(): void {
+        const homeButton = this.elementRef.nativeElement.querySelector('#homeButton');
+        this.buttonPressCommand = new ButtonPressCommand(homeButton);
+        this.invoker.addCommand(this.buttonPressCommand, this.timerService.currentTime);
+    }
+
     quitGame(): void {
+        const quitButton = this.elementRef.nativeElement.querySelector('#quitGame');
+        this.buttonPressCommand = new ButtonPressCommand(quitButton);
         this.dialog.open(QuitGameModalComponent, {
             disableClose: true,
         });
+        this.invoker.addCommand(this.buttonPressCommand, this.timerService.currentTime);
     }
 
     inputIsChanging(): void {
