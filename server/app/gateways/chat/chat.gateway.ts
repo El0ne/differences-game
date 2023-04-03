@@ -75,10 +75,18 @@ export class ChatGateway implements OnGatewayDisconnect {
                 name: data.winnerName,
                 time: data.gameDuration,
             };
-            this.gameCardService.updateGameCard(gameCard, playerRankingBoard, data.isMultiplayer);
-            const message = `${date} - ${data.winnerName} obtient la ${data.gameDuration} place dans les meilleurs temps du jeu ${data.gameName} en 
-            ${data.gameMode}.`;
-            this.server.emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message, event: 'abandon' } as RoomMessage);
+            let position: number;
+            const updatedGame = await this.gameCardService.updateGameCard(gameCard, playerRankingBoard, data.isMultiplayer);
+            for (const ranking of data.isMultiplayer ? updatedGame.multiTimes : updatedGame.soloTimes) {
+                if (ranking.name === data.winnerName) {
+                    position = (data.isMultiplayer ? updatedGame.multiTimes : updatedGame.soloTimes).indexOf(ranking);
+                }
+            }
+            if (position + 1 <= 3) {
+                const message = `${date} - ${data.winnerName} obtient la ${position + 1} place dans les meilleurs temps du jeu ${data.gameName} en 
+                ${data.gameMode}.`;
+                this.server.emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message, event: 'abandon' } as RoomMessage);
+            }
         }
     }
 

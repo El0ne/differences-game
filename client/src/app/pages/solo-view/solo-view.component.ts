@@ -17,6 +17,7 @@ import { CHAT_EVENTS, RoomEvent, RoomManagement } from '@common/chat-gateway-eve
 import { DifferenceInformation, MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
 import { GameConstants } from '@common/game-constants';
+import { gameHistory } from '@common/game-history';
 import { MATCH_EVENTS } from '@common/match-gateway-communication';
 import { Subject } from 'rxjs';
 
@@ -157,21 +158,21 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         return this.timerService.convert(this.timerService.currentTime);
     }
 
-    // notifyNewBestTime(winnerId: string, isAbandon: boolean, mode: string): void {
-    //     const winnerName: string = this.socketService.names.get(winnerId) as string;
-    //     this.socketService.send<gameHistory>(CHAT_EVENTS.BestTime, {
-    //         id: this.currentGameId,
-    //         winnerName,
-    //         player1Name: this.player,
-    //         player2Name: this.opponent,
-    //         gameName: this.gameCardInfo.name,
-    //         gameMode: mode,
-    //         gameDuration: this.timerService.currentTime,
-    //         startTime: this.startTime,
-    //         isMultiplayer: this.isMultiplayer,
-    //         isAbandon,
-    //     });
-    // }
+    notifyNewBestTime(winnerId: string, isAbandon: boolean, mode: string): void {
+        const winnerName: string = this.socketService.names.get(winnerId) as string;
+        this.socketService.send<gameHistory>(CHAT_EVENTS.BestTime, {
+            id: this.currentGameId,
+            winnerName,
+            player1Name: this.player,
+            player2Name: this.opponent,
+            gameName: this.gameCardInfo.name,
+            gameMode: mode,
+            gameDuration: this.timerService.currentTime,
+            startTime: this.startTime,
+            isMultiplayer: this.isMultiplayer,
+            isAbandon,
+        });
+    }
 
     winGame(winnerId: string): void {
         if (!this.left.endGame) {
@@ -274,12 +275,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             const endGameVerification = this.numberOfDifferences / 2;
             if (this.currentScorePlayer >= endGameVerification) {
                 this.socketService.send<string>(MATCH_EVENTS.Win, this.currentRoom);
-                // this.notifyNewBestTime(this.socketService.socketId, false, 'classique');
+                this.notifyNewBestTime(this.socketService.socketId, false, 'classique');
             }
         } else {
             if (this.currentScorePlayer === this.numberOfDifferences) {
                 this.winGame(this.socketService.socketId);
-                // this.notifyNewBestTime(this.socketService.socketId, false, 'classique');
+                this.notifyNewBestTime(this.socketService.socketId, false, 'classique');
             }
         }
     }

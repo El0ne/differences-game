@@ -73,7 +73,7 @@ export class GameCardService {
         };
     }
 
-    async updateGameCard(game: GameCard, winnerBoard: RankingBoard, isMultiplayer: boolean): Promise<void> {
+    async updateGameCard(game: GameCard, winnerBoard: RankingBoard, isMultiplayer: boolean): Promise<GameCard> {
         console.log(game);
         console.log(winnerBoard);
         console.log(isMultiplayer);
@@ -82,6 +82,8 @@ export class GameCardService {
         } else {
             game.soloTimes = this.bestTimesService.updateBestTimes(game.soloTimes, winnerBoard);
         }
-        await this.gameCardModel.findOneAndReplace({ _id: game._id }, game);
+        console.log('here');
+        await this.gameCardModel.findOneAndUpdate({ _id: game._id }, game);
+        return game;
     }
 }
