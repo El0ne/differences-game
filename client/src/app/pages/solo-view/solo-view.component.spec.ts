@@ -136,7 +136,7 @@ describe('SoloViewComponent', () => {
         const configureSocketReactionsSpy = spyOn(component, 'configureSocketReactions');
         Object.defineProperty(socketServiceMock, 'socketId', { value: 'playerId' });
         component.ngOnInit();
-        expect(component.currentGameId).toEqual('234');
+        expect(component.stageId).toEqual('234');
         expect(component.isMultiplayer).toBe(true);
         expect(component.gameCardInfo).toBe(SERVICE_MOCK_GAME_CARD);
         expect(component.numberOfDifferences).toEqual(SERVICE_MOCK_GAME_CARD.differenceNumber);
@@ -431,7 +431,7 @@ describe('SoloViewComponent', () => {
 
     it('notifyNewBestTime should send gameHistory information as well as current timer time', () => {
         component.player = 'player';
-        component.currentGameId = '0';
+        component.stageId = '0';
         component.opponent = 'loser';
         component.timerService.currentTime = 23;
         component.startTime = 'date';
@@ -442,7 +442,7 @@ describe('SoloViewComponent', () => {
 
     it('notifyNewBestTime should send gameHistory information with correct names', () => {
         component.player = 'loser';
-        component.currentGameId = '0';
+        component.stageId = '0';
         component.opponent = 'opponent';
         component.timerService.currentTime = 23;
         component.startTime = 'date';

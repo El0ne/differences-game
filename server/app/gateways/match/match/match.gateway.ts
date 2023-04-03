@@ -34,7 +34,7 @@ export class MatchGateway implements OnGatewayDisconnect {
     }
 
     @SubscribeMessage(MATCH_EVENTS.Win)
-    win(@ConnectedSocket() socket: Socket, room: string): void {
+    win(@ConnectedSocket() socket: Socket, @MessageBody() room: string): void {
         if (socket.rooms.has(room)) {
             this.server.to(room).emit(MATCH_EVENTS.Win, socket.id);
         }

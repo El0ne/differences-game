@@ -17,7 +17,7 @@
 
     <div class="flex-game">
         <div class="image-container neon-border">
-            <app-click-event #left [id]="1" [original]="'original'" [gameCardId]="this.currentGameId"
+            <app-click-event #left [id]="1" [original]="'original'" [gameCardId]="this.stageId"
                 [imagePath]="this.gameCardInfo.originalImageName" (differenceDetected)="differenceHandler($event)"
                 (mistake)="handleMistake()" (cheatModeHandler)="resetDifferences($event)"
                 *ngIf="this.gameCardInfo"></app-click-event>
@@ -88,7 +88,7 @@
         </div>
 
         <div class="image-container neon-border">
-            <app-click-event #right [id]="2" [original]="'different'" [gameCardId]="this.currentGameId"
+            <app-click-event #right [id]="2" [original]="'different'" [gameCardId]="this.stageId"
                 [imagePath]="this.gameCardInfo.differenceImageName" (differenceDetected)="differenceHandler($event)"
                 (mistake)="handleMistake()" (cheatModeHandler)="resetDifferences($event)"
                 *ngIf="this.gameCardInfo"></app-click-event>

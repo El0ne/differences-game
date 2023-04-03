@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { WaitingRoomComponent, WaitingRoomDataPassing } from '@app/modals/waiting-room/waiting-room.component';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { GameParametersService } from '@app/services/game-parameters/game-parameters.service';
 import { STAGE } from '@app/services/server-routes';
 import { SocketService } from '@app/services/socket/socket.service';
 import { GameCardInformation } from '@common/game-card';
@@ -31,6 +32,7 @@ export class GameCardSelectionComponent implements OnInit {
         private dialog: MatDialog,
         private router: Router,
         private gameCardService: GameCardInformationService,
+        private gameParamService: GameParametersService,
     ) {}
     ngOnInit(): void {
         this.image = `${STAGE}/image/${this.gameCardInformation.originalImageName}`;
@@ -60,11 +62,16 @@ export class GameCardSelectionComponent implements OnInit {
         this.dialog.open(WaitingRoomComponent, { disableClose: true, data });
     }
 
-    selectPlayerName(isSoloGame: boolean): void {
+    selectPlayerName(isMultiplayer: boolean): void {
         const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true });
         dialogRef.afterClosed().subscribe((isNameEntered: boolean) => {
             if (isNameEntered) {
-                if (isSoloGame) {
+                this.gameParamService.gameParameters = {
+                    stageId: this.gameCardInformation._id,
+                    isLimitedTimeGame: false,
+                    isMultiplayerGame: isMultiplayer,
+                };
+                if (!isMultiplayer) {
                     this.socketService.gameRoom = this.socketService.socketId;
                     this.socketService.send<SoloGameCreation>(MATCH_EVENTS.createSoloGame, {
                         stageId: this.gameCardInformation._id,

@@ -1,15 +1,15 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
 import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal.component';
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
-import { LIMITED_TIME_MODE_ID } from '@app/pages/limited-time/limited-time.component';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
+import { GameParametersService } from '@app/services/game-parameters/game-parameters.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { EndGame } from '@common/chat-dialog-constants';
@@ -45,12 +45,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     currentScorePlayer: number = 0;
     currentScoreOpponent: number = 0;
     numberOfDifferences: number;
-    currentGameId: string;
+    stageId: string;
     endGame: Subject<void> = new Subject<void>();
     gameCardInfo: GameCardInformation;
     startTime: string;
     soloTimer: ReturnType<typeof setInterval>;
-    isClassique: boolean;
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
     gameConstants: GameConstants;
     // eslint-disable-next-line max-params
@@ -58,11 +57,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         public timerService: TimerSoloService,
         private gameCardInfoService: GameCardInformationService,
         private foundDifferenceService: FoundDifferenceService,
-        private route: ActivatedRoute,
         private dialog: MatDialog,
         private router: Router,
         public socketService: SocketService,
         private gameConstantsService: GameConstantsService,
+        private gameParamService: GameParametersService,
     ) {}
 
     ngOnInit(): void {
@@ -70,21 +69,18 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.router.navigate(['/home']);
             return;
         }
+        this.isLimitedTimeMode = this.gameParamService.gameParameters.isLimitedTimeGame;
+        this.isMultiplayer = this.gameParamService.gameParameters.isMultiplayerGame;
+        this.stageId = this.gameParamService.gameParameters.stageId;
+
         this.player = this.socketService.names.get(this.socketService.socketId) as string;
         this.opponent = this.socketService.names.get(this.socketService.opponentSocket) as string;
         this.startTime = new Date().toLocaleString('fr-FR');
-        const gameId = this.route.snapshot.paramMap.get('stageId');
-        this.isMultiplayer = this.router.url.includes('multiplayer');
-        this.isClassique = !this.router.url.includes('limited');
         this.gameConstantsService.getGameConstants().subscribe((gameConstants: GameConstants) => {
             this.gameConstants = gameConstants;
         });
 
-        if (gameId) {
-            this.currentGameId = gameId;
-
-            this.isLimitedTimeMode = this.currentGameId === LIMITED_TIME_MODE_ID;
-
+        if (this.stageId) {
             if (this.isLimitedTimeMode) {
                 this.socketService.listen<StageInformation>(LIMITED_TIME_MODE_EVENTS.NewStageInformation, (newStageInfo: StageInformation) => {
                     Object.assign(this.gameCardInfo, newStageInfo);
@@ -92,14 +88,14 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                     console.log(this.gameCardInfo);
                 });
             } else {
-                this.gameCardInfoService.getGameCardInfoFromId(this.currentGameId).subscribe((gameCardData) => {
+                this.gameCardInfoService.getGameCardInfoFromId(this.stageId).subscribe((gameCardData) => {
                     this.gameCardInfo = gameCardData;
                     this.numberOfDifferences = this.gameCardInfo.differenceNumber;
                     if (!this.isMultiplayer) {
                         // TODO change object implementation
                         // abandon solo
                         const gameHistory: GameHistoryDTO = {
-                            gameId: this.currentGameId,
+                            gameId: this.stageId,
                             gameName: this.gameCardInfo.name,
                             gameMode: 'classique',
                             gameDuration: 0,
@@ -187,7 +183,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     activateCheatMode(event: KeyboardEvent): void {
         if (event.key === 't') {
             this.invertDifferences();
-            this.left.getDifferences(this.currentGameId).subscribe((data) => {
+            this.left.getDifferences(this.stageId).subscribe((data) => {
                 if (this.left.toggleCheatMode) this.handleFlash(this.foundDifferenceService.findPixelsFromDifference(data));
             });
         }
@@ -210,7 +206,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         };
 
         const gameHistory: GameHistoryDTO = {
-            gameId: this.currentGameId,
+            gameId: this.stageId,
             gameName: this.gameCardInfo.name,
             gameMode: mode,
             gameDuration: this.timerService.currentTime,
@@ -231,7 +227,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     winGame(winnerId: string): void {
+        console.log('yo');
         if (!this.left.endGame) {
+            console.log('yo');
             this.timerService.stopTimer();
             this.left.endGame = true;
             this.right.endGame = true;
