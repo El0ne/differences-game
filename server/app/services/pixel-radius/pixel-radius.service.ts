@@ -19,8 +19,9 @@ export class PixelRadiusService {
         const radiusSquared = radius ** 2;
 
         for (let i = upExtremity; i <= downExtremity; i++) {
+            const verticalRadiusSquared = (i - pixelCoordinateY) ** 2;
             for (let j = leftExtremity; j <= rightExtremity; j++) {
-                if (roundRadius && (j - pixelCoordinateX) ** 2 + (i - pixelCoordinateY) ** 2 > radiusSquared) {
+                if (roundRadius && (j - pixelCoordinateX) ** 2 + verticalRadiusSquared > radiusSquared) {
                     continue;
                 }
                 adjacentPixels.push(i * this.imageDimensionsService.getWidth() + j);
