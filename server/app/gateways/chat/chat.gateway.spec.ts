@@ -21,7 +21,7 @@ import { PixelPositionService } from '@app/services/pixel-position/pixel-positio
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { RoomMessage } from '@common/chat-gateway-constants';
 import { CHAT_EVENTS } from '@common/chat-gateway-events';
-import { FAKE_GAME_HISTORY, FAKE_GAME_HISTORY_SINGLE } from '@common/mock/game-history-mock';
+import { FAKE_GAME_HISTORY, FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE, FAKE_GAME_HISTORY_SINGLE } from '@common/mock/game-history-mock';
 import { Logger } from '@nestjs/common';
 import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -208,9 +208,89 @@ describe('ChatGateway', () => {
         expect(sendSpy).not.toHaveBeenCalled();
     });
 
+    it('best time should properly assign player name', async () => {
+        jest.spyOn(gameCardService, 'getGameCardById').mockReturnValue(true);
+        jest.spyOn(gameHistoryService, 'addGameToHistory').mockReturnValue(true);
+        jest.spyOn(gameCardService, 'updateGameCard').mockReturnValue({
+            multiTimes: [
+                { name: 'test', time: 3 },
+                { name: 'string', time: 4 },
+            ],
+            soloTimes: [
+                { name: 'test', time: 3 },
+                { name: 'string', time: 4 },
+            ],
+        });
+        stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
+        jest.spyOn(server, 'emit');
+        server.to.returns({
+            emit: (event: string, data) => {
+                expect(event).toEqual(CHAT_EVENTS.RoomMessage);
+                expect(data.message.includes(FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE.gameMode)).toBeTruthy();
+                expect(data.message.includes('string').toBeTrue());
+            },
+        } as any);
+        gateway.bestTime(socket, FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE);
+    });
+
+    it('best time should properly assign player name', async () => {
+        jest.spyOn(gameCardService, 'getGameCardById').mockReturnValue(true);
+        jest.spyOn(gameHistoryService, 'addGameToHistory').mockReturnValue(true);
+        jest.spyOn(gameCardService, 'updateGameCard').mockReturnValue({
+            multiTimes: [
+                { name: 'test', time: 3 },
+                { name: 'string', time: 4 },
+            ],
+            soloTimes: [
+                { name: 'test', time: 3 },
+                { name: 'string', time: 4 },
+            ],
+        });
+        FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE.player1.hasWon = false;
+        stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
+        jest.spyOn(server, 'emit');
+        server.to.returns({
+            emit: (event: string, data) => {
+                expect(event).toEqual(CHAT_EVENTS.RoomMessage);
+                expect(data.message.includes(FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE.gameMode)).toBeTruthy();
+                expect(data.message.includes('string').toBeTrue());
+            },
+        } as any);
+        gateway.bestTime(socket, FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE);
+    });
+
+    it('best time should include choose correct ranking', async () => {
+        FAKE_GAME_HISTORY_SINGLE.isMultiplayer = false;
+        jest.spyOn(gameCardService, 'getGameCardById').mockReturnValue(true);
+        jest.spyOn(gameHistoryService, 'addGameToHistory').mockReturnValue(true);
+        jest.spyOn(gameCardService, 'updateGameCard').mockReturnValue({
+            multiTimes: [
+                { name: 'test', time: 3 },
+                { name: 'string', time: 4 },
+            ],
+            soloTimes: [
+                { name: 'test', time: 3 },
+                { name: 'string', time: 4 },
+            ],
+        });
+        stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
+        jest.spyOn(server, 'emit');
+        server.to.returns({
+            emit: (event: string, data) => {
+                expect(event).toEqual(CHAT_EVENTS.RoomMessage);
+                expect(data.message.includes(FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE.gameMode)).toBeTruthy();
+                expect(data.message.includes('string').toBeTrue());
+                expect(data.message.includes('solo').toBeTrue());
+            },
+        } as any);
+        gateway.bestTime(socket, FAKE_GAME_HISTORY_SINGLE);
+        FAKE_GAME_HISTORY_SINGLE.isMultiplayer = true;
+    });
+
     it('best time message should include multiplayer depending on multiplayer mode', async () => {
         socket.data.isSolo = true;
-        FAKE_GAME_HISTORY_SINGLE.isMultiplayer = true;
+        FAKE_GAME_HISTORY_SINGLE.player1.hasWon = true;
+        FAKE_GAME_HISTORY_SINGLE.isMultiplayer = false;
         const getGameCardSpy = jest.spyOn(gameCardService, 'getGameCardById').mockReturnValue(true);
         const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockReturnValue(true);
         const updateTimeSpy = jest.spyOn(gameCardService, 'updateGameCard').mockReturnValue({

@@ -77,9 +77,10 @@ export class ChatGateway implements OnGatewayDisconnect {
                 };
                 let position: number;
                 const updatedGame = await this.gameCardService.updateGameCard(gameCard, playerRankingBoard, data.isMultiplayer);
-                for (const ranking of data.isMultiplayer ? updatedGame.multiTimes : updatedGame.soloTimes) {
+                const rankingList = data.isMultiplayer ? updatedGame.multiTimes : updatedGame.soloTimes;
+                for (const ranking of rankingList) {
                     if (ranking.name === winnerName) {
-                        position = (data.isMultiplayer ? updatedGame.multiTimes : updatedGame.soloTimes).indexOf(ranking) + 1;
+                        position = rankingList.indexOf(ranking) + 1;
                     }
                 }
                 if (position <= 3) {
