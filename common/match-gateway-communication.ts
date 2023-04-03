@@ -5,6 +5,8 @@ export enum MATCH_EVENTS {
     StartTime = 'StartTime',
     Difference = 'Difference',
     Win = 'Win',
+    SoloGameInformation = 'SoloGameInformation',
+    Time = 'Time',
 }
 
 export enum LIMITED_TIME_MODE_EVENTS {

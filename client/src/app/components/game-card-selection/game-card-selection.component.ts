@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { WaitingRoomComponent, WaitingRoomDataPassing } from '@app/modals/waiting-room/waiting-room.component';
+import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { STAGE } from '@app/services/server-routes';
 import { SocketService } from '@app/services/socket/socket.service';
 import { GameCardInformation } from '@common/game-card';
@@ -19,17 +20,31 @@ import { JoinHostInWaitingRequest, WAITING_ROOM_EVENTS } from '@common/waiting-r
 export class GameCardSelectionComponent implements OnInit {
     @Input() gameCardInformation: GameCardInformation;
     @Input() isConfig: boolean | null;
-    @Output() gameDeleted = new EventEmitter<void>();
+    @Output() refreshGameCard = new EventEmitter<void>();
     image: string = '';
     createGameButton: boolean = true;
 
-    constructor(private socketService: SocketService, private dialog: MatDialog, private router: Router) {}
+    // we need more than 3 services/dialog/router
+    // eslint-disable-next-line max-params
+    constructor(
+        private socketService: SocketService,
+        private dialog: MatDialog,
+        private router: Router,
+        private gameCardService: GameCardInformationService,
+    ) {}
     ngOnInit(): void {
         this.image = `${STAGE}/image/${this.gameCardInformation.originalImageName}`;
     }
 
     deleteGame(): void {
         this.socketService.send(WAITING_ROOM_EVENTS.DeleteGame, this.gameCardInformation._id);
+        // TODO find out where the emit went
+    }
+
+    resetBestTimes(): void {
+        this.gameCardService.resetBestTime(this.gameCardInformation._id).subscribe(() => {
+            this.refreshGameCard.emit();
+        });
     }
 
     hostOrJoinGame(): void {

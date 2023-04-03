@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { PlayerDifference } from '@common/difference-information';
+import { GameHistoryDTO } from '@common/game-history.dto';
 import { MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStubbedInstance, createStubInstance, stub } from 'sinon';
@@ -118,4 +120,35 @@ describe('MatchGateway', () => {
         gateway.stopTimer(socket, 'room');
         expect(gateway.timers.has('room')).toBeFalsy();
     });
+
+    it('storeSoloGame Information should store solo game information for in case of abandon', () => {
+        gateway.storeSoloGameInformation(socket, FAKE_GAME_HISTORY_DTO);
+        expect(socket.data.soloGame).toEqual(FAKE_GAME_HISTORY_DTO);
+        expect(socket.data.isSolo).toBe(true);
+    });
+
+    it('updateGameTime Information should set the value of the internal timer', () => {
+        socket.data.soloGame = {};
+        gateway.updateGameTime(socket, 25);
+        expect(socket.data.soloGame.gameDuration).toEqual(25);
+    });
 });
+
+const FAKE_GAME_HISTORY_DTO: GameHistoryDTO = {
+    gameId: 'test',
+    gameName: 'game',
+    gameMode: 'classique',
+    gameDuration: 23,
+    startTime: 'date',
+    isMultiplayer: true,
+    player1: {
+        name: 'winner',
+        hasAbandon: false,
+        hasWon: true,
+    },
+    player2: {
+        name: 'loser',
+        hasAbandon: false,
+        hasWon: false,
+    },
+};

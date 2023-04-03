@@ -3,11 +3,14 @@
 
 import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
 import { GameCard, gameCardSchema } from '@app/schemas/game-cards.schemas';
+import { GameHistory, gameHistorySchema } from '@app/schemas/game-history';
+import { BestTimesService } from '@app/services/best-times/best-times.service';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameDifficultyService } from '@app/services/game-difficulty/game-difficulty.service';
+import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
@@ -15,7 +18,7 @@ import { PixelPositionService } from '@app/services/pixel-position/pixel-positio
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { HttpStatus } from '@nestjs/common';
-import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
+import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { assert } from 'console';
 import * as fs from 'fs';
@@ -28,8 +31,6 @@ import Sinon, { stub } from 'sinon';
 import * as request from 'supertest';
 import { StageController } from './stage.controller';
 
-const DELAY_BEFORE_CLOSING_CONNECTION = 200;
-
 describe('StageController', () => {
     let httpServer: unknown;
     let controller: StageController;
@@ -38,19 +39,21 @@ describe('StageController', () => {
     let getGameCardByIdStub;
     let gameCardService: GameCardService;
     let imageManagerService: ImageManagerService;
+    let bestTimesService: BestTimesService;
 
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
 
     beforeEach(async () => {
         mongoServer = await MongoMemoryServer.create();
-        const mongoUri = await mongoServer.getUri();
+        const mongoUri = mongoServer.getUri();
 
         const module: TestingModule = await Test.createTestingModule({
             imports: [
                 MongooseModule.forRoot(mongoUri),
                 MongooseModule.forFeature([{ name: Differences.name, schema: differencesSchema }]),
                 MongooseModule.forFeature([{ name: GameCard.name, schema: gameCardSchema }]),
+                MongooseModule.forFeature([{ name: GameHistory.name, schema: gameHistorySchema }]),
             ],
             controllers: [StageController],
             providers: [
@@ -64,6 +67,8 @@ describe('StageController', () => {
                 PixelPositionService,
                 DifferenceClickService,
                 GameManagerService,
+                BestTimesService,
+                GameHistoryService,
             ],
         }).compile();
 
@@ -73,11 +78,14 @@ describe('StageController', () => {
         controller = module.get<StageController>(StageController);
         gameCardService = module.get<GameCardService>(GameCardService);
         imageManagerService = module.get<ImageManagerService>(ImageManagerService);
+        bestTimesService = module.get<BestTimesService>(BestTimesService);
         connection = await module.get(getConnectionToken());
         getGameCardStub = stub(gameCardService, 'getGameCards');
         getGameCardsNumberStub = stub(gameCardService, 'getGameCardsNumber');
         getGameCardByIdStub = stub(gameCardService, 'getGameCardById');
     });
+
+    const DELAY_BEFORE_CLOSING_CONNECTION = 200;
 
     afterEach((done) => {
         getGameCardStub.restore();
@@ -224,6 +232,58 @@ describe('StageController', () => {
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
         expect(imageManagerService.deleteImage).toHaveBeenCalledWith(wrongImage);
     });
+
+    it('resetAllBestTimes() should call resetAllGameCards', async () => {
+        const resetMock = jest.spyOn(bestTimesService, 'resetAllBestTimes');
+        const response = await request(httpServer).put('/stage/best-times');
+
+        expect(resetMock).toHaveBeenCalled();
+        expect(response.status).toBe(HttpStatus.NO_CONTENT);
+    });
+
+    it('resetAllBestTimes() should return 500 if the request is invalid', async () => {
+        jest.spyOn(bestTimesService, 'resetAllBestTimes').mockImplementationOnce(() => {
+            throw new Error();
+        });
+        const response = await request(httpServer).put('/stage/best-times');
+
+        expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    });
+
+    it('resetBestTimes() should call resetGameCard', async () => {
+        const resetMock = jest.spyOn(bestTimesService, 'resetBestTimes').mockImplementation();
+        const response = await request(httpServer).put('/stage/best-times/5');
+
+        expect(resetMock).toHaveBeenCalled();
+        expect(response.status).toBe(HttpStatus.NO_CONTENT);
+    });
+
+    it('resetBestTimes() should return 500 if the request is invalid', async () => {
+        jest.spyOn(bestTimesService, 'resetBestTimes').mockImplementationOnce(() => {
+            throw new Error();
+        });
+        const response = await request(httpServer).put('/stage/best-times/4');
+
+        expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    });
+
+    // it('deleteAllGames() should call deleteAllGameCards', async () => {
+    //     const deleteAllGameMock = jest.spyOn(gameCardService, 'deleteAllGameCards').mockImplementation();
+    //     const response = await request(httpServer).delete('/stage');
+
+    //     expect(deleteAllGameMock).toHaveBeenCalled();
+    //     expect(response.status).toBe(HttpStatus.NO_CONTENT);
+    // });
+
+    // it('deleteAllGames() should return 500 if there is an error in the treatment', async () => {
+    //     const deleteAllGameMock = jest.spyOn(gameCardService, 'deleteAllGameCards').mockImplementationOnce(() => {
+    //         throw new Error();
+    //     });
+    //     const response = await request(httpServer).delete('/stage');
+
+    //     expect(deleteAllGameMock).toHaveBeenCalled();
+    //     expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    // });
 });
 
 const FAKE_GAME_INFO: GameCardDto = {
