@@ -8,21 +8,21 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
 import { Model } from 'mongoose';
 
-const TIME_MULTIPLIER = 200;
-const MINIMUM_GENERATED_TIME = 30;
-const GENERATED_NAME_LENGTH = 10;
+export const TIME_MULTIPLIER = 200;
+export const MINIMUM_GENERATED_TIME = 30;
+export const GENERATED_NAME_LENGTH = 10;
 
 @Injectable()
 export class BestTimesService {
     constructor(@InjectModel(GameCard.name) private gameCardModel: Model<GameCardDocument>) {}
-    async resetAllGameCards(): Promise<void> {
-        const test = await this.gameCardModel.find({});
-        test.forEach(async (gameCard) => {
-            await this.resetGameCard(gameCard._id);
+    async resetAllBestTimes(): Promise<void> {
+        const allGameCards = await this.gameCardModel.find({});
+        allGameCards.forEach(async (gameCard) => {
+            await this.resetBestTimes(gameCard._id);
         });
     }
 
-    async resetGameCard(_id: string): Promise<void> {
+    async resetBestTimes(_id: string): Promise<void> {
         await this.gameCardModel.updateOne(
             { _id: new ObjectId(_id) },
             { $set: { soloTimes: this.generateBestTimes(), multiTimes: this.generateBestTimes() } },
@@ -61,7 +61,6 @@ export class BestTimesService {
     }
 
     updateBestTimes(initialRankingBoard: RankingBoard[], winnerBoard: RankingBoard): RankingBoard[] {
-        // copy necessary to avoid mutating the initialRankingBoard, which causes considerable issues
         const initialRankingBoardCopy = initialRankingBoard.slice();
         initialRankingBoardCopy.push(winnerBoard);
         const updatedRankingBoard = initialRankingBoardCopy.sort((a, b) => {

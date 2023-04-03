@@ -1,9 +1,10 @@
 import { GameCardService } from '@app/services/game-card/game-card.service';
+import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { RoomMessage } from '@common/chat-gateway-constants';
 import { CHAT_EVENTS, MESSAGE_MAX_LENGTH, Room, RoomEvent, RoomManagement } from '@common/chat-gateway-events';
-import { gameHistory } from '@common/game-history';
+import { GameHistoryDTO } from '@common/game-history.dto';
 import { RankingBoard } from '@common/ranking-board';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
@@ -13,7 +14,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
 
     private waitingRoom: Room[] = [];
-    constructor(private gameCardService: GameCardService, private logger: Logger) {}
+    constructor(private gameHistoryService: GameHistoryService, private gameCardService: GameCardService) {}
 
     @SubscribeMessage(CHAT_EVENTS.Validate)
     validate(socket: Socket, message: string): void {
@@ -64,36 +65,44 @@ export class ChatGateway implements OnGatewayDisconnect {
     }
 
     @SubscribeMessage(CHAT_EVENTS.BestTime)
-    async bestTime(socket: Socket, data: gameHistory) {
-        if (!data.isAbandon) {
-            const date = this.dateCreator();
-            // const position = this.gameCardService.updateTime();
-            // if (position);
-            const gameCard = await this.gameCardService.getGameCardById(data.id);
-            const playerRankingBoard: RankingBoard = {
-                name: data.winnerName,
-                time: data.gameDuration,
-            };
-            let position: number;
-            const updatedGame = await this.gameCardService.updateGameCard(gameCard, playerRankingBoard, data.isMultiplayer);
-            for (const ranking of data.isMultiplayer ? updatedGame.multiTimes : updatedGame.soloTimes) {
-                if (ranking.name === data.winnerName) {
-                    position = (data.isMultiplayer ? updatedGame.multiTimes : updatedGame.soloTimes).indexOf(ranking);
+    async bestTime(socket: Socket, data: GameHistoryDTO) {
+        if (await this.gameCardService.getGameCardById(data.gameId)) {
+            if (!(data.player1.hasAbandon || data.player2?.hasAbandon)) {
+                const date = this.dateCreator();
+                const gameCard = await this.gameCardService.getGameCardById(data.gameId);
+                const winnerName = data.player1.hasWon ? data.player1.name : data.player2?.name;
+                const playerRankingBoard: RankingBoard = {
+                    name: winnerName,
+                    time: data.gameDuration,
+                };
+                let position: number;
+                const updatedGame = await this.gameCardService.updateGameCard(gameCard, playerRankingBoard, data.isMultiplayer);
+                for (const ranking of data.isMultiplayer ? updatedGame.multiTimes : updatedGame.soloTimes) {
+                    if (ranking.name === winnerName) {
+                        position = (data.isMultiplayer ? updatedGame.multiTimes : updatedGame.soloTimes).indexOf(ranking) + 1;
+                    }
+                }
+                if (position <= 3) {
+                    const message = `${date} - ${winnerName} obtient la ${position} place dans les meilleurs temps du jeu ${data.gameName} en 
+                    ${data.isMultiplayer ? 'multijoueur' : 'solo'}.`;
+                    this.server.emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message, event: 'abandon' } as RoomMessage);
                 }
             }
-            if (position + 1 <= 3) {
-                const message = `${date} - ${data.winnerName} obtient la ${position + 1} place dans les meilleurs temps du jeu ${data.gameName} en 
-                ${data.gameMode}.`;
-                this.server.emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message, event: 'abandon' } as RoomMessage);
-            }
+            socket.data.isSolo = false;
+
+            this.gameHistoryService.addGameToHistory(data);
         }
     }
 
     handleDisconnect(socket: Socket): void {
-        if (socket.data.room)
+        if (socket.data.room) {
             this.server
                 .to(socket.data.room)
                 .emit(CHAT_EVENTS.Abandon, { socketId: socket.id, message: this.dateCreator(), event: 'abandon' } as RoomMessage);
+        }
+        if (socket.data.isSolo) {
+            this.bestTime(socket, socket.data.soloGame);
+        }
     }
 
     dateCreator(): string {

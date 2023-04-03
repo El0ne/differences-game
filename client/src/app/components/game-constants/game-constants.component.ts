@@ -1,6 +1,9 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { GameHistoryComponent } from '@app/components/game-history/game-history.component';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
+import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { GameConstants, getDefaultGameConstants } from '@common/game-constants';
 
 @Component({
@@ -12,7 +15,14 @@ export class GameConstantsComponent implements OnInit {
     @Output() bestTimeReset = new EventEmitter<void>();
     gameConstants: GameConstants;
 
-    constructor(private gameConstantsService: GameConstantsService, private gameCardService: GameCardInformationService) {}
+    // need more than 3 services and dialog
+    // eslint-disable-next-line max-params
+    constructor(
+        private gameConstantsService: GameConstantsService,
+        private gameCardService: GameCardInformationService,
+        private dialog: MatDialog,
+        private gameHistoryService: GameHistoryService,
+    ) {}
 
     ngOnInit(): void {
         this.gameConstantsService.getGameConstants().subscribe((gameConstants: GameConstants) => {
@@ -52,5 +62,13 @@ export class GameConstantsComponent implements OnInit {
         } else {
             return inputValue;
         }
+    }
+
+    openGameHistory(): void {
+        this.dialog.open(GameHistoryComponent);
+    }
+
+    deleteGameHistory(): void {
+        this.gameHistoryService.deleteGameHistory().subscribe();
     }
 }

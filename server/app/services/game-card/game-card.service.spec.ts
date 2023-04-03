@@ -3,6 +3,7 @@
 /* eslint-disable no-underscore-dangle */
 import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
 import { GameCard, GameCardDocument, gameCardSchema } from '@app/schemas/game-cards.schemas';
+import { GameHistory, gameHistorySchema } from '@app/schemas/game-history';
 import { BestTimesService } from '@app/services/best-times/best-times.service';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
@@ -14,13 +15,14 @@ import { PixelPositionService } from '@app/services/pixel-position/pixel-positio
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { RankingBoard } from '@common/ranking-board';
-import { MongooseModule, getConnectionToken, getModelToken } from '@nestjs/mongoose';
+import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing/test';
 import { ObjectId } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection, Model, Query } from 'mongoose';
 import { stub } from 'sinon';
+import { GameHistoryService } from '../game-history/game-history.service';
 import { GameCardService } from './game-card.service';
 describe('GameCardService', () => {
     let service: GameCardService;
@@ -46,6 +48,7 @@ describe('GameCardService', () => {
                 MongooseModule.forFeature([
                     { name: GameCard.name, schema: gameCardSchema },
                     { name: Differences.name, schema: differencesSchema },
+                    { name: GameHistory.name, schema: gameHistorySchema },
                 ]),
             ],
             providers: [
@@ -58,6 +61,7 @@ describe('GameCardService', () => {
                 PixelPositionService,
                 BestTimesService,
                 GameManagerService,
+                GameHistoryService,
             ],
         }).compile();
 
