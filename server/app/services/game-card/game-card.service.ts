@@ -74,15 +74,11 @@ export class GameCardService {
     }
 
     async updateGameCard(game: GameCard, winnerBoard: RankingBoard, isMultiplayer: boolean): Promise<GameCard> {
-        console.log(game);
-        console.log(winnerBoard);
-        console.log(isMultiplayer);
         if (isMultiplayer) {
             game.multiTimes = this.bestTimesService.updateBestTimes(game.multiTimes, winnerBoard);
         } else {
             game.soloTimes = this.bestTimesService.updateBestTimes(game.soloTimes, winnerBoard);
         }
-        console.log('here');
         await this.gameCardModel.findOneAndUpdate({ _id: game._id }, game);
         return game;
     }

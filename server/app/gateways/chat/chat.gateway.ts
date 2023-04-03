@@ -65,7 +65,6 @@ export class ChatGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage(CHAT_EVENTS.BestTime)
     async bestTime(socket: Socket, data: gameHistory) {
-        this.logger.log(data);
         if (!data.isAbandon) {
             const date = this.dateCreator();
             // const position = this.gameCardService.updateTime();
