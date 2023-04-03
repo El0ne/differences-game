@@ -73,7 +73,7 @@ describe('GameCardInformationService', () => {
         expect(postSpy).toHaveBeenCalled();
     });
 
-    it('getGameCardInfo should call get on httpManager', () => {
+    it('deleteImage should call delete on httpManager', () => {
         const deleteSpy = spyOn(service.http, 'delete');
 
         service.deleteImage('');
