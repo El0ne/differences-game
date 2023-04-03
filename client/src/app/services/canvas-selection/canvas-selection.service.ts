@@ -18,10 +18,12 @@ export class CanvasSelectionService {
             this.canvasInformations.isInOriginalCanvas = true;
             this.canvasInformations.drawingCanvas1 = this.canvasInformations.originalDrawnCanvas;
             this.canvasInformations.drawingCanvas2 = this.canvasInformations.originalRectangleCanvas;
+            console.log('left :', 'X: ', mouseEvent.offsetX, ' Y: ', mouseEvent.offsetY);
         } else if ([this.canvasInformations.differenceRectangleCanvas, this.canvasInformations.differenceDrawnCanvas].includes(target)) {
             this.canvasInformations.isInOriginalCanvas = false;
             this.canvasInformations.drawingCanvas1 = this.canvasInformations.differenceDrawnCanvas;
             this.canvasInformations.drawingCanvas2 = this.canvasInformations.differenceRectangleCanvas;
+            console.log('right :', 'X: ', mouseEvent.offsetX, ' Y: ', mouseEvent.offsetY);
         }
 
         return this.canvasInformations;

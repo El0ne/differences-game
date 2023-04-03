@@ -55,6 +55,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     currentRoom: string;
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
     inputElement = document.querySelector('input');
+    isWinner: boolean = false;
+    isReplayMode: boolean = false;
 
     buttonPressCommand: ButtonPressCommand;
     modalCloseCommand: ModalCloseCommand;
@@ -173,7 +175,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.showNavBar = false;
             this.dialog.open(GameWinModalComponent, {
                 disableClose: true,
-                data: { isMultiplayer: this.isMultiplayer, winner: this.socketService.names.get(winnerId) } as EndGame,
+                data: { isMultiplayer: this.isMultiplayer, winner: this.socketService.names.get(winnerId), isWinner: this.isWinner } as EndGame,
             });
         }
     }
@@ -290,6 +292,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         if (this.isMultiplayer) {
             const endGameVerification = this.numberOfDifferences / 2;
             if (this.currentScorePlayer >= endGameVerification) {
+                this.isWinner = true;
                 this.socketService.send<string>(MATCH_EVENTS.Win, this.currentRoom);
             }
         } else {
