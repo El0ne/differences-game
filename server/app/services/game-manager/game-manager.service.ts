@@ -58,7 +58,6 @@ export class GameManagerService {
     }
 
     async startLimitedTimeGame(room: string, numberOfPlayers: number): Promise<void> {
-        console.log('yo');
         const gameCards: GameCard[] = await this.gameCardService.getAllGameCards();
         const stageInformations: StageInformation[] = gameCards.map((gameCard) => {
             const stageId = gameCard._id.toString();
@@ -85,7 +84,6 @@ export class GameManagerService {
             playersInGame: numberOfPlayers,
             stagesUsed: gameCards.map((stage) => stage._id.toString()),
         });
-        console.log(this.limitedTimeModeGames);
     }
 
     giveNextLimitedTimeStage(room: string): StageInformation {

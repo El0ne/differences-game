@@ -1,7 +1,7 @@
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND, SoloGameCreation } from '@common/match-gateway-communication';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
@@ -10,7 +10,7 @@ import { Server, Socket } from 'socket.io';
 export class MatchGateway implements OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
     timers: Map<string, ReturnType<typeof setTimeout>> = new Map<string, ReturnType<typeof setTimeout>>();
-    constructor(private gameManagerService: GameManagerService, private logger: Logger) {}
+    constructor(private gameManagerService: GameManagerService) {}
 
     @SubscribeMessage(MATCH_EVENTS.createSoloGame)
     async createSoloGame(@ConnectedSocket() socket: Socket, @MessageBody() gameInfo: SoloGameCreation): Promise<void> {

@@ -3,7 +3,7 @@ import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { JoinHostInWaitingRequest, PlayerInformations, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 import { Test, TestingModule } from '@nestjs/testing';
-import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
+import { SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { BroadcastOperator, Server, Socket } from 'socket.io';
 import { StageWaitingRoomGateway } from './stage-waiting-room.gateway';
 
@@ -107,7 +107,7 @@ describe('StageWaitingRoomGateway', () => {
 
     it(`accept opponent should set the 2 players in the same room, 
     send a matchAccepted to the opponent and a matchConfirmed its socket 
-    when not in limited-time-game-mode`, () => {
+    when not in limited-time-game-mode`, async () => {
         const opponentSocket = createStubInstance<Socket>(Socket);
         Object.defineProperty(opponentSocket, 'id', { value: 'opponentId' });
         opponentSocket.data = {};
@@ -119,7 +119,7 @@ describe('StageWaitingRoomGateway', () => {
             // eslint-disable-next-line @typescript-eslint/no-empty-function, no-unused-vars
             emit: (event: string) => {},
         } as BroadcastOperator<unknown, unknown>);
-        gateway.acceptOpponent(socket, { playerName: 'host1', playerSocketId: 'opponentId', isLimitedTimeMode: true });
+        await gateway.acceptOpponent(socket, { playerName: 'host1', playerSocketId: 'opponentId', isLimitedTimeMode: true });
         expect(socket.to.calledWith('stage1')).toBeTruthy();
         expect(socket.emit.calledWith(WAITING_ROOM_EVENTS.DeclineOpponent, 'randomRoomId'));
         expect(socket.data.stageInHosting).toEqual(null);
@@ -145,7 +145,7 @@ describe('StageWaitingRoomGateway', () => {
             emit: (event: string) => {},
         } as BroadcastOperator<unknown, unknown>);
         const deleteGameCardSpy = jest.spyOn(gameCardService, 'deleteGameCard');
-        const deleteGameSpy = jest.spyOn(gameManagerService, 'deleteGame');
+        const deleteGameSpy = jest.spyOn(gameManagerService, 'deleteGameFromDb');
         await gateway.deleteGame('stageId');
         expect(deleteGameCardSpy).toBeCalledWith('stageId');
         expect(deleteGameSpy).toBeCalledWith('stageId');

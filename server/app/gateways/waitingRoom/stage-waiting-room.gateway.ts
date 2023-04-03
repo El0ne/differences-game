@@ -62,7 +62,7 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
     }
 
     @SubscribeMessage(WAITING_ROOM_EVENTS.AcceptOpponent)
-    async acceptOpponent(@ConnectedSocket() socket: Socket, @MessageBody() acceptation: AcceptOpponentInformation): void {
+    async acceptOpponent(@ConnectedSocket() socket: Socket, @MessageBody() acceptation: AcceptOpponentInformation): Promise<void> {
         const opponentSocket: Socket = this.server.sockets.sockets.get(acceptation.playerSocketId);
         this.clearRooms(socket);
         this.clearRooms(opponentSocket);

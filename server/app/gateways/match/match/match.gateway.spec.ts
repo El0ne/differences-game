@@ -81,10 +81,10 @@ describe('MatchGateway', () => {
         const createGameSpy = jest.spyOn(gameManagerServiceSpy, 'addGame');
         Object.defineProperty(socket, 'id', { value: '123' });
 
-        gateway.createSoloGame(socket, { stageId: 'stageId', isLimitedTimeMode: false });
+        await gateway.createSoloGame(socket, { stageId: 'stageId', isLimitedTimeMode: false });
         expect(createGameSpy).toHaveBeenCalledWith('stageId', 1);
         expect(socket.data.stageId).toEqual('stageId');
-        expect(socket.data.room).toEqual('stageId');
+        expect(socket.data.room).toEqual('123');
 
         const createLimitedTimeGameSpy = jest.spyOn(gameManagerServiceSpy, 'startLimitedTimeGame');
         gateway.createSoloGame(socket, { stageId: 'stageId1', isLimitedTimeMode: true });
