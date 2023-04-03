@@ -10,6 +10,7 @@ import { GameConstantsController } from './controllers/game-constants/game-const
 import { StageController } from './controllers/stage/stage.controller';
 import { MatchGateway } from './gateways/match/match/match.gateway';
 import { StageWaitingRoomGateway } from './gateways/waitingRoom/stage-waiting-room.gateway';
+import { BestTimesService } from './services/best-times/best-times.service';
 import { DifferenceClickService } from './services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from './services/difference-detection/difference-detection.service';
 import { DifferencesCounterService } from './services/differences-counter/differences-counter.service';
@@ -53,6 +54,7 @@ import { PixelRadiusService } from './services/pixel-radius/pixel-radius.service
         GameManagerService,
         MatchGateway,
         GameConstantService,
+        BestTimesService,
     ],
 })
 export class AppModule {}
