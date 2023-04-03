@@ -3,12 +3,14 @@
 
 import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
 import { GameCard, gameCardSchema } from '@app/schemas/game-cards.schemas';
+import { GameHistory, gameHistorySchema } from '@app/schemas/game-history';
 import { BestTimesService } from '@app/services/best-times/best-times.service';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameDifficultyService } from '@app/services/game-difficulty/game-difficulty.service';
+import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
@@ -29,8 +31,6 @@ import Sinon, { stub } from 'sinon';
 import * as request from 'supertest';
 import { StageController } from './stage.controller';
 
-const DELAY_BEFORE_CLOSING_CONNECTION = 200;
-
 describe('StageController', () => {
     let httpServer: unknown;
     let controller: StageController;
@@ -46,13 +46,14 @@ describe('StageController', () => {
 
     beforeEach(async () => {
         mongoServer = await MongoMemoryServer.create();
-        const mongoUri = await mongoServer.getUri();
+        const mongoUri = mongoServer.getUri();
 
         const module: TestingModule = await Test.createTestingModule({
             imports: [
                 MongooseModule.forRoot(mongoUri),
                 MongooseModule.forFeature([{ name: Differences.name, schema: differencesSchema }]),
                 MongooseModule.forFeature([{ name: GameCard.name, schema: gameCardSchema }]),
+                MongooseModule.forFeature([{ name: GameHistory.name, schema: gameHistorySchema }]),
             ],
             controllers: [StageController],
             providers: [
@@ -67,6 +68,7 @@ describe('StageController', () => {
                 DifferenceClickService,
                 GameManagerService,
                 BestTimesService,
+                GameHistoryService,
             ],
         }).compile();
 
@@ -82,6 +84,8 @@ describe('StageController', () => {
         getGameCardsNumberStub = stub(gameCardService, 'getGameCardsNumber');
         getGameCardByIdStub = stub(gameCardService, 'getGameCardById');
     });
+
+    const DELAY_BEFORE_CLOSING_CONNECTION = 200;
 
     afterEach((done) => {
         getGameCardStub.restore();

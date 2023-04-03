@@ -1,4 +1,5 @@
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
+import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { Injectable } from '@nestjs/common';
 
 interface MapGameInfo {
@@ -9,7 +10,7 @@ interface MapGameInfo {
 export class GameManagerService {
     gamePlayedInformation: Map<string, MapGameInfo> = new Map();
 
-    constructor(private differenceClickService: DifferenceClickService) {}
+    constructor(private differenceClickService: DifferenceClickService, private gameHistoryService: GameHistoryService) {}
 
     async endGame(stageId: string): Promise<void> {
         const currentMapGameInfo = this.gamePlayedInformation.get(stageId);
@@ -43,5 +44,6 @@ export class GameManagerService {
         } else {
             await this.differenceClickService.deleteDifferences(stageId);
         }
+        await this.gameHistoryService.deleteGameHistory(stageId);
     }
 }

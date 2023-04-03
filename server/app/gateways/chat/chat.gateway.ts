@@ -1,7 +1,9 @@
-import { bestTimeInformation } from '@common/best-time';
+import { GameCardService } from '@app/services/game-card/game-card.service';
+import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { RoomMessage } from '@common/chat-gateway-constants';
 import { CHAT_EVENTS, MESSAGE_MAX_LENGTH, Room, RoomEvent, RoomManagement } from '@common/chat-gateway-events';
-import { Injectable } from '@nestjs/common';
+import { GameHistoryDTO } from '@common/game-history.dto';
+import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
@@ -11,6 +13,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
 
     private waitingRoom: Room[] = [];
+    constructor(private gameHistoryService: GameHistoryService, private logger: Logger, private gameCardService: GameCardService) {}
 
     @SubscribeMessage(CHAT_EVENTS.Validate)
     validate(socket: Socket, message: string): void {
@@ -61,18 +64,33 @@ export class ChatGateway implements OnGatewayDisconnect {
     }
 
     @SubscribeMessage(CHAT_EVENTS.BestTime)
-    bestTime(socket: Socket, data: bestTimeInformation) {
-        const date = this.dateCreator();
-        const message = `${date} - ${data.winner} obtient la ${data.position} place dans les meilleurs temps du jeu ${data.gameName} en 
-        ${data.mode}.`;
-        this.server.emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message, event: 'abandon' } as RoomMessage);
+    async bestTime(socket: Socket, data: GameHistoryDTO) {
+        if (await this.gameCardService.getGameCardById(data.gameId)) {
+            if (!(data.player1.hasAbandon || data.player2?.hasAbandon)) {
+                const date = this.dateCreator();
+                // const position = this.gameCardService.updateTime();
+                // if (position);
+                // TODO add solo or multi in message
+                const message = `${date} - ${data.player1.name} obtient la ${data.gameDuration} place dans les meilleurs temps du jeu ${
+                    data.gameName
+                } en ${data.isMultiplayer ? 'multijoueur' : 'solo'}.`;
+                this.server.emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message, event: 'abandon' } as RoomMessage);
+            }
+            socket.data.isSolo = false;
+
+            this.gameHistoryService.addGameToHistory(data);
+        }
     }
 
     handleDisconnect(socket: Socket): void {
-        if (socket.data.room)
+        if (socket.data.room) {
             this.server
                 .to(socket.data.room)
                 .emit(CHAT_EVENTS.Abandon, { socketId: socket.id, message: this.dateCreator(), event: 'abandon' } as RoomMessage);
+        }
+        if (socket.data.isSolo) {
+            this.bestTime(socket, socket.data.soloGame);
+        }
     }
 
     dateCreator(): string {

@@ -3,9 +3,11 @@
 /* eslint-disable no-underscore-dangle */
 import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
 import { GameCard, GameCardDocument, gameCardSchema } from '@app/schemas/game-cards.schemas';
+import { GameHistory, gameHistorySchema } from '@app/schemas/game-history';
 import { BestTimesService } from '@app/services/best-times/best-times.service';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
+import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
@@ -43,6 +45,7 @@ describe('GameCardService', () => {
                 MongooseModule.forFeature([
                     { name: GameCard.name, schema: gameCardSchema },
                     { name: Differences.name, schema: differencesSchema },
+                    { name: GameHistory.name, schema: gameHistorySchema },
                 ]),
             ],
             providers: [
@@ -55,6 +58,7 @@ describe('GameCardService', () => {
                 PixelPositionService,
                 BestTimesService,
                 GameManagerService,
+                GameHistoryService,
             ],
         }).compile();
 
