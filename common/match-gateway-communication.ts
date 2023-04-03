@@ -10,6 +10,7 @@ export enum MATCH_EVENTS {
 export enum LIMITED_TIME_MODE_EVENTS {
     GetFirstStageInformation = 'getFirstStageInformation',
     NewStageInformation = 'newStageInformation',
+    StartLimitedTimeGame = 'startLimitedTimeGame',
 }
 
 export const ONE_SECOND = 1000;

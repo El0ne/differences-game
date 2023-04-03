@@ -8,7 +8,7 @@ import { WaitingRoomComponent, WaitingRoomDataPassing } from '@app/modals/waitin
 import { STAGE } from '@app/services/server-routes';
 import { SocketService } from '@app/services/socket/socket.service';
 import { GameCardInformation } from '@common/game-card';
-import { MATCH_EVENTS } from '@common/match-gateway-communication';
+import { MATCH_EVENTS, SoloGameCreation } from '@common/match-gateway-communication';
 import { JoinHostInWaitingRequest, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 
 @Component({
@@ -51,7 +51,10 @@ export class GameCardSelectionComponent implements OnInit {
             if (isNameEntered) {
                 if (isSoloGame) {
                     this.socketService.gameRoom = this.socketService.socketId;
-                    this.socketService.send(MATCH_EVENTS.createSoloGame, this.gameCardInformation._id);
+                    this.socketService.send<SoloGameCreation>(MATCH_EVENTS.createSoloGame, {
+                        stageId: this.gameCardInformation._id,
+                        isLimitedTimeMode: false,
+                    });
                     this.router.navigate(['/solo/' + this.gameCardInformation._id]);
                 } else this.hostOrJoinGame();
             }

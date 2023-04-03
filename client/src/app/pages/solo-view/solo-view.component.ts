@@ -69,11 +69,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.currentGameId = gameId;
             this.isLimitedTimeMode = this.currentGameId === LIMITED_TIME_MODE_ID;
 
-            if (!this.isLimitedTimeMode) {
-                this.socketService.listen(LIMITED_TIME_MODE_EVENTS.NewStageInformation, (newStageInfo: StageInformation) => {
+            if (this.isLimitedTimeMode) {
+                this.socketService.listen<StageInformation>(LIMITED_TIME_MODE_EVENTS.NewStageInformation, (newStageInfo: StageInformation) => {
                     Object.assign(this.gameCardInfo, newStageInfo);
+                    console.log(newStageInfo);
+                    console.log(this.gameCardInfo);
                 });
-                this.socketService.send(LIMITED_TIME_MODE_EVENTS.GetFirstStageInformation);
             } else {
                 this.gameCardInfoService.getGameCardInfoFromId(this.currentGameId).subscribe((gameCardData) => {
                     this.gameCardInfo = gameCardData;
