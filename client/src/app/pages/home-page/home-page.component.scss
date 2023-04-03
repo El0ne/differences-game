@@ -35,6 +35,8 @@ body {
     position: relative;
     margin: 0.5em 0;
     padding: 0.8em 2.2em;
+    width: 30rem;
+    height: 9rem;
     cursor: pointer;
 
     background: #ffffff;
@@ -42,9 +44,9 @@ body {
     border-radius: 0.4em;
 
     text-transform: uppercase;
-    font-size: 1.4em;
     font-family: 'Work Sans', sans-serif;
-    font-weight: 500;
+    font-size: x-large;
+    font-weight: 600;
     letter-spacing: 0.04em;
 
     mix-blend-mode: color-dodge;
