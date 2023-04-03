@@ -2,6 +2,7 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { MatTableModule } from '@angular/material/table';
 import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { FAKE_GAME_HISTORY } from '@common/mock/game-history-mock';
 import { of } from 'rxjs';
@@ -18,7 +19,7 @@ describe('GameHistoryComponent', () => {
         };
         await TestBed.configureTestingModule({
             declarations: [GameHistoryComponent],
-            imports: [HttpClientTestingModule],
+            imports: [HttpClientTestingModule, MatTableModule],
             providers: [{ provide: GameHistoryService, useValue: gameHistoryService }],
         }).compileComponents();
 
