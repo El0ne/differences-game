@@ -83,8 +83,7 @@ export class ModalCloseCommand implements Command {
 }
 
 export class Invoker {
-    private commands = new Array();
-    private time: number;
+    commands = new Array();
 
     addCommand(command: Command, time: number): void {
         this.commands.push({ action: command, time });
@@ -92,15 +91,10 @@ export class Invoker {
         console.log(this.commands);
     }
 
-    getTimer(time: number): number {
-        this.time = time;
-        return this.time;
-    }
-
-    run(): void {
+    run(time: number): void {
         this.commands.forEach((command) => {
             setTimeout(() => {
-                if (command.time === this.time) {
+                if (command.time === time) {
                     command.action.execute();
                 }
             });
