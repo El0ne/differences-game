@@ -63,8 +63,6 @@ export class GameCardService {
             name: game.name,
             difficulty: game.difficulty,
             differenceNumber: game.differenceNumber,
-            originalImageName: game.baseImage,
-            differenceImageName: game.differenceImage,
             soloTimes: this.bestTimesService.generateBestTimes(),
             multiTimes: this.bestTimesService.generateBestTimes(),
         };

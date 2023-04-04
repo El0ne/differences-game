@@ -257,8 +257,6 @@ export class GameCreationPageComponent implements OnInit {
                         _id: data.gameId,
                         name: this.gameTitle,
                         difficulty: data.gameDifficulty,
-                        baseImage: data.originalImageName,
-                        differenceImage: data.differenceImageName,
                         radius: this.differenceRadius,
                         differenceNumber: data.gameDifferenceNumber,
                     };

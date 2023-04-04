@@ -1,5 +1,5 @@
 import { Component, Inject, NgZone } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
@@ -37,8 +37,9 @@ export class ModalPageComponent {
         // using _id property which causes linting error
         // eslint-disable-next-line no-underscore-dangle
         this.clickService.deleteDifferences(this.data.gameInfo._id).subscribe();
-        this.gameCardService.deleteImage(this.data.gameInfo.baseImage).subscribe();
-        this.gameCardService.deleteImage(this.data.gameInfo.differenceImage).subscribe();
+        // TODO Delete image with IMAGE path
+        // this.gameCardService.deleteImage(this.data.gameInfo.baseImage).subscribe();
+        // this.gameCardService.deleteImage(this.data.gameInfo.differenceImage).subscribe();
         this.redirection('/creatingGame');
     }
 

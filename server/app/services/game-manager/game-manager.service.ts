@@ -71,8 +71,9 @@ export class GameManagerService {
             this.addGame(stageId, numberOfPlayers);
             return {
                 _id: stageId,
-                originalImageName: gameCard.originalImageName,
-                differenceImageName: gameCard.differenceImageName,
+                // TODO fix with Alexis
+                originalImageName: 'gameCard.originalImageName',
+                differenceImageName: 'gameCard.differenceImageName',
             };
         });
 
