@@ -5,6 +5,7 @@ export enum MATCH_EVENTS {
     StartTime = 'StartTime',
     Difference = 'Difference',
     Win = 'Win',
+    Replay = 'Replay',
 }
 
 export const ONE_SECOND = 1000;

@@ -1,6 +1,7 @@
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
+import { ReplayTimerInformations } from '@common/replay-timer-informations';
 import { Injectable } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -44,12 +45,26 @@ export class MatchGateway implements OnGatewayDisconnect {
         }
     }
 
+    @SubscribeMessage(MATCH_EVENTS.Replay)
+    replay(socket: Socket, replayInformations: ReplayTimerInformations): void {
+        this.replayTimer(socket, replayInformations.room, replayInformations.currentTime, replayInformations.timeMultiplier);
+    }
+
     timer(room: string): void {
         let timerCount = 0;
         const timer = setInterval(() => {
             timerCount++;
             this.server.to(room).emit(MATCH_EVENTS.Timer, timerCount);
         }, ONE_SECOND);
+        this.timers.set(room, timer);
+    }
+
+    replayTimer(socket: Socket, room: string, timerCount: number, multiplier: number): void {
+        this.stopTimer(socket, room);
+        const timer = setInterval(() => {
+            timerCount++;
+            this.server.to(room).emit(MATCH_EVENTS.Timer, timerCount);
+        }, ONE_SECOND * multiplier);
         this.timers.set(room, timer);
     }
 

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SocketService } from '@app/services/socket/socket.service';
 import { MATCH_EVENTS } from '@common/match-gateway-communication';
+import { ReplayTimerInformations } from '@common/replay-timer-informations';
 import { Subscription } from 'rxjs';
 import { SECONDS_IN_MINUTE, TEN } from './timer-solo.constants';
 
@@ -21,6 +22,15 @@ export class TimerSoloService {
 
     stopTimer(): void {
         this.socket.send(MATCH_EVENTS.EndTime, this.socket.gameRoom);
+    }
+
+    restartTimer(multiplier: number): void {
+        const restartTimerInformations: ReplayTimerInformations = {
+            room: this.socket.gameRoom,
+            currentTime: this.currentTime,
+            timeMultiplier: multiplier,
+        };
+        this.socket.send(MATCH_EVENTS.Replay, restartTimerInformations);
     }
 
     convert(seconds: number): string {

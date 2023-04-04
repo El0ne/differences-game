@@ -57,11 +57,14 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     inputElement = document.querySelector('input');
     isWinner: boolean = false;
     isReplayMode: boolean = false;
+    isReplayPaused: boolean = false;
+    timeMultiplier: number = 1;
 
     buttonPressCommand: ButtonPressCommand;
     modalCloseCommand: ModalCloseCommand;
 
     invoker: Invoker;
+    commandIndex: number = 0;
     // eslint-disable-next-line max-params
     constructor(
         public timerService: TimerSoloService,
@@ -173,9 +176,20 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.left.endGame = true;
             this.right.endGame = true;
             this.showNavBar = false;
-            this.dialog.open(GameWinModalComponent, {
+            const dialogRef = this.dialog.open(GameWinModalComponent, {
                 disableClose: true,
                 data: { isMultiplayer: this.isMultiplayer, winner: this.socketService.names.get(winnerId), isWinner: this.isWinner } as EndGame,
+            });
+            dialogRef.afterClosed().subscribe(() => {
+                this.isReplayMode = true;
+
+                this.timerService.currentTime = 0;
+                this.messages = [];
+                this.currentScorePlayer = 0;
+                this.currentScoreOpponent = 0;
+                this.timerService.restartTimer(1);
+
+                this.replayGame();
             });
         }
     }
@@ -300,5 +314,44 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.winGame(this.socketService.socketId);
             }
         }
+    }
+
+    pauseReplay(): void {
+        this.isReplayPaused = !this.isReplayPaused;
+        if (this.isReplayPaused) {
+            console.log('pause');
+            this.timerService.stopTimer();
+        } else {
+            this.timerService.restartTimer(this.timeMultiplier);
+        }
+    }
+
+    fastForwardReplay(multiplier: number): void {
+        this.timeMultiplier = multiplier;
+        this.timerService.restartTimer(this.timeMultiplier);
+    }
+
+    replayGame(): void {
+        setTimeout(() => {
+            // console.log('i: ', this.commandIndex);
+            const command = this.invoker.commands[this.commandIndex];
+            // console.log('command: ', command);
+            // console.log('command time: ', command.time, 'current time: ', this.timerService.currentTime);
+            if (command.time === this.timerService.currentTime) {
+                // console.log('move supposed to be executed');
+                command.action.execute();
+                this.commandIndex++;
+                if (this.commandIndex >= this.invoker.commands.length) {
+                    console.log('end of command list');
+
+                    return;
+                }
+                this.replayGame();
+            } else {
+                // console.log('not same time, retry');
+                // console.log(' \n');
+                this.replayGame();
+            }
+        }, 100);
     }
 }
