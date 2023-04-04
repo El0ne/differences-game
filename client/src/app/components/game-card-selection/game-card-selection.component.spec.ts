@@ -10,7 +10,7 @@ import { GAMES } from '@app/mock/game-cards';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { WaitingRoomComponent, WaitingRoomDataPassing } from '@app/modals/waiting-room/waiting-room.component';
 import { SocketService } from '@app/services/socket/socket.service';
-import { MATCH_EVENTS } from '@common/match-gateway-communication';
+import { MATCH_EVENTS, SoloGameCreation } from '@common/match-gateway-communication';
 import { JoinHostInWaitingRequest, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 import { of } from 'rxjs';
 import { GameCardSelectionComponent } from './game-card-selection.component';
@@ -78,7 +78,10 @@ describe('GameCardSelectionComponent', () => {
         const routerSpy = spyOn(TestBed.inject(Router), 'navigate');
         component.selectPlayerName(true);
         expect(routerSpy).toHaveBeenCalledWith(['/solo/' + component.gameCardInformation._id]);
-        expect(socketServiceSpy.send).toHaveBeenCalledWith(MATCH_EVENTS.createSoloGame, '123');
+        expect(socketServiceSpy.send).toHaveBeenCalledWith(MATCH_EVENTS.createSoloGame, {
+            stageId: '123',
+            isLimitedTimeMode: false,
+        } as SoloGameCreation);
     });
 
     it('selectPlayerName should call hostOrJoinGame if in multiplayer', () => {

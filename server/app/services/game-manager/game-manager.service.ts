@@ -2,6 +2,7 @@
 import { GameCard } from '@app/schemas/game-cards.schemas';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { GameCardService } from '@app/services/game-card/game-card.service';
+import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { StageInformation } from '@common/game-card';
 import { Injectable } from '@nestjs/common';
 
@@ -21,7 +22,11 @@ export class GameManagerService {
     gamePlayedInformation: Map<string, MapGameInfo> = new Map();
     limitedTimeModeGames: Map<string, LimitedTimeGameInfo> = new Map();
 
-    constructor(private differenceClickService: DifferenceClickService, private gameCardService: GameCardService) {}
+    constructor(
+        private differenceClickService: DifferenceClickService,
+        private gameHistoryService: GameHistoryService,
+        private gameCardService: GameCardService,
+    ) {}
 
     async endGame(stageId: string): Promise<void> {
         const currentMapGameInfo = this.gamePlayedInformation.get(stageId);
@@ -55,6 +60,7 @@ export class GameManagerService {
         } else {
             await this.differenceClickService.deleteDifferences(stageId);
         }
+        await this.gameHistoryService.deleteGameHistory(stageId);
     }
 
     async startLimitedTimeGame(room: string, numberOfPlayers: number): Promise<void> {
