@@ -1,25 +1,26 @@
-import { Controller, Get, HttpStatus, Param, Res } from '@nestjs/common';
+import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
+import { Controller, Get, HttpStatus, Param, Query, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { join } from 'path';
 
 @Controller('image')
 export class ImageController {
+    constructor(private imageManagerService: ImageManagerService) {}
     // return the name of the two images
-    // @Get('') id passed in query
-    // async getImageNames(@Param() param, @Res() res: Response): Promise<void> {
-    //     try {
-    //         const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);
-    //         res.status(HttpStatus.OK).sendFile(imagePath);
-    //     } catch (err) {
-    //         res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-    //     }
-    // }
+    @Get('')
+    async getImageNames(@Query('id') id: string, @Res() res: Response): Promise<void> {
+        try {
+            const test = await this.imageManagerService.getImageObjectById(id);
+            // const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);
+            res.status(HttpStatus.OK).send(test);
+        } catch (err) {
+            res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     @Get('/:imageName')
     async getImage(@Param() param, @Res() res: Response): Promise<void> {
-        console.log('first');
         try {
             const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);
-            console.log('imagePath', imagePath);
             res.status(HttpStatus.OK).sendFile(imagePath);
         } catch (err) {
             res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);

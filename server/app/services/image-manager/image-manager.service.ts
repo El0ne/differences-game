@@ -19,6 +19,10 @@ export class ImageManagerService {
         return newImageObject.save();
     }
 
+    async getImageObjectById(id: string): Promise<Images> {
+        return await this.imagesModel.findById(new ObjectId(id));
+    }
+
     deleteImage(imageName: string): void {
         const imagePath = `assets/images/${imageName}`;
         if (fs.existsSync(imagePath)) {
