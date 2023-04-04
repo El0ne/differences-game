@@ -14,4 +14,8 @@ export class ImagesService {
         const options = { params: new HttpParams().set('id', id) };
         return this.http.get<ImageObject>(IMAGE, options);
     }
+
+    deleteImageObjects(id: string): Observable<void> {
+        return this.http.delete<void>(`${IMAGE}/${id}`);
+    }
 }

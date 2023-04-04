@@ -1,8 +1,11 @@
+// using _id property which causes linting error
+/* eslint-disable no-underscore-dangle */
 import { Component, Inject, NgZone } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { ImagesService } from '@app/services/images/images.service';
 import { GameCardDto } from '@common/game-card.dto';
 
 @Component({
@@ -26,6 +29,7 @@ export class ModalPageComponent {
         private gameCardService: GameCardInformationService,
         private clickService: ClickEventService,
         private ngZone: NgZone,
+        private imagesServices: ImagesService,
     ) {}
 
     createGame(): void {
@@ -34,12 +38,8 @@ export class ModalPageComponent {
     }
 
     dropGame(): void {
-        // using _id property which causes linting error
-        // eslint-disable-next-line no-underscore-dangle
         this.clickService.deleteDifferences(this.data.gameInfo._id).subscribe();
-        // TODO Delete image with IMAGE path
-        // this.gameCardService.deleteImage(this.data.gameInfo.baseImage).subscribe();
-        // this.gameCardService.deleteImage(this.data.gameInfo.differenceImage).subscribe();
+        this.imagesServices.deleteImageObjects(this.data.gameInfo._id).subscribe();
         this.redirection('/creatingGame');
     }
 

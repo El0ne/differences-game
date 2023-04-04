@@ -125,7 +125,6 @@ export class GameManagerService {
 
     async deleteFromMongo(id: string): Promise<void> {
         await this.differenceClickService.deleteDifferences(id);
-        // TODO delete images and delete image object
         await this.imageManagerService.deleteImageObject(id);
     }
 }

@@ -1,5 +1,5 @@
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
-import { Controller, Get, HttpStatus, Param, Query, Res } from '@nestjs/common';
+import { Controller, Delete, Get, HttpStatus, Param, Query, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { join } from 'path';
 
@@ -27,13 +27,13 @@ export class ImageController {
         }
     }
 
-    // @Delete('/image/:imageName')
-    // async deleteImage(@Param() param, @Res() res: Response): Promise<void> {
-    //     try {
-    //         this.imageManagerService.deleteImage(param.imageName);
-    //         res.status(HttpStatus.NO_CONTENT).send([]);
-    //     } catch (err) {
-    //         res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-    //     }
-    // }
+    @Delete('/:id')
+    async deleteImageObjects(@Param() param, @Res() res: Response): Promise<void> {
+        try {
+            this.imageManagerService.deleteImageObject(param.id);
+            res.status(HttpStatus.NO_CONTENT).send([]);
+        } catch (err) {
+            res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
