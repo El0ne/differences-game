@@ -37,9 +37,7 @@ export class ChatGateway implements OnGatewayDisconnect {
                 dateFormatted = `${date} - ${data.event}.`;
             }
 
-            this.server
-                .to(data.room)
-                .emit(CHAT_EVENTS.RoomMessage, { socketId: socket.id, message: dateFormatted, event: 'notification' } as RoomMessage);
+            this.server.to(data.room).emit(CHAT_EVENTS.RoomMessage, { socketId: socket.id, message: dateFormatted, event: 'event' } as RoomMessage);
         }
     }
 
@@ -50,7 +48,7 @@ export class ChatGateway implements OnGatewayDisconnect {
             const dateFormatted = `${date} - Indice utilisé.`;
             this.server
                 .to(room)
-                .emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message: dateFormatted, event: 'abandon' } as RoomMessage);
+                .emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message: dateFormatted, event: 'notification' } as RoomMessage);
         }
     }
 
@@ -75,18 +73,17 @@ export class ChatGateway implements OnGatewayDisconnect {
                     name: winnerName,
                     time: data.gameDuration,
                 };
-                let position: number;
                 const updatedGame = await this.gameCardService.updateGameCard(gameCard, playerRankingBoard, data.isMultiplayer);
                 const rankingList = data.isMultiplayer ? updatedGame.multiTimes : updatedGame.soloTimes;
                 for (const ranking of rankingList) {
                     if (ranking.name === winnerName) {
-                        position = rankingList.indexOf(ranking) + 1;
+                        const position = rankingList.indexOf(ranking) + 1;
+                        if (position <= 3) {
+                            const message = `${date} - ${winnerName} obtient la ${position} place dans les meilleurs temps du jeu ${data.gameName} en 
+                            ${data.isMultiplayer ? 'multijoueur' : 'solo'}.`;
+                            this.server.emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message, event: 'notification' } as RoomMessage);
+                        }
                     }
-                }
-                if (position <= 3) {
-                    const message = `${date} - ${winnerName} obtient la ${position} place dans les meilleurs temps du jeu ${data.gameName} en 
-                    ${data.isMultiplayer ? 'multijoueur' : 'solo'}.`;
-                    this.server.emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message, event: 'abandon' } as RoomMessage);
                 }
             }
             socket.data.isSolo = false;
@@ -99,7 +96,7 @@ export class ChatGateway implements OnGatewayDisconnect {
         if (socket.data.room) {
             this.server
                 .to(socket.data.room)
-                .emit(CHAT_EVENTS.Abandon, { socketId: socket.id, message: this.dateCreator(), event: 'abandon' } as RoomMessage);
+                .emit(CHAT_EVENTS.Abandon, { socketId: socket.id, message: this.dateCreator(), event: 'notification' } as RoomMessage);
         }
         if (socket.data.isSolo) {
             this.bestTime(socket, socket.data.soloGame);
