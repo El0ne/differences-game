@@ -10,6 +10,7 @@ import { FoundDifferenceService } from '@app/services/found-differences/found-di
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
 import { GameParametersService } from '@app/services/game-parameters/game-parameters.service';
+import { ImagesService } from '@app/services/images/images.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { EndGame } from '@common/chat-dialog-constants';
@@ -19,6 +20,7 @@ import { DifferenceInformation, MultiplayerDifferenceInformation, PlayerDifferen
 import { GameCardInformation, StageInformation } from '@common/game-card';
 import { GameConstants } from '@common/game-constants';
 import { GameHistoryDTO } from '@common/game-history.dto';
+import { ImageObject } from '@common/image-object';
 import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
 import { PlayerGameInfo } from '@common/player-game-info';
 import { Subject } from 'rxjs';
@@ -48,6 +50,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     stageId: string;
     endGame: Subject<void> = new Subject<void>();
     gameCardInfo: GameCardInformation;
+    imagesInfo: ImageObject;
     startTime: string;
     soloTimer: ReturnType<typeof setInterval>;
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
@@ -62,6 +65,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         public socketService: SocketService,
         private gameConstantsService: GameConstantsService,
         private gameParamService: GameParametersService,
+        private imagesService: ImagesService,
     ) {}
 
     ngOnInit(): void {
@@ -81,6 +85,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         });
 
         if (this.stageId) {
+            this.imagesService.getImageNames(this.stageId).subscribe((imageObject) => {
+                this.imagesInfo = imageObject;
+            });
             if (this.isLimitedTimeMode) {
                 this.socketService.listen<StageInformation>(LIMITED_TIME_MODE_EVENTS.NewStageInformation, (newStageInfo: StageInformation) => {
                     Object.assign(this.gameCardInfo, newStageInfo);

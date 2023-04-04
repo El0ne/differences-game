@@ -6,7 +6,8 @@ export interface StageInformation {
     differenceImageName: string;
 }
 
-export interface GameCardInformation extends StageInformation {
+export interface GameCardInformation {
+    _id: string;
     name: string;
     difficulty: string;
     differenceNumber: number;
