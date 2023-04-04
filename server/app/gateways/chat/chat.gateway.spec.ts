@@ -17,6 +17,7 @@ import { GameHistoryService } from '@app/services/game-history/game-history.serv
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
+import { getFakeGameCard } from '@app/services/mock/fake-game-card';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { RoomMessage } from '@common/chat-gateway-constants';
@@ -35,9 +36,10 @@ describe('ChatGateway', () => {
     let logger: SinonStubbedInstance<Logger>;
     let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
+    let gameCard: GameCard;
     const TEST_ROOM_ID = 'test';
-    let gameHistoryService;
-    let gameCardService;
+    let gameHistoryService: GameHistoryService;
+    let gameCardService: GameCardService;
 
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
@@ -45,6 +47,11 @@ describe('ChatGateway', () => {
     beforeEach(async () => {
         mongoServer = await MongoMemoryServer.create();
         const mongoUri = await mongoServer.getUri();
+
+        gameCard = getFakeGameCard();
+
+        gameCard.multiTimes = rankings.multiTimes;
+        gameCard.soloTimes = rankings.soloTimes;
 
         logger = createStubInstance(Logger);
         socket = createStubInstance<Socket>(Socket);
@@ -146,9 +153,9 @@ describe('ChatGateway', () => {
 
     it('best time should add game history to mongoDB', async () => {
         socket.data.isSolo = true;
-        const getGameCardSpy = jest.spyOn(gameCardService, 'getGameCardById').mockReturnValue(true);
-        const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockReturnValue(true);
-        jest.spyOn(gameCardService, 'updateGameCard').mockReturnValue(rankings);
+        const getGameCardSpy = jest.spyOn(gameCardService, 'getGameCardById').mockResolvedValue(gameCard);
+        const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockImplementation();
+        jest.spyOn(gameCardService, 'updateGameCard').mockResolvedValue(gameCard);
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         const sendSpy = jest.spyOn(server, 'emit');
         server.to.returns({
@@ -168,9 +175,9 @@ describe('ChatGateway', () => {
     });
 
     it('best time should properly select the winner name and not send if undefined ', async () => {
-        const getGameCardSpy = jest.spyOn(gameCardService, 'getGameCardById').mockReturnValue(true);
-        const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockReturnValue(true);
-        jest.spyOn(gameCardService, 'updateGameCard').mockReturnValue(rankings);
+        const getGameCardSpy = jest.spyOn(gameCardService, 'getGameCardById').mockResolvedValue(gameCard);
+        const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockImplementation();
+        jest.spyOn(gameCardService, 'updateGameCard').mockResolvedValue(gameCard);
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         const sendSpy = jest.spyOn(server, 'emit');
         server.to.returns({
@@ -191,9 +198,9 @@ describe('ChatGateway', () => {
     });
 
     it('best time should properly assign player name', async () => {
-        jest.spyOn(gameCardService, 'getGameCardById').mockReturnValue(true);
-        jest.spyOn(gameHistoryService, 'addGameToHistory').mockReturnValue(true);
-        jest.spyOn(gameCardService, 'updateGameCard').mockReturnValue(rankings);
+        jest.spyOn(gameCardService, 'getGameCardById').mockResolvedValue(gameCard);
+        jest.spyOn(gameHistoryService, 'addGameToHistory').mockImplementation();
+        jest.spyOn(gameCardService, 'updateGameCard').mockResolvedValue(gameCard);
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         jest.spyOn(server, 'emit');
         server.to.returns({
@@ -207,9 +214,9 @@ describe('ChatGateway', () => {
     });
 
     it('best time should properly assign player name', async () => {
-        jest.spyOn(gameCardService, 'getGameCardById').mockReturnValue(true);
-        jest.spyOn(gameHistoryService, 'addGameToHistory').mockReturnValue(true);
-        jest.spyOn(gameCardService, 'updateGameCard').mockReturnValue(rankings);
+        jest.spyOn(gameCardService, 'getGameCardById').mockResolvedValue(gameCard);
+        jest.spyOn(gameHistoryService, 'addGameToHistory').mockImplementation();
+        jest.spyOn(gameCardService, 'updateGameCard').mockResolvedValue(gameCard);
         FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE.player1.hasWon = false;
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         jest.spyOn(server, 'emit');
@@ -225,9 +232,9 @@ describe('ChatGateway', () => {
 
     it('best time should include choose correct ranking', async () => {
         FAKE_GAME_HISTORY_SINGLE.isMultiplayer = false;
-        jest.spyOn(gameCardService, 'getGameCardById').mockReturnValue(true);
-        jest.spyOn(gameHistoryService, 'addGameToHistory').mockReturnValue(true);
-        jest.spyOn(gameCardService, 'updateGameCard').mockReturnValue(rankings);
+        jest.spyOn(gameCardService, 'getGameCardById').mockResolvedValue(gameCard);
+        jest.spyOn(gameHistoryService, 'addGameToHistory').mockImplementation();
+        jest.spyOn(gameCardService, 'updateGameCard').mockResolvedValue(gameCard);
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         jest.spyOn(server, 'emit');
         server.to.returns({
@@ -246,9 +253,9 @@ describe('ChatGateway', () => {
         socket.data.isSolo = true;
         FAKE_GAME_HISTORY_SINGLE.player1.hasWon = true;
         FAKE_GAME_HISTORY_SINGLE.isMultiplayer = false;
-        const getGameCardSpy = jest.spyOn(gameCardService, 'getGameCardById').mockReturnValue(true);
-        const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockReturnValue(true);
-        const updateTimeSpy = jest.spyOn(gameCardService, 'updateGameCard').mockReturnValue(rankings);
+        const getGameCardSpy = jest.spyOn(gameCardService, 'getGameCardById').mockResolvedValue(gameCard);
+        const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockImplementation();
+        const updateTimeSpy = jest.spyOn(gameCardService, 'updateGameCard').mockResolvedValue(gameCard);
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         const sendSpy = jest.spyOn(server, 'emit');
         server.to.returns({
@@ -271,9 +278,9 @@ describe('ChatGateway', () => {
     });
 
     it('best time message should include solo on solo mode', async () => {
-        const getGameCardSpy = jest.spyOn(gameCardService, 'getGameCardById').mockReturnValue(true);
-        const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockReturnValue(true);
-        const updateTimeSpy = jest.spyOn(gameCardService, 'updateGameCard').mockReturnValue(rankings);
+        const getGameCardSpy = jest.spyOn(gameCardService, 'getGameCardById').mockResolvedValue(gameCard);
+        const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockImplementation();
+        const updateTimeSpy = jest.spyOn(gameCardService, 'updateGameCard').mockResolvedValue(gameCard);
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         const sendSpy = jest.spyOn(server, 'emit');
         server.to.returns({
@@ -303,8 +310,9 @@ describe('ChatGateway', () => {
             hasWon: false,
         };
         FAKE_GAME_HISTORY_SINGLE.player2.hasAbandon = false;
-        const getGameCardSpy = jest.spyOn(gameCardService, 'getGameCardById').mockReturnValue(true);
-        const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockReturnValue(true);
+        const getGameCardSpy = jest.spyOn(gameCardService, 'getGameCardById').mockResolvedValue(gameCard);
+        const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockImplementation();
+        jest.spyOn(gameCardService, 'updateGameCard').mockResolvedValue(gameCard);
         const sendSpy = jest.spyOn(server, 'emit');
         await gateway.bestTime(socket, FAKE_GAME_HISTORY_SINGLE);
         expect(getGameCardSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_SINGLE.gameId);
