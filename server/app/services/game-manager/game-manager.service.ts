@@ -5,6 +5,7 @@ import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { StageInformation } from '@common/game-card';
 import { Injectable } from '@nestjs/common';
+import { ImageManagerService } from '../image-manager/image-manager.service';
 
 interface MapGameInfo {
     numberOfPlayers: number;
@@ -26,6 +27,7 @@ export class GameManagerService {
         private differenceClickService: DifferenceClickService,
         private gameHistoryService: GameHistoryService,
         private gameCardService: GameCardService,
+        private imageManagerService: ImageManagerService,
     ) {}
 
     async endGame(stageId: string): Promise<void> {
@@ -124,5 +126,6 @@ export class GameManagerService {
     async deleteFromMongo(id: string): Promise<void> {
         await this.differenceClickService.deleteDifferences(id);
         // TODO delete images and delete image object
+        await this.imageManagerService.deleteImageObject(id);
     }
 }
