@@ -20,6 +20,7 @@ import { ClickEventService } from '@app/services/click-event/click-event.service
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
+import { GameParametersService } from '@app/services/game-parameters/game-parameters.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { CHAT_EVENTS } from '@common/chat-gateway-events';
 import { DifferenceInformation, PlayerDifference } from '@common/difference-information';
@@ -39,6 +40,7 @@ describe('SoloViewComponent', () => {
     let modalSpy: MatDialog;
     let clickEventServiceSpy: ClickEventService;
     let gameConstantsService: GameConstantsService;
+    let gameParamService: GameParametersService;
 
     const mockActivatedRoute = { snapshot: { paramMap: { get: () => '234' } } };
     let mockRouter: Router;
@@ -59,6 +61,14 @@ describe('SoloViewComponent', () => {
         gameConstantsService.getGameConstants = () => {
             return of(MOCK_GAME_CONSTANTS);
         };
+        gameParamService = jasmine.createSpyObj('GameParametersService', ['']);
+
+        gameParamService.gameParameters = {
+            isMultiplayerGame: true,
+            isLimitedTimeGame: true,
+            stageId: '123',
+        };
+
         foundDifferenceServiceSpy.findPixelsFromDifference = (data: number[][]) => {
             const returnArray: number[] = [];
             for (const array of data) {
@@ -100,6 +110,7 @@ describe('SoloViewComponent', () => {
                 { provide: FoundDifferenceService, useValue: foundDifferenceServiceSpy },
                 { provide: MatDialog, useValue: modalSpy },
                 { provide: GameConstantsService, useValue: gameConstantsService },
+                { provide: GameParametersService, useValue: gameParamService },
             ],
             teardown: { destroyAfterEach: false },
         }).compileComponents();
