@@ -4,6 +4,7 @@
 import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
 import { GameCard, gameCardSchema } from '@app/schemas/game-cards.schemas';
 import { GameHistory, gameHistorySchema } from '@app/schemas/game-history';
+import { Images, imagesSchema } from '@app/schemas/images.schema';
 import { BestTimesService } from '@app/services/best-times/best-times.service';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
@@ -54,6 +55,7 @@ describe('StageController', () => {
                 MongooseModule.forFeature([{ name: Differences.name, schema: differencesSchema }]),
                 MongooseModule.forFeature([{ name: GameCard.name, schema: gameCardSchema }]),
                 MongooseModule.forFeature([{ name: GameHistory.name, schema: gameHistorySchema }]),
+                MongooseModule.forFeature([{ name: Images.name, schema: imagesSchema }]),
             ],
             controllers: [StageController],
             providers: [
@@ -290,8 +292,6 @@ const FAKE_GAME_INFO: GameCardDto = {
     _id: '0',
     name: 'game.name',
     difficulty: 'Facile',
-    baseImage: 'game.baseImage',
-    differenceImage: 'game.differenceImage',
     radius: 3,
     differenceNumber: 6,
 };
@@ -301,8 +301,6 @@ const FAKE_GAME_CARD: GameCard = {
     name: 'game.name',
     difficulty: 'Facile',
     differenceNumber: 6,
-    originalImageName: 'game.baseImage',
-    differenceImageName: 'game.differenceImage',
     soloTimes: [
         { time: 0, name: '--' },
         { time: 0, name: '--' },
@@ -317,7 +315,7 @@ const FAKE_GAME_CARD: GameCard = {
 
 const FAKE_GAME_CARD_ANSWER = {
     _id: '00000000773db8b853265f32',
-    differenceImageName: 'game.differenceImage',
+    name: 'game.name',
     differenceNumber: 6,
     difficulty: 'Facile',
     multiTimes: [
@@ -325,8 +323,6 @@ const FAKE_GAME_CARD_ANSWER = {
         { name: '--', time: 0 },
         { name: '--', time: 0 },
     ],
-    name: 'game.name',
-    originalImageName: 'game.baseImage',
     soloTimes: [
         { name: '--', time: 0 },
         { name: '--', time: 0 },

@@ -1,17 +1,47 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
+import { Images, imagesSchema } from '@app/schemas/images.schema';
+import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as fs from 'fs';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { Connection } from 'mongoose';
 import * as sinon from 'sinon';
 import { ImageManagerService } from './image-manager.service';
 describe('ImageManagerService', () => {
     let service: ImageManagerService;
+    let mongoServer: MongoMemoryServer;
+    // let imagesModel: Model<ImagesDocument>;
+    let connection: Connection;
 
     beforeEach(async () => {
+        mongoServer = await MongoMemoryServer.create();
+
         const module: TestingModule = await Test.createTestingModule({
+            imports: [
+                MongooseModule.forRootAsync({
+                    useFactory: () => ({
+                        uri: mongoServer.getUri(),
+                    }),
+                }),
+                MongooseModule.forFeature([{ name: Images.name, schema: imagesSchema }]),
+            ],
             providers: [ImageManagerService],
         }).compile();
 
         service = module.get<ImageManagerService>(ImageManagerService);
+        connection = await module.get(getConnectionToken());
+
+        // imagesModel = module.get<Model<ImagesDocument>>(getModelToken(GameCard.name));
+    });
+
+    const DELAY_BEFORE_CLOSING_CONNECTION = 200;
+
+    afterEach((done) => {
+        setTimeout(async () => {
+            await connection.close();
+            await mongoServer.stop();
+            done();
+        }, DELAY_BEFORE_CLOSING_CONNECTION);
     });
 
     it('should be defined', () => {

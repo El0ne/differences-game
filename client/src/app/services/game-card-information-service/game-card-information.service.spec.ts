@@ -63,8 +63,6 @@ describe('GameCardInformationService', () => {
             _id: '1',
             name: 'name',
             difficulty: 'difficult',
-            baseImage: 'string',
-            differenceImage: 'string',
             radius: 3,
             differenceNumber: 3,
         };

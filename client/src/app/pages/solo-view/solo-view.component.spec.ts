@@ -468,8 +468,6 @@ const SERVICE_MOCK_GAME_CARD: GameCardInformation = {
     name: 'game',
     difficulty: 'Facile',
     differenceNumber: 7,
-    originalImageName: 'game.baseImage',
-    differenceImageName: 'game.differenceImage',
     soloTimes: [
         { time: 0, name: '--' },
         { time: 0, name: '--' },

@@ -5,6 +5,7 @@ import { StageWaitingRoomGateway } from '@app/gateways/waitingRoom/stage-waiting
 import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
 import { GameCard, gameCardSchema } from '@app/schemas/game-cards.schemas';
 import { GameHistory, gameHistorySchema } from '@app/schemas/game-history';
+import { Images, imagesSchema } from '@app/schemas/images.schema';
 import { BestTimesService } from '@app/services/best-times/best-times.service';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
@@ -53,6 +54,7 @@ describe('ChatGateway', () => {
                 MongooseModule.forFeature([{ name: GameCard.name, schema: gameCardSchema }]),
                 MongooseModule.forFeature([{ name: GameHistory.name, schema: gameHistorySchema }]),
                 MongooseModule.forFeature([{ name: Differences.name, schema: differencesSchema }]),
+                MongooseModule.forFeature([{ name: Images.name, schema: imagesSchema }]),
             ],
             providers: [
                 ChatGateway,

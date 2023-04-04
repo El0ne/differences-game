@@ -5,8 +5,6 @@ const GAME1: GameCardInformation = {
     name: 'Library',
     difficulty: 'Difficile',
     differenceNumber: 5,
-    originalImageName: '/assets/444-640x480.jpg',
-    differenceImageName: '/assets/444-640x480.jpg',
     soloTimes: [
         { time: 60, name: 'Inull' },
         { time: 90, name: 'second' },
@@ -24,8 +22,6 @@ const GAME2: GameCardInformation = {
     name: 'game2',
     difficulty: 'Difficile',
     differenceNumber: 5,
-    originalImageName: '/assets/444-640x480.jpg',
-    differenceImageName: '/assets/444-640x480.jpg',
     soloTimes: [
         { time: 60, name: 'Inull' },
         { time: 90, name: 'second' },
