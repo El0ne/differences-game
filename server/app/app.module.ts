@@ -6,6 +6,7 @@ import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GameClickController } from './controllers/game-click/game-click.controller';
+import { ImageController } from './controllers/image/image.controller';
 import { StageController } from './controllers/stage/stage.controller';
 import { MatchGateway } from './gateways/match/match/match.gateway';
 import { StageWaitingRoomGateway } from './gateways/waitingRoom/stage-waiting-room.gateway';
@@ -36,7 +37,7 @@ import { PixelRadiusService } from './services/pixel-radius/pixel-radius.service
             { name: Images.name, schema: imagesSchema },
         ]),
     ],
-    controllers: [GameClickController, StageController],
+    controllers: [GameClickController, StageController, ImageController],
     providers: [
         ChatGateway,
         StageWaitingRoomGateway,

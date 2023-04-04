@@ -5,7 +5,7 @@ import { join } from 'path';
 @Controller('image')
 export class ImageController {
     // return the name of the two images
-    // @Get('/:id')
+    // @Get('') id passed in query
     // async getImageNames(@Param() param, @Res() res: Response): Promise<void> {
     //     try {
     //         const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);
@@ -14,11 +14,12 @@ export class ImageController {
     //         res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
     //     }
     // }
-
-    @Get('/:id/:imageName')
+    @Get('/:imageName')
     async getImage(@Param() param, @Res() res: Response): Promise<void> {
+        console.log('first');
         try {
             const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);
+            console.log('imagePath', imagePath);
             res.status(HttpStatus.OK).sendFile(imagePath);
         } catch (err) {
             res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
