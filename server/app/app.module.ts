@@ -9,6 +9,7 @@ import { GameClickController } from './controllers/game-click/game-click.control
 import { StageController } from './controllers/stage/stage.controller';
 import { MatchGateway } from './gateways/match/match/match.gateway';
 import { StageWaitingRoomGateway } from './gateways/waitingRoom/stage-waiting-room.gateway';
+import { Images, imagesSchema } from './schemas/images.schema';
 import { DifferenceClickService } from './services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from './services/difference-detection/difference-detection.service';
 import { DifferencesCounterService } from './services/differences-counter/differences-counter.service';
@@ -32,6 +33,7 @@ import { PixelRadiusService } from './services/pixel-radius/pixel-radius.service
         MongooseModule.forFeature([
             { name: Differences.name, schema: differencesSchema },
             { name: GameCard.name, schema: gameCardSchema },
+            { name: Images.name, schema: imagesSchema },
         ]),
     ],
     controllers: [GameClickController, StageController],

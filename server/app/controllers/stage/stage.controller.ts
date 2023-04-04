@@ -12,6 +12,7 @@ import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
+import { ObjectId } from 'mongodb';
 import { diskStorage } from 'multer';
 import * as path from 'path';
 import { join } from 'path';
@@ -88,6 +89,7 @@ export class StageController {
                 const differencesArray = await this.differenceService.compareImages(fileArray[0].path, fileArray[1].path, param.radius);
                 if (this.gameDifficultyService.isGameValid(differencesArray)) {
                     const differenceObjectId = await this.differenceClickService.createDifferenceArray(differencesArray);
+                    await this.imageManagerService.createImageObject(new ObjectId(differenceObjectId), fileArray[0].filename, fileArray[1].filename);
                     const difficulty = this.gameDifficultyService.setGameDifficulty(differencesArray);
 
                     const data: ServerGeneratedGameInfo = {
