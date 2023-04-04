@@ -384,7 +384,7 @@ describe('ChatGateway', () => {
         server.to.returns({
             emit: (event: string, data: RoomMessage) => {
                 expect(event).toEqual(CHAT_EVENTS.Abandon);
-                expect(data.event).toEqual('abandon');
+                expect(data.event).toEqual('notification');
                 expect(data.socketId).toEqual('id');
             },
         } as any);

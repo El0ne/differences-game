@@ -119,15 +119,23 @@ describe('BestTimesService', () => {
 
     it('updateBestTimes should return a ranking board with the same best times if the newTime is not in the top 3', () => {
         const updatedRankingBoard = service.updateBestTimes(FAKE_RANKING_BOARD, FAKE_LOSER_BOARD);
-        expect(updatedRankingBoard[0]).toBe(FAKE_RANKING_BOARD[0]);
-        expect(updatedRankingBoard[1]).toBe(FAKE_RANKING_BOARD[1]);
-        expect(updatedRankingBoard[2]).toBe(FAKE_RANKING_BOARD[2]);
+        expect(updatedRankingBoard).toEqual(FAKE_RANKING_BOARD);
+    });
+
+    it('updateBestTimes should not change the 3rd position place if equal to the current time', () => {
+        const updatedRankingBoard = service.updateBestTimes(FAKE_RANKING_BOARD, FAKE_EQUAL_TIME_3RD);
+        expect(updatedRankingBoard).toEqual(FAKE_RANKING_BOARD);
     });
 });
 
 const FAKE_WINNER_BOARD: RankingBoard = {
     name: 'Victoria Lavictoire',
     time: 10,
+};
+
+const FAKE_EQUAL_TIME_3RD: RankingBoard = {
+    name: 'test',
+    time: 25,
 };
 
 const FAKE_LOSER_BOARD: RankingBoard = {

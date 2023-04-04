@@ -203,6 +203,12 @@ describe('GameCardService', () => {
         gameCard.soloTimes = FAKE_RANKING_BOARD;
         service.updateGameCard(gameCard, FAKE_PLAYER_BOARD, false);
         expect(gameCard.soloTimes[0]).toEqual(FAKE_PLAYER_BOARD);
+
+        service.updateGameCard(gameCard, FAKE_SECOND_PLAYER_BOARD, false);
+        expect(gameCard.soloTimes[1]).toEqual(FAKE_SECOND_PLAYER_BOARD);
+
+        service.updateGameCard(gameCard, FAKE_THIRD_PLAYER_BOARD, false);
+        expect(gameCard.soloTimes[2]).toEqual(FAKE_THIRD_PLAYER_BOARD);
     });
 
     it('updateGameCard should update a game card s best times in a multiplayer game', async () => {
@@ -210,22 +216,26 @@ describe('GameCardService', () => {
         gameCard.multiTimes = FAKE_RANKING_BOARD;
         service.updateGameCard(gameCard, FAKE_PLAYER_BOARD, true);
         expect(gameCard.multiTimes[0]).toEqual(FAKE_PLAYER_BOARD);
+
+        service.updateGameCard(gameCard, FAKE_SECOND_PLAYER_BOARD, true);
+        expect(gameCard.multiTimes[1]).toEqual(FAKE_SECOND_PLAYER_BOARD);
+
+        service.updateGameCard(gameCard, FAKE_THIRD_PLAYER_BOARD, true);
+        expect(gameCard.multiTimes[2]).toEqual(FAKE_THIRD_PLAYER_BOARD);
     });
 
     it('updateGameCard should not update a game card s best times in solo when player time is not in the top 3', async () => {
         const gameCard = getFakeGameCard();
         gameCard.soloTimes = FAKE_RANKING_BOARD;
         service.updateGameCard(gameCard, BAD_PLAYER_BOARD, false);
-        expect(gameCard.soloTimes[0]).not.toEqual(BAD_PLAYER_BOARD);
-        expect(gameCard.soloTimes[0]).toEqual(FAKE_RANKING_BOARD[0]);
+        expect(gameCard.soloTimes).toEqual(FAKE_RANKING_BOARD);
     });
 
     it('updateGameCard should not update a game card s best times in multiplayer when player time is not in the top 3', async () => {
         const gameCard = getFakeGameCard();
         gameCard.multiTimes = FAKE_RANKING_BOARD;
         service.updateGameCard(gameCard, BAD_PLAYER_BOARD, true);
-        expect(gameCard.multiTimes[0]).not.toEqual(BAD_PLAYER_BOARD);
-        expect(gameCard.multiTimes[0]).toEqual(FAKE_RANKING_BOARD[0]);
+        expect(gameCard.multiTimes).toEqual(FAKE_RANKING_BOARD);
     });
 });
 
@@ -242,6 +252,16 @@ const FAKE_GAME_INFO: GameCardDto = {
 const FAKE_PLAYER_BOARD: RankingBoard = {
     name: 'Albert Einstein',
     time: 10,
+};
+
+const FAKE_SECOND_PLAYER_BOARD: RankingBoard = {
+    name: 'second',
+    time: 12,
+};
+
+const FAKE_THIRD_PLAYER_BOARD: RankingBoard = {
+    name: 'third',
+    time: 13,
 };
 
 const BAD_PLAYER_BOARD: RankingBoard = {
