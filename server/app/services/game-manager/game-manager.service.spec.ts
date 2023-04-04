@@ -1,10 +1,12 @@
 import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
 import { GameHistory, gameHistorySchema } from '@app/schemas/game-history';
+import { Images, imagesSchema } from '@app/schemas/images.schema';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
+import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { DELAY_BEFORE_CLOSING_CONNECTION } from '@app/tests/constants';
@@ -38,6 +40,7 @@ describe('GameManagerService', () => {
                 }),
                 MongooseModule.forFeature([{ name: Differences.name, schema: differencesSchema }]),
                 MongooseModule.forFeature([{ name: GameHistory.name, schema: gameHistorySchema }]),
+                MongooseModule.forFeature([{ name: Images.name, schema: imagesSchema }]),
             ],
             providers: [
                 GameManagerService,
@@ -48,6 +51,7 @@ describe('GameManagerService', () => {
                 PixelPositionService,
                 { provide: GameCardService, useValue: gameCardService },
                 GameHistoryService,
+                ImageManagerService,
             ],
         }).compile();
 

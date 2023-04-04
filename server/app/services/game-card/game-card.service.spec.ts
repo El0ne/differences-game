@@ -25,7 +25,6 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection, Model } from 'mongoose';
 import { stub } from 'sinon';
 import { GameCardService } from './game-card.service';
-
 describe('GameCardService', () => {
     let service: GameCardService;
     let gameCardModel: Model<GameCardDocument>;
