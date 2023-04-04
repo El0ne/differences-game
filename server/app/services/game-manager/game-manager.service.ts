@@ -34,7 +34,7 @@ export class GameManagerService {
             currentMapGameInfo.numberOfPlayers -= 1;
             if (currentMapGameInfo.numberOfPlayers === 0) {
                 if (currentMapGameInfo.isDeleted) {
-                    await this.differenceClickService.deleteDifferences(stageId);
+                    this.deleteFromMongo(stageId);
                 }
                 this.gamePlayedInformation.delete(stageId);
             }
@@ -58,9 +58,9 @@ export class GameManagerService {
         if (currentMapGameInfo) {
             currentMapGameInfo.isDeleted = true;
         } else {
-            await this.differenceClickService.deleteDifferences(stageId);
+            this.deleteFromMongo(stageId);
         }
-        await this.gameHistoryService.deleteGameHistory(stageId);
+        // await this.gameHistoryService.deleteGameHistory(stageId);
     }
 
     async startLimitedTimeGame(room: string, numberOfPlayers: number): Promise<void> {
@@ -119,5 +119,10 @@ export class GameManagerService {
                 this.limitedTimeModeGames.delete(room);
             }
         }
+    }
+
+    async deleteFromMongo(id: string): Promise<void> {
+        await this.differenceClickService.deleteDifferences(id);
+        // TODO delete images and delete image object
     }
 }
