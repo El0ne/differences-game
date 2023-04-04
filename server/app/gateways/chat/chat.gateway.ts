@@ -1,7 +1,7 @@
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { RoomMessage } from '@common/chat-gateway-constants';
-import { CHAT_EVENTS, MESSAGE_MAX_LENGTH, Room, RoomEvent, RoomManagement } from '@common/chat-gateway-events';
+import { CHAT_EVENTS, MESSAGE_MAX_LENGTH, Room, RoomEvent, RoomManagement, SECOND_CONVERTION } from '@common/chat-gateway-events';
 import { GameHistoryDTO } from '@common/game-history.dto';
 import { RankingBoard } from '@common/ranking-board';
 import { Injectable } from '@nestjs/common';
@@ -99,6 +99,10 @@ export class ChatGateway implements OnGatewayDisconnect {
                 .emit(CHAT_EVENTS.Abandon, { socketId: socket.id, message: this.dateCreator(), event: 'notification' } as RoomMessage);
         }
         if (socket.data.isSolo) {
+            const endGameTime = Date.now();
+            const startTime = socket.data.soloGame.gameDuration;
+            const duration = Math.floor((endGameTime - startTime) / SECOND_CONVERTION);
+            socket.data.soloGame.gameDuration = duration;
             this.bestTime(socket, socket.data.soloGame);
         }
     }
