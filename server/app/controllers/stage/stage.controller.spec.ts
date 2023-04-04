@@ -17,6 +17,7 @@ import { ImageDimensionsService } from '@app/services/image-dimensions/image-dim
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
+import { DELAY_BEFORE_CLOSING_CONNECTION } from '@app/tests/constants';
 import { GameCardDto } from '@common/game-card.dto';
 import { HttpStatus } from '@nestjs/common';
 import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
@@ -86,8 +87,6 @@ describe('StageController', () => {
         getGameCardsNumberStub = stub(gameCardService, 'getGameCardsNumber');
         getGameCardByIdStub = stub(gameCardService, 'getGameCardById');
     });
-
-    const DELAY_BEFORE_CLOSING_CONNECTION = 200;
 
     afterEach((done) => {
         getGameCardStub.restore();

@@ -1,5 +1,6 @@
 import { Images, imagesSchema } from '@app/schemas/images.schema';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
+import { DELAY_BEFORE_CLOSING_CONNECTION } from '@app/tests/constants';
 import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
@@ -25,7 +26,6 @@ describe('ImageController', () => {
         connection = await module.get(getConnectionToken());
     });
 
-    const DELAY_BEFORE_CLOSING_CONNECTION = 200;
     afterEach((done) => {
         setTimeout(async () => {
             await connection.close();

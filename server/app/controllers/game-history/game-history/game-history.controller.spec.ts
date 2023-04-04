@@ -5,6 +5,7 @@ import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { assert } from 'console';
 // import { FAKE_GAME_HISTORY } from '@app/mock/game-history-mock';
+import { DELAY_BEFORE_CLOSING_CONNECTION } from '@app/tests/constants';
 import { FAKE_GAME_HISTORY, getFakeGameHistoryElement } from '@common/mock/game-history-mock';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection } from 'mongoose';
@@ -36,8 +37,6 @@ describe('GameHistoryController', () => {
         gameHistoryService = module.get<GameHistoryService>(GameHistoryService);
         connection = await module.get(getConnectionToken());
     });
-
-    const DELAY_BEFORE_CLOSING_CONNECTION = 200;
 
     afterEach((done) => {
         setTimeout(async () => {

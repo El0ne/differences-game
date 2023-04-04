@@ -19,6 +19,7 @@ import { ImageDimensionsService } from '@app/services/image-dimensions/image-dim
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
+import { DELAY_BEFORE_CLOSING_CONNECTION } from '@app/tests/constants';
 import { RoomMessage } from '@common/chat-gateway-constants';
 import { CHAT_EVENTS } from '@common/chat-gateway-events';
 import { FAKE_GAME_HISTORY, FAKE_GAME_HISTORY_SINGLE } from '@common/mock/game-history-mock';
@@ -28,7 +29,6 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection } from 'mongoose';
 import { SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
-const DELAY_BEFORE_CLOSING_CONNECTION = 200;
 describe('ChatGateway', () => {
     let gateway: ChatGateway;
     let socket: SinonStubbedInstance<Socket>;

@@ -7,6 +7,7 @@ import { GameHistoryService } from '@app/services/game-history/game-history.serv
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
+import { DELAY_BEFORE_CLOSING_CONNECTION } from '@app/tests/constants';
 import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
@@ -55,8 +56,6 @@ describe('GameManagerService', () => {
         gameHistoryService = module.get<GameHistoryService>(GameHistoryService);
         connection = await module.get(getConnectionToken());
     });
-
-    const DELAY_BEFORE_CLOSING_CONNECTION = 200;
 
     afterEach((done) => {
         setTimeout(async () => {

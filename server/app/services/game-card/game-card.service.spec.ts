@@ -15,6 +15,7 @@ import { ImageManagerService } from '@app/services/image-manager/image-manager.s
 import { getFakeGameCard } from '@app/services/mock/fake-game-card';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
+import { DELAY_BEFORE_CLOSING_CONNECTION } from '@app/tests/constants';
 import { GameCardDto } from '@common/game-card.dto';
 import { MongooseModule, getConnectionToken, getModelToken } from '@nestjs/mongoose';
 import { TestingModule } from '@nestjs/testing';
@@ -73,8 +74,6 @@ describe('GameCardService', () => {
         connection = await module.get(getConnectionToken());
         await gameCardModel.deleteMany({});
     });
-
-    const DELAY_BEFORE_CLOSING_CONNECTION = 200;
 
     afterEach((done) => {
         setTimeout(async () => {

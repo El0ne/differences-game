@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Images, imagesSchema } from '@app/schemas/images.schema';
+import { DELAY_BEFORE_CLOSING_CONNECTION } from '@app/tests/constants';
 import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as fs from 'fs';
@@ -33,8 +34,6 @@ describe('ImageManagerService', () => {
 
         // imagesModel = module.get<Model<ImagesDocument>>(getModelToken(GameCard.name));
     });
-
-    const DELAY_BEFORE_CLOSING_CONNECTION = 200;
 
     afterEach((done) => {
         setTimeout(async () => {
