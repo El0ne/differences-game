@@ -20,6 +20,7 @@ import { ClickEventService } from '@app/services/click-event/click-event.service
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
+import { GameParametersService } from '@app/services/game-parameters/game-parameters.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { CHAT_EVENTS } from '@common/chat-gateway-events';
 import { DifferenceInformation, PlayerDifference } from '@common/difference-information';
@@ -39,6 +40,7 @@ describe('SoloViewComponent', () => {
     let modalSpy: MatDialog;
     let clickEventServiceSpy: ClickEventService;
     let gameConstantsService: GameConstantsService;
+    let gameParamService: GameParametersService;
 
     const mockActivatedRoute = { snapshot: { paramMap: { get: () => '234' } } };
     let mockRouter: Router;
@@ -48,7 +50,7 @@ describe('SoloViewComponent', () => {
         clickEventServiceSpy.getDifferences = () => of([[1, 2, 3], [4, 5], [6], [], [7, 8, 9]]);
 
         mockRouter = jasmine.createSpyObj<Router>('Router', ['navigate'], ['url']);
-        Object.defineProperty(mockRouter, 'url', { value: 'multiplayer/234' });
+        Object.defineProperty(mockRouter, 'url', { value: 'game' });
 
         foundDifferenceServiceSpy = jasmine.createSpyObj('FoundDifferenceService', [
             'addDifferenceFound',
@@ -88,6 +90,9 @@ describe('SoloViewComponent', () => {
             return;
         };
 
+        gameParamService = jasmine.createSpyObj('GameParametersService', ['gameParameters']);
+        gameParamService.gameParameters = { isMultiplayerGame: true, isLimitedTimeGame: false, stageId: '234' };
+
         await TestBed.configureTestingModule({
             declarations: [SoloViewComponent, ClickEventComponent],
             imports: [FormsModule, HttpClientTestingModule, RouterTestingModule, MatIconModule, MatDialogModule, BrowserAnimationsModule],
@@ -100,6 +105,7 @@ describe('SoloViewComponent', () => {
                 { provide: FoundDifferenceService, useValue: foundDifferenceServiceSpy },
                 { provide: MatDialog, useValue: modalSpy },
                 { provide: GameConstantsService, useValue: gameConstantsService },
+                { provide: GameParametersService, useValue: gameParamService },
             ],
             teardown: { destroyAfterEach: false },
         }).compileComponents();
@@ -121,7 +127,7 @@ describe('SoloViewComponent', () => {
     });
 
     it('ngOnInit should prepare an eventual abandon case if in solo mode ', fakeAsync(() => {
-        Object.defineProperty(mockRouter, 'url', { value: 'solo/234' });
+        Object.defineProperty(gameParamService.gameParameters, 'isMultiplayerGame', { value: false });
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.ngOnInit();
         tick(ONE_SECOND);
