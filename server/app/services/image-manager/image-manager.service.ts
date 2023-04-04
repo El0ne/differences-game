@@ -24,8 +24,9 @@ export class ImageManagerService {
     }
 
     async deleteImageObject(id: string): Promise<void> {
-        const test = await this.imagesModel.findByIdAndDelete(new ObjectId(id));
-        console.log('test', test);
+        const imageObject = await this.imagesModel.findByIdAndDelete(new ObjectId(id));
+        this.deleteImage(imageObject.originalImageName);
+        this.deleteImage(imageObject.differenceImageName);
     }
 
     deleteImage(imageName: string): void {
