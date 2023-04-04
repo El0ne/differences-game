@@ -3,7 +3,6 @@ import { GameCard } from '@app/schemas/game-cards.schemas';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameHistoryService } from '@app/services/game-history/game-history.service';
-import { StageInformation } from '@common/game-card';
 import { Injectable } from '@nestjs/common';
 
 interface MapGameInfo {
@@ -12,7 +11,7 @@ interface MapGameInfo {
 }
 
 interface LimitedTimeGameInfo {
-    stageInfo: StageInformation[];
+    gameStages: string[];
     playersInGame: number;
     readonly stagesUsed: string[];
 }
@@ -65,38 +64,33 @@ export class GameManagerService {
 
     async startLimitedTimeGame(room: string, numberOfPlayers: number): Promise<void> {
         const gameCards: GameCard[] = await this.gameCardService.getAllGameCards();
-        const stageInformations: StageInformation[] = gameCards.map((gameCard) => {
+        const allStagesId: string[] = gameCards.map((gameCard) => {
             const stageId = gameCard._id.toString();
-
             this.addGame(stageId, numberOfPlayers);
-            return {
-                _id: stageId,
-                originalImageName: gameCard.originalImageName,
-                differenceImageName: gameCard.differenceImageName,
-            };
+            return stageId;
         });
 
         // randomize gameCards
-        for (let i = stageInformations.length - 1; i > 0; i--) {
+        for (let i = allStagesId.length - 1; i > 0; i--) {
             // TODO test if no gameCArds are in bd when starting game
             const j = Math.floor(Math.random() * (i + 1));
-            const temp: StageInformation = stageInformations[i];
-            stageInformations[i] = stageInformations[j];
-            stageInformations[j] = temp;
+            const temp: string = allStagesId[i];
+            allStagesId[i] = allStagesId[j];
+            allStagesId[j] = temp;
         }
 
         this.limitedTimeModeGames.set(room, {
-            stageInfo: stageInformations,
+            gameStages: allStagesId,
             playersInGame: numberOfPlayers,
-            stagesUsed: gameCards.map((stage) => stage._id.toString()),
+            stagesUsed: allStagesId,
         });
     }
 
-    giveNextLimitedTimeStage(room: string): StageInformation {
+    giveNextLimitedTimeStage(room: string): string {
         const gameInfo: LimitedTimeGameInfo = this.limitedTimeModeGames.get(room);
-        let randomStageInfo: StageInformation;
+        let randomStageInfo: string;
         if (gameInfo) {
-            randomStageInfo = gameInfo.stageInfo.pop();
+            randomStageInfo = gameInfo.gameStages.pop();
             // if array is empty
             if (!randomStageInfo) {
                 for (let i = 0; i < gameInfo.playersInGame; i++) {

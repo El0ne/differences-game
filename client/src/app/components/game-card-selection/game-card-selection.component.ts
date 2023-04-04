@@ -77,7 +77,7 @@ export class GameCardSelectionComponent implements OnInit {
                         stageId: this.gameCardInformation._id,
                         isLimitedTimeMode: false,
                     });
-                    this.router.navigate(['/solo/' + this.gameCardInformation._id]);
+                    this.router.navigate(['/game']);
                 } else this.hostOrJoinGame();
             }
         });
