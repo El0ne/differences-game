@@ -16,15 +16,15 @@ export class PixelRadiusService {
         const upExtremity = Math.max(pixelCoordinateY - radius, 0);
         const downExtremity = Math.min(pixelCoordinateY + radius, this.imageDimensionsService.getHeight() - 1);
 
+        const radiusSquared = radius ** 2;
+
         for (let i = upExtremity; i <= downExtremity; i++) {
+            const verticalRadiusSquared = (i - pixelCoordinateY) ** 2;
             for (let j = leftExtremity; j <= rightExtremity; j++) {
-                if (roundRadius) {
-                    if (Math.pow(j - pixelCoordinateX, 2) + Math.pow(i - pixelCoordinateY, 2) <= Math.pow(radius, 2)) {
-                        adjacentPixels.push(i * this.imageDimensionsService.getWidth() + j);
-                    }
-                } else {
-                    adjacentPixels.push(i * this.imageDimensionsService.getWidth() + j);
+                if (roundRadius && (j - pixelCoordinateX) ** 2 + verticalRadiusSquared > radiusSquared) {
+                    continue;
                 }
+                adjacentPixels.push(i * this.imageDimensionsService.getWidth() + j);
             }
         }
         return adjacentPixels;

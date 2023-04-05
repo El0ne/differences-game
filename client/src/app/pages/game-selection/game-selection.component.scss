@@ -8,20 +8,6 @@ body {
     height: 10%;
 }
 
-.game-properties {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 8%;
-}
-.game-constants {
-    color: white;
-    margin-bottom: 30px;
-    width: 100%;
-    font-size: 20px;
-    text-align: center;
-}
-
 app-game-card-selection {
     margin-bottom: 40px;
     scale: 0.9;
@@ -92,6 +78,6 @@ app-game-card-selection {
     color: #666666;
 }
 
-#create-a-stage-button {
+button {
     font-size: x-large;
 }

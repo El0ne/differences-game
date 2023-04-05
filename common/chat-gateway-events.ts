@@ -17,6 +17,7 @@ export enum CHAT_EVENTS {
     Clock = 'clock',
 
     Disconnect = 'Disconnect',
+    BestTime = 'BestTime',
 }
 
 export interface RoomManagement {
