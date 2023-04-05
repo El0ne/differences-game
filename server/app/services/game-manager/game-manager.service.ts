@@ -63,15 +63,10 @@ export class GameManagerService {
 
     async startLimitedTimeGame(room: string, numberOfPlayers: number): Promise<void> {
         const gameCards: GameCard[] = await this.gameCardService.getAllGameCards();
-        const allStagesId = gameCards.map((gameCard) => {
+        const allStagesId: string[] = gameCards.map((gameCard) => {
             const stageId = gameCard._id.toString();
             this.addGame(stageId, numberOfPlayers);
-            return {
-                _id: stageId,
-                // TODO fix with Alexis
-                originalImageName: 'gameCard.originalImageName',
-                differenceImageName: 'gameCard.differenceImageName',
-            };
+            return stageId;
         });
 
         // randomize gameCards

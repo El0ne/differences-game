@@ -29,7 +29,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection } from 'mongoose';
 import { SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
-const DELAY_BEFORE_CLOSING_CONNECTION = 200;
+
 describe('ChatGateway', () => {
     let gateway: ChatGateway;
     let socket: SinonStubbedInstance<Socket>;
