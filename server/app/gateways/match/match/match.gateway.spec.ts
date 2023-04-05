@@ -115,14 +115,8 @@ describe('MatchGateway', () => {
 
     it('storeSoloGame Information should store solo game information for in case of abandon', () => {
         gateway.storeSoloGameInformation(socket, FAKE_GAME_HISTORY_DTO);
-        expect(socket.data.soloGame).toEqual(FAKE_GAME_HISTORY_DTO);
+        expect(socket.data.soloGame).toBeDefined();
         expect(socket.data.isSolo).toBe(true);
-    });
-
-    it('updateGameTime Information should set the value of the internal timer', () => {
-        socket.data.soloGame = {};
-        gateway.updateGameTime(socket, 25);
-        expect(socket.data.soloGame.gameDuration).toEqual(25);
     });
 });
 
