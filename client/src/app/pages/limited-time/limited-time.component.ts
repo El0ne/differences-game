@@ -37,9 +37,8 @@ export class LimitedTimeComponent implements OnInit, OnDestroy {
         });
 
         this.socketService.listen<string>(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, (stageId: string) => {
-            this.gameParamService.gameParameters.isLimitedTimeGame = true;
             this.gameParamService.gameParameters.stageId = stageId;
-            this.router.navigate(['/game' + LIMITED_TIME_MODE_ID]);
+            this.router.navigate(['/game']);
         });
 
         this.socketService.send(WAITING_ROOM_EVENTS.ScanForHost, [LIMITED_TIME_MODE_ID]);

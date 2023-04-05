@@ -83,7 +83,7 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
         if (acceptation.isLimitedTimeMode) {
             this.matchGateway.timer(roomId);
             await this.gameManagerService.startLimitedTimeGame(roomId, 2);
-            socket.to(roomId).emit(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, this.gameManagerService.giveNextLimitedTimeStage(roomId));
+            this.server.to(roomId).emit(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, this.gameManagerService.giveNextLimitedTimeStage(roomId));
         } else {
             socket.to(socket.data.stageInHosting).emit(WAITING_ROOM_EVENTS.MatchRefused, "l'hôte a trouvé un autre adversaire");
             this.matchGateway.timer(roomId);
