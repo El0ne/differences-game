@@ -1,26 +1,25 @@
-<body class="modal-page">
-    <button class="normal-button" (click)="handleCancel()">Annuler</button>
-    <div *ngIf="waitingRoomInfo.isHost;else clientView">
-        <div *ngIf="clientsInWaitingRoom.size === 0;else opponents">
-            <h1 class="neon">
-                En attente d'opposants
-            </h1>
+<body class="modal-page container">
+    <div *ngIf="waitingRoomInfo.isHost; else clientView">
+        <div *ngIf="clientsInWaitingRoom.size === 0; else opponents">
+            <h1 class="neon name-title-entry">En attente d'un joueur opposant...</h1>
+            <div class="hourglass-icon-container">
+                <div class="hourglass-icon">
+                    <mat-icon class="icon centered-icon">hourglass_empty</mat-icon>
+                </div>
+            </div>
         </div>
     </div>
+    <button class="normal-button" (click)="handleCancel()">Annuler</button>
 </body>
 
 <ng-template #opponents>
     <div *ngFor="let opponentId of clientsInWaitingRoom.keys()" class="opponents-container">
-        <h2 class="neon">
-            NOM : {{clientsInWaitingRoom.get(opponentId)}}
-        </h2>
+        <h2 class="neon">NOM : {{ clientsInWaitingRoom.get(opponentId) }}</h2>
         <button (click)="acceptOpponent(opponentId)" class="normal-button">Accept</button>
         <button (click)="declineOpponent(opponentId)" class="normal-button">Decline</button>
     </div>
 </ng-template>
 
 <ng-template #clientView>
-    <h1 class="neon">
-        En attente de la confirmation de l'hôte
-    </h1>
+    <h1 class="neon">En attente de la confirmation de l'hôte...</h1>
 </ng-template>

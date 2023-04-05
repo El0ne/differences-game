@@ -2,7 +2,6 @@ import { GameManagerService } from '@app/services/game-manager/game-manager.serv
 import { MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameHistoryDTO } from '@common/game-history.dto';
 import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND, SoloGameCreation } from '@common/match-gateway-communication';
-
 import { Injectable } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -20,8 +19,7 @@ export class MatchGateway implements OnGatewayDisconnect {
         socket.data.room = socket.id;
         if (gameInfo.isLimitedTimeMode) {
             await this.gameManagerService.startLimitedTimeGame(socket.data.room, 1);
-            const test = this.gameManagerService.giveNextLimitedTimeStage(socket.data.room);
-            socket.emit(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, test);
+            socket.emit(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, this.gameManagerService.giveNextLimitedTimeStage(socket.data.room));
         } else {
             this.timer(socket.data.room);
             this.gameManagerService.addGame(gameInfo.stageId, 1);
@@ -74,10 +72,8 @@ export class MatchGateway implements OnGatewayDisconnect {
     }
 
     async handleDisconnect(socket: Socket): Promise<void> {
-        if (socket.data.stageId) {
-            await this.gameManagerService.endGame(socket.data.stageId);
-            this.timers.delete(socket.data.room);
-        }
+        await this.gameManagerService.endGame(socket.data.stageId);
+        this.timers.delete(socket.data.room);
         this.gameManagerService.removePlayerFromLimitedTimeGame(socket.data.room);
     }
 }

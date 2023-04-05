@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable no-unused-vars */
 import { MatchGateway } from '@app/gateways/match/match/match.gateway';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
@@ -69,7 +71,6 @@ describe('StageWaitingRoomGateway', () => {
     it('unHostGame should send a gameDeleted to the room of the hosted game and remove the socket from the gameHosts', () => {
         socket.data.stageInHosting = 'stage1';
         socket.to.returns({
-            // eslint-disable-next-line @typescript-eslint/no-empty-function, no-unused-vars
             emit: (event: string) => {},
         } as BroadcastOperator<unknown, unknown>);
         gateway.unhostGame(socket);
@@ -116,7 +117,9 @@ describe('StageWaitingRoomGateway', () => {
         socket.data.stageInHosting = 'stage1';
 
         socket.to.returns({
-            // eslint-disable-next-line @typescript-eslint/no-empty-function, no-unused-vars
+            emit: (event: string) => {},
+        } as BroadcastOperator<unknown, unknown>);
+        server.to.returns({
             emit: (event: string) => {},
         } as BroadcastOperator<unknown, unknown>);
         await gateway.acceptOpponent(socket, { playerName: 'host1', playerSocketId: 'opponentId', isLimitedTimeMode: true });
@@ -141,7 +144,6 @@ describe('StageWaitingRoomGateway', () => {
     it('deleteGame should send a call services to delete game and emit to the stage room and clean the gameHost map of the stage', async () => {
         gateway.gameHosts.set('stageId', 'host');
         server.to.returns({
-            // eslint-disable-next-line @typescript-eslint/no-empty-function, no-unused-vars
             emit: (event: string) => {},
         } as BroadcastOperator<unknown, unknown>);
         const deleteGameCardSpy = jest.spyOn(gameCardService, 'deleteGameCard');

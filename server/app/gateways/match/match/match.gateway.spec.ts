@@ -3,7 +3,7 @@
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { PlayerDifference } from '@common/difference-information';
 import { GameHistoryDTO } from '@common/game-history.dto';
-import { MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
+import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { BroadcastOperator, Server, Socket } from 'socket.io';
@@ -88,19 +88,25 @@ describe('MatchGateway', () => {
         expect(socket.data.stageId).toEqual('stageId');
         expect(socket.data.room).toEqual('123');
 
+        // const socketEmitSpy = jest.spyOn(socket, 'emit');
         const createLimitedTimeGameSpy = jest.spyOn(gameManagerServiceSpy, 'startLimitedTimeGame');
-        gateway.createSoloGame(socket, { stageId: 'stageId1', isLimitedTimeMode: true });
+        const giveNextStageIdSpy = jest.spyOn(gameManagerServiceSpy, 'giveNextLimitedTimeStage');
+        giveNextStageIdSpy.mockReturnValue('stageId1');
+        await gateway.createSoloGame(socket, { stageId: 'stageId1', isLimitedTimeMode: true });
         expect(createLimitedTimeGameSpy).toHaveBeenCalledWith('123', 1);
+        expect(giveNextStageIdSpy).toHaveBeenCalledWith('123');
         expect(socket.data.stageId).toEqual('stageId1');
+        expect(socket.emit.calledWith(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, 'stageId1')).toBeTruthy();
     });
 
     it('handleDisconnect should call gameManagerService.endgame only if its a socket that wasa playing before', async () => {
         const endgameSpy = jest.spyOn(gameManagerServiceSpy, 'endGame');
-        gateway.handleDisconnect(socket);
-        expect(endgameSpy).not.toHaveBeenCalled();
+        const removeLimitedTimePlayerSpy = jest.spyOn(gameManagerServiceSpy, 'removePlayerFromLimitedTimeGame');
         socket.data.stageId = 'stageId';
-        gateway.handleDisconnect(socket);
+        socket.data.room = 'room';
+        await gateway.handleDisconnect(socket);
         expect(endgameSpy).toHaveBeenCalledWith('stageId');
+        expect(removeLimitedTimePlayerSpy).toHaveBeenCalledWith('room');
     });
 
     it('timer should add a new timer to timer map', async () => {
