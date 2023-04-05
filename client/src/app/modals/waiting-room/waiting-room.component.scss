@@ -1,8 +1,45 @@
 .opponents-container {
-    display: flex;
+    display: inline-block;
+    justify-content: space-around;
 }
 
 body {
     height: 10em;
     width: 20em;
+}
+
+.container {
+    width: 500px;
+    height: 250px;
+    justify-content: space-around;
+    align-items: center;
+    border-radius: 25px;
+}
+
+.name-entry-title {
+    font-size: 2.5em;
+}
+
+.normal-button {
+    justify-content: center;
+    width: 100px;
+    height: 40px;
+}
+
+.hourglass-icon {
+    display: flexbox;
+    justify-content: center;
+    text-align: center;
+    margin-left: 40%;
+    width: 75px;
+    height: 75px;
+    color: #fff;
+}
+
+.hourglass-icon-container {
+    width: 100%;
+}
+
+.centered-icon {
+    margin-top: 36%;
 }
