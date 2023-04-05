@@ -65,9 +65,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
     inputElement = document.querySelector('input');
     isWinner: boolean = false;
+
     isReplayMode: boolean = false;
     isReplayPaused: boolean = false;
     timeMultiplier: number = 1;
+    replayTimeoutId: ReturnType<typeof setTimeout>;
 
     buttonPressCommand: ButtonPressCommand;
     modalCloseCommand: ModalCloseCommand;
@@ -407,39 +409,34 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     replayGame(): void {
-        setTimeout(() => {
-            // console.log('i: ', this.commandIndex);
+        this.replayTimeoutId = setTimeout(() => {
             const command = this.invoker.commands[this.commandIndex];
-            // console.log('command: ', command);
-            // console.log('command time: ', command.time, 'current time: ', this.timerService.currentTime);
             if (command.time === this.timerService.currentTime) {
-                // console.log('move supposed to be executed');
                 command.action.execute();
                 this.commandIndex++;
                 if (this.commandIndex >= this.invoker.commands.length) {
-                    console.log('end of command list');
                     this.timerService.stopTimer();
                     const dialogRef = this.dialog.open(ReplayGameModalComponent, {
                         disableClose: true,
                     });
-                    dialogRef.afterClosed().subscribe(() => {
-                        this.isReplayMode = true;
-
-                        this.timerService.currentTime = 0;
-                        this.messages = [];
-                        this.currentScorePlayer = 0;
-                        this.currentScoreOpponent = 0;
-                        this.timerService.restartTimer(1);
-                        this.commandIndex = 0;
-
-                        this.replayGame();
+                    dialogRef.afterClosed().subscribe((result) => {
+                        if (result === 'replay') {
+                            this.isReplayMode = true;
+                            this.timerService.currentTime = 0;
+                            this.messages = [];
+                            this.currentScorePlayer = 0;
+                            this.currentScoreOpponent = 0;
+                            this.timerService.restartTimer(1);
+                            this.commandIndex = 0;
+                            this.replayGame();
+                        } else if (result === 'continue') {
+                            clearTimeout(this.replayTimeoutId);
+                        }
                     });
                     return;
                 }
                 this.replayGame();
             } else {
-                // console.log('not same time, retry');
-                // console.log(' \n');
                 this.replayGame();
             }
         }, 50);

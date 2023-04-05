@@ -15,12 +15,11 @@ export class ReplayGameModalComponent implements OnInit {
     ngOnInit(): void {}
 
     confirm(): void {
-        this.matDialogRef.close();
+        this.matDialogRef.close('quit');
         this.router.navigate(['/home']);
     }
 
     replay(): void {
-        this.matDialogRef.close();
-        // this.isReplaySelected = true;
+        this.matDialogRef.close('replay');
     }
 }

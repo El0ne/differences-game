@@ -14,6 +14,7 @@ export class GameWinModalComponent {
 
     confirm(): void {
         this.matDialogRef.close();
+        this.isReplaySelected = false;
         this.router.navigate(['/home']);
     }
 
