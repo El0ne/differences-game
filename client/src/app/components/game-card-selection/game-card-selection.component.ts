@@ -47,6 +47,7 @@ export class GameCardSelectionComponent implements OnInit {
 
     deleteGame(): void {
         this.socketService.send(WAITING_ROOM_EVENTS.DeleteGame, this.gameCardInformation._id);
+        // TODO find out where the emit went
     }
 
     resetBestTimes(): void {
@@ -83,7 +84,7 @@ export class GameCardSelectionComponent implements OnInit {
                         stageId: this.gameCardInformation._id,
                         isLimitedTimeMode: false,
                     });
-                    this.router.navigate(['/solo/' + this.gameCardInformation._id]);
+                    this.router.navigate(['/game']);
                 } else this.hostOrJoinGame();
             }
         });

@@ -55,6 +55,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     soloTimer: ReturnType<typeof setInterval>;
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
     gameConstants: GameConstants;
+    // reason: need all parameters for constructor
     // eslint-disable-next-line max-params
     constructor(
         public timerService: TimerSoloService,

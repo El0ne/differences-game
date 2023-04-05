@@ -9,6 +9,7 @@ import { BestTimeComponent } from '@app/components/best-time/best-time.component
 import { GAMES } from '@app/mock/game-cards';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { WaitingRoomComponent, WaitingRoomDataPassing } from '@app/modals/waiting-room/waiting-room.component';
+import { GameParametersService } from '@app/services/game-parameters/game-parameters.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { MATCH_EVENTS, SoloGameCreation } from '@common/match-gateway-communication';
 import { JoinHostInWaitingRequest, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
@@ -25,6 +26,7 @@ describe('GameCardSelectionComponent', () => {
     let choseNameAfterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
     let waitingRoomAfterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
     let socketServiceSpy: SocketService;
+    let gameParamService: GameParametersService;
 
     beforeEach(async () => {
         modalSpy = jasmine.createSpyObj('MatDialog', ['open']);
@@ -37,6 +39,9 @@ describe('GameCardSelectionComponent', () => {
         socketServiceSpy = jasmine.createSpyObj('SocketService', ['names', 'listen', 'delete', 'send', 'connect'], ['socketId']);
         socketServiceSpy.names = new Map<string, string>();
 
+        gameParamService = jasmine.createSpyObj('GameParametersService', ['gameParameters']);
+        // gameParamService.gameParameters = { isMultiplayerGame: true, isLimitedTimeGame: false, stageId: '234' };
+
         await TestBed.configureTestingModule({
             declarations: [GameCardSelectionComponent, BestTimeComponent, ChosePlayerNameDialogComponent, WaitingRoomComponent],
             imports: [MatIconModule, RouterTestingModule, HttpClientTestingModule],
@@ -46,6 +51,7 @@ describe('GameCardSelectionComponent', () => {
                     provide: SocketService,
                     useValue: socketServiceSpy,
                 },
+                { provide: GameParametersService, useValue: gameParamService },
             ],
             teardown: { destroyAfterEach: false },
         }).compileComponents();
@@ -76,18 +82,35 @@ describe('GameCardSelectionComponent', () => {
     it('selectPlayerName should redirect to solo view after opening the modal if in soloGame', () => {
         modalSpy.open = () => choseNameAfterClosedSpy;
         const routerSpy = spyOn(TestBed.inject(Router), 'navigate');
-        component.selectPlayerName(true);
-        expect(routerSpy).toHaveBeenCalledWith(['/solo/' + component.gameCardInformation._id]);
+        const isMultiplayer = false;
+        component.selectPlayerName(isMultiplayer);
+        expect(routerSpy).toHaveBeenCalledWith(['/game']);
+        expect(gameParamService.gameParameters).toEqual({
+            stageId: GAMES[0]._id,
+            isLimitedTimeGame: false,
+            isMultiplayerGame: isMultiplayer,
+        });
         expect(socketServiceSpy.send).toHaveBeenCalledWith(MATCH_EVENTS.createSoloGame, {
             stageId: '123',
             isLimitedTimeMode: false,
         } as SoloGameCreation);
     });
 
+    it('selectPlayerName should do nothing if isNameEntered is false', () => {
+        modalSpy.open = () => choseNameAfterClosedSpy;
+        const routerSpy = spyOn(TestBed.inject(Router), 'navigate');
+        const hostOrJoinGameSpy = spyOn(component, 'hostOrJoinGame');
+        const isMultiplayer = false;
+        choseNameAfterClosedSpy.afterClosed = () => of(isMultiplayer);
+        component.selectPlayerName(isMultiplayer);
+        expect(routerSpy).not.toHaveBeenCalled();
+        expect(hostOrJoinGameSpy).not.toHaveBeenCalled();
+    });
+
     it('selectPlayerName should call hostOrJoinGame if in multiplayer', () => {
         modalSpy.open = () => choseNameAfterClosedSpy;
         const spy = spyOn(component, 'hostOrJoinGame').and.stub();
-        component.selectPlayerName(false);
+        component.selectPlayerName(true);
         expect(spy).toHaveBeenCalled();
     });
 
