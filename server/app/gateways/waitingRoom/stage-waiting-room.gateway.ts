@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { MatchGateway } from '@app/gateways/match/match/match.gateway';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
@@ -108,6 +109,15 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
 
         this.server.to(stageId).emit(WAITING_ROOM_EVENTS.GameDeleted);
         this.server.to(stageId).emit(WAITING_ROOM_EVENTS.MatchRefused, "La fiche n'est plus disponible pour jouer");
+    }
+
+    @SubscribeMessage(WAITING_ROOM_EVENTS.DeleteAllGames)
+    async deleteAllGames(): Promise<void> {
+        const gameCards = await this.gameCardService.getAllGameCards();
+        const stageIds = gameCards.map((gameCard) => gameCard._id.toString());
+        for (const stageId of stageIds) {
+            await this.deleteGame(stageId);
+        }
     }
 
     handleDisconnect(socket: Socket) {

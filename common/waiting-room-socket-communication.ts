@@ -14,6 +14,7 @@ export enum WAITING_ROOM_EVENTS {
     MatchRefused = 'matchRefused',
     MatchConfirmed = 'matchConfirmed',
     DeleteGame = 'deleteGame',
+    DeleteAllGames = 'deleteAllGames',
     GameDeleted = 'gameDeleted',
 }
 

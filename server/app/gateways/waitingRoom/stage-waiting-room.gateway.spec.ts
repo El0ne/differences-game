@@ -1,8 +1,11 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable no-unused-vars */
 import { MatchGateway } from '@app/gateways/match/match/match.gateway';
+import { GameCard } from '@app/schemas/game-cards.schemas';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
+import { getFakeGameCard } from '@app/services/mock/fake-game-card';
 import { JoinHostInWaitingRequest, PlayerInformations, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStubbedInstance, createStubInstance, stub } from 'sinon';
@@ -153,6 +156,15 @@ describe('StageWaitingRoomGateway', () => {
         expect(deleteGameSpy).toBeCalledWith('stageId');
         expect(server.to.calledWith('stageId')).toBeTruthy();
         expect(gateway.gameHosts.has('stageId')).toBeFalsy();
+    });
+    it('deleteAllGames should call deleteGame for all the stages gameCards returned by gameCardService', async () => {
+        stub(gateway, 'deleteGame');
+        const deleteGameSpy = jest.spyOn(gateway, 'deleteGame').mockResolvedValue();
+        const gameCards: GameCard[] = new Array(3).fill(getFakeGameCard());
+        gameCardService.getAllGameCards.returns(Promise.resolve(gameCards));
+        await gateway.deleteAllGames();
+        expect(deleteGameSpy).toHaveBeenCalledWith(gameCards[0]._id.toString());
+        expect(deleteGameSpy).toHaveBeenCalledTimes(3);
     });
 
     it('handleDisconnect should call unhostGame or quitHost on the right conditions', () => {
