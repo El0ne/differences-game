@@ -9,6 +9,7 @@ import { GameCardInformationService } from '@app/services/game-card-information-
 import { GameCardDto } from '@common/game-card.dto';
 import { of } from 'rxjs';
 
+import { ImagesService } from '@app/services/images/images.service';
 import { ModalPageComponent } from './modal-page.component';
 
 describe('ModalPageComponent', () => {
@@ -16,6 +17,7 @@ describe('ModalPageComponent', () => {
     let fixture: ComponentFixture<ModalPageComponent>;
     let gameCardService: GameCardInformationService;
     let clickService: ClickEventService;
+    let imagesServices: ImagesService;
     let dialogRefSpyObject: MatDialogRef<ModalPageComponent>;
 
     beforeEach(async () => {
@@ -48,6 +50,7 @@ describe('ModalPageComponent', () => {
         fixture.detectChanges();
         gameCardService = TestBed.inject(GameCardInformationService);
         clickService = TestBed.inject(ClickEventService);
+        imagesServices = TestBed.inject(ImagesService);
     });
 
     it('createGame should call create game from service and redirection', () => {
@@ -62,8 +65,8 @@ describe('ModalPageComponent', () => {
 
     it('drop game should call redirection', () => {
         const redirectionMock = spyOn(component, 'redirection');
-        const serviceDeleteImageMock = spyOn(gameCardService, 'deleteImage').and.returnValue(of());
         const deleteDifferencesMock = spyOn(clickService, 'deleteDifferences').and.returnValue(of());
+        const deleteImagesObjectMock = spyOn(imagesServices, 'deleteImageObjects').and.returnValue(of());
 
         component.data = {
             image: 'string',
@@ -74,10 +77,7 @@ describe('ModalPageComponent', () => {
         component.dropGame();
 
         expect(deleteDifferencesMock).toHaveBeenCalledOnceWith(component.data.gameInfo._id);
-        expect(serviceDeleteImageMock).toHaveBeenCalledTimes(2);
-        // TODO add expect for delete when implemented with IMAGE
-        // expect(serviceDeleteImageMock).toHaveBeenCalledWith(component.data.gameInfo.baseImage);
-        // expect(serviceDeleteImageMock).toHaveBeenCalledWith(component.data.gameInfo.differenceImage);
+        expect(deleteImagesObjectMock).toHaveBeenCalledOnceWith(component.data.gameInfo._id);
         expect(redirectionMock).toHaveBeenCalledOnceWith('/creatingGame');
     });
 

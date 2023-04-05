@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -40,7 +41,7 @@ describe('GameSelectionComponent', () => {
 
         TestBed.configureTestingModule({
             declarations: [GameSelectionComponent, GameCardSelectionComponent, BestTimeComponent],
-            imports: [RouterTestingModule, MatIconModule, MatDialogModule],
+            imports: [RouterTestingModule, MatIconModule, MatDialogModule, HttpClientTestingModule],
             providers: [
                 { provide: GameCardInformationService, useValue: mockService },
                 { provide: SocketService, useValue: socketServiceSpy },
