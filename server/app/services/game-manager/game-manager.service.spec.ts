@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
 import { GameHistory, gameHistorySchema } from '@app/schemas/game-history';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
@@ -12,6 +13,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection } from 'mongoose';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
+import { getFakeGameCard } from '../mock/fake-game-card';
 import { GameManagerService } from './game-manager.service';
 
 describe('GameManagerService', () => {
@@ -20,6 +22,7 @@ describe('GameManagerService', () => {
     let gameCardService: SinonStubbedInstance<GameCardService>;
     let gameHistoryService: GameHistoryService;
     const id = '63fe6fb0b9546f9126a1811e';
+    const ROOM = 'room';
 
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
@@ -117,5 +120,17 @@ describe('GameManagerService', () => {
         expect(service.gamePlayedInformation.get(id).isDeleted).toBe(false);
         await service.deleteGameFromDb(id);
         expect(service.gamePlayedInformation.get(id).isDeleted).toBe(true);
+    });
+
+    it('startLimitedTimeGame should add in limitedTimeModeGames the room with the infos for all games', async () => {
+        const gameCard = getFakeGameCard();
+        const getAllGameCardsSpy = jest.spyOn(gameCardService, 'getAllGameCards').mockReturnValue(Promise.resolve(new Array(3).fill(gameCard)));
+
+        await service.startLimitedTimeGame(ROOM, 2);
+        expect(getAllGameCardsSpy).toHaveBeenCalled();
+        const limitedTimeGameInfo = service.limitedTimeModeGames.get(ROOM);
+        expect(limitedTimeGameInfo.playersInGame).toEqual(2);
+        expect(limitedTimeGameInfo.gameStages === limitedTimeGameInfo.stagesUsed).toBeTruthy();
+        expect(limitedTimeGameInfo.gameStages[0]).toEqual(gameCard._id.toString());
     });
 });
