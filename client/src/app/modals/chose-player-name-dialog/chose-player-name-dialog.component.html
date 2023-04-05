@@ -1,10 +1,13 @@
 <div class="modal-page container">
-    <button class="normal-button" type="button" (click)="cancelNameInput()">annuler</button>
-    <div class="info">
-        <h1 class="neon">Entrez votre nom</h1>
+    <div class="exit-button-container">
+        <button class="exit-button" type="button" (click)="cancelNameInput()">
+            <mat-icon class="icon">exit_to_app</mat-icon>
+        </button>
     </div>
-    <input type="text" class="name-field" placeholder="Entrez votre nom" [(ngModel)]="playerName" cdkFocusInitial
-        (keyup.enter)="validateName()" />
+    <div class="info">
+        <h1 class="neon name-entry-title">Entrez votre nom</h1>
+    </div>
+    <input type="text" class="name-field" placeholder="Entrez votre nom" [(ngModel)]="playerName" cdkFocusInitial (keyup.enter)="validateName()" />
     <h1 class="neon" *ngIf="showNameErrorMessage">Nom invalide</h1>
     <button class="normal-button" type="button" (click)="validateName()">
         <mat-icon class="icon">check</mat-icon>
