@@ -113,10 +113,11 @@ describe('StageWaitingRoomGateway', () => {
     send a matchAccepted to the opponent and a matchConfirmed its socket 
     when not in limited-time-game-mode`, async () => {
         const opponentSocket = createStubInstance<Socket>(Socket);
-        Object.defineProperty(opponentSocket, 'id', { value: 'opponentId' });
+        const opponentSocketId = 'opponentId';
+        Object.defineProperty(opponentSocket, 'id', { value: opponentSocketId });
         opponentSocket.data = {};
-        stub(opponentSocket, 'rooms').value(new Set(['stage1', 'opponentId']));
-        server.sockets.sockets.set('opponentId', opponentSocket);
+        stub(opponentSocket, 'rooms').value(new Set(['stage1', opponentSocketId]));
+        server.sockets.sockets.set(opponentSocketId, opponentSocket);
         socket.data.stageInHosting = 'stage1';
 
         socket.to.returns({
@@ -125,13 +126,24 @@ describe('StageWaitingRoomGateway', () => {
         server.to.returns({
             emit: (event: string) => {},
         } as BroadcastOperator<unknown, unknown>);
-        await gateway.acceptOpponent(socket, { playerName: 'host1', playerSocketId: 'opponentId', isLimitedTimeMode: true });
+        const addGameSpy = jest.spyOn(gameManagerService, 'addGame').mockImplementation();
+
+        await gateway.acceptOpponent(socket, { playerName: 'host1', playerSocketId: opponentSocketId, isLimitedTimeMode: false });
         expect(socket.to.calledWith('stage1')).toBeTruthy();
-        expect(socket.emit.calledWith(WAITING_ROOM_EVENTS.DeclineOpponent, 'randomRoomId'));
         expect(socket.data.stageInHosting).toEqual(null);
         expect(opponentSocket.data.stageInWaiting).toEqual(null);
         expect(socket.data.room).not.toBe(undefined);
         expect(opponentSocket.data.room).toEqual(socket.data.room);
+        expect(addGameSpy).toHaveBeenCalledWith('stage1', 2);
+
+        socket.data.stageInHosting = 'limitedTimeModeTest';
+        const createLimitedTimeGameSpy = jest.spyOn(gameManagerService, 'startLimitedTimeGame').mockImplementation();
+        const giveNextStageIdSpy = jest.spyOn(gameManagerService, 'giveNextLimitedTimeStage').mockReturnValue('limitedTimeModeTest');
+        await gateway.acceptOpponent(socket, { playerName: 'host1', playerSocketId: opponentSocketId, isLimitedTimeMode: true });
+        expect(createLimitedTimeGameSpy).toHaveBeenCalledWith(socket.data.room, 2);
+        expect(giveNextStageIdSpy).toHaveBeenCalledWith(socket.data.room);
+
+        expect(socket.data.room === opponentSocket.data.room).toBeTruthy();
     });
 
     it('declineOpponent should send a matchRefusedEvent to the opponent', () => {

@@ -83,6 +83,11 @@ describe('GameManagerService', () => {
         expect(deleteDifferencesMock).toBeCalledTimes(1);
     });
 
+    it('endGame and removePlayerFromLimitedTimeGame should not throw errors if they are provided undefined', async () => {
+        await service.endGame(undefined);
+        service.removePlayerFromLimitedTimeGame(undefined);
+    });
+
     it('endGame should decrease the amount of game being played otherwise', async () => {
         const numberOfPlayer = 5;
         service.addGame(id, numberOfPlayer);
