@@ -16,6 +16,7 @@ import { GameInfoModalComponent } from './modals/game-info-modal/game-info-modal
 import { GameWinModalComponent } from './modals/game-win-modal/game-win-modal.component';
 import { ModalPageComponent } from './modals/modal-page/modal-page.component';
 import { QuitGameModalComponent } from './modals/quit-game-modal/quit-game-modal.component';
+import { ReplayGameModalComponent } from './modals/replay-game-modal/replay-game-modal.component';
 import { WaitingRoomComponent } from './modals/waiting-room/waiting-room.component';
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 import { GameSelectionComponent } from './pages/game-selection/game-selection.component';
@@ -44,6 +45,7 @@ import { SoloViewComponent } from './pages/solo-view/solo-view.component';
         GameInfoModalComponent,
         QuitGameModalComponent,
         GameWinModalComponent,
+        ReplayGameModalComponent,
     ],
     entryComponents: [ModalPageComponent],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, MatIconModule],

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -6,6 +7,7 @@ import { ClickEventComponent } from '@app/components/click-event/click-event.com
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
 import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal.component';
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
+import { ReplayGameModalComponent } from '@app/modals/replay-game-modal/replay-game-modal.component';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import {
@@ -343,7 +345,22 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.commandIndex++;
                 if (this.commandIndex >= this.invoker.commands.length) {
                     console.log('end of command list');
+                    this.timerService.stopTimer();
+                    const dialogRef = this.dialog.open(ReplayGameModalComponent, {
+                        disableClose: true,
+                    });
+                    dialogRef.afterClosed().subscribe(() => {
+                        this.isReplayMode = true;
 
+                        this.timerService.currentTime = 0;
+                        this.messages = [];
+                        this.currentScorePlayer = 0;
+                        this.currentScoreOpponent = 0;
+                        this.timerService.restartTimer(1);
+                        this.commandIndex = 0;
+
+                        this.replayGame();
+                    });
                     return;
                 }
                 this.replayGame();
@@ -352,6 +369,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 // console.log(' \n');
                 this.replayGame();
             }
-        }, 100);
+        }, 50);
     }
 }
