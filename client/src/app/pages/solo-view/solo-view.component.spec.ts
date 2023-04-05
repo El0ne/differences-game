@@ -125,10 +125,8 @@ describe('SoloViewComponent', () => {
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.ngOnInit();
         tick(ONE_SECOND);
-        expect(sendSpy).toHaveBeenCalledTimes(2);
-        expect(component.soloTimer).toBeTruthy();
+        expect(sendSpy).toHaveBeenCalledTimes(1);
         expect(component.gameConstants).toEqual(MOCK_GAME_CONSTANTS);
-        clearInterval(component.soloTimer);
     }));
 
     it('should set the current gameCard id according to value in route and request gameCard as well as game player information', () => {

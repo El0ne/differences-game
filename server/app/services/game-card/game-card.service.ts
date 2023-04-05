@@ -4,6 +4,7 @@ import { BestTimesService } from '@app/services/best-times/best-times.service';
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { GameCardDto } from '@common/game-card.dto';
+import { RankingBoard } from '@common/ranking-board';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
@@ -70,5 +71,15 @@ export class GameCardService {
             soloTimes: this.bestTimesService.generateBestTimes(),
             multiTimes: this.bestTimesService.generateBestTimes(),
         };
+    }
+
+    async updateGameCard(game: GameCard, winnerBoard: RankingBoard, isMultiplayer: boolean): Promise<GameCard> {
+        if (isMultiplayer) {
+            game.multiTimes = this.bestTimesService.updateBestTimes(game.multiTimes, winnerBoard);
+        } else {
+            game.soloTimes = this.bestTimesService.updateBestTimes(game.soloTimes, winnerBoard);
+        }
+        await this.gameCardModel.findOneAndUpdate({ _id: game._id }, game);
+        return game;
     }
 }

@@ -9,6 +9,7 @@ import { BestTimeComponent } from '@app/components/best-time/best-time.component
 import { GAMES } from '@app/mock/game-cards';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { WaitingRoomComponent, WaitingRoomDataPassing } from '@app/modals/waiting-room/waiting-room.component';
+import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { GameCardInformation } from '@common/game-card';
 import { MATCH_EVENTS } from '@common/match-gateway-communication';
@@ -19,9 +20,8 @@ import { GameCardSelectionComponent } from './game-card-selection.component';
 describe('GameCardSelectionComponent', () => {
     let component: GameCardSelectionComponent;
     let fixture: ComponentFixture<GameCardSelectionComponent>;
-    const gameCardServiceSpyObj = jasmine.createSpyObj('GameCardInformationService', ['deleteGame', 'playGame']);
-    gameCardServiceSpyObj.deleteGame.and.returnValue(of());
-    gameCardServiceSpyObj.playGame.and.returnValue(of());
+    const gameCardServiceSpyObj = jasmine.createSpyObj('GameCardInformationService', ['resetBestTime']);
+    gameCardServiceSpyObj.resetBestTime.and.returnValue(of());
     let modalSpy: MatDialog;
     let choseNameAfterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
     let waitingRoomAfterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
@@ -47,6 +47,7 @@ describe('GameCardSelectionComponent', () => {
                     provide: SocketService,
                     useValue: socketServiceSpy,
                 },
+                { provide: GameCardInformationService, useValue: gameCardServiceSpyObj },
             ],
             teardown: { destroyAfterEach: false },
         }).compileComponents();
@@ -62,9 +63,17 @@ describe('GameCardSelectionComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('deleteGame should call gameCardService.deleteGame and gameDeleted.emit', () => {
+    it('deleteGame should call gameDeleted.emit', () => {
         component.deleteGame();
         expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.DeleteGame, '123');
+    });
+
+    it('resetBestTimes() should call resetBestTime from the service', () => {
+        // spyOn(gameCardServiceSpyObj, 'resetBestTime').and.returnValue(new Observable<void>());
+
+        component.resetBestTimes();
+
+        expect(gameCardServiceSpyObj.resetBestTime).toHaveBeenCalled();
     });
 
     it('selectPlayerName should redirect to solo view after opening the modal if in soloGame', () => {
