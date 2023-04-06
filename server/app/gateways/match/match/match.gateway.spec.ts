@@ -89,7 +89,7 @@ describe('MatchGateway', () => {
         expect(socket.data.room).toEqual('123');
 
         const createLimitedTimeGameSpy = jest.spyOn(gameManagerServiceSpy, 'startLimitedTimeGame').mockImplementation();
-        const giveNextStageIdSpy = jest.spyOn(gameManagerServiceSpy, 'giveNextLimitedTimeStage');
+        const giveNextStageIdSpy = jest.spyOn(gameManagerServiceSpy, 'giveNextStage');
         giveNextStageIdSpy.mockReturnValue('stageId1');
         await gateway.createSoloGame(socket, { stageId: 'stageId1', isLimitedTimeMode: true });
         expect(createLimitedTimeGameSpy).toHaveBeenCalledWith('123', 1);

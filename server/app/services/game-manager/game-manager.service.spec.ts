@@ -6,6 +6,7 @@ import { DifferencesCounterService } from '@app/services/differences-counter/dif
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
+import { getFakeGameCard } from '@app/services/mock/fake-game-card';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
@@ -13,7 +14,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection } from 'mongoose';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
-import { getFakeGameCard } from '../mock/fake-game-card';
 import { GameManagerService } from './game-manager.service';
 
 describe('GameManagerService', () => {
@@ -23,6 +23,7 @@ describe('GameManagerService', () => {
     let gameHistoryService: GameHistoryService;
     const id = '63fe6fb0b9546f9126a1811e';
     const ROOM = 'room';
+    const gameCard = getFakeGameCard();
 
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
@@ -122,15 +123,50 @@ describe('GameManagerService', () => {
         expect(service.gamePlayedInformation.get(id).isDeleted).toBe(true);
     });
 
-    it('startLimitedTimeGame should add in limitedTimeModeGames the room with the infos for all games', async () => {
-        const gameCard = getFakeGameCard();
+    it('startLimitedTimeGame should add in limitedTimeModeGames the room with the infos for all games and call addGame for each stages', async () => {
         const getAllGameCardsSpy = jest.spyOn(gameCardService, 'getAllGameCards').mockReturnValue(Promise.resolve(new Array(3).fill(gameCard)));
+        const addGameSpy = jest.spyOn(service, 'addGame').mockImplementation();
 
-        await service.startLimitedTimeGame(ROOM, 2);
+        const isGameCreated = await service.startLimitedTimeGame(ROOM, 2);
+        expect(isGameCreated).toBeTruthy();
         expect(getAllGameCardsSpy).toHaveBeenCalled();
         const limitedTimeGameInfo = service.limitedTimeModeGames.get(ROOM);
         expect(limitedTimeGameInfo.playersInGame).toEqual(2);
         expect(limitedTimeGameInfo.gameStages === limitedTimeGameInfo.stagesUsed).toBeTruthy();
         expect(limitedTimeGameInfo.gameStages[0]).toEqual(gameCard._id.toString());
+        expect(addGameSpy).toBeCalledTimes(3);
+        expect(addGameSpy).toBeCalledWith(gameCard._id.toString(), 2);
+    });
+
+    it('startLimitedTimeGame should not create any game and return false if tere is no gameCards', async () => {
+        jest.spyOn(gameCardService, 'getAllGameCards').mockReturnValue(Promise.resolve([]));
+        const addGameSpy = jest.spyOn(service, 'addGame').mockImplementation();
+        const isGameCreated = await service.startLimitedTimeGame(ROOM, 2);
+        expect(isGameCreated).toBeFalsy();
+        expect(addGameSpy).not.toBeCalled();
+    });
+
+    it('giveNextStage should give the next stage if there is one, or undefined where there is none left', async () => {
+        jest.spyOn(gameCardService, 'getAllGameCards').mockReturnValue(Promise.resolve([gameCard]));
+        await service.startLimitedTimeGame(ROOM, 2);
+        const nextStage = service.giveNextStage(ROOM);
+        expect(nextStage).toEqual(gameCard._id.toString());
+        const noStageExpected = service.giveNextStage(ROOM);
+        expect(noStageExpected).toEqual(undefined);
+    });
+
+    it(`removePlayerFromLimitedTimeGame should remove the player from the game
+        and delete the game if there is no more player. It should also call endGame 
+        for each stages in the limitedTime game`, async () => {
+        jest.spyOn(gameCardService, 'getAllGameCards').mockReturnValue(Promise.resolve(Promise.resolve(new Array(3).fill(gameCard))));
+        const endGameSpy = jest.spyOn(service, 'endGame').mockImplementation();
+        await service.startLimitedTimeGame(ROOM, 2);
+        service.removePlayerFromLimitedTimeGame(ROOM);
+        expect(service.limitedTimeModeGames.get(ROOM).playersInGame).toEqual(1);
+        expect(endGameSpy).not.toBeCalled();
+        service.removePlayerFromLimitedTimeGame(ROOM);
+        expect(service.limitedTimeModeGames.get(ROOM)).toEqual(undefined);
+        expect(endGameSpy).toBeCalledTimes(3);
+        expect(endGameSpy).toBeCalledWith(gameCard._id.toString());
     });
 });

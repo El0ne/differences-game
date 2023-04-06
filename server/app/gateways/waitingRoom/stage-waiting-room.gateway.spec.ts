@@ -138,7 +138,7 @@ describe('StageWaitingRoomGateway', () => {
 
         socket.data.stageInHosting = 'limitedTimeModeTest';
         const createLimitedTimeGameSpy = jest.spyOn(gameManagerService, 'startLimitedTimeGame').mockImplementation();
-        const giveNextStageIdSpy = jest.spyOn(gameManagerService, 'giveNextLimitedTimeStage').mockReturnValue('limitedTimeModeTest');
+        const giveNextStageIdSpy = jest.spyOn(gameManagerService, 'giveNextStage').mockReturnValue('limitedTimeModeTest');
         await gateway.acceptOpponent(socket, { playerName: 'host1', playerSocketId: opponentSocketId, isLimitedTimeMode: true });
         expect(createLimitedTimeGameSpy).toHaveBeenCalledWith(socket.data.room, 2);
         expect(giveNextStageIdSpy).toHaveBeenCalledWith(socket.data.room);
