@@ -1,6 +1,18 @@
 .opponents-container {
-    display: inline-block;
-    justify-content: space-around;
+    display: center;
+    text-overflow: hidden;
+    background-color: #360a21;
+}
+
+.scrolling-bar {
+    width: 300px;
+    height: 100px;
+    overflow-y: scroll;
+    scrollbar-width: thin;
+}
+
+.ng-star-inserted {
+    height: 10rem;
 }
 
 body {
@@ -24,6 +36,9 @@ body {
     justify-content: center;
     width: 100px;
     height: 40px;
+    margin-left: 5%;
+    margin-right: 5%;
+    margin-bottom: 15%;
 }
 
 .hourglass-icon {
@@ -42,4 +57,27 @@ body {
 
 .centered-icon {
     margin-top: 36%;
+}
+
+.cancel-button {
+    cursor: pointer;
+    display: flexbox;
+    justify-content: left;
+    text-align: center;
+    width: 80px;
+    height: 40px;
+    color: #fff;
+    background-color: #ff124f;
+    border-radius: 15px;
+    box-shadow: 0 5px #999;
+}
+
+.cancel-button:enabled:active {
+    background-color: #ff124dc5;
+    box-shadow: 0 5px #666;
+    transform: translateY(4px);
+}
+
+.cancel-button:hover {
+    background-color: #ff124dc5;
 }
