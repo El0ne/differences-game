@@ -47,7 +47,7 @@ export class LimitedTimeComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         this.socketService.delete(WAITING_ROOM_EVENTS.MatchCreated);
         this.socketService.delete(WAITING_ROOM_EVENTS.MatchDeleted);
-        this.socketService.delete(WAITING_ROOM_EVENTS.MatchCreated);
+        this.socketService.delete(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame);
     }
 
     hostOrJoinGame(): void {
