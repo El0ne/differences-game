@@ -11,27 +11,12 @@ import { GameCardDto } from '@common/game-card.dto';
 import { ImageUploadDto } from '@common/image-upload.dto';
 import { ImageDto } from '@common/image.dto';
 import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
-import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    HttpException,
-    HttpStatus,
-    Param,
-    Post,
-    Put,
-    Query,
-    Res,
-    UploadedFiles,
-    UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Put, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { ObjectId } from 'mongodb';
 import { diskStorage } from 'multer';
 import * as path from 'path';
-import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 // based on https://www.youtube.com/watch?v=f-URVd2OKYc
 export const storage = diskStorage({
@@ -131,25 +116,27 @@ export class StageController {
         }
     }
 
-    @Get('/image/:imageName')
-    async getImage(@Param() param, @Res() res: Response): Promise<void> {
-        try {
-            const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);
-            res.status(HttpStatus.OK).sendFile(imagePath);
-        } catch (err) {
-            res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+    // TODO remove
+    // @Get('/image/:imageName')
+    // async getImage(@Param() param, @Res() res: Response): Promise<void> {
+    //     try {
+    //         const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);
+    //         res.status(HttpStatus.OK).sendFile(imagePath);
+    //     } catch (err) {
+    //         res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    // }
 
-    @Delete('/image/:imageName')
-    async deleteImage(@Param() param, @Res() res: Response): Promise<void> {
-        try {
-            this.imageManagerService.deleteImage(param.imageName);
-            res.status(HttpStatus.NO_CONTENT).send([]);
-        } catch (err) {
-            res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+    // TODO remove
+    // @Delete('/image/:imageName')
+    // async deleteImage(@Param() param, @Res() res: Response): Promise<void> {
+    //     try {
+    //         this.imageManagerService.deleteImage(param.imageName);
+    //         res.status(HttpStatus.NO_CONTENT).send([]);
+    //     } catch (err) {
+    //         res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    // }
 
     @Put('/best-times')
     async resetAllBestTimes(@Res() res: Response): Promise<void> {
