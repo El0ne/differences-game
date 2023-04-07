@@ -178,7 +178,5 @@ describe('GameSelectionComponent', () => {
         expect(component.numberOfGameInformations).toEqual(GAME_CARDS_TO_DISPLAY);
         expect(component.selectGameCards).toHaveBeenCalled();
         expect(gameCardInfoService.getNumberOfGameCardInformation).toHaveBeenCalled();
-
-        // TODO set a false setTimeout
     });
 });
