@@ -22,6 +22,8 @@ import { GameManagerService } from './game-manager.service';
 describe('GameManagerService', () => {
     let service: GameManagerService;
     let gameCardService: SinonStubbedInstance<GameCardService>;
+    let imageManagerService: ImageManagerService;
+    let differenceClickService: DifferenceClickService;
     const id = '63fe6fb0b9546f9126a1811e';
     const ROOM = 'room';
     const gameCard = getFakeGameCard();
@@ -58,6 +60,9 @@ describe('GameManagerService', () => {
         }).compile();
 
         service = module.get<GameManagerService>(GameManagerService);
+        imageManagerService = module.get<ImageManagerService>(ImageManagerService);
+        differenceClickService = module.get<DifferenceClickService>(DifferenceClickService);
+
         connection = await module.get(getConnectionToken());
     });
 
@@ -163,5 +168,15 @@ describe('GameManagerService', () => {
         expect(service.limitedTimeModeGames.get(ROOM)).toEqual(undefined);
         expect(endGameSpy).toBeCalledTimes(3);
         expect(endGameSpy).toBeCalledWith(gameCard._id.toString());
+    });
+
+    it('deleteFromMongo should call deleteDifferences and deleteImageObject functions from services', async () => {
+        jest.spyOn(differenceClickService, 'deleteDifferences').mockImplementation();
+        jest.spyOn(imageManagerService, 'deleteImageObject').mockImplementation();
+
+        await service.deleteFromMongo(id);
+
+        expect(differenceClickService.deleteDifferences).toBeCalledWith(id);
+        expect(imageManagerService.deleteImageObject).toBeCalledWith(id);
     });
 });
