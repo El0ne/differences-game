@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -19,16 +19,16 @@ describe('GameSelectionComponent', () => {
     let component: GameSelectionComponent;
     let fixture: ComponentFixture<GameSelectionComponent>;
     let gameCardInfoService: GameCardInformationService;
-    let testNumber: Subject<number>;
+    // let testNumber: Subject<number>;
     let testGameCardsInformation: Subject<GameCardInformation[]>;
     let socketServiceSpy: SocketService;
 
     beforeEach(() => {
-        testNumber = new Subject<number>();
+        // testNumber = new Subject<number>();
         gameCardInfoService = jasmine.createSpyObj('GameCardInformationService', ['getGameCardsInformation', 'getNumberOfGameCardInformation']);
         gameCardInfoService.getNumberOfGameCardInformation = () => {
-            testNumber.next(GAME_CARDS_TO_DISPLAY);
-            return testNumber.asObservable();
+            // testNumber.next(GAME_CARDS_TO_DISPLAY);
+            return of(GAME_CARDS_TO_DISPLAY);
         };
 
         testGameCardsInformation = new Subject<GameCardInformation[]>();
@@ -168,15 +168,17 @@ describe('GameSelectionComponent', () => {
         expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.ScanForHost, ['123']);
     });
 
-    it('refreshGameCards() should call selectGameCards() and getGameCardsInformations()', () => {
+    it('refreshGameCards() should call selectGameCards() and getGameCardsInformations()', fakeAsync(() => {
         const DELAY_BEFORE_REFRESH = 250;
 
         spyOn(component, 'selectGameCards').and.returnValue();
-        component.refreshGameCards();
-        tick(DELAY_BEFORE_REFRESH);
+        spyOn(gameCardInfoService, 'getNumberOfGameCardInformation').and.returnValue(of(GAME_CARDS_TO_DISPLAY));
 
+        component.refreshGameCards();
+        tick(DELAY_BEFORE_REFRESH * 3);
+
+        expect(gameCardInfoService.getNumberOfGameCardInformation).toHaveBeenCalled();
         expect(component.numberOfGameInformations).toEqual(GAME_CARDS_TO_DISPLAY);
         expect(component.selectGameCards).toHaveBeenCalled();
-        expect(gameCardInfoService.getNumberOfGameCardInformation).toHaveBeenCalled();
-    });
+    }));
 });
