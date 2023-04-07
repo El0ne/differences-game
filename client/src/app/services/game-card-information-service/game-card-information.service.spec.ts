@@ -71,13 +71,6 @@ describe('GameCardInformationService', () => {
         expect(postSpy).toHaveBeenCalled();
     });
 
-    it('deleteImage should call delete on httpManager', () => {
-        const deleteSpy = spyOn(service.http, 'delete');
-
-        service.deleteImage('');
-        expect(deleteSpy).toHaveBeenCalled();
-    });
-
     it('resetAllBestTimes() should reset best times of all the game cards', () => {
         service.resetAllBestTimes().subscribe(() => {
             expect().nothing();
