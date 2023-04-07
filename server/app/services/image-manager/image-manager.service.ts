@@ -9,12 +9,7 @@ import { Model } from 'mongoose';
 export class ImageManagerService {
     constructor(@InjectModel(Images.name) private imagesModel: Model<ImagesDocument>) {}
 
-    async createImageObject(_id: ObjectId, originalImageName: string, differenceImageName: string): Promise<Images> {
-        const imageObject: Images = {
-            _id,
-            originalImageName,
-            differenceImageName,
-        };
+    async createImageObject(imageObject: Images): Promise<Images> {
         const newImageObject = new this.imagesModel(imageObject);
         return newImageObject.save();
     }

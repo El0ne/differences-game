@@ -1,5 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 // using _id property causes linting warning
+import { Images } from '@app/schemas/images.schema';
 import { BestTimesService } from '@app/services/best-times/best-times.service';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
@@ -105,7 +106,12 @@ export class StageController {
                 const differencesArray = await this.differenceService.compareImages(fileArray[0].path, fileArray[1].path, param.radius);
                 if (this.gameDifficultyService.isGameValid(differencesArray)) {
                     const differenceObjectId = await this.differenceClickService.createDifferenceArray(differencesArray);
-                    await this.imageManagerService.createImageObject(new ObjectId(differenceObjectId), fileArray[0].filename, fileArray[1].filename);
+                    const imageData: Images = {
+                        _id: new ObjectId(differenceObjectId),
+                        originalImageName: fileArray[0].filename,
+                        differenceImageName: fileArray[1].filename,
+                    };
+                    await this.imageManagerService.createImageObject(imageData);
                     const difficulty = this.gameDifficultyService.setGameDifficulty(differencesArray);
 
                     const data: ServerGeneratedGameInfo = {

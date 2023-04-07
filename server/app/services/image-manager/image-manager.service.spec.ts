@@ -1,5 +1,7 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Images, imagesSchema } from '@app/schemas/images.schema';
+import { getFakeImageObject } from '@app/services/mock/fake-image-objects';
 import { DELAY_BEFORE_CLOSING_CONNECTION } from '@app/tests/constants';
 import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -41,6 +43,13 @@ describe('ImageManagerService', () => {
             await mongoServer.stop();
             done();
         }, DELAY_BEFORE_CLOSING_CONNECTION);
+    });
+
+    it('createImageObject should add an Image Object to the list of Image Objects', async () => {
+        const fakeImageObject = getFakeImageObject();
+        await service.createImageObject(fakeImageObject);
+        const response = await service.getImageObjectById(fakeImageObject._id.toHexString());
+        expect(response).toEqual(expect.objectContaining(fakeImageObject));
     });
 
     it('should be defined', () => {
