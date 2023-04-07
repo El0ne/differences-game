@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Images, ImagesDocument, imagesSchema } from '@app/schemas/images.schema';
-import { getFakeImageObject } from '@app/services/mock/fake-image-objects';
+import { getFakeImages } from '@app/services/mock/fake-images';
 import { DELAY_BEFORE_CLOSING_CONNECTION } from '@app/tests/constants';
 import { MongooseModule, getConnectionToken, getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -52,10 +52,10 @@ describe('ImageManagerService', () => {
     });
 
     it('createImageObject should add an Image Object to the list of Image Objects', async () => {
-        const fakeImageObject = getFakeImageObject();
-        await service.createImageObject(fakeImageObject);
-        const response = await service.getImageObjectById(fakeImageObject._id.toHexString());
-        expect(response).toEqual(expect.objectContaining(fakeImageObject));
+        const fakeImages = getFakeImages();
+        await service.createImageObject(fakeImages);
+        const response = await service.getImageObjectById(fakeImages._id.toHexString());
+        expect(response).toEqual(expect.objectContaining(fakeImages));
     });
 
     it('getGameCardById should call find by id', async () => {
@@ -66,18 +66,18 @@ describe('ImageManagerService', () => {
     });
 
     it('deleteImageObject should call findByIdAndDelete and deleteImage', async () => {
-        const fakeImageObject = getFakeImageObject();
+        const fakeImages = getFakeImages();
         jest.spyOn(imagesModel, 'findByIdAndDelete').mockImplementation(() => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            return fakeImageObject as any;
+            return fakeImages as any;
         });
         jest.spyOn(service, 'deleteImage').mockImplementation();
 
         const id = new ObjectId(123);
         await service.deleteImageObject(id.toHexString());
         expect(imagesModel.findByIdAndDelete).toBeCalledWith(id);
-        expect(service.deleteImage).toBeCalledWith(fakeImageObject.originalImageName);
-        expect(service.deleteImage).toBeCalledWith(fakeImageObject.differenceImageName);
+        expect(service.deleteImage).toBeCalledWith(fakeImages.originalImageName);
+        expect(service.deleteImage).toBeCalledWith(fakeImages.differenceImageName);
     });
 
     it('should delete the image at the provided path', () => {

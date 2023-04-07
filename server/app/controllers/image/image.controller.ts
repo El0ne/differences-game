@@ -6,13 +6,11 @@ import { join } from 'path';
 @Controller('image')
 export class ImageController {
     constructor(private imageManagerService: ImageManagerService) {}
-    // return the name of the two images
     @Get('')
     async getImageNames(@Query('id') id: string, @Res() res: Response): Promise<void> {
         try {
-            const test = await this.imageManagerService.getImageObjectById(id);
-            // const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);
-            res.status(HttpStatus.OK).send(test);
+            const image = await this.imageManagerService.getImageObjectById(id);
+            res.status(HttpStatus.OK).send(image);
         } catch (err) {
             res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         }

@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
-import { Images } from '@app/schemas/images.schema';
-import { ObjectId } from 'mongodb';
+import { ImageObject } from '@common/image-object';
 
-export const getFakeImageObject = (): Images => ({
-    _id: new ObjectId(),
+export const getFakeImageObject = (): ImageObject => ({
+    _id: 'dowvb;dfv',
     originalImageName: 'oriegbw;fb',
     differenceImageName: 'reibgqvefve',
 });
