@@ -91,14 +91,4 @@ describe('GameCardInformationService', () => {
         expect(req.request.method).toBe('PUT');
         req.flush(null);
     });
-
-    it('deleteAllGames() should delete all the game cards', () => {
-        service.deleteAllGames().subscribe(() => {
-            expect().nothing();
-        });
-
-        const req = httpController.expectOne(`${STAGE}`);
-        expect(req.request.method).toBe('DELETE');
-        req.flush(null);
-    });
 });

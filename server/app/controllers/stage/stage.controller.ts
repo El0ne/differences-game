@@ -164,14 +164,4 @@ export class StageController {
             res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    // @Delete('/')
-    // async deleteAllGames(@Res() res: Response): Promise<void> {
-    //     try {
-    //         await this.gameCardService.deleteAllGameCards();
-    //         res.status(HttpStatus.NO_CONTENT).send();
-    //     } catch (err) {
-    //         res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-    //     }
-    // }
 }

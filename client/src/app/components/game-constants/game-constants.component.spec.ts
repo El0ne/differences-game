@@ -32,13 +32,9 @@ describe('GameConstantsComponent', () => {
             return of();
         };
 
-        gameCardService = jasmine.createSpyObj('GameCardInformationService', ['resetAllBestTimes', 'deleteAllGames']);
+        gameCardService = jasmine.createSpyObj('GameCardInformationService', ['resetAllBestTimes']);
 
         gameCardService.resetAllBestTimes = () => {
-            return of();
-        };
-
-        gameCardService.deleteAllGames = () => {
             return of();
         };
 
