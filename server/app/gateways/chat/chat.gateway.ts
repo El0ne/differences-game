@@ -86,10 +86,9 @@ export class ChatGateway implements OnGatewayDisconnect {
                     }
                 }
             }
-            socket.data.isSolo = false;
-
-            this.gameHistoryService.addGameToHistory(data);
         }
+        socket.data.isSolo = false;
+        this.gameHistoryService.addGameToHistory(data);
     }
 
     handleDisconnect(socket: Socket): void {
