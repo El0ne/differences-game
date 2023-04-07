@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, tick } from '@angular/core/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -169,10 +169,16 @@ describe('GameSelectionComponent', () => {
     });
 
     it('refreshGameCards() should call selectGameCards() and getGameCardsInformations()', () => {
+        const DELAY_BEFORE_REFRESH = 250;
+
         spyOn(component, 'selectGameCards').and.returnValue();
         component.refreshGameCards();
+        tick(DELAY_BEFORE_REFRESH);
+
         expect(component.numberOfGameInformations).toEqual(GAME_CARDS_TO_DISPLAY);
         expect(component.selectGameCards).toHaveBeenCalled();
+        expect(gameCardInfoService.getNumberOfGameCardInformation).toHaveBeenCalled();
+
         // TODO set a false setTimeout
     });
 });
