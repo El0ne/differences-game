@@ -10,7 +10,7 @@ import { FileManipulationService } from '@app/services/file-manipulation/file-ma
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { PenService } from '@app/services/pen-service/pen-service.service';
 import { RectangleService } from '@app/services/rectangle/rectangle.service';
-import { STAGE } from '@app/services/server-routes';
+import { IMAGE } from '@app/services/server-routes';
 import { UndoRedoService } from '@app/services/undo-redo/undo-redo.service';
 import { CanvasInformations } from '@common/canvas-informations';
 import { GameCardDto } from '@common/game-card.dto';
@@ -262,7 +262,7 @@ export class GameCreationPageComponent implements OnInit {
                     };
                     this.difficulty = data.gameDifficulty;
                     this.differenceNumber = data.gameDifferenceNumber;
-                    this.differenceImage = `${STAGE}/image/difference-image.bmp`;
+                    this.differenceImage = `${IMAGE}/difference-image.bmp`;
                     this.openSaveModal();
                 } else {
                     alert("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
