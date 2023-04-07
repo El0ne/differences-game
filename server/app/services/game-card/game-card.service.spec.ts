@@ -25,6 +25,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection, Model } from 'mongoose';
 import { stub } from 'sinon';
 import { GameCardService } from './game-card.service';
+
 describe('GameCardService', () => {
     let service: GameCardService;
     let gameCardModel: Model<GameCardDocument>;
@@ -130,6 +131,13 @@ describe('GameCardService', () => {
         await service.createGameCard(FAKE_GAME_INFO);
         const game = await service.getGameCardById(fakeGameCard._id.toHexString());
         expect(game).toEqual(expect.objectContaining(fakeGameCard));
+    });
+
+    it('deleteGameCard should call gameCardModel.findByIdAndDelete with a certain id', async () => {
+        jest.spyOn(gameCardModel, 'findByIdAndDelete').mockImplementation();
+        const id = new ObjectId(123);
+        await service.deleteGameCard(id.toHexString());
+        expect(gameCardModel.findByIdAndDelete).toBeCalledWith(id);
     });
 
     it('generateGameCard should create a game card from a game informations', async () => {

@@ -44,18 +44,8 @@ export class GameCardService {
     }
 
     async deleteGameCard(id: string): Promise<void> {
-        const deletedGameCard = await this.gameCardModel.findByIdAndDelete(new ObjectId(id));
-        // this.imageManagerService.deleteImage(deletedGameCard.originalImageName);
-        // this.imageManagerService.deleteImage(deletedGameCard.differenceImageName);
+        await this.gameCardModel.findByIdAndDelete(new ObjectId(id));
     }
-
-    // async deleteAllGameCards(): Promise<void> {
-    //     const allGameCards = await this.gameCardModel.find({});
-    //     allGameCards.forEach(async (gameCard) => {
-    //         await this.deleteGameCard(gameCard._id);
-    //         await this.gameManagerService.deleteGameFromDb(gameCard._id.toString());
-    //     });
-    // }
 
     generateGameCard(game: GameCardDto): GameCard {
         return {
