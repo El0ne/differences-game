@@ -40,14 +40,12 @@ export class GameCardSelectionComponent implements OnInit {
         let originalImageName;
         this.imagesService.getImageNames(this.gameCardInformation._id).subscribe((imageObject) => {
             originalImageName = imageObject.originalImageName;
-            console.log('originalImageName', originalImageName);
             this.image = `${IMAGE}/${originalImageName}`;
         });
     }
 
     deleteGame(): void {
         this.socketService.send(WAITING_ROOM_EVENTS.DeleteGame, this.gameCardInformation._id);
-        // TODO find out where the emit went
     }
 
     resetBestTimes(): void {

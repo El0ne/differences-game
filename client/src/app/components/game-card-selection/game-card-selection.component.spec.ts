@@ -19,9 +19,6 @@ import { GameCardSelectionComponent } from './game-card-selection.component';
 describe('GameCardSelectionComponent', () => {
     let component: GameCardSelectionComponent;
     let fixture: ComponentFixture<GameCardSelectionComponent>;
-    const gameCardServiceSpyObj = jasmine.createSpyObj('GameCardInformationService', ['deleteGame', 'playGame']);
-    gameCardServiceSpyObj.deleteGame.and.returnValue(of());
-    gameCardServiceSpyObj.playGame.and.returnValue(of());
     let modalSpy: MatDialog;
     let choseNameAfterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
     let waitingRoomAfterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
@@ -65,7 +62,7 @@ describe('GameCardSelectionComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('deleteGame should call gameCardService.deleteGame and gameDeleted.emit', () => {
+    it('deleteGame should call socket send', () => {
         component.deleteGame();
         expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.DeleteGame, '123');
     });
