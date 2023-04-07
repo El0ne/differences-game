@@ -19,7 +19,7 @@ export class MatchGateway implements OnGatewayDisconnect {
         socket.data.room = socket.id;
         if (gameInfo.isLimitedTimeMode) {
             await this.gameManagerService.startLimitedTimeGame(socket.data.room, 1);
-            socket.emit(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, this.gameManagerService.giveNextLimitedTimeStage(socket.data.room));
+            socket.emit(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, this.gameManagerService.giveNextStage(socket.data.room));
         } else {
             this.timer(socket.data.room);
             this.gameManagerService.addGame(gameInfo.stageId, 1);

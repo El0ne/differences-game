@@ -268,24 +268,6 @@ describe('StageController', () => {
 
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
-
-    // it('deleteAllGames() should call deleteAllGameCards', async () => {
-    //     const deleteAllGameMock = jest.spyOn(gameCardService, 'deleteAllGameCards').mockImplementation();
-    //     const response = await request(httpServer).delete('/stage');
-
-    //     expect(deleteAllGameMock).toHaveBeenCalled();
-    //     expect(response.status).toBe(HttpStatus.NO_CONTENT);
-    // });
-
-    // it('deleteAllGames() should return 500 if there is an error in the treatment', async () => {
-    //     const deleteAllGameMock = jest.spyOn(gameCardService, 'deleteAllGameCards').mockImplementationOnce(() => {
-    //         throw new Error();
-    //     });
-    //     const response = await request(httpServer).delete('/stage');
-
-    //     expect(deleteAllGameMock).toHaveBeenCalled();
-    //     expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
-    // });
 });
 
 const FAKE_GAME_INFO: GameCardDto = {

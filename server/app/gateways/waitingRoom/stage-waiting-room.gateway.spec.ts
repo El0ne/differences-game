@@ -1,8 +1,11 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable no-unused-vars */
 import { MatchGateway } from '@app/gateways/match/match/match.gateway';
+import { GameCard } from '@app/schemas/game-cards.schemas';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
+import { getFakeGameCard } from '@app/services/mock/fake-game-card';
 import { JoinHostInWaitingRequest, PlayerInformations, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStubbedInstance, createStubInstance, stub } from 'sinon';
@@ -110,10 +113,11 @@ describe('StageWaitingRoomGateway', () => {
     send a matchAccepted to the opponent and a matchConfirmed its socket 
     when not in limited-time-game-mode`, async () => {
         const opponentSocket = createStubInstance<Socket>(Socket);
-        Object.defineProperty(opponentSocket, 'id', { value: 'opponentId' });
+        const opponentSocketId = 'opponentId';
+        Object.defineProperty(opponentSocket, 'id', { value: opponentSocketId });
         opponentSocket.data = {};
-        stub(opponentSocket, 'rooms').value(new Set(['stage1', 'opponentId']));
-        server.sockets.sockets.set('opponentId', opponentSocket);
+        stub(opponentSocket, 'rooms').value(new Set(['stage1', opponentSocketId]));
+        server.sockets.sockets.set(opponentSocketId, opponentSocket);
         socket.data.stageInHosting = 'stage1';
 
         socket.to.returns({
@@ -122,13 +126,24 @@ describe('StageWaitingRoomGateway', () => {
         server.to.returns({
             emit: (event: string) => {},
         } as BroadcastOperator<unknown, unknown>);
-        await gateway.acceptOpponent(socket, { playerName: 'host1', playerSocketId: 'opponentId', isLimitedTimeMode: true });
+        const addGameSpy = jest.spyOn(gameManagerService, 'addGame').mockImplementation();
+
+        await gateway.acceptOpponent(socket, { playerName: 'host1', playerSocketId: opponentSocketId, isLimitedTimeMode: false });
         expect(socket.to.calledWith('stage1')).toBeTruthy();
-        expect(socket.emit.calledWith(WAITING_ROOM_EVENTS.DeclineOpponent, 'randomRoomId'));
         expect(socket.data.stageInHosting).toEqual(null);
         expect(opponentSocket.data.stageInWaiting).toEqual(null);
         expect(socket.data.room).not.toBe(undefined);
         expect(opponentSocket.data.room).toEqual(socket.data.room);
+        expect(addGameSpy).toHaveBeenCalledWith('stage1', 2);
+
+        socket.data.stageInHosting = 'limitedTimeModeTest';
+        const createLimitedTimeGameSpy = jest.spyOn(gameManagerService, 'startLimitedTimeGame').mockImplementation();
+        const giveNextStageIdSpy = jest.spyOn(gameManagerService, 'giveNextStage').mockReturnValue('limitedTimeModeTest');
+        await gateway.acceptOpponent(socket, { playerName: 'host1', playerSocketId: opponentSocketId, isLimitedTimeMode: true });
+        expect(createLimitedTimeGameSpy).toHaveBeenCalledWith(socket.data.room, 2);
+        expect(giveNextStageIdSpy).toHaveBeenCalledWith(socket.data.room);
+
+        expect(socket.data.room === opponentSocket.data.room).toBeTruthy();
     });
 
     it('declineOpponent should send a matchRefusedEvent to the opponent', () => {
@@ -153,6 +168,15 @@ describe('StageWaitingRoomGateway', () => {
         expect(deleteGameSpy).toBeCalledWith('stageId');
         expect(server.to.calledWith('stageId')).toBeTruthy();
         expect(gateway.gameHosts.has('stageId')).toBeFalsy();
+    });
+    it('deleteAllGames should call deleteGame for all the stages gameCards returned by gameCardService', async () => {
+        stub(gateway, 'deleteGame');
+        const deleteGameSpy = jest.spyOn(gateway, 'deleteGame').mockResolvedValue();
+        const gameCards: GameCard[] = new Array(3).fill(getFakeGameCard());
+        gameCardService.getAllGameCards.returns(Promise.resolve(gameCards));
+        await gateway.deleteAllGames();
+        expect(deleteGameSpy).toHaveBeenCalledWith(gameCards[0]._id.toString());
+        expect(deleteGameSpy).toHaveBeenCalledTimes(3);
     });
 
     it('handleDisconnect should call unhostGame or quitHost on the right conditions', () => {

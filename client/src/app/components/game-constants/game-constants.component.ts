@@ -4,7 +4,9 @@ import { GameHistoryComponent } from '@app/components/game-history/game-history.
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
 import { GameHistoryService } from '@app/services/game-history/game-history.service';
+import { SocketService } from '@app/services/socket/socket.service';
 import { GameConstants, getDefaultGameConstants } from '@common/game-constants';
+import { WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 
 @Component({
     selector: 'app-game-constants',
@@ -22,6 +24,7 @@ export class GameConstantsComponent implements OnInit {
         private gameCardService: GameCardInformationService,
         private dialog: MatDialog,
         private gameHistoryService: GameHistoryService,
+        private socketService: SocketService,
     ) {}
 
     ngOnInit(): void {
@@ -46,9 +49,7 @@ export class GameConstantsComponent implements OnInit {
     }
 
     deleteAllGames(): void {
-        this.gameCardService.deleteAllGames().subscribe(() => {
-            this.bestTimeReset.emit();
-        });
+        this.socketService.send(WAITING_ROOM_EVENTS.DeleteAllGames);
     }
 
     checkNumber(event: FocusEvent, minValue: number, maxValue: number): number {

@@ -61,7 +61,7 @@ export class GameManagerService {
         }
     }
 
-    async startLimitedTimeGame(room: string, numberOfPlayers: number): Promise<void> {
+    async startLimitedTimeGame(room: string, numberOfPlayers: number): Promise<boolean> {
         const gameCards: GameCard[] = await this.gameCardService.getAllGameCards();
         const allStagesId: string[] = gameCards.map((gameCard) => {
             const stageId = gameCard._id.toString();
@@ -69,35 +69,32 @@ export class GameManagerService {
             return stageId;
         });
 
-        // randomize gameCards
-        for (let i = allStagesId.length - 1; i > 0; i--) {
-            // TODO test if no gameCArds are in bd when starting game
-            const j = Math.floor(Math.random() * (i + 1));
-            const temp: string = allStagesId[i];
-            allStagesId[i] = allStagesId[j];
-            allStagesId[j] = temp;
-        }
+        const isGameCardsPopulated = gameCards.length !== 0;
+        if (isGameCardsPopulated) {
+            for (let i = allStagesId.length - 1; i > 0; i--) {
+                // TODO test if no gameCArds are in bd when starting game
+                const j = Math.floor(Math.random() * (i + 1));
+                const temp: string = allStagesId[i];
+                allStagesId[i] = allStagesId[j];
+                allStagesId[j] = temp;
+            }
 
-        this.limitedTimeModeGames.set(room, {
-            gameStages: allStagesId,
-            playersInGame: numberOfPlayers,
-            stagesUsed: allStagesId,
-        });
+            this.limitedTimeModeGames.set(room, {
+                gameStages: allStagesId,
+                playersInGame: numberOfPlayers,
+                stagesUsed: allStagesId,
+            });
+        }
+        return isGameCardsPopulated;
     }
 
-    giveNextLimitedTimeStage(room: string): string {
+    giveNextStage(room: string): string {
         const gameInfo: LimitedTimeGameInfo = this.limitedTimeModeGames.get(room);
         let randomStageInfo: string;
         if (gameInfo) {
             randomStageInfo = gameInfo.gameStages.pop();
-            // if array is empty
-            if (!randomStageInfo) {
-                for (let i = 0; i < gameInfo.playersInGame; i++) {
-                    this.removePlayerFromLimitedTimeGame(room);
-                }
-            }
         }
-        return randomStageInfo; // if returns undefined, means game is finished
+        return randomStageInfo;
     }
 
     removePlayerFromLimitedTimeGame(room: string): void {
@@ -105,8 +102,8 @@ export class GameManagerService {
         if (gameInfo) {
             gameInfo.playersInGame -= 1;
             if (gameInfo.playersInGame === 0) {
-                gameInfo.stagesUsed.forEach((stageId: string) => {
-                    this.endGame(stageId);
+                gameInfo.stagesUsed.forEach(async (stageId: string) => {
+                    await this.endGame(stageId);
                 });
                 this.limitedTimeModeGames.delete(room);
             }

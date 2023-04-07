@@ -18,21 +18,21 @@ import { GameSelectionComponent } from './game-selection.component';
 describe('GameSelectionComponent', () => {
     let component: GameSelectionComponent;
     let fixture: ComponentFixture<GameSelectionComponent>;
-    let mockService: GameCardInformationService;
+    let gameCardInfoService: GameCardInformationService;
     let testNumber: Subject<number>;
     let testGameCardsInformation: Subject<GameCardInformation[]>;
     let socketServiceSpy: SocketService;
 
     beforeEach(() => {
         testNumber = new Subject<number>();
-        mockService = jasmine.createSpyObj('GameCardInformationService', ['getGameCardsInformation', 'getNumberOfGameCardInformation']);
-        mockService.getNumberOfGameCardInformation = () => {
+        gameCardInfoService = jasmine.createSpyObj('GameCardInformationService', ['getGameCardsInformation', 'getNumberOfGameCardInformation']);
+        gameCardInfoService.getNumberOfGameCardInformation = () => {
             testNumber.next(GAME_CARDS_TO_DISPLAY);
             return testNumber.asObservable();
         };
 
         testGameCardsInformation = new Subject<GameCardInformation[]>();
-        mockService.getGameCardsInformations = () => {
+        gameCardInfoService.getGameCardsInformations = () => {
             testGameCardsInformation.next(GAMES.slice(0, GAME_CARDS_TO_DISPLAY));
             return testGameCardsInformation.asObservable();
         };
@@ -43,7 +43,7 @@ describe('GameSelectionComponent', () => {
             declarations: [GameSelectionComponent, GameCardSelectionComponent, BestTimeComponent],
             imports: [RouterTestingModule, MatIconModule, MatDialogModule, HttpClientTestingModule],
             providers: [
-                { provide: GameCardInformationService, useValue: mockService },
+                { provide: GameCardInformationService, useValue: gameCardInfoService },
                 { provide: SocketService, useValue: socketServiceSpy },
             ],
         }).compileComponents();
@@ -166,5 +166,13 @@ describe('GameSelectionComponent', () => {
         component.numberOfGameInformations = 5;
         component.selectGameCards();
         expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.ScanForHost, ['123']);
+    });
+
+    it('refreshGameCards() should call selectGameCards() and getGameCardsInformations()', () => {
+        spyOn(component, 'selectGameCards').and.returnValue();
+        component.refreshGameCards();
+        expect(component.numberOfGameInformations).toEqual(GAME_CARDS_TO_DISPLAY);
+        expect(component.selectGameCards).toHaveBeenCalled();
+        // TODO set a false setTimeout
     });
 });

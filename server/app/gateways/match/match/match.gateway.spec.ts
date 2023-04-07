@@ -88,9 +88,8 @@ describe('MatchGateway', () => {
         expect(socket.data.stageId).toEqual('stageId');
         expect(socket.data.room).toEqual('123');
 
-        // const socketEmitSpy = jest.spyOn(socket, 'emit');
-        const createLimitedTimeGameSpy = jest.spyOn(gameManagerServiceSpy, 'startLimitedTimeGame');
-        const giveNextStageIdSpy = jest.spyOn(gameManagerServiceSpy, 'giveNextLimitedTimeStage');
+        const createLimitedTimeGameSpy = jest.spyOn(gameManagerServiceSpy, 'startLimitedTimeGame').mockImplementation();
+        const giveNextStageIdSpy = jest.spyOn(gameManagerServiceSpy, 'giveNextStage');
         giveNextStageIdSpy.mockReturnValue('stageId1');
         await gateway.createSoloGame(socket, { stageId: 'stageId1', isLimitedTimeMode: true });
         expect(createLimitedTimeGameSpy).toHaveBeenCalledWith('123', 1);
@@ -100,8 +99,8 @@ describe('MatchGateway', () => {
     });
 
     it('handleDisconnect should call gameManagerService.endgame only if its a socket that wasa playing before', async () => {
-        const endgameSpy = jest.spyOn(gameManagerServiceSpy, 'endGame');
-        const removeLimitedTimePlayerSpy = jest.spyOn(gameManagerServiceSpy, 'removePlayerFromLimitedTimeGame');
+        const endgameSpy = jest.spyOn(gameManagerServiceSpy, 'endGame').mockImplementation();
+        const removeLimitedTimePlayerSpy = jest.spyOn(gameManagerServiceSpy, 'removePlayerFromLimitedTimeGame').mockImplementation();
         socket.data.stageId = 'stageId';
         socket.data.room = 'room';
         await gateway.handleDisconnect(socket);
