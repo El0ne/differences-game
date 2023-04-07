@@ -116,28 +116,6 @@ export class StageController {
         }
     }
 
-    // TODO remove
-    // @Get('/image/:imageName')
-    // async getImage(@Param() param, @Res() res: Response): Promise<void> {
-    //     try {
-    //         const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);
-    //         res.status(HttpStatus.OK).sendFile(imagePath);
-    //     } catch (err) {
-    //         res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-    //     }
-    // }
-
-    // TODO remove
-    // @Delete('/image/:imageName')
-    // async deleteImage(@Param() param, @Res() res: Response): Promise<void> {
-    //     try {
-    //         this.imageManagerService.deleteImage(param.imageName);
-    //         res.status(HttpStatus.NO_CONTENT).send([]);
-    //     } catch (err) {
-    //         res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-    //     }
-    // }
-
     @Put('/best-times')
     async resetAllBestTimes(@Res() res: Response): Promise<void> {
         try {

@@ -177,61 +177,6 @@ describe('StageController', () => {
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 
-    // it('getImage() should return an image if the imageName is valid', async () => {
-    //     const image = new Jimp(1, 1, 'white', (err) => {
-    //         if (err) throw err;
-    //     });
-
-    //     image.write('assets/images/test.bmp');
-    //     const response = await request(httpServer).get('/stage/image/test.bmp');
-    //     expect(response.statusCode).toEqual(HttpStatus.OK);
-    //     fs.unlink('assets/images/test.bmp', (err) => {
-    //         if (err) throw err;
-    //     });
-    // });
-
-    // it('getImage() should return an  500 error if path is not functional', async () => {
-    //     jest.spyOn(join, 'join').mockImplementationOnce(() => {
-    //         throw new Error();
-    //     });
-
-    //     const image = new Jimp(1, 1, 'white', (err) => {
-    //         if (err) throw err;
-    //     });
-
-    //     image.write('assets/images/test.bmp');
-    //     const response = await request(httpServer).get('/stage/image/test.bmp');
-    //     expect(response.statusCode).toEqual(HttpStatus.INTERNAL_SERVER_ERROR);
-    //     fs.unlink('assets/images/test.bmp', (err) => {
-    //         if (err) throw err;
-    //     });
-    // });
-
-    // it('deleteImage() should call imageManagerService.deleteImage() with the image name as a parameter', async () => {
-    //     const image = new Jimp(1, 1, 'white', (err) => {
-    //         if (err) throw err;
-    //     });
-
-    //     image.write('assets/images/test.bmp');
-    //     jest.spyOn(imageManagerService, 'deleteImage');
-
-    //     const response = await request(httpServer).delete('/stage/image/test.bmp');
-
-    //     expect(response.status).toBe(HttpStatus.NO_CONTENT);
-    //     expect(imageManagerService.deleteImage).toHaveBeenCalledWith('test.bmp');
-    // });
-
-    // it('deleteImage() should return 500 if the request is invalid', async () => {
-    //     jest.spyOn(imageManagerService, 'deleteImage').mockImplementationOnce(() => {
-    //         throw new Error();
-    //     });
-    //     const wrongImage = 'wrong_image.bmp';
-    //     const response = await request(httpServer).delete(`/stage/image/${wrongImage}`);
-
-    //     expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
-    //     expect(imageManagerService.deleteImage).toHaveBeenCalledWith(wrongImage);
-    // });
-
     it('resetAllBestTimes() should call resetAllGameCards', async () => {
         const resetMock = jest.spyOn(bestTimesService, 'resetAllBestTimes');
         const response = await request(httpServer).put('/stage/best-times');
