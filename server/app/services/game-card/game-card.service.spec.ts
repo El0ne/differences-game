@@ -30,8 +30,6 @@ describe('GameCardService', () => {
     let gameCardModel: Model<GameCardDocument>;
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
-    // let imageManagerService: ImageManagerService;
-    // let gameManagerService: GameManagerService;
     let bestTimesService: BestTimesService;
 
     beforeEach(async () => {
@@ -66,8 +64,6 @@ describe('GameCardService', () => {
         }).compile();
 
         service = module.get<GameCardService>(GameCardService);
-        // imageManagerService = module.get<ImageManagerService>(ImageManagerService);
-        // gameManagerService = module.get<GameManagerService>(GameManagerService);
         bestTimesService = module.get<BestTimesService>(BestTimesService);
         gameCardModel = module.get<Model<GameCardDocument>>(getModelToken(GameCard.name));
         connection = await module.get(getConnectionToken());
@@ -135,38 +131,6 @@ describe('GameCardService', () => {
         const game = await service.getGameCardById(fakeGameCard._id.toHexString());
         expect(game).toEqual(expect.objectContaining(fakeGameCard));
     });
-
-    // it('deleteGameCard should delete a gameCard, its 2 images and call the deleteDifferences service', async () => {
-    //     const gameCard = getFakeGameCard();
-    //     const imageManagerServiceMock = jest.spyOn(imageManagerService, 'deleteImage').mockImplementation();
-
-    //     await gameCardModel.create(gameCard);
-
-    //     await service.deleteGameCard(gameCard._id.toHexString());
-
-    //     // TODO fix delete test when implemented
-    //     // expect(imageManagerServiceMock).toHaveBeenCalledWith(gameCard.originalImageName);
-    //     // expect(imageManagerServiceMock).toHaveBeenCalledWith(gameCard.differenceImageName);
-    // });
-
-    // it('deleteAllGameCards should delete all the gameCards, and call game manager delete game for each game cards', async () => {
-    //     const fakeGameCardArray: GameCard[] = [];
-
-    //     jest.spyOn(service, 'deleteGameCard').mockImplementation();
-    //     jest.spyOn(gameManagerService, 'deleteGame').mockImplementation();
-
-    //     for (let i = 0; i < 5; i++) {
-    //         fakeGameCardArray.push(getFakeGameCard());
-    //     }
-    //     jest.spyOn(gameCardModel, 'find').mockReturnValueOnce(
-    //         Promise.resolve(fakeGameCardArray) as unknown as Query<unknown[] | null, GameCardDocument>,
-    //     );
-    //     await service.deleteAllGameCards();
-
-    //     expect(gameCardModel.find).toBeCalled();
-    //     expect(service.deleteGameCard).toBeCalledTimes(fakeGameCardArray.length);
-    //     expect(gameManagerService.deleteGame).toBeCalledTimes(fakeGameCardArray.length);
-    // });
 
     it('generateGameCard should create a game card from a game informations', async () => {
         const gameCard = getFakeGameCard();
