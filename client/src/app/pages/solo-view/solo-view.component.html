@@ -1,9 +1,10 @@
 <body>
     <div class="nav-bar">
         <div class="options" *ngIf="showNavBar">
-            <button id="homeButton" class="normal-button home-button option-buttons" type="button" routerLink="/home" (click)="returnHome()">
+            <!-- <button id="homeButton" class="normal-button home-button option-buttons" type="button" routerLink="/home" (click)="returnHome()"> -->
+            <!-- <button id="homeButton" class="normal-button home-button option-buttons" type="button" routerLink="/home">
                 <mat-icon class="icon">home</mat-icon>
-            </button>
+            </button> -->
             <button id="infoButton" class="normal-button option-buttons" type="button" (click)="openInfoModal()">
                 <mat-icon class="icon">info</mat-icon>
             </button>
@@ -118,7 +119,12 @@
         </div>
     </div>
     <div *ngIf="isReplayMode" class="replay-container">
-        <button class="replay-button normal-button" type="button" (click)="pauseReplay()"><mat-icon class="icon">pause</mat-icon></button>
+        <button class="replay-button normal-button" type="button" [ngClass]="{ 'play-button': isReplayPaused }" (click)="pauseReplay()">
+            <mat-icon *ngIf="isReplayPaused; else play" class="icon">play_arrow</mat-icon>
+        </button>
+        <ng-template #play>
+            <mat-icon class="icon">pause</mat-icon>
+        </ng-template>
         <button class="replay-button fast-forward normal-button" type="button" (click)="fastForwardReplay(0.5)">
             <div>
                 <mat-icon class="icon">fast_forward</mat-icon>

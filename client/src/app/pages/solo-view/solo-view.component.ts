@@ -12,9 +12,10 @@ import { FoundDifferenceService } from '@app/services/found-differences/found-di
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
 import {
-    ButtonPressCommand,
     Invoker,
+    KeyPressCommand,
     ModalCloseCommand,
+    OpenInfoModalCommand,
     SendMessageCommand,
     WriteMessageCommand,
 } from '@app/services/replay-game/replay-events-handler';
@@ -71,7 +72,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     timeMultiplier: number = 1;
     replayTimeoutId: ReturnType<typeof setTimeout>;
 
-    buttonPressCommand: ButtonPressCommand;
+    openInfoModalCommand: OpenInfoModalCommand;
     modalCloseCommand: ModalCloseCommand;
 
     invoker: Invoker;
@@ -85,7 +86,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private dialog: MatDialog,
         private router: Router,
-        private elementRef: ElementRef,
+        // private elementRef: ElementRef,
         public socketService: SocketService,
         private gameConstantsService: GameConstantsService,
     ) {
@@ -204,6 +205,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.left.getDifferences(this.currentGameId).subscribe((data) => {
                 if (this.left.toggleCheatMode) this.handleFlash(this.foundDifferenceService.findPixelsFromDifference(data));
             });
+            const cheatModeCommand = new KeyPressCommand(event.key);
+            this.invoker.addCommand(cheatModeCommand, this.timerService.currentTime);
         }
     }
 
@@ -281,8 +284,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     openInfoModal(): void {
-        const infoButton = this.elementRef.nativeElement.querySelector('#infoButton');
-        this.buttonPressCommand = new ButtonPressCommand(infoButton);
+        // const infoButton = this.elementRef.nativeElement.querySelector('#infoButton');
+        this.openInfoModalCommand = new OpenInfoModalCommand(this);
         const dialogRef = this.dialog.open(GameInfoModalComponent, {
             data: {
                 gameCardInfo: this.gameCardInfo,
@@ -290,38 +293,51 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 numberOfPlayers: this.isMultiplayer ? 2 : 1,
             },
         });
-        this.invoker.addCommand(this.buttonPressCommand, this.timerService.currentTime);
-        dialogRef.afterClosed().subscribe(() => {
-            this.modalCloseCommand = new ModalCloseCommand(dialogRef);
-            this.invoker.addCommand(this.modalCloseCommand, this.timerService.currentTime);
-        });
+
+        console.log('in component: ', dialogRef);
+        if (this.isReplayMode === false) {
+            this.invoker.addCommand(this.openInfoModalCommand, this.timerService.currentTime);
+            dialogRef.afterClosed().subscribe(() => {
+                // this.modalCloseCommand = new ModalCloseCommand(dialogRef);
+                this.modalCloseCommand = new ModalCloseCommand(this);
+                this.invoker.addCommand(this.modalCloseCommand, this.timerService.currentTime);
+            });
+        }
     }
 
-    returnHome(): void {
-        const homeButton = this.elementRef.nativeElement.querySelector('#homeButton');
-        this.buttonPressCommand = new ButtonPressCommand(homeButton);
-        this.invoker.addCommand(this.buttonPressCommand, this.timerService.currentTime);
+    closeInfoModal(): void {
+        this.dialog.closeAll();
     }
+
+    // returnHome(): void {
+    //     const homeButton = this.elementRef.nativeElement.querySelector('#homeButton');
+    //     this.buttonPressCommand = new ButtonPressCommand(homeButton);
+    //     this.invoker.addCommand(this.buttonPressCommand, this.timerService.currentTime);
+    // }
 
     quitGame(): void {
-        const quitButton = this.elementRef.nativeElement.querySelector('#quitGame');
-        this.buttonPressCommand = new ButtonPressCommand(quitButton);
+        // const quitButton = this.elementRef.nativeElement.querySelector('#quitGame');
+        // this.buttonPressCommand = new ButtonPressCommand(quitButton);
         this.dialog.open(QuitGameModalComponent, {
             disableClose: true,
         });
-        this.invoker.addCommand(this.buttonPressCommand, this.timerService.currentTime);
+        // this.invoker.addCommand(this.buttonPressCommand, this.timerService.currentTime);
     }
 
     inputIsChanging(): void {
         console.log(this.messageContent);
-        const writeMessageCommand = new WriteMessageCommand(this.inputChat.nativeElement, this.messageContent);
-        this.invoker.addCommand(writeMessageCommand, this.timerService.currentTime);
+        setTimeout(() => {
+            const writeMessageCommand = new WriteMessageCommand(this.inputChat.nativeElement, this.messageContent);
+            this.invoker.addCommand(writeMessageCommand, this.timerService.currentTime);
+        }, 50);
     }
 
     sendMessage(): void {
         this.socketService.send<string>(CHAT_EVENTS.Validate, this.messageContent);
-        const sendMessageCommand = new SendMessageCommand();
-        this.invoker.addCommand(sendMessageCommand, this.timerService.currentTime);
+        if (this.isReplayMode === false) {
+            const sendMessageCommand = new SendMessageCommand(this);
+            this.invoker.addCommand(sendMessageCommand, this.timerService.currentTime);
+        }
         this.messageContent = '';
     }
 
@@ -414,6 +430,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             if (command.time === this.timerService.currentTime) {
                 command.action.execute();
                 this.commandIndex++;
+                console.log(this.commandIndex);
+                console.log(this.invoker.commands.length);
                 if (this.commandIndex >= this.invoker.commands.length) {
                     this.timerService.stopTimer();
                     const dialogRef = this.dialog.open(ReplayGameModalComponent, {

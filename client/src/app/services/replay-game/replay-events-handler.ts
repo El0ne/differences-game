@@ -1,9 +1,9 @@
 /* eslint-disable max-classes-per-file */
 
-import { MatDialogRef } from '@angular/material/dialog';
-import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
+import { SoloViewComponent } from '@app/pages/solo-view/solo-view.component';
 
 /* eslint-disable max-classes-per-file */
+
 export interface Command {
     execute(): void;
 }
@@ -18,11 +18,11 @@ export class ClickCommand implements Command {
     }
 
     execute(): void {
-        // const event = new MouseEvent('click', {
-        //     clientX: this.x,
-        //     clientY: this.y,
-        // });
-        // document.dispatchEvent(event);
+        const event = new MouseEvent('click', {
+            clientX: this.x,
+            clientY: this.y,
+        });
+        document.dispatchEvent(event);
         console.log('click : ', 'x :', this.x, 'y :', this.y, '\n');
     }
 }
@@ -38,59 +38,71 @@ export class WriteMessageCommand implements Command {
 
     execute(): void {
         this.input.value = this.currentMessage;
-        // this.input.dispatchEvent(new Event('input'));
+        this.input.dispatchEvent(new Event('input'));
         console.log('write message : ', this.currentMessage);
         console.log(' \n');
     }
 }
 
 export class SendMessageCommand implements Command {
+    soloview: SoloViewComponent;
+    constructor(soloView: SoloViewComponent) {
+        this.soloview = soloView;
+    }
+
     execute(): void {
-        // window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+        this.soloview.sendMessage();
         console.log('send message');
         console.log(' \n');
     }
 }
-export class CheatModeCommand implements Command {
+
+export class KeyPressCommand implements Command {
+    private key: string;
+
+    constructor(key: string) {
+        this.key = key;
+    }
+
     execute(): void {
-        // window.dispatchEvent(new KeyboardEvent('keydown', { key: 't' }));
-        console.log('cheat mode');
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: this.key }));
+        console.log('key press : ', this.key);
         console.log(' \n');
     }
 }
 
-export class ClueCommand implements Command {
-    execute(): void {
-        // window.dispatchEvent(new KeyboardEvent('keydown', { key: 'i' }));
-        console.log('clue');
-        console.log(' \n');
-    }
-}
-
-export class ButtonPressCommand implements Command {
-    private button: HTMLButtonElement;
-
-    constructor(button: HTMLButtonElement) {
-        this.button = button;
+export class OpenInfoModalCommand implements Command {
+    soloView: SoloViewComponent;
+    // private button: HTMLButtonElement;
+    constructor(soloView: SoloViewComponent) {
+        this.soloView = soloView;
     }
 
+    // constructor(button: HTMLButtonElement) {
+    //     this.button = button;
+    // }
+
     execute(): void {
-        // this.button.click();
-        console.log('click button : ', this.button);
-        console.log(' \n');
+        console.log(this.soloView);
+        this.soloView.openInfoModal();
+        // console.log('click button : ', this.button);
+        console.log('modal info opened \n');
     }
 }
 
 export class ModalCloseCommand implements Command {
-    private modal: MatDialogRef<GameInfoModalComponent>;
+    // private modal: MatDialogRef<GameInfoModalComponent>;
+    soloView: SoloViewComponent;
 
-    constructor(modal: MatDialogRef<GameInfoModalComponent>) {
-        this.modal = modal;
+    // constructor(modal: MatDialogRef<GameInfoModalComponent>) {
+    //     this.modal = modal;
+    // }
+    constructor(soloView: SoloViewComponent) {
+        this.soloView = soloView;
     }
-
     execute(): void {
-        // this.modal.close();
-        console.log('close modal : ', this.modal);
+        // console.log('in command class : ', this.modal);
+        this.soloView.closeInfoModal();
         console.log(' \n');
     }
 }
@@ -103,15 +115,4 @@ export class Invoker {
 
         console.log(this.commands);
     }
-
-    // run(time: number): void {
-    //     this.commands.forEach((command) => {
-    //         console.log(command);
-    //         setTimeout(() => {
-    //             if (command.time === time) {
-    //                 command.action.execute();
-    //             }
-    //         }, 1000);
-    //     });
-    // }
 }
