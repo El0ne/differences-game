@@ -24,7 +24,6 @@ import { ImageObject } from '@common/image-object';
 import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
 import { PlayerGameInfo } from '@common/player-game-info';
 import { Subject } from 'rxjs';
-
 @Component({
     selector: 'app-solo-view',
     templateUrl: './solo-view.component.html',
@@ -92,8 +91,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             if (this.isLimitedTimeMode) {
                 this.socketService.listen<StageInformation>(LIMITED_TIME_MODE_EVENTS.NewStageInformation, (newStageInfo: StageInformation) => {
                     Object.assign(this.gameCardInfo, newStageInfo);
-                    console.log(newStageInfo);
-                    console.log(this.gameCardInfo);
                 });
             } else {
                 this.gameCardInfoService.getGameCardInfoFromId(this.stageId).subscribe((gameCardData) => {
@@ -235,9 +232,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     winGame(winnerId: string): void {
-        console.log('yo');
         if (!this.left.endGame) {
-            console.log('yo');
             this.timerService.stopTimer();
             this.left.endGame = true;
             this.right.endGame = true;
