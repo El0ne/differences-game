@@ -1,10 +1,11 @@
 import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
+import { GameHistory, gameHistorySchema } from '@app/schemas/game-history';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
-import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
+import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection } from 'mongoose';
@@ -28,6 +29,7 @@ describe('GameManagerService', () => {
                     }),
                 }),
                 MongooseModule.forFeature([{ name: Differences.name, schema: differencesSchema }]),
+                MongooseModule.forFeature([{ name: GameHistory.name, schema: gameHistorySchema }]),
             ],
             providers: [
                 GameManagerService,

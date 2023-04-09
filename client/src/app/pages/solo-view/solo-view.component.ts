@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -18,7 +19,9 @@ import { CHAT_EVENTS, RoomEvent, RoomManagement } from '@common/chat-gateway-eve
 import { DifferenceInformation, MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
 import { GameConstants } from '@common/game-constants';
+import { GameHistoryDTO } from '@common/game-history.dto';
 import { MATCH_EVENTS } from '@common/match-gateway-communication';
+import { PlayerGameInfo } from '@common/player-game-info';
 import { Subject } from 'rxjs';
 import { MAX_HINT_TIME_IN_MS } from './solo-view-constants';
 
@@ -50,6 +53,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     hintIcon: boolean;
     thirdHint: boolean;
     hintColor: string;
+    startTime: string;
+    isClassic: boolean;
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
     gameConstants: GameConstants;
     boundGetRandomDifference: (event: KeyboardEvent) => void = this.getRandomDifference.bind(this);
@@ -70,27 +75,45 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.thirdHint = false;
         this.hintIcon = true;
-        const gameId = this.route.snapshot.paramMap.get('stageId');
-        this.isMultiplayer = this.router.url.includes('multiplayer');
-        this.gameConstantsService.getGameConstants().subscribe((gameConstants: GameConstants) => {
-            this.gameConstants = gameConstants;
-        });
 
         if (!this.socketService.liveSocket()) {
             this.router.navigate(['/home']);
             return;
         }
+        this.player = this.socketService.names.get(this.socketService.socketId) as string;
+        this.opponent = this.socketService.names.get(this.socketService.opponentSocket) as string;
+        this.currentRoom = this.socketService.gameRoom;
+        this.startTime = new Date().toLocaleString('fr-FR');
+        const gameId = this.route.snapshot.paramMap.get('stageId');
+        this.isMultiplayer = this.router.url.includes('multiplayer');
+        this.isClassic = !this.router.url.includes('limited');
+        this.gameConstantsService.getGameConstants().subscribe((gameConstants: GameConstants) => {
+            this.gameConstants = gameConstants;
+        });
 
         if (gameId) {
             this.currentGameId = gameId;
             this.gameCardInfoService.getGameCardInfoFromId(this.currentGameId).subscribe((gameCardData) => {
                 this.gameCardInfo = gameCardData;
                 this.numberOfDifferences = this.gameCardInfo.differenceNumber;
+                if (!this.isMultiplayer) {
+                    const gameHistory: GameHistoryDTO = {
+                        gameId: this.currentGameId,
+                        gameName: this.gameCardInfo.name,
+                        gameMode: 'classique',
+                        gameDuration: 0,
+                        startTime: this.startTime,
+                        isMultiplayer: this.isMultiplayer,
+                        player1: {
+                            name: this.player,
+                            hasAbandon: true,
+                            hasWon: false,
+                        },
+                    };
+                    this.socketService.send<GameHistoryDTO>(MATCH_EVENTS.SoloGameInformation, gameHistory);
+                }
             });
         }
-        this.player = this.socketService.names.get(this.socketService.socketId) as string;
-        this.opponent = this.socketService.names.get(this.socketService.opponentSocket) as string;
-        this.currentRoom = this.socketService.gameRoom;
         this.showTime();
         this.addCheatMode();
         this.configureSocketReactions();
@@ -108,9 +131,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.messages.push(data);
         });
         this.socketService.listen<RoomMessage>(CHAT_EVENTS.Abandon, (message: RoomMessage) => {
-            this.winGame(this.socketService.socketId);
-            message.message = `${message.message} - ${this.opponent} a abandonné la partie.`;
-            this.messages.push(message);
+            if (!this.left.endGame) {
+                this.winGame(this.socketService.socketId);
+                this.notifyNewBestTime(this.socketService.socketId, true, 'classique');
+                message.message = `${message.message} - ${this.opponent} a abandonné la partie.`;
+                this.messages.push(message);
+            }
         });
         this.socketService.listen<PlayerDifference>(MATCH_EVENTS.Difference, (data: PlayerDifference) => {
             this.effectHandler(data);
@@ -218,6 +244,35 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         return this.gameHintService.hintsRemaining;
     }
 
+    notifyNewBestTime(winnerId: string, isAbandon: boolean, mode: string): void {
+        const winnerName: string = this.socketService.names.get(winnerId) as string;
+        const player1: PlayerGameInfo = {
+            name: winnerName,
+            hasAbandon: false,
+            hasWon: true,
+        };
+
+        const gameHistory: GameHistoryDTO = {
+            gameId: this.currentGameId,
+            gameName: this.gameCardInfo.name,
+            gameMode: mode,
+            gameDuration: this.timerService.currentTime,
+            startTime: this.startTime,
+            isMultiplayer: this.isMultiplayer,
+            player1,
+        };
+        if (this.isMultiplayer) {
+            const loserName = winnerName === this.player ? this.opponent : this.player;
+            const player2: PlayerGameInfo = {
+                name: loserName,
+                hasAbandon: isAbandon,
+                hasWon: false,
+            };
+            gameHistory.player2 = player2;
+        }
+        this.socketService.send<GameHistoryDTO>(CHAT_EVENTS.BestTime, gameHistory);
+    }
+
     winGame(winnerId: string): void {
         if (!this.left.endGame) {
             this.timerService.stopTimer();
@@ -319,10 +374,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             const endGameVerification = this.numberOfDifferences / 2;
             if (this.currentScorePlayer >= endGameVerification) {
                 this.socketService.send<string>(MATCH_EVENTS.Win, this.currentRoom);
+                this.notifyNewBestTime(this.socketService.socketId, false, 'classique');
             }
         } else {
             if (this.currentScorePlayer === this.numberOfDifferences) {
                 this.winGame(this.socketService.socketId);
+                this.notifyNewBestTime(this.socketService.socketId, false, 'classique');
             }
         }
     }

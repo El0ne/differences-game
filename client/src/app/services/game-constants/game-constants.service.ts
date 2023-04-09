@@ -15,7 +15,6 @@ export class GameConstantsService {
     }
 
     updateGameConstants(gameConstants: GameConstants): Observable<void> {
-        const body = gameConstants;
-        return this.http.put<void>(`${GAME_CONSTANTS}`, body);
+        return this.http.put<void>(GAME_CONSTANTS, gameConstants);
     }
 }

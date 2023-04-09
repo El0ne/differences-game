@@ -1,7 +1,7 @@
 <div class="game-constants-container" *ngIf="gameConstants">
     <div class="game-constants">
-        Pénalité l'utilisation d'un indice (entre 0 et 10 secondes):
-        <input type="number" (blur)="gameConstants.hint = checkNumber($event, 0, 10)" [(ngModel)]="gameConstants.hint" [min]="0" [max]="10" />
+        Pénalité l'utilisation d'un indice (entre 5 et 10 secondes):
+        <input type="number" (blur)="gameConstants.hint = checkNumber($event, 5, 10)" [(ngModel)]="gameConstants.hint" [min]="5" [max]="10" />
         secondes
     </div>
     <div class="game-constants">
@@ -17,12 +17,12 @@
     </div>
 
     <div class="game-constants">
-        Temps gagné avec la découverte d'une différence (entre 0 et 10 secondes):
+        Temps gagné avec la découverte d'une différence (entre 5 et 10 secondes):
         <input
             type="number"
             [(ngModel)]="gameConstants.difference"
-            (blur)="gameConstants.difference = checkNumber($event, 0, 10)"
-            [min]="0"
+            (blur)="gameConstants.difference = checkNumber($event, 5, 10)"
+            [min]="5"
             [max]="10"
         />
         secondes
@@ -35,4 +35,12 @@
     >
         Sauvegarder les constantes de parties
     </button>
+    <button type="button" class="normal-button save-button" (click)="resetGameConstants()">Réinitialiser les constantes de parties</button>
+    <button type="button" class="normal-button save-button" (click)="resetAllBestTimes()">Réinitialiser les meilleurs temps</button>
+    <button type="button" class="normal-button save-button" (click)="openGameHistory()">Historique des parties</button>
+    <button type="button" class="normal-button save-button" (click)="deleteGameHistory()">Supprimer l'historique de parties</button>
+    <!-- TODO Uncomment after merge with history -->
+    <!-- <button type="button" class="normal-button save-button">Consulter l'historique de parties</button> -->
+    <!-- <button type="button" class="normal-button save-button">Supprimer l'historique de parties</button> -->
+    <button type="button" class="normal-button save-button" (click)="deleteAllGames()">Supprimer toutes les parties</button>
 </div>

@@ -19,12 +19,15 @@ import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-mo
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
 import { GameHintService } from '@app/services/game-hint/game-hint.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { CHAT_EVENTS } from '@common/chat-gateway-events';
 import { DifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
-import { MATCH_EVENTS } from '@common/match-gateway-communication';
+import { GameConstants } from '@common/game-constants';
+import { GameHistoryDTO } from '@common/game-history.dto';
+import { MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
 import { of } from 'rxjs';
 import { SoloViewComponent } from './solo-view.component';
 
@@ -37,6 +40,7 @@ describe('SoloViewComponent', () => {
     let gameHintServiceMock: GameHintService;
     let modalSpy: MatDialog;
     let clickEventServiceSpy: ClickEventService;
+    let gameConstantsService: GameConstantsService;
 
     const mockActivatedRoute = { snapshot: { paramMap: { get: () => '234' } } };
     let mockRouter: Router;
@@ -58,7 +62,10 @@ describe('SoloViewComponent', () => {
             'clearDifferenceFound',
             'findPixelsFromDifference',
         ]);
-
+        gameConstantsService = jasmine.createSpyObj('GameConstantService', ['getGameConstants']);
+        gameConstantsService.getGameConstants = () => {
+            return of(MOCK_GAME_CONSTANTS);
+        };
         foundDifferenceServiceSpy.findPixelsFromDifference = (data: number[][]) => {
             const returnArray: number[] = [];
             for (const array of data) {
@@ -100,6 +107,7 @@ describe('SoloViewComponent', () => {
                 { provide: FoundDifferenceService, useValue: foundDifferenceServiceSpy },
                 { provide: MatDialog, useValue: modalSpy },
                 { provide: GameHintService, useValue: gameHintServiceMock },
+                { provide: GameConstantsService, useValue: gameConstantsService },
             ],
             teardown: { destroyAfterEach: false },
         }).compileComponents();
@@ -119,6 +127,15 @@ describe('SoloViewComponent', () => {
         component.ngOnInit();
         expect(mockRouter.navigate).toHaveBeenCalledWith(['/home']);
     });
+
+    it('ngOnInit should prepare an eventual abandon case if in solo mode ', fakeAsync(() => {
+        Object.defineProperty(mockRouter, 'url', { value: 'solo/234' });
+        const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
+        component.ngOnInit();
+        tick(ONE_SECOND);
+        expect(sendSpy).toHaveBeenCalledTimes(1);
+        expect(component.gameConstants).toEqual(MOCK_GAME_CONSTANTS);
+    }));
 
     it('should set the current gameCard id according to value in route and request gameCard as well as game player information', () => {
         const showTimeSpy = spyOn(component, 'showTime');
@@ -240,6 +257,18 @@ describe('SoloViewComponent', () => {
         });
     });
 
+    it('should open the game info modal with the correct data', () => {
+        component.isMultiplayer = false;
+        component.openInfoModal();
+        expect(modalSpy.open).toHaveBeenCalledWith(GameInfoModalComponent, {
+            data: {
+                gameCardInfo: component.gameCardInfo,
+                numberOfDifferences: component.numberOfDifferences,
+                numberOfPlayers: 1,
+            },
+        });
+    });
+
     it('should open the quit game modal with disableClose set to true', () => {
         component.quitGame();
         expect(modalSpy.open).toHaveBeenCalledWith(QuitGameModalComponent, {
@@ -319,19 +348,24 @@ describe('SoloViewComponent', () => {
         component.currentScorePlayer = 2;
         component.currentRoom = 'win';
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
+        const notifyBestTimeSpy = spyOn(component, 'notifyNewBestTime').and.callThrough();
         component.endGameVerification();
         expect(sendSpy).toHaveBeenCalledWith(MATCH_EVENTS.Win, component.currentRoom);
+        expect(notifyBestTimeSpy).toHaveBeenCalledWith(socketServiceMock.socketId, false, 'classique');
     });
 
     it('endGameVerification should call winGame if currentScore of player is equal to number of differences', () => {
+        component.isMultiplayer = false;
         component.currentScorePlayer = 2;
         component.numberOfDifferences = 2;
-        component.isMultiplayer = false;
-        const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
+        const sendSpy = spyOn(socketServiceMock, 'send');
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        const notifyBestTimeSpy = spyOn(component, 'notifyNewBestTime').and.callFake(() => {});
         spyOn(component, 'winGame');
         component.endGameVerification();
         expect(component.winGame).toHaveBeenCalled();
         expect(sendSpy).not.toHaveBeenCalled();
+        expect(notifyBestTimeSpy).toHaveBeenCalledWith(socketServiceMock.socketId, false, 'classique');
     });
 
     it('winGame should set all end game related boolean and open gameWin modal with true to multiplayer and winner name in multiplayer', () => {
@@ -436,7 +470,7 @@ describe('SoloViewComponent', () => {
     it('activateThirdHint should set hintFlag to false and thirdHint to true', () => {
         component.activateThirdHint();
         expect(component.thirdHint).toBeTrue();
-        expect(component.hintFlag).toBeFalse();
+        expect(component.hintIcon).toBeFalse();
     });
 
     it('turnOffHints should set thirdHint to false', () => {
@@ -447,6 +481,28 @@ describe('SoloViewComponent', () => {
     it('turnOffHints should set thirdHint to true', () => {
         component.turnOffHints(true);
         expect(component.thirdHint).toBeTrue();
+    });
+
+    it('notifyNewBestTime should send gameHistory information as well as current timer time', () => {
+        component.player = 'player';
+        component.currentGameId = '0';
+        component.opponent = 'loser';
+        component.timerService.currentTime = 23;
+        component.startTime = 'date';
+        const sendSpy = spyOn(socketServiceMock, 'send');
+        component.notifyNewBestTime('playerId', false, 'classique');
+        expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.BestTime, MOCK_GAME_HISTORY);
+    });
+
+    it('notifyNewBestTime should send gameHistory information with correct names', () => {
+        component.player = 'loser';
+        component.currentGameId = '0';
+        component.opponent = 'opponent';
+        component.timerService.currentTime = 23;
+        component.startTime = 'date';
+        const sendSpy = spyOn(socketServiceMock, 'send');
+        component.notifyNewBestTime('opponentId', false, 'classique');
+        expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.BestTime, MOCK_GAME_HISTORY_2);
     });
 });
 
@@ -478,4 +534,48 @@ const SERVICE_MOCK_GAME_CARD: GameCardInformation = {
         { time: 0, name: '--' },
         { time: 0, name: '--' },
     ],
+};
+
+const MOCK_GAME_CONSTANTS: GameConstants = {
+    countDown: 0,
+    hint: 3,
+    difference: 4,
+};
+
+const MOCK_GAME_HISTORY: GameHistoryDTO = {
+    gameId: '0',
+    gameName: 'game',
+    gameMode: 'classique',
+    gameDuration: 23,
+    startTime: 'date',
+    isMultiplayer: true,
+    player1: {
+        name: 'player',
+        hasAbandon: false,
+        hasWon: true,
+    },
+    player2: {
+        name: 'loser',
+        hasAbandon: false,
+        hasWon: false,
+    },
+};
+
+const MOCK_GAME_HISTORY_2: GameHistoryDTO = {
+    gameId: '0',
+    gameName: 'game',
+    gameMode: 'classique',
+    gameDuration: 23,
+    startTime: 'date',
+    isMultiplayer: true,
+    player1: {
+        name: 'opponent',
+        hasAbandon: false,
+        hasWon: true,
+    },
+    player2: {
+        name: 'loser',
+        hasAbandon: false,
+        hasWon: false,
+    },
 };
