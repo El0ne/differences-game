@@ -78,6 +78,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     invoker: Invoker;
     commandIndex: number = 0;
     gameConstants: GameConstants;
+
+    // form: HTMLFormElement | null = document.querySelector('form');
+
     // eslint-disable-next-line max-params
     constructor(
         public timerService: TimerSoloService,
@@ -88,7 +91,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private router: Router,
         // private elementRef: ElementRef,
         public socketService: SocketService,
-        private gameConstantsService: GameConstantsService,
+        private gameConstantsService: GameConstantsService, // private renderer: Renderer2, // private elementRef: ElementRef,
     ) {
         this.invoker = new Invoker();
     }
@@ -179,6 +182,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.removeCheatMode();
     }
 
+    // resetHTML() {
+    //     const div = this.elementRef.nativeElement.querySelector('#myDiv');
+    //     this.renderer.setProperty(div, 'innerHTML', '');
+    // }
+
     invertDifferences(): void {
         this.left.toggleCheatMode = !this.left.toggleCheatMode;
         this.right.toggleCheatMode = !this.right.toggleCheatMode;
@@ -205,8 +213,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.left.getDifferences(this.currentGameId).subscribe((data) => {
                 if (this.left.toggleCheatMode) this.handleFlash(this.foundDifferenceService.findPixelsFromDifference(data));
             });
-            const cheatModeCommand = new KeyPressCommand(event.key);
-            this.invoker.addCommand(cheatModeCommand, this.timerService.currentTime);
+
+            if (this.isReplayMode === false) {
+                const cheatModeCommand = new KeyPressCommand(event, this);
+                this.invoker.addCommand(cheatModeCommand, this.timerService.currentTime);
+            }
         }
     }
 
@@ -265,6 +276,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.currentScorePlayer = 0;
                 this.currentScoreOpponent = 0;
                 this.timerService.restartTimer(1);
+                this.foundDifferenceService.clearDifferenceFound();
 
                 this.replayGame();
             });
@@ -446,6 +458,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                             this.currentScoreOpponent = 0;
                             this.timerService.restartTimer(1);
                             this.commandIndex = 0;
+                            this.foundDifferenceService.clearDifferenceFound();
+                            // this.resetHTML();
+                            // this.form?.reset();
                             this.replayGame();
                         } else if (result === 'continue') {
                             clearTimeout(this.replayTimeoutId);

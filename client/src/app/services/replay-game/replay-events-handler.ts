@@ -58,15 +58,21 @@ export class SendMessageCommand implements Command {
 }
 
 export class KeyPressCommand implements Command {
-    private key: string;
+    private event: KeyboardEvent;
+    private soloView: SoloViewComponent;
 
-    constructor(key: string) {
-        this.key = key;
+    constructor(event: KeyboardEvent, soloView: SoloViewComponent) {
+        this.event = event;
+        this.soloView = soloView;
     }
 
     execute(): void {
-        window.dispatchEvent(new KeyboardEvent('keydown', { key: this.key }));
-        console.log('key press : ', this.key);
+        // window.dispatchEvent(new KeyboardEvent('keydown', { key: this.key }));
+        if (this.event.key === 't') {
+            // this.soloView.addCheatMode();
+            this.soloView.activateCheatMode(this.event);
+        }
+        console.log('key press : ', this.event.key);
         console.log(' \n');
     }
 }
