@@ -80,7 +80,6 @@ export class GameSelectionComponent implements OnInit {
         setTimeout(() => {
             this.gameCardService.getNumberOfGameCardInformation().subscribe((data) => {
                 this.numberOfGameInformations = data;
-                // console.log(this.numberOfGameInformations);
                 this.selectGameCards();
             });
         }, DELAY_BEFORE_REFRESH);
