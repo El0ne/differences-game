@@ -69,7 +69,7 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
         this.socket.gameRoom = gameRoom;
         this.dialogRef.close();
         if (!this.waitingRoomInfo.isLimitedTimeMode) {
-            this.router.navigate(['/multiplayer/' + this.waitingRoomInfo.stageId]);
+            this.router.navigate(['/game']);
         }
     }
 
