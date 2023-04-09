@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { GameHistoryService } from '@app/services/game-history/game-history.service';
+import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { GameHistoryDTO } from '@common/game-history.dto';
 
 @Component({
