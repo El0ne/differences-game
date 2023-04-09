@@ -24,7 +24,7 @@ import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.serv
 import { DELAY_BEFORE_CLOSING_CONNECTION } from '@app/tests/constants';
 import { RoomMessage } from '@common/chat-gateway-constants';
 import { CHAT_EVENTS } from '@common/chat-gateway-events';
-import { FAKE_GAME_HISTORY, FAKE_GAME_HISTORY_SINGLE } from '@common/mock/game-history-mock';
+import { FAKE_GAME_HISTORY, FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE, FAKE_GAME_HISTORY_SINGLE } from '@common/mock/game-history-mock';
 import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
