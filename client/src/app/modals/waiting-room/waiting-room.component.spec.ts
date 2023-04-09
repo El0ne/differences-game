@@ -72,7 +72,7 @@ describe('WaitingRoomComponent', () => {
 
     it('navigateToMultiplayer should close the dialog and navigate to the right game', () => {
         component.navigateToMultiplayer('gameRoom');
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/multiplayer/123']);
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/game']);
     });
 
     it('acceptOpponent should send an acceptOpponent event and add the opponent name to the map', () => {

@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { RouterTestingModule } from '@angular/router/testing';
 import { SocketService } from '@app/services/socket/socket.service';
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MatIconModule } from '@angular/material/icon';
+import { Router } from '@angular/router';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
+import { WaitingRoomComponent, WaitingRoomDataPassing } from '@app/modals/waiting-room/waiting-room.component';
 import { GameParametersService } from '@app/services/game-parameters/game-parameters.service';
 import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, SoloGameCreation } from '@common/match-gateway-communication';
 import { JoinHostInWaitingRequest, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
@@ -20,6 +22,7 @@ describe('LimitedTimeComponent', () => {
     let choseNameAfterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
     let waitingRoomAfterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
     let gameParamService: GameParametersService;
+    let routerSpy: Router;
 
     beforeEach(async () => {
         modalSpy = jasmine.createSpyObj('MatDialog', ['open']);
@@ -30,14 +33,17 @@ describe('LimitedTimeComponent', () => {
         socketServiceSpy = jasmine.createSpyObj('SocketService', ['names', 'listen', 'delete', 'send', 'connect'], ['socketId']);
         socketServiceSpy.names = new Map<string, string>();
         gameParamService = jasmine.createSpyObj('GameParametersService', ['gameParameters']);
+        routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+
         await TestBed.configureTestingModule({
             declarations: [LimitedTimeComponent],
-            imports: [RouterTestingModule, MatDialogModule, MatIconModule, HttpClientTestingModule],
+            imports: [MatDialogModule, MatIconModule, HttpClientTestingModule],
             providers: [
                 { provide: MatDialog, useValue: modalSpy },
                 { provide: SocketService, useValue: socketServiceSpy },
                 { provide: GameParametersService, useValue: gameParamService },
                 { provide: SocketService, useValue: socketServiceSpy },
+                { provide: Router, useValue: routerSpy },
             ],
         }).compileComponents();
 
@@ -82,14 +88,13 @@ describe('LimitedTimeComponent', () => {
     });
 
     it('hostOrJoinGame should open the waitingRoom dialog a send the good event depending on createGameButton', () => {
-        modalSpy.open = () => waitingRoomAfterClosedSpy;
         component.createGameButton = true;
         component.hostOrJoinGame();
         expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.HostGame, LIMITED_TIME_MODE_ID);
-        // expect(modalSpy.open).toHaveBeenCalledWith(WaitingRoomComponent, {
-        //     disableClose: true,
-        //     data: { stageId: LIMITED_TIME_MODE_ID, isHost: true, isLimitedTimeMode: true } as WaitingRoomDataPassing,
-        // });
+        expect(modalSpy.open).toHaveBeenCalledWith(WaitingRoomComponent, {
+            disableClose: true,
+            data: { stageId: LIMITED_TIME_MODE_ID, isHost: true, isLimitedTimeMode: true } as WaitingRoomDataPassing,
+        });
 
         component.createGameButton = false;
         Object.defineProperty(socketServiceSpy, 'socketId', { value: 'playerId' });
@@ -99,10 +104,10 @@ describe('LimitedTimeComponent', () => {
             playerName: 'playerName',
             stageId: LIMITED_TIME_MODE_ID,
         } as JoinHostInWaitingRequest);
-        // expect(modalSpy.open).toHaveBeenCalledWith(WaitingRoomComponent, {
-        //     disableClose: true,
-        //     data: { stageId: LIMITED_TIME_MODE_ID, isHost: false, isLimitedTimeMode: true } as WaitingRoomDataPassing,
-        // });
+        expect(modalSpy.open).toHaveBeenCalledWith(WaitingRoomComponent, {
+            disableClose: true,
+            data: { stageId: LIMITED_TIME_MODE_ID, isHost: false, isLimitedTimeMode: true } as WaitingRoomDataPassing,
+        });
     });
 
     it('ngOnDestroy should delete the listeners', () => {
@@ -110,5 +115,33 @@ describe('LimitedTimeComponent', () => {
         expect(socketServiceSpy.delete).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.MatchCreated);
         expect(socketServiceSpy.delete).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.MatchDeleted);
         expect(socketServiceSpy.delete).toHaveBeenCalledWith(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame);
+    });
+
+    it('MatchCreated event should set the createGameButton to false', () => {
+        socketServiceSpy.listen = (event: string, callback: any) => {
+            if (event === WAITING_ROOM_EVENTS.MatchCreated) callback('stageId');
+        };
+        component.createGameButton = true;
+        component.ngOnInit();
+        expect(component.createGameButton).toBeFalsy();
+    });
+
+    it('MatchDeleted event should set the createGameButton to true', () => {
+        socketServiceSpy.listen = (event: string, callback: any) => {
+            if (event === WAITING_ROOM_EVENTS.MatchDeleted) callback('stageId');
+        };
+        component.createGameButton = false;
+        component.ngOnInit();
+        expect(component.createGameButton).toBeTruthy();
+    });
+
+    it('StartLimitedTimeGame event should redirect to the gamePage and set the first stageId for gameParamService', () => {
+        // const navigateSpy = spyOn(routerSpy, 'navigate');
+        socketServiceSpy.listen = (event: string, callback: any) => {
+            if (event === LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame) callback('stageId');
+        };
+        component.ngOnInit();
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/game']);
+        expect(gameParamService.gameParameters.stageId).toBe('stageId');
     });
 });
