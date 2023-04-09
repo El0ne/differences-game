@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { HEIGHT, WIDTH } from '@app/components/click-event/click-event-constant';
+import { APPROXIMATE_RADIUS, FIFTY_PERCENT, MAX_RGB_VALUE, MINIMUM_RADIUS, SEVENTY_FIVE_PERCENT, TWENTY_FIVE_PERCENT } from './game-hint-constants';
 
 @Injectable({
     providedIn: 'root',
@@ -12,54 +14,48 @@ export class GameHintService {
 
     getPercentages(positions: number[]): number[] {
         this.hintsRemaining -= 1;
-        return this.getCornerPosition([positions[0] / 640, positions[1] / 480]);
+        return this.getCornerPosition([positions[0] / WIDTH, positions[1] / HEIGHT]);
     }
 
     getCornerPosition(positions: number[]): number[] {
         const corners = [];
         for (const position of positions) {
-            switch (this.hintsRemaining) {
-                case 2: {
-                    corners.push(this.roundDownFour(position));
-                    break;
-                }
-                case 1: {
-                    corners.push(this.roundDown(position));
-                    break;
-                }
+            if (this.hintsRemaining === 2) {
+                corners.push(this.roundDownFour(position));
+            } else if (this.hintsRemaining === 1) {
+                corners.push(this.roundDown(position));
             }
         }
         return corners;
     }
 
     roundDown(toRoundDown: number): number {
-        if (toRoundDown < 0.25) {
+        if (toRoundDown < TWENTY_FIVE_PERCENT) {
             return 0;
-        } else if (toRoundDown < 0.5) {
-            return 0.25;
-        } else if (toRoundDown < 0.75) {
-            return 0.5;
+        } else if (toRoundDown < FIFTY_PERCENT) {
+            return TWENTY_FIVE_PERCENT;
+        } else if (toRoundDown < SEVENTY_FIVE_PERCENT) {
+            return FIFTY_PERCENT;
         } else {
-            return 0.75;
+            return SEVENTY_FIVE_PERCENT;
         }
     }
 
     roundDownFour(toRoundDown: number): number {
-        if (toRoundDown < 0.5) {
+        if (toRoundDown < FIFTY_PERCENT) {
             return 0;
         } else {
-            return 0.5;
+            return FIFTY_PERCENT;
         }
     }
 
     setColor(clickPosition: number[], hintPosition: number[]): string {
         const radius = Math.sqrt((clickPosition[0] - hintPosition[0]) ** 2 + (clickPosition[1] - hintPosition[1]) ** 2);
-        if (radius < 50) {
-            return '#881901';
-        } else if (radius < 100) return '#FF2D00';
-        else if (radius < 150) return '#FF8EBC';
-        else if (radius < 200) return '#A5D7FF';
-        else if (radius < 250) return '#4575FF';
-        else return '#0042FF';
+
+        const red = Math.round((MAX_RGB_VALUE * radius) / APPROXIMATE_RADIUS);
+        const blue = Math.round(MAX_RGB_VALUE * (1 - radius / APPROXIMATE_RADIUS));
+
+        if (radius < MINIMUM_RADIUS) return '#FF2D00';
+        else return `rgb(${blue}, 0, ${red})`;
     }
 }

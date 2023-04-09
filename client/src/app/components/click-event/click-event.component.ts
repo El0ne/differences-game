@@ -55,6 +55,8 @@ export class ClickEventComponent implements OnInit {
         this.secondHint = false;
         this.foundDifferences = [];
 
+        this.modification.nativeElement.addEventListener('mousemove', this.handleMouseMove.bind(this));
+
         const image = new Image();
         image.crossOrigin = 'Anonymous';
         image.src = `${STAGE}/image/${this.imagePath}`;
@@ -62,6 +64,13 @@ export class ClickEventComponent implements OnInit {
             const context = this.picture.nativeElement.getContext('2d') as CanvasRenderingContext2D;
             context.drawImage(image, 0, 0);
         };
+    }
+
+    handleMouseMove(event: MouseEvent): void {
+        const rect = this.picture.nativeElement.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        this.color.emit([x, y]);
     }
 
     getDifferences(id: string): Observable<number[][]> {
@@ -73,7 +82,7 @@ export class ClickEventComponent implements OnInit {
         return this.pixelModificationService.getCoordInImage(mouseEvent, rect);
     }
 
-    convertPosToPixel(toTransform: number): number[] {
+    convertPositionToPixel(toTransform: number): number[] {
         return this.pixelModificationService.positionToPixel(toTransform);
     }
 
@@ -99,8 +108,6 @@ export class ClickEventComponent implements OnInit {
                         this.firstHint = false;
                         this.secondHint = false;
                         this.thirdHint.emit(false);
-                    } else {
-                        this.color.emit([this.getCoordInImage(mouseEvent)[0], this.getCoordInImage(mouseEvent)[1]]);
                     }
                     this.differenceDetected.emit({
                         differencesPosition: this.differenceData.differencesPosition,

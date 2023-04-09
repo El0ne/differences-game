@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
+import { HEIGHT, MAX_EFFECT_TIME, WIDTH } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
 import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal.component';
@@ -20,6 +20,7 @@ import { GameCardInformation } from '@common/game-card';
 import { GameConstants } from '@common/game-constants';
 import { MATCH_EVENTS } from '@common/match-gateway-communication';
 import { Subject } from 'rxjs';
+import { MAX_HINT_TIME_IN_MS } from './solo-view-constants';
 
 @Component({
     selector: 'app-solo-view',
@@ -46,7 +47,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     endGame: Subject<void> = new Subject<void>();
     gameCardInfo: GameCardInformation;
     currentRoom: string;
-    hintFlag: boolean;
+    hintIcon: boolean;
     thirdHint: boolean;
     hintColor: string;
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
@@ -68,7 +69,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.thirdHint = false;
-        this.hintFlag = true;
+        this.hintIcon = true;
         const gameId = this.route.snapshot.paramMap.get('stageId');
         this.isMultiplayer = this.router.url.includes('multiplayer');
         this.gameConstantsService.getGameConstants().subscribe((gameConstants: GameConstants) => {
@@ -164,7 +165,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     setColor(clickPosition: number[]): void {
-        this.hintColor = this.gameHintService.setColor(clickPosition, this.left.convertPosToPixel(this.left.currentPixelHint));
+        this.hintColor = this.gameHintService.setColor(clickPosition, this.left.convertPositionToPixel(this.left.currentPixelHint));
     }
 
     getRandomDifference(event: KeyboardEvent | null): void {
@@ -175,23 +176,30 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 const randomPixel = pixelArray[Math.floor(Math.random() * pixelArray.length)];
                 this.left.currentPixelHint = randomPixel;
                 this.right.currentPixelHint = this.left.currentPixelHint;
-                const randomPixelPosition = this.gameHintService.getPercentages(this.left.convertPosToPixel(randomPixel));
+                const randomPixelPosition = this.gameHintService.getPercentages(this.left.convertPositionToPixel(randomPixel));
                 if (randomPixelPosition.length === 0) {
                     this.activateThirdHint();
+                } else {
+                    this.left.hintPosX = (randomPixelPosition[1] * HEIGHT).toString();
+                    this.left.hintPosY = (randomPixelPosition[0] * WIDTH).toString();
+                    this.right.hintPosX = this.left.hintPosX;
+                    this.right.hintPosY = this.left.hintPosY;
                 }
-                this.left.hintPosX = (randomPixelPosition[1] * 480).toString();
-                this.left.hintPosY = (randomPixelPosition[0] * 640).toString();
-                this.right.hintPosX = this.left.hintPosX;
-                this.right.hintPosY = this.left.hintPosY;
+
                 this.left.firstHint = this.gameHintService.hintsRemaining === 2;
                 this.left.secondHint = this.gameHintService.hintsRemaining === 1;
+
+                setTimeout(() => {
+                    this.left.firstHint = false;
+                    this.left.secondHint = false;
+                }, MAX_HINT_TIME_IN_MS);
             });
         }
     }
 
     activateThirdHint(): void {
         this.thirdHint = true;
-        this.hintFlag = false;
+        this.hintIcon = false;
     }
 
     turnOffHints(flag: boolean): void {
