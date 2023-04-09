@@ -1,12 +1,11 @@
 import { GameHistory, gameHistorySchema } from '@app/schemas/game-history';
 import { GameHistoryService } from '@app/services/game-history/game-history.service';
+import { DELAY_BEFORE_CLOSING_CONNECTION } from '@app/tests/constants';
+import { FAKE_GAME_HISTORY, getFakeGameHistoryElement } from '@common/mock/game-history-mock';
 import { HttpStatus } from '@nestjs/common';
 import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { assert } from 'console';
-// import { FAKE_GAME_HISTORY } from '@app/mock/game-history-mock';
-import { DELAY_BEFORE_CLOSING_CONNECTION } from '@app/tests/constants';
-import { FAKE_GAME_HISTORY, getFakeGameHistoryElement } from '@common/mock/game-history-mock';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection } from 'mongoose';
 import { stub } from 'sinon';

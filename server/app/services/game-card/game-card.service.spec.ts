@@ -17,6 +17,7 @@ import { PixelPositionService } from '@app/services/pixel-position/pixel-positio
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { DELAY_BEFORE_CLOSING_CONNECTION } from '@app/tests/constants';
 import { GameCardDto } from '@common/game-card.dto';
+import { RankingBoard } from '@common/ranking-board';
 import { MongooseModule, getConnectionToken, getModelToken } from '@nestjs/mongoose';
 import { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing/test';
@@ -25,13 +26,16 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection, Model } from 'mongoose';
 import { stub } from 'sinon';
 import { GameCardService } from './game-card.service';
-
 describe('GameCardService', () => {
     let service: GameCardService;
     let gameCardModel: Model<GameCardDocument>;
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
+    let imageManagerService: ImageManagerService;
+    let gameManagerService: GameManagerService;
     let bestTimesService: BestTimesService;
+
+    let FAKE_RANKING_BOARD: RankingBoard[];
 
     beforeEach(async () => {
         mongoServer = await MongoMemoryServer.create();
@@ -65,10 +69,27 @@ describe('GameCardService', () => {
         }).compile();
 
         service = module.get<GameCardService>(GameCardService);
+        imageManagerService = module.get<ImageManagerService>(ImageManagerService);
+        gameManagerService = module.get<GameManagerService>(GameManagerService);
         bestTimesService = module.get<BestTimesService>(BestTimesService);
         gameCardModel = module.get<Model<GameCardDocument>>(getModelToken(GameCard.name));
         connection = await module.get(getConnectionToken());
         await gameCardModel.deleteMany({});
+
+        FAKE_RANKING_BOARD = [
+            {
+                name: 'Yvon Gagné',
+                time: 15,
+            },
+            {
+                name: 'Pierre Laroche',
+                time: 20,
+            },
+            {
+                name: 'Jean Laporte',
+                time: 25,
+            },
+        ];
     });
 
     afterEach((done) => {
@@ -153,6 +174,46 @@ describe('GameCardService', () => {
         gameCard.name = 'game.name';
         expect(await service.createGameCard(FAKE_GAME_INFO)).toEqual(expect.objectContaining(gameCard));
     });
+
+    it('updateGameCard should update a game card s best times in a solo game', async () => {
+        const gameCard = getFakeGameCard();
+        gameCard.soloTimes = FAKE_RANKING_BOARD;
+        service.updateGameCard(gameCard, FAKE_PLAYER_BOARD, false);
+        expect(gameCard.soloTimes[0]).toEqual(FAKE_PLAYER_BOARD);
+
+        service.updateGameCard(gameCard, FAKE_SECOND_PLAYER_BOARD, false);
+        expect(gameCard.soloTimes[1]).toEqual(FAKE_SECOND_PLAYER_BOARD);
+
+        service.updateGameCard(gameCard, FAKE_THIRD_PLAYER_BOARD, false);
+        expect(gameCard.soloTimes[2]).toEqual(FAKE_THIRD_PLAYER_BOARD);
+    });
+
+    it('updateGameCard should update a game card s best times in a multiplayer game', async () => {
+        const gameCard = getFakeGameCard();
+        gameCard.multiTimes = FAKE_RANKING_BOARD;
+        service.updateGameCard(gameCard, FAKE_PLAYER_BOARD, true);
+        expect(gameCard.multiTimes[0]).toEqual(FAKE_PLAYER_BOARD);
+
+        service.updateGameCard(gameCard, FAKE_SECOND_PLAYER_BOARD, true);
+        expect(gameCard.multiTimes[1]).toEqual(FAKE_SECOND_PLAYER_BOARD);
+
+        service.updateGameCard(gameCard, FAKE_THIRD_PLAYER_BOARD, true);
+        expect(gameCard.multiTimes[2]).toEqual(FAKE_THIRD_PLAYER_BOARD);
+    });
+
+    it('updateGameCard should not update a game card s best times in solo when player time is not in the top 3', async () => {
+        const gameCard = getFakeGameCard();
+        gameCard.soloTimes = FAKE_RANKING_BOARD;
+        service.updateGameCard(gameCard, BAD_PLAYER_BOARD, false);
+        expect(gameCard.soloTimes).toEqual(FAKE_RANKING_BOARD);
+    });
+
+    it('updateGameCard should not update a game card s best times in multiplayer when player time is not in the top 3', async () => {
+        const gameCard = getFakeGameCard();
+        gameCard.multiTimes = FAKE_RANKING_BOARD;
+        service.updateGameCard(gameCard, BAD_PLAYER_BOARD, true);
+        expect(gameCard.multiTimes).toEqual(FAKE_RANKING_BOARD);
+    });
 });
 
 const FAKE_GAME_INFO: GameCardDto = {
@@ -161,4 +222,24 @@ const FAKE_GAME_INFO: GameCardDto = {
     difficulty: 'Facile',
     radius: 3,
     differenceNumber: 6,
+};
+
+const FAKE_PLAYER_BOARD: RankingBoard = {
+    name: 'Albert Einstein',
+    time: 10,
+};
+
+const FAKE_SECOND_PLAYER_BOARD: RankingBoard = {
+    name: 'second',
+    time: 12,
+};
+
+const FAKE_THIRD_PLAYER_BOARD: RankingBoard = {
+    name: 'third',
+    time: 13,
+};
+
+const BAD_PLAYER_BOARD: RankingBoard = {
+    name: 'Pierre Cayouette',
+    time: 180,
 };

@@ -12,11 +12,14 @@ export class GameHistoryComponent implements OnInit {
 
     displayedColumns: string[] = ['date', 'duration', 'mode', 'player1', 'player2'];
 
-    constructor(private gameHistoryService: GameHistoryService) {}
+    constructor(private gameHistoryService: GameHistoryService, private timerService: TimerSoloService) {}
 
     ngOnInit(): void {
         this.gameHistoryService.getGameHistory().subscribe((gameHistory) => {
             this.gameHistory = gameHistory;
         });
+    }
+    convertToMinute(seconds: number): string {
+        return this.timerService.convert(seconds);
     }
 }

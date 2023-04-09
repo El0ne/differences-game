@@ -59,4 +59,13 @@ export class BestTimesService {
         }
         return word;
     }
+
+    updateBestTimes(initialRankingBoard: RankingBoard[], winnerBoard: RankingBoard): RankingBoard[] {
+        const initialRankingBoardCopy = initialRankingBoard.slice();
+        initialRankingBoardCopy.push(winnerBoard);
+        const updatedRankingBoard = initialRankingBoardCopy.sort((a, b) => {
+            return a.time - b.time;
+        });
+        return updatedRankingBoard.slice(0, 3);
+    }
 }

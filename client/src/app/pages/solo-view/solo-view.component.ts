@@ -73,6 +73,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.router.navigate(['/home']);
             return;
         }
+<<<<<<< HEAD
         this.isLimitedTimeMode = this.gameParamService.gameParameters.isLimitedTimeGame;
         this.isMultiplayer = this.gameParamService.gameParameters.isMultiplayerGame;
         this.stageId = this.gameParamService.gameParameters.stageId;
@@ -119,6 +120,41 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                     }
                 });
             }
+=======
+        this.player = this.socketService.names.get(this.socketService.socketId) as string;
+        this.opponent = this.socketService.names.get(this.socketService.opponentSocket) as string;
+        this.currentRoom = this.socketService.gameRoom;
+        this.startTime = new Date().toLocaleString('fr-FR');
+        const gameId = this.route.snapshot.paramMap.get('stageId');
+        this.isMultiplayer = this.router.url.includes('multiplayer');
+        this.isClassic = !this.router.url.includes('limited');
+        this.gameConstantsService.getGameConstants().subscribe((gameConstants: GameConstants) => {
+            this.gameConstants = gameConstants;
+        });
+
+        if (gameId) {
+            this.currentGameId = gameId;
+            this.gameCardInfoService.getGameCardInfoFromId(this.currentGameId).subscribe((gameCardData) => {
+                this.gameCardInfo = gameCardData;
+                this.numberOfDifferences = this.gameCardInfo.differenceNumber;
+                if (!this.isMultiplayer) {
+                    const gameHistory: GameHistoryDTO = {
+                        gameId: this.currentGameId,
+                        gameName: this.gameCardInfo.name,
+                        gameMode: 'classique',
+                        gameDuration: 0,
+                        startTime: this.startTime,
+                        isMultiplayer: this.isMultiplayer,
+                        player1: {
+                            name: this.player,
+                            hasAbandon: true,
+                            hasWon: false,
+                        },
+                    };
+                    this.socketService.send<GameHistoryDTO>(MATCH_EVENTS.SoloGameInformation, gameHistory);
+                }
+            });
+>>>>>>> origin/dev
         }
         this.showTime();
         this.addCheatMode();

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { MatchGateway } from '@app/gateways/match/match/match.gateway';
@@ -17,6 +18,7 @@ import { GameHistoryService } from '@app/services/game-history/game-history.serv
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
+import { getFakeGameCard } from '@app/services/mock/fake-game-card';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { DELAY_BEFORE_CLOSING_CONNECTION } from '@app/tests/constants';
@@ -29,14 +31,14 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection } from 'mongoose';
 import { SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
-
 describe('ChatGateway', () => {
     let gateway: ChatGateway;
     let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
+    let gameCard: GameCard;
     const TEST_ROOM_ID = 'test';
-    let gameHistoryService;
-    let gameCardService;
+    let gameHistoryService: GameHistoryService;
+    let gameCardService: GameCardService;
 
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
@@ -44,6 +46,11 @@ describe('ChatGateway', () => {
     beforeEach(async () => {
         mongoServer = await MongoMemoryServer.create();
         const mongoUri = await mongoServer.getUri();
+
+        gameCard = getFakeGameCard();
+
+        gameCard.multiTimes = rankings.multiTimes;
+        gameCard.soloTimes = rankings.soloTimes;
 
         socket = createStubInstance<Socket>(Socket);
         server = createStubInstance<Server>(Server);
@@ -141,8 +148,9 @@ describe('ChatGateway', () => {
 
     it('best time should add game history to mongoDB', async () => {
         socket.data.isSolo = true;
-        const getGameCardSpy = jest.spyOn(gameCardService, 'getGameCardById').mockReturnValue(true);
-        const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockReturnValue(true);
+        const getGameCardSpy = jest.spyOn(gameCardService, 'getGameCardById').mockResolvedValue(gameCard);
+        const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockImplementation();
+        jest.spyOn(gameCardService, 'updateGameCard').mockResolvedValue(gameCard);
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         const sendSpy = jest.spyOn(server, 'emit');
         server.to.returns({
@@ -161,11 +169,88 @@ describe('ChatGateway', () => {
         expect(sendSpy).toHaveBeenCalled();
     });
 
+    it('best time should properly select the winner name and not send if undefined ', async () => {
+        const getGameCardSpy = jest.spyOn(gameCardService, 'getGameCardById').mockResolvedValue(gameCard);
+        const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockImplementation();
+        jest.spyOn(gameCardService, 'updateGameCard').mockResolvedValue(gameCard);
+        stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
+        const sendSpy = jest.spyOn(server, 'emit');
+        server.to.returns({
+            emit: (event: string, data) => {
+                expect(event).toEqual(CHAT_EVENTS.RoomMessage);
+                expect(data.event).toEqual('abandon');
+                expect(data.socketId).toEqual(CHAT_EVENTS.Event);
+                expect(data.message.includes(FAKE_GAME_HISTORY[0].gameMode)).toBeTruthy();
+                expect(data.message.includes('solo').toBeTruthy());
+            },
+        } as any);
+        FAKE_GAME_HISTORY_SINGLE.player1.hasWon = false;
+        await gateway.bestTime(socket, FAKE_GAME_HISTORY_SINGLE);
+        expect(getGameCardSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_SINGLE.gameId);
+        expect(socket.data.isSolo).toBe(false);
+        expect(addGameSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_SINGLE);
+        expect(sendSpy).not.toHaveBeenCalled();
+    });
+
+    it('best time should properly assign player name', async () => {
+        jest.spyOn(gameCardService, 'getGameCardById').mockResolvedValue(gameCard);
+        jest.spyOn(gameHistoryService, 'addGameToHistory').mockImplementation();
+        jest.spyOn(gameCardService, 'updateGameCard').mockResolvedValue(gameCard);
+        stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
+        jest.spyOn(server, 'emit');
+        server.to.returns({
+            emit: (event: string, data) => {
+                expect(event).toEqual(CHAT_EVENTS.RoomMessage);
+                expect(data.message.includes(FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE.gameMode)).toBeTruthy();
+                expect(data.message.includes('string').toBeTrue());
+            },
+        } as any);
+        gateway.bestTime(socket, FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE);
+    });
+
+    it('best time should properly assign player name', async () => {
+        jest.spyOn(gameCardService, 'getGameCardById').mockResolvedValue(gameCard);
+        jest.spyOn(gameHistoryService, 'addGameToHistory').mockImplementation();
+        jest.spyOn(gameCardService, 'updateGameCard').mockResolvedValue(gameCard);
+        FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE.player1.hasWon = false;
+        stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
+        jest.spyOn(server, 'emit');
+        server.to.returns({
+            emit: (event: string, data) => {
+                expect(event).toEqual(CHAT_EVENTS.RoomMessage);
+                expect(data.message.includes(FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE.gameMode)).toBeTruthy();
+                expect(data.message.includes('string').toBeTrue());
+            },
+        } as any);
+        gateway.bestTime(socket, FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE);
+    });
+
+    it('best time should include choose correct ranking', async () => {
+        FAKE_GAME_HISTORY_SINGLE.isMultiplayer = false;
+        jest.spyOn(gameCardService, 'getGameCardById').mockResolvedValue(gameCard);
+        jest.spyOn(gameHistoryService, 'addGameToHistory').mockImplementation();
+        jest.spyOn(gameCardService, 'updateGameCard').mockResolvedValue(gameCard);
+        stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
+        jest.spyOn(server, 'emit');
+        server.to.returns({
+            emit: (event: string, data) => {
+                expect(event).toEqual(CHAT_EVENTS.RoomMessage);
+                expect(data.message.includes(FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE.gameMode)).toBeTruthy();
+                expect(data.message.includes('string').toBeTrue());
+                expect(data.message.includes('solo').toBeTrue());
+            },
+        } as any);
+        gateway.bestTime(socket, FAKE_GAME_HISTORY_SINGLE);
+        FAKE_GAME_HISTORY_SINGLE.isMultiplayer = true;
+    });
+
     it('best time message should include multiplayer depending on multiplayer mode', async () => {
         socket.data.isSolo = true;
-        FAKE_GAME_HISTORY_SINGLE.isMultiplayer = true;
-        const getGameCardSpy = jest.spyOn(gameCardService, 'getGameCardById').mockReturnValue(true);
-        const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockReturnValue(true);
+        FAKE_GAME_HISTORY_SINGLE.player1.hasWon = true;
+        FAKE_GAME_HISTORY_SINGLE.isMultiplayer = false;
+        const getGameCardSpy = jest.spyOn(gameCardService, 'getGameCardById').mockResolvedValue(gameCard);
+        const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockImplementation();
+        const updateTimeSpy = jest.spyOn(gameCardService, 'updateGameCard').mockResolvedValue(gameCard);
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         const sendSpy = jest.spyOn(server, 'emit');
         server.to.returns({
@@ -175,6 +260,8 @@ describe('ChatGateway', () => {
                 expect(data.socketId).toEqual(CHAT_EVENTS.Event);
                 expect(data.message.includes(FAKE_GAME_HISTORY_SINGLE.gameMode)).toBeTruthy();
                 expect(data.message.includes('multiplayer').toBeTruthy());
+                expect(data.message.includes('string').toBeTrue());
+                expect(data.message.includes('2').toBeTrue());
             },
         } as any);
         await gateway.bestTime(socket, FAKE_GAME_HISTORY_SINGLE);
@@ -182,11 +269,13 @@ describe('ChatGateway', () => {
         expect(socket.data.isSolo).toBe(false);
         expect(addGameSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_SINGLE);
         expect(sendSpy).toHaveBeenCalled();
+        expect(updateTimeSpy).toHaveBeenCalled();
     });
 
     it('best time message should include solo on solo mode', async () => {
-        const getGameCardSpy = jest.spyOn(gameCardService, 'getGameCardById').mockReturnValue(true);
-        const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockReturnValue(true);
+        const getGameCardSpy = jest.spyOn(gameCardService, 'getGameCardById').mockResolvedValue(gameCard);
+        const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockImplementation();
+        const updateTimeSpy = jest.spyOn(gameCardService, 'updateGameCard').mockResolvedValue(gameCard);
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         const sendSpy = jest.spyOn(server, 'emit');
         server.to.returns({
@@ -195,13 +284,16 @@ describe('ChatGateway', () => {
                 expect(data.event).toEqual('abandon');
                 expect(data.socketId).toEqual(CHAT_EVENTS.Event);
                 expect(data.message.includes(FAKE_GAME_HISTORY_SINGLE.gameMode)).toBeTruthy();
-                expect(data.message.includes('solo').toBeTruthy());
+                expect(data.message.includes('solo').toBeTrue());
+                expect(data.message.includes('string').toBeTrue());
+                expect(data.message.includes('2').toBeTrue());
             },
         } as any);
         await gateway.bestTime(socket, FAKE_GAME_HISTORY_SINGLE);
         expect(getGameCardSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_SINGLE.gameId);
         expect(addGameSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_SINGLE);
         expect(sendSpy).toHaveBeenCalled();
+        expect(updateTimeSpy).toHaveBeenCalled();
     });
 
     it('best time should ignore the emit to chat if a player has abandoned the game', async () => {
@@ -213,8 +305,9 @@ describe('ChatGateway', () => {
             hasWon: false,
         };
         FAKE_GAME_HISTORY_SINGLE.player2.hasAbandon = false;
-        const getGameCardSpy = jest.spyOn(gameCardService, 'getGameCardById').mockReturnValue(true);
-        const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockReturnValue(true);
+        const getGameCardSpy = jest.spyOn(gameCardService, 'getGameCardById').mockResolvedValue(gameCard);
+        const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockImplementation();
+        jest.spyOn(gameCardService, 'updateGameCard').mockResolvedValue(gameCard);
         const sendSpy = jest.spyOn(server, 'emit');
         await gateway.bestTime(socket, FAKE_GAME_HISTORY_SINGLE);
         expect(getGameCardSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_SINGLE.gameId);
@@ -286,7 +379,7 @@ describe('ChatGateway', () => {
         server.to.returns({
             emit: (event: string, data: RoomMessage) => {
                 expect(event).toEqual(CHAT_EVENTS.Abandon);
-                expect(data.event).toEqual('abandon');
+                expect(data.event).toEqual('notification');
                 expect(data.socketId).toEqual('id');
             },
         } as any);
@@ -310,3 +403,14 @@ describe('ChatGateway', () => {
         expect(expectedDate.includes(minutes)).toBe(true);
     });
 });
+
+export const rankings = {
+    multiTimes: [
+        { name: 'test', time: 3 },
+        { name: 'string', time: 4 },
+    ],
+    soloTimes: [
+        { name: 'test', time: 3 },
+        { name: 'string', time: 4 },
+    ],
+};

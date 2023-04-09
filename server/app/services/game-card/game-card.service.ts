@@ -1,8 +1,8 @@
 /* eslint-disable no-underscore-dangle */ // need it because the id_ attribute from MongoDb
 import { GameCard, GameCardDocument } from '@app/schemas/game-cards.schemas';
 import { BestTimesService } from '@app/services/best-times/best-times.service';
-import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { GameCardDto } from '@common/game-card.dto';
+import { RankingBoard } from '@common/ranking-board';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
@@ -10,13 +10,7 @@ import { Model } from 'mongoose';
 
 @Injectable()
 export class GameCardService {
-    // we need 3 services and one model for this service
-    // eslint-disable-next-line max-params
-    constructor(
-        @InjectModel(GameCard.name) private gameCardModel: Model<GameCardDocument>,
-        private imageManagerService: ImageManagerService,
-        private bestTimesService: BestTimesService, // private gameManagerService: GameManagerService,
-    ) {}
+    constructor(@InjectModel(GameCard.name) private gameCardModel: Model<GameCardDocument>, private bestTimesService: BestTimesService) {}
 
     async getAllGameCards(): Promise<GameCard[]> {
         return await this.gameCardModel.find({});
@@ -56,5 +50,15 @@ export class GameCardService {
             soloTimes: this.bestTimesService.generateBestTimes(),
             multiTimes: this.bestTimesService.generateBestTimes(),
         };
+    }
+
+    async updateGameCard(game: GameCard, winnerBoard: RankingBoard, isMultiplayer: boolean): Promise<GameCard> {
+        if (isMultiplayer) {
+            game.multiTimes = this.bestTimesService.updateBestTimes(game.multiTimes, winnerBoard);
+        } else {
+            game.soloTimes = this.bestTimesService.updateBestTimes(game.soloTimes, winnerBoard);
+        }
+        await this.gameCardModel.findOneAndUpdate({ _id: game._id }, game);
+        return game;
     }
 }
