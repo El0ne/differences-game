@@ -270,21 +270,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 data: { isMultiplayer: this.isMultiplayer, winner: this.socketService.names.get(winnerId), isWinner: this.isWinner } as EndGame,
             });
             dialogRef.afterClosed().subscribe(() => {
-                this.resetCanvas();
-                this.isReplayMode = true;
-
-                this.timerService.currentTime = 0;
-                this.messages = [];
-                this.currentScorePlayer = 0;
-                this.currentScoreOpponent = 0;
-                this.timerService.restartTimer(1);
-                this.foundDifferenceService.clearDifferenceFound();
-                this.showNavBar = true;
-                this.left.endGame = false;
-                this.right.endGame = false;
-                // this.addCheatMode();
-
-                this.replayGame();
+                this.resetPropertiesForReplay();
             });
         }
     }
@@ -457,23 +443,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                     });
                     dialogRef.afterClosed().subscribe((result) => {
                         if (result === 'replay') {
-                            this.resetCanvas();
-
-                            this.isReplayMode = true;
-                            this.timerService.currentTime = 0;
-                            this.messages = [];
-                            this.currentScorePlayer = 0;
-                            this.currentScoreOpponent = 0;
-                            this.timerService.restartTimer(1);
-                            this.commandIndex = 0;
-                            this.foundDifferenceService.clearDifferenceFound();
-                            this.showNavBar = true;
-                            this.left.endGame = false;
-                            this.right.endGame = false;
-                            // this.addCheatMode();
-                            // this.resetHTML();
-                            // this.form?.reset();
-                            this.replayGame();
+                            this.resetPropertiesForReplay();
                         } else if (result === 'continue') {
                             clearTimeout(this.replayTimeoutId);
                         }
@@ -495,5 +465,25 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         // }, 30);
         this.left.ngOnInit();
         this.right.ngOnInit();
+    }
+
+    resetPropertiesForReplay(): void {
+        this.resetCanvas();
+
+        this.isReplayMode = true;
+        this.timerService.currentTime = 0;
+        this.messages = [];
+        this.currentScorePlayer = 0;
+        this.currentScoreOpponent = 0;
+        this.timerService.restartTimer(1);
+        this.commandIndex = 0;
+        this.foundDifferenceService.clearDifferenceFound();
+        this.showNavBar = true;
+        this.left.endGame = false;
+        this.right.endGame = false;
+        // this.addCheatMode();
+        // this.resetHTML(); NOT IN FIRST RESET
+        // this.form?.reset(); NOT IN FIRST RESET
+        this.replayGame();
     }
 }
