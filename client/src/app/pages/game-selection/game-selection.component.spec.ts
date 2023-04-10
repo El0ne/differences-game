@@ -19,15 +19,12 @@ describe('GameSelectionComponent', () => {
     let component: GameSelectionComponent;
     let fixture: ComponentFixture<GameSelectionComponent>;
     let gameCardInfoService: GameCardInformationService;
-    // let testNumber: Subject<number>;
     let testGameCardsInformation: Subject<GameCardInformation[]>;
     let socketServiceSpy: SocketService;
 
     beforeEach(() => {
-        // testNumber = new Subject<number>();
         gameCardInfoService = jasmine.createSpyObj('GameCardInformationService', ['getGameCardsInformation', 'getNumberOfGameCardInformation']);
         gameCardInfoService.getNumberOfGameCardInformation = () => {
-            // testNumber.next(GAME_CARDS_TO_DISPLAY);
             return of(GAME_CARDS_TO_DISPLAY);
         };
 
