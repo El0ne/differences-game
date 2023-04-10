@@ -29,7 +29,7 @@ export class ImageController {
     async deleteImageObjects(@Param() param, @Res() res: Response): Promise<void> {
         try {
             this.imageManagerService.deleteImageObject(param.id);
-            res.status(HttpStatus.NO_CONTENT).send([]);
+            res.status(HttpStatus.NO_CONTENT).send();
         } catch (err) {
             res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         }
