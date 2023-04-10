@@ -196,7 +196,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     getRandomDifference(event: KeyboardEvent | null): void {
         if (event?.key === 'i') {
-            this.timerService.currentTime += this.gameConstants.hint;
+            this.timerService.restartTimer(1, this.gameConstants.hint);
             if (this.hintsRemaining() > 0) this.socketService.send(CHAT_EVENTS.Hint, this.currentRoom);
             this.left.getDifferences(this.currentGameId).subscribe((data) => {
                 const pixelArray = this.foundDifferenceService.findPixelsFromDifference(data);
