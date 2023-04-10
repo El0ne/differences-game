@@ -277,6 +277,10 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.currentScoreOpponent = 0;
                 this.timerService.restartTimer(1);
                 this.foundDifferenceService.clearDifferenceFound();
+                this.showNavBar = true;
+                this.left.endGame = false;
+                this.right.endGame = false;
+                // this.addCheatMode();
 
                 this.replayGame();
             });
@@ -459,6 +463,10 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                             this.timerService.restartTimer(1);
                             this.commandIndex = 0;
                             this.foundDifferenceService.clearDifferenceFound();
+                            this.showNavBar = true;
+                            this.left.endGame = false;
+                            this.right.endGame = false;
+                            // this.addCheatMode();
                             // this.resetHTML();
                             // this.form?.reset();
                             this.replayGame();
