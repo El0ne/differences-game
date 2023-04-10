@@ -309,3 +309,14 @@ app-click-event {
 .fast-forward {
     justify-content: flex-end;
 }
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 9rem;
+    background-color: rgba(0, 0, 0, 0);
+    pointer-events: auto;
+    z-index: 999;
+}
