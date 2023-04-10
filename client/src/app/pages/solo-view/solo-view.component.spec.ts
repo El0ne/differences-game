@@ -473,16 +473,6 @@ describe('SoloViewComponent', () => {
         expect(component.hintIcon).toBeFalse();
     });
 
-    it('turnOffHints should set thirdHint to false', () => {
-        component.turnOffHints(false);
-        expect(component.thirdHint).toBeFalse();
-    });
-
-    it('turnOffHints should set thirdHint to true', () => {
-        component.turnOffHints(true);
-        expect(component.thirdHint).toBeTrue();
-    });
-
     it('notifyNewBestTime should send gameHistory information as well as current timer time', () => {
         component.player = 'player';
         component.currentGameId = '0';

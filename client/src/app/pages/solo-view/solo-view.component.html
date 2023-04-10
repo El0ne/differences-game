@@ -27,7 +27,6 @@
                 (mistake)="handleMistake()"
                 (cheatModeHandler)="resetDifferences($event)"
                 (color)="setColor($event)"
-                (thirdHint)="turnOffHints($event)"
                 *ngIf="this.gameCardInfo"
             ></app-click-event>
         </div>
@@ -101,13 +100,14 @@
                     <button class="send-button" (click)="sendMessage()"></button>
                 </div>
             </div>
-            <div *ngIf="this.hintIcon === true">
+            <div *ngIf="this.hintIcon">
                 <button class="hint hint-button" type="button" (click)="getDiffFromClick()">
                     <mat-icon>search</mat-icon>
                 </button>
                 <div class="playerName">{{ hintsRemaining() }}</div>
             </div>
-            <div *ngIf="this.thirdHint === true" class="third-hint-box neon-border" [ngStyle]="{ 'background-color': this.hintColor }"></div>
+            <div *ngIf="this.thirdHint" class="third-hint-box neon-border" [ngStyle]="{ 'background-color': this.hintColor }"></div>
+            <p *ngIf="this.thirdHint" class="message centered">Plus vous êtes proches de la différence, plus la carré est rouge</p>
         </div>
 
         <div class="image-container neon-border">
@@ -121,7 +121,6 @@
                 (mistake)="handleMistake()"
                 (cheatModeHandler)="resetDifferences($event)"
                 (color)="setColor($event)"
-                (thirdHint)="turnOffHints($event)"
                 *ngIf="this.gameCardInfo"
             ></app-click-event>
         </div>

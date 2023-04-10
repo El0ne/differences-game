@@ -23,7 +23,7 @@ import { GameHistoryDTO } from '@common/game-history.dto';
 import { MATCH_EVENTS } from '@common/match-gateway-communication';
 import { PlayerGameInfo } from '@common/player-game-info';
 import { Subject } from 'rxjs';
-import { MAX_HINT_TIME_IN_MS } from './solo-view-constants';
+import { DOUBLE_HINT_TIME_IN_MS, HINT_TIME_IN_MS } from './solo-view-constants';
 
 @Component({
     selector: 'app-solo-view',
@@ -196,6 +196,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     getRandomDifference(event: KeyboardEvent | null): void {
         if (event?.key === 'i') {
+            this.timerService.currentTime += this.gameConstants.hint;
             if (this.hintsRemaining() > 0) this.socketService.send(CHAT_EVENTS.Hint, this.currentRoom);
             this.left.getDifferences(this.currentGameId).subscribe((data) => {
                 const pixelArray = this.foundDifferenceService.findPixelsFromDifference(data);
@@ -215,10 +216,23 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.left.firstHint = this.gameHintService.hintsRemaining === 2;
                 this.left.secondHint = this.gameHintService.hintsRemaining === 1;
 
-                setTimeout(() => {
-                    this.left.firstHint = false;
-                    this.left.secondHint = false;
-                }, MAX_HINT_TIME_IN_MS);
+                this.right.firstHint = this.gameHintService.hintsRemaining === 2;
+                this.right.secondHint = this.gameHintService.hintsRemaining === 1;
+                if (this.right.firstHint) {
+                    setTimeout(() => {
+                        this.left.firstHint = false;
+                        this.right.firstHint = false;
+                    }, HINT_TIME_IN_MS);
+                } else if (this.right.secondHint) {
+                    setTimeout(() => {
+                        this.left.secondHint = false;
+                        this.right.secondHint = false;
+                    }, HINT_TIME_IN_MS);
+                } else {
+                    setTimeout(() => {
+                        this.thirdHint = false;
+                    }, DOUBLE_HINT_TIME_IN_MS);
+                }
             });
         }
     }
@@ -226,10 +240,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     activateThirdHint(): void {
         this.thirdHint = true;
         this.hintIcon = false;
-    }
-
-    turnOffHints(flag: boolean): void {
-        this.thirdHint = flag;
     }
 
     showTime(): void {
