@@ -79,6 +79,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     commandIndex: number = 0;
     gameConstants: GameConstants;
 
+    isCanvasEnabled: boolean = true;
     // form: HTMLFormElement | null = document.querySelector('form');
 
     // eslint-disable-next-line max-params
@@ -91,7 +92,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private router: Router,
         // private elementRef: ElementRef,
         public socketService: SocketService,
-        private gameConstantsService: GameConstantsService, // private renderer: Renderer2, // private elementRef: ElementRef,
+        private gameConstantsService: GameConstantsService, // private renderer: Renderer2, // private elementRef: ElementRef, // private changeDetector: ChangeDetectorRef,
     ) {
         this.invoker = new Invoker();
     }
@@ -269,6 +270,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 data: { isMultiplayer: this.isMultiplayer, winner: this.socketService.names.get(winnerId), isWinner: this.isWinner } as EndGame,
             });
             dialogRef.afterClosed().subscribe(() => {
+                this.resetCanvas();
                 this.isReplayMode = true;
 
                 this.timerService.currentTime = 0;
@@ -455,6 +457,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                     });
                     dialogRef.afterClosed().subscribe((result) => {
                         if (result === 'replay') {
+                            this.resetCanvas();
+
                             this.isReplayMode = true;
                             this.timerService.currentTime = 0;
                             this.messages = [];
@@ -481,5 +485,15 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.replayGame();
             }
         }, 50);
+    }
+    resetCanvas(): void {
+        console.log('first');
+        // this.isCanvasEnabled = false;
+        // // this.changeDetector.detectChanges();
+        // setTimeout(() => {
+        //     this.isCanvasEnabled = true;
+        // }, 30);
+        this.left.ngOnInit();
+        this.right.ngOnInit();
     }
 }
