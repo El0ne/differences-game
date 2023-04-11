@@ -125,7 +125,7 @@ export class EndGameCommand implements Command {
         this.soloView = soloView;
     }
     execute(): void {
-        this.soloView.winGame(this.soloView.socketService.socketId);
+        this.soloView.openReplayModal();
     }
 }
 

@@ -255,6 +255,19 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.socketService.send<GameHistoryDTO>(CHAT_EVENTS.BestTime, gameHistory);
     }
 
+    openReplayModal(): void {
+        const dialogRef = this.dialog.open(ReplayGameModalComponent, {
+            disableClose: true,
+        });
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result === 'replay') {
+                this.resetPropertiesForReplay();
+            } else if (result === 'continue') {
+                clearTimeout(this.replayTimeoutId);
+            }
+        });
+    }
+
     winGame(winnerId: string): void {
         let dialogRef;
         if (!this.left.endGame) {
@@ -276,16 +289,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 }
             } else {
                 // this.timerService.stopTimer();
-                dialogRef = this.dialog.open(ReplayGameModalComponent, {
-                    disableClose: true,
-                });
-                dialogRef.afterClosed().subscribe((result) => {
-                    if (result === 'replay') {
-                        this.resetPropertiesForReplay();
-                    } else if (result === 'continue') {
-                        clearTimeout(this.replayTimeoutId);
-                    }
-                });
+                this.openReplayModal();
                 // return;
             }
         }
@@ -437,7 +441,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.timeMultiplier = multiplier;
         this.timerService.restartTimer(this.timeMultiplier);
     }
-
     replayGame(): void {
         this.replayTimeoutId = setTimeout(() => {
             const command = this.invoker.commands[this.commandIndex];
