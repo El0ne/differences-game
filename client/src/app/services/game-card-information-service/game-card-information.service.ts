@@ -40,19 +40,11 @@ export class GameCardInformationService {
         return this.http.post<ServerGeneratedGameInfo>(`${STAGE}/image/${radius}`, formData);
     }
 
-    deleteImage(image: string): Observable<void> {
-        return this.http.delete<void>(`${STAGE}/image/${image}`);
-    }
-
     resetAllBestTimes(): Observable<void> {
         return this.http.put<void>(`${STAGE}/best-times`, null);
     }
 
     resetBestTime(id: string): Observable<void> {
         return this.http.put<void>(`${STAGE}/best-times/${id}`, null);
-    }
-
-    deleteAllGames(): Observable<void> {
-        return this.http.delete<void>(`${STAGE}`);
     }
 }

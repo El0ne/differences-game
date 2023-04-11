@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MOCK_ARRAY } from '@app/pages/solo-view/mock-array';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
-import { STAGE } from '@app/services/server-routes';
+import { IMAGE } from '@app/services/server-routes';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { of, Subject } from 'rxjs';
 import { DIFFERENCE_FOUND, DIFFERENCE_NOT_FOUND, TEST_DIFFERENCES } from './click-event-constants-testing';
@@ -158,7 +158,7 @@ describe('ClickEventComponent', () => {
         component.ngOnInit();
 
         expect(window.Image).toHaveBeenCalledWith();
-        expect(imageSpyObj.src).toBe(`${STAGE}/image/test.png`);
+        expect(imageSpyObj.src).toBe(`${IMAGE}/test.png`);
         expect(imageSpyObj.crossOrigin).toBe('Anonymous');
         imageSpyObj.onload();
         expect(CanvasRenderingContext2D.prototype.drawImage).toHaveBeenCalled();

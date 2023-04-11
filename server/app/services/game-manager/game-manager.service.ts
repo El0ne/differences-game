@@ -2,7 +2,7 @@
 import { GameCard } from '@app/schemas/game-cards.schemas';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { GameCardService } from '@app/services/game-card/game-card.service';
-import { GameHistoryService } from '@app/services/game-history/game-history.service';
+import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { Injectable } from '@nestjs/common';
 
 interface MapGameInfo {
@@ -23,8 +23,8 @@ export class GameManagerService {
 
     constructor(
         private differenceClickService: DifferenceClickService,
-        private gameHistoryService: GameHistoryService,
         private gameCardService: GameCardService,
+        private imageManagerService: ImageManagerService,
     ) {}
 
     async endGame(stageId: string): Promise<void> {
@@ -33,7 +33,7 @@ export class GameManagerService {
             currentMapGameInfo.numberOfPlayers -= 1;
             if (currentMapGameInfo.numberOfPlayers === 0) {
                 if (currentMapGameInfo.isDeleted) {
-                    await this.differenceClickService.deleteDifferences(stageId);
+                    this.deleteFromMongo(stageId);
                 }
                 this.gamePlayedInformation.delete(stageId);
             }
@@ -57,9 +57,8 @@ export class GameManagerService {
         if (currentMapGameInfo) {
             currentMapGameInfo.isDeleted = true;
         } else {
-            await this.differenceClickService.deleteDifferences(stageId);
+            this.deleteFromMongo(stageId);
         }
-        await this.gameHistoryService.deleteGameHistory(stageId);
     }
 
     async startLimitedTimeGame(room: string, numberOfPlayers: number): Promise<boolean> {
@@ -109,5 +108,10 @@ export class GameManagerService {
                 this.limitedTimeModeGames.delete(room);
             }
         }
+    }
+
+    async deleteFromMongo(id: string): Promise<void> {
+        await this.differenceClickService.deleteDifferences(id);
+        await this.imageManagerService.deleteImageObject(id);
     }
 }

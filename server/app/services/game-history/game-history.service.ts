@@ -20,8 +20,4 @@ export class GameHistoryService {
     async deleteAllGameHistory(): Promise<void> {
         await this.gameCardModel.deleteMany({});
     }
-
-    async deleteGameHistory(gameId: string): Promise<void> {
-        await this.gameCardModel.deleteMany({ gameId });
-    }
 }
