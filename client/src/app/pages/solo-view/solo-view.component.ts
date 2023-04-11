@@ -266,13 +266,15 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.left.endGame = true;
             this.right.endGame = true;
             this.showNavBar = false;
-            const dialogRef = this.dialog.open(GameWinModalComponent, {
-                disableClose: true,
-                data: { isMultiplayer: this.isMultiplayer, winner: this.socketService.names.get(winnerId), isWinner: this.isWinner } as EndGame,
-            });
-            dialogRef.afterClosed().subscribe(() => {
-                this.resetPropertiesForReplay();
-            });
+            if (!this.isReplayMode) {
+                const dialogRef = this.dialog.open(GameWinModalComponent, {
+                    disableClose: true,
+                    data: { isMultiplayer: this.isMultiplayer, winner: this.socketService.names.get(winnerId), isWinner: this.isWinner } as EndGame,
+                });
+                dialogRef.afterClosed().subscribe(() => {
+                    this.resetPropertiesForReplay();
+                });
+            }
         }
     }
 
