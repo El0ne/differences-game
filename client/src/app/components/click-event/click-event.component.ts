@@ -2,7 +2,8 @@ import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild }
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { PixelModificationService } from '@app/services/pixel-modification/pixel-modification.service';
-import { ClickCommand, Command } from '@app/services/replay-game/replay-events-handler';
+import { Command } from '@app/services/replay-game/commands/command';
+import { ClickCommand } from '@app/services/replay-game/replay-events-handler';
 import { STAGE } from '@app/services/server-routes';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { DifferenceInformation } from '@common/difference-information';

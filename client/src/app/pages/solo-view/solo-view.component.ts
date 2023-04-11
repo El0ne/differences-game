@@ -11,8 +11,8 @@ import { ReplayGameModalComponent } from '@app/modals/replay-game-modal/replay-g
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
+import { Command } from '@app/services/replay-game/commands/command';
 import {
-    Command,
     Invoker,
     KeyPressCommand,
     ModalCloseCommand,

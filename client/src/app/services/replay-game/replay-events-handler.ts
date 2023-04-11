@@ -2,12 +2,7 @@
 
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { SoloViewComponent } from '@app/pages/solo-view/solo-view.component';
-
-/* eslint-disable max-classes-per-file */
-
-export interface Command {
-    execute(): void;
-}
+import { Command } from './commands/command';
 
 export class ClickCommand implements Command {
     clickEvent: ClickEventComponent;
