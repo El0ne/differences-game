@@ -2,6 +2,9 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Command } from '@app/commands/command';
+import { Invoker, KeyPressCommand, ModalCloseCommand, OpenInfoModalCommand, SendMessageCommand } from '@app/commands/replay-events-handler';
+import { WriteMessageCommand } from '@app/commands/write-message/write-message';
 import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
@@ -11,15 +14,6 @@ import { ReplayGameModalComponent } from '@app/modals/replay-game-modal/replay-g
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
-import { Command } from '@app/services/replay-game/commands/command';
-import {
-    Invoker,
-    KeyPressCommand,
-    ModalCloseCommand,
-    OpenInfoModalCommand,
-    SendMessageCommand,
-    WriteMessageCommand,
-} from '@app/services/replay-game/replay-events-handler';
 import { SocketService } from '@app/services/socket/socket.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { EndGame } from '@common/chat-dialog-constants';
