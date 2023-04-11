@@ -38,7 +38,7 @@ export class ClickEventComponent implements OnInit {
     constructor(
         private clickEventService: ClickEventService,
         private foundDifferenceService: FoundDifferenceService,
-        private pixelModificationService: PixelModificationService, // private soloView: SoloViewComponent,
+        private pixelModificationService: PixelModificationService,
     ) {}
 
     async ngOnInit(): Promise<void> {
@@ -69,13 +69,8 @@ export class ClickEventComponent implements OnInit {
     }
 
     isDifferent(mouseEvent: MouseEvent): void {
-        // TODO replace true by !isReplay
-        // eslint-disable-next-line no-constant-condition
-        if (true) {
-            const clickCommand = new ClickCommand(this, mouseEvent.clientX, mouseEvent.clientY);
-            // this.soloView.invoker.addCommand(clickCommand, this.soloView.timerService.currentTime);
-            this.command.emit(clickCommand);
-        }
+        const clickCommand = new ClickCommand(this, mouseEvent.clientX, mouseEvent.clientY);
+        this.command.emit(clickCommand);
 
         this.clickEventService
             .isADifference(this.getCoordInImage(mouseEvent)[0], this.getCoordInImage(mouseEvent)[1], this.gameCardId)
@@ -101,7 +96,7 @@ export class ClickEventComponent implements OnInit {
 
     async clearEffect(): Promise<void> {
         const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-        await this.pixelModificationService.turnOffYellow(originalContext, this.foundDifferenceService.foundDifferences);
+        this.pixelModificationService.turnOffYellow(originalContext, this.foundDifferenceService.foundDifferences);
     }
 
     async differenceEffect(currentDifferences: number[]): Promise<void> {
