@@ -92,7 +92,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private router: Router,
         // private elementRef: ElementRef,
         public socketService: SocketService,
-        private gameConstantsService: GameConstantsService, // private renderer: Renderer2, // private elementRef: ElementRef, // private changeDetector: ChangeDetectorRef,
+        private gameConstantsService: GameConstantsService, // private renderer: Renderer2, // private elementRef: ElementRef,
     ) {
         this.invoker = new Invoker();
     }

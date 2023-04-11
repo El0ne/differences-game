@@ -1,5 +1,6 @@
 /* eslint-disable max-classes-per-file */
 
+import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { SoloViewComponent } from '@app/pages/solo-view/solo-view.component';
 
 /* eslint-disable max-classes-per-file */
@@ -9,12 +10,14 @@ export interface Command {
 }
 
 export class ClickCommand implements Command {
+    clickEvent: ClickEventComponent;
     private x: number;
     private y: number;
 
-    constructor(x: number, y: number) {
+    constructor(clickEvent: ClickEventComponent, x: number, y: number) {
         this.x = x;
         this.y = y;
+        this.clickEvent = clickEvent;
     }
 
     execute(): void {
@@ -22,7 +25,8 @@ export class ClickCommand implements Command {
             clientX: this.x,
             clientY: this.y,
         });
-        document.dispatchEvent(event);
+        // document.dispatchEvent(event);
+        this.clickEvent.isDifferent(event);
         console.log('click : ', 'x :', this.x, 'y :', this.y, '\n');
     }
 }

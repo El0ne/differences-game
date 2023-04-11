@@ -70,7 +70,7 @@ export class ClickEventComponent implements OnInit {
     }
 
     isDifferent(mouseEvent: MouseEvent): void {
-        const clickCommand = new ClickCommand(mouseEvent.clientX, mouseEvent.clientY);
+        const clickCommand = new ClickCommand(this, mouseEvent.clientX, mouseEvent.clientY);
         this.clickEventService
             .isADifference(this.getCoordInImage(mouseEvent)[0], this.getCoordInImage(mouseEvent)[1], this.gameCardId)
             .subscribe((data) => {
