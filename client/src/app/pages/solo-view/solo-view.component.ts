@@ -12,6 +12,7 @@ import { FoundDifferenceService } from '@app/services/found-differences/found-di
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
 import {
+    Command,
     Invoker,
     KeyPressCommand,
     ModalCloseCommand,
@@ -92,7 +93,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private router: Router,
         // private elementRef: ElementRef,
         public socketService: SocketService,
-        private gameConstantsService: GameConstantsService, // private renderer: Renderer2, // private elementRef: ElementRef, // private changeDetector: ChangeDetectorRef,
+        private gameConstantsService: GameConstantsService, // private renderer: Renderer2, // private elementRef: ElementRef,
     ) {
         this.invoker = new Invoker();
     }
@@ -217,7 +218,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
             if (this.isReplayMode === false) {
                 const cheatModeCommand = new KeyPressCommand(event, this);
-                this.invoker.addCommand(cheatModeCommand, this.timerService.currentTime);
+                this.addCommand(cheatModeCommand);
             }
         }
     }
@@ -300,11 +301,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
         console.log('in component: ', dialogRef);
         if (this.isReplayMode === false) {
-            this.invoker.addCommand(this.openInfoModalCommand, this.timerService.currentTime);
+            this.addCommand(this.openInfoModalCommand);
             dialogRef.afterClosed().subscribe(() => {
                 // this.modalCloseCommand = new ModalCloseCommand(dialogRef);
                 this.modalCloseCommand = new ModalCloseCommand(this);
-                this.invoker.addCommand(this.modalCloseCommand, this.timerService.currentTime);
+                this.addCommand(this.modalCloseCommand);
             });
         }
     }
@@ -332,16 +333,13 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         console.log(this.messageContent);
         setTimeout(() => {
             const writeMessageCommand = new WriteMessageCommand(this.inputChat.nativeElement, this.messageContent);
-            this.invoker.addCommand(writeMessageCommand, this.timerService.currentTime);
+            this.addCommand(writeMessageCommand);
         }, 50);
     }
 
     sendMessage(): void {
         this.socketService.send<string>(CHAT_EVENTS.Validate, this.messageContent);
-        if (this.isReplayMode === false) {
-            const sendMessageCommand = new SendMessageCommand(this);
-            this.invoker.addCommand(sendMessageCommand, this.timerService.currentTime);
-        }
+        this.addCommand(new SendMessageCommand(this));
         this.messageContent = '';
     }
 
@@ -485,5 +483,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         // this.resetHTML(); NOT IN FIRST RESET
         // this.form?.reset(); NOT IN FIRST RESET
         this.replayGame();
+    }
+    addCommand(command: Command): void {
+        if (!this.isReplayMode) this.invoker.addCommand(command, this.timerService.currentTime);
     }
 }
