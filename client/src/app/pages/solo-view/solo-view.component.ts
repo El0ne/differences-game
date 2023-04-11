@@ -71,9 +71,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     timeMultiplier: number = 1;
     replayTimeoutId: ReturnType<typeof setTimeout>;
 
-    openInfoModalCommand: OpenInfoModalCommand;
-    modalCloseCommand: CloseInfoModalCommand;
-
     invoker: Invoker;
     commandIndex: number = 0;
     gameConstants: GameConstants;
@@ -290,7 +287,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     openInfoModal(): void {
         // const infoButton = this.elementRef.nativeElement.querySelector('#infoButton');
-        this.openInfoModalCommand = new OpenInfoModalCommand(this);
         const dialogRef = this.dialog.open(GameInfoModalComponent, {
             data: {
                 gameCardInfo: this.gameCardInfo,
@@ -301,11 +297,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
         console.log('in component: ', dialogRef);
         if (this.isReplayMode === false) {
-            this.addCommand(this.openInfoModalCommand);
+            this.addCommand(new OpenInfoModalCommand(this));
             dialogRef.afterClosed().subscribe(() => {
-                // this.modalCloseCommand = new ModalCloseCommand(dialogRef);
-                this.modalCloseCommand = new CloseInfoModalCommand(this);
-                this.addCommand(this.modalCloseCommand);
+                this.addCommand(new CloseInfoModalCommand(this));
             });
         }
     }
