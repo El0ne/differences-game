@@ -2,6 +2,12 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
+import { CloseInfoModalCommand } from '@app/commands/close-info-modal-command/close-info-modal-command';
+import { Command, Invoker } from '@app/commands/command';
+import { KeyPressCommand } from '@app/commands/key-press/key-press-command';
+import { OpenInfoModalCommand } from '@app/commands/open-info-modal-command/open-info-modal-command';
+import { SendMessageCommand } from '@app/commands/send-message/send-message-command';
+import { WriteMessageCommand } from '@app/commands/write-message/write-message';
 import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
@@ -11,15 +17,6 @@ import { ReplayGameModalComponent } from '@app/modals/replay-game-modal/replay-g
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
-import {
-    Command,
-    Invoker,
-    KeyPressCommand,
-    ModalCloseCommand,
-    OpenInfoModalCommand,
-    SendMessageCommand,
-    WriteMessageCommand,
-} from '@app/services/replay-game/replay-events-handler';
 import { SocketService } from '@app/services/socket/socket.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { EndGame } from '@common/chat-dialog-constants';
@@ -72,9 +69,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     isReplayPaused: boolean = false;
     timeMultiplier: number = 1;
     replayTimeoutId: ReturnType<typeof setTimeout>;
-
-    openInfoModalCommand: OpenInfoModalCommand;
-    modalCloseCommand: ModalCloseCommand;
 
     invoker: Invoker;
     commandIndex: number = 0;
@@ -306,7 +300,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     openInfoModal(): void {
         // const infoButton = this.elementRef.nativeElement.querySelector('#infoButton');
-        this.openInfoModalCommand = new OpenInfoModalCommand(this);
         const dialogRef = this.dialog.open(GameInfoModalComponent, {
             data: {
                 gameCardInfo: this.gameCardInfo,
@@ -317,11 +310,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
         console.log('in component: ', dialogRef);
         if (this.isReplayMode === false) {
-            this.addCommand(this.openInfoModalCommand);
+            this.addCommand(new OpenInfoModalCommand(this));
             dialogRef.afterClosed().subscribe(() => {
-                // this.modalCloseCommand = new ModalCloseCommand(dialogRef);
-                this.modalCloseCommand = new ModalCloseCommand(this);
-                this.addCommand(this.modalCloseCommand);
+                this.addCommand(new CloseInfoModalCommand(this));
             });
         }
     }
