@@ -95,6 +95,25 @@ export class ClickEventComponent implements OnInit {
             });
     }
 
+    replayOpponentClick(mouseEvent: MouseEvent): void {
+        this.clickEventService
+            .isADifference(this.getCoordInImage(mouseEvent)[0], this.getCoordInImage(mouseEvent)[1], this.gameCardId)
+            .subscribe((data) => {
+                this.differenceData = data;
+                if (
+                    this.differenceData.isADifference &&
+                    !this.foundDifferenceService.foundDifferences.includes(this.differenceData.differencesPosition)
+                ) {
+                    this.differenceDetected.emit({
+                        differencesPosition: this.differenceData.differencesPosition,
+                        lastDifferences: this.differenceData.differenceArray,
+                    });
+                } else {
+                    this.mistake.emit();
+                }
+            });
+    }
+
     async clearEffect(): Promise<void> {
         const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.pixelModificationService.turnOffYellow(originalContext, this.foundDifferenceService.foundDifferences);

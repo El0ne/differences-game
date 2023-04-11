@@ -6,6 +6,7 @@ import { CloseInfoModalCommand } from '@app/commands/close-info-modal-command/cl
 import { Command, Invoker } from '@app/commands/command';
 import { KeyPressCommand } from '@app/commands/key-press/key-press-command';
 import { OpenInfoModalCommand } from '@app/commands/open-info-modal-command/open-info-modal-command';
+import { OpponentDifference } from '@app/commands/opponent-difference/opponent-difference';
 import { SendMessageCommand } from '@app/commands/send-message/send-message-command';
 import { WriteMessageCommand } from '@app/commands/write-message/write-message';
 import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
@@ -409,6 +410,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     effectHandler(information: PlayerDifference): void {
+        this.addCommand(new OpponentDifference(this, information));
         if (!this.left.toggleCheatMode) {
             this.handleFlash(information.lastDifferences);
         }
