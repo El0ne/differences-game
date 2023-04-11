@@ -284,7 +284,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 dialogRef.afterClosed().subscribe(() => {
                     this.resetPropertiesForReplay();
                 });
-                if (!this.isWinner) {
+                if (this.isMultiplayer && !this.isWinner) {
                     const endGameCommand = new EndGameCommand(this);
                     this.addCommand(endGameCommand);
                 }
@@ -340,9 +340,15 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     quitGame(): void {
         // const quitButton = this.elementRef.nativeElement.querySelector('#quitGame');
         // this.buttonPressCommand = new ButtonPressCommand(quitButton);
-        this.dialog.open(QuitGameModalComponent, {
+        const dialogRef = this.dialog.open(QuitGameModalComponent, {
             disableClose: true,
         });
+        if (this.isReplayMode) {
+            this.timerService.stopTimer();
+            dialogRef.afterClosed().subscribe(() => {
+                this.timerService.restartTimer(this.timeMultiplier);
+            });
+        }
         // this.invoker.addCommand(this.buttonPressCommand, this.timerService.currentTime);
     }
 
