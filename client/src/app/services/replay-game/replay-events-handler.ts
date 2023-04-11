@@ -27,6 +27,8 @@ export class ClickCommand implements Command {
     }
 }
 
+// export class FoundDifferenceCommand implements Command {
+
 export class WriteMessageCommand implements Command {
     private currentMessage: string;
     private input: HTMLInputElement;
