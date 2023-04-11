@@ -3,10 +3,9 @@ import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/co
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CloseInfoModalCommand } from '@app/commands/close-info-modal-command/close-info-modal-command';
-import { Command } from '@app/commands/command';
+import { Command, Invoker } from '@app/commands/command';
 import { KeyPressCommand } from '@app/commands/key-press/key-press-command';
 import { OpenInfoModalCommand } from '@app/commands/open-info-modal-command/open-info-modal-command';
-import { Invoker } from '@app/commands/replay-events-handler';
 import { SendMessageCommand } from '@app/commands/send-message/send-message-command';
 import { WriteMessageCommand } from '@app/commands/write-message/write-message';
 import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
