@@ -12,6 +12,7 @@ import { FoundDifferenceService } from '@app/services/found-differences/found-di
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
 import {
+    Command,
     Invoker,
     KeyPressCommand,
     ModalCloseCommand,
@@ -485,5 +486,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         // this.resetHTML(); NOT IN FIRST RESET
         // this.form?.reset(); NOT IN FIRST RESET
         this.replayGame();
+    }
+    addCommand(command: Command): void {
+        this.invoker.addCommand(command, this.timerService.currentTime);
     }
 }

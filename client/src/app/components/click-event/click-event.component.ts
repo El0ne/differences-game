@@ -1,9 +1,8 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { SoloViewComponent } from '@app/pages/solo-view/solo-view.component';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { PixelModificationService } from '@app/services/pixel-modification/pixel-modification.service';
-import { ClickCommand } from '@app/services/replay-game/replay-events-handler';
+import { ClickCommand, Command } from '@app/services/replay-game/replay-events-handler';
 import { STAGE } from '@app/services/server-routes';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { DifferenceInformation } from '@common/difference-information';
@@ -25,6 +24,7 @@ export class ClickEventComponent implements OnInit {
     @Output() differenceDetected: EventEmitter<DifferenceInformation> = new EventEmitter<DifferenceInformation>();
     @Output() mistake: EventEmitter<void> = new EventEmitter<void>();
     @Output() cheatModeHandler: EventEmitter<KeyboardEvent> = new EventEmitter<KeyboardEvent>();
+    @Output() command: EventEmitter<Command> = new EventEmitter<Command>();
     @ViewChild('picture', { static: true })
     picture: ElementRef<HTMLCanvasElement>;
     @ViewChild('modification', { static: true })
@@ -38,8 +38,7 @@ export class ClickEventComponent implements OnInit {
     constructor(
         private clickEventService: ClickEventService,
         private foundDifferenceService: FoundDifferenceService,
-        private pixelModificationService: PixelModificationService,
-        private soloView: SoloViewComponent,
+        private pixelModificationService: PixelModificationService, // private soloView: SoloViewComponent,
     ) {}
 
     async ngOnInit(): Promise<void> {
@@ -70,7 +69,14 @@ export class ClickEventComponent implements OnInit {
     }
 
     isDifferent(mouseEvent: MouseEvent): void {
-        const clickCommand = new ClickCommand(this, mouseEvent.clientX, mouseEvent.clientY);
+        // TODO replace true by !isReplay
+        // eslint-disable-next-line no-constant-condition
+        if (true) {
+            const clickCommand = new ClickCommand(this, mouseEvent.clientX, mouseEvent.clientY);
+            // this.soloView.invoker.addCommand(clickCommand, this.soloView.timerService.currentTime);
+            this.command.emit(clickCommand);
+        }
+
         this.clickEventService
             .isADifference(this.getCoordInImage(mouseEvent)[0], this.getCoordInImage(mouseEvent)[1], this.gameCardId)
             .subscribe((data) => {
@@ -91,7 +97,6 @@ export class ClickEventComponent implements OnInit {
                     this.displayError(mouseEvent);
                 }
             });
-        this.soloView.invoker.addCommand(clickCommand, this.soloView.timerService.currentTime);
     }
 
     async clearEffect(): Promise<void> {
