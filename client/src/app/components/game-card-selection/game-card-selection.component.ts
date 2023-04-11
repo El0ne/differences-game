@@ -7,7 +7,8 @@ import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-di
 import { WaitingRoomComponent, WaitingRoomDataPassing } from '@app/modals/waiting-room/waiting-room.component';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameParametersService } from '@app/services/game-parameters/game-parameters.service';
-import { STAGE } from '@app/services/server-routes';
+import { ImagesService } from '@app/services/images/images.service';
+import { IMAGE } from '@app/services/server-routes';
 import { SocketService } from '@app/services/socket/socket.service';
 import { GameCardInformation } from '@common/game-card';
 import { MATCH_EVENTS, SoloGameCreation } from '@common/match-gateway-communication';
@@ -33,14 +34,16 @@ export class GameCardSelectionComponent implements OnInit {
         private router: Router,
         private gameCardService: GameCardInformationService,
         private gameParamService: GameParametersService,
+        private imagesService: ImagesService,
     ) {}
     ngOnInit(): void {
-        this.image = `${STAGE}/image/${this.gameCardInformation.originalImageName}`;
+        this.imagesService.getImageNames(this.gameCardInformation._id).subscribe((imageObject) => {
+            this.image = `${IMAGE}/${imageObject.originalImageName}`;
+        });
     }
 
     deleteGame(): void {
         this.socketService.send(WAITING_ROOM_EVENTS.DeleteGame, this.gameCardInformation._id);
-        // TODO find out where the emit went
     }
 
     resetBestTimes(): void {

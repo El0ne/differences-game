@@ -10,6 +10,8 @@ import { Observable, of } from 'rxjs';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { GameHistoryComponent } from '@app/components/game-history/game-history.component';
 import { GameHistoryService } from '@app/services/game-history/game-history.service';
+import { SocketService } from '@app/services/socket/socket.service';
+import { WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 import { GameConstantsComponent } from './game-constants.component';
 
 describe('GameConstantsComponent', () => {
@@ -19,6 +21,7 @@ describe('GameConstantsComponent', () => {
     let gameCardService: GameCardInformationService;
     let gameHistoryService: GameHistoryService;
     let modalSpy: MatDialog;
+    let socketServiceSpy: SocketService;
 
     beforeEach(async () => {
         gameConstantsService = jasmine.createSpyObj('GameConstantsService', ['getGameConstants', 'updateGameConstants']);
@@ -29,13 +32,9 @@ describe('GameConstantsComponent', () => {
             return of();
         };
 
-        gameCardService = jasmine.createSpyObj('GameCardInformationService', ['resetAllBestTimes', 'deleteAllGames']);
+        gameCardService = jasmine.createSpyObj('GameCardInformationService', ['resetAllBestTimes']);
 
         gameCardService.resetAllBestTimes = () => {
-            return of();
-        };
-
-        gameCardService.deleteAllGames = () => {
             return of();
         };
 
@@ -44,6 +43,9 @@ describe('GameConstantsComponent', () => {
         gameHistoryService.deleteGameHistory = () => {
             return of();
         };
+
+        socketServiceSpy = jasmine.createSpyObj('SocketService', ['send']);
+
         await TestBed.configureTestingModule({
             declarations: [GameConstantsComponent],
             imports: [HttpClientTestingModule, FormsModule, MatDialogModule],
@@ -52,6 +54,10 @@ describe('GameConstantsComponent', () => {
                 { provide: GameCardInformationService, useValue: gameCardService },
                 { provide: MatDialog, useValue: modalSpy },
                 { provide: GameHistoryService, useValue: gameHistoryService },
+                {
+                    provide: SocketService,
+                    useValue: socketServiceSpy,
+                },
             ],
         }).compileComponents();
 
@@ -105,11 +111,9 @@ describe('GameConstantsComponent', () => {
     });
 
     it('deleteAllGames() should call deleteAllGames from the service', fakeAsync(() => {
-        spyOn(gameCardService, 'deleteAllGames').and.returnValue(new Observable<void>());
-
         component.deleteAllGames();
 
-        expect(gameCardService.deleteAllGames).toHaveBeenCalled();
+        expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.DeleteAllGames);
     }));
 
     it('checkNumber() should return a number between the min and max value for the input', () => {

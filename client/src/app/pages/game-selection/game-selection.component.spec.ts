@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -18,16 +19,13 @@ describe('GameSelectionComponent', () => {
     let component: GameSelectionComponent;
     let fixture: ComponentFixture<GameSelectionComponent>;
     let gameCardInfoService: GameCardInformationService;
-    let testNumber: Subject<number>;
     let testGameCardsInformation: Subject<GameCardInformation[]>;
     let socketServiceSpy: SocketService;
 
     beforeEach(() => {
-        testNumber = new Subject<number>();
         gameCardInfoService = jasmine.createSpyObj('GameCardInformationService', ['getGameCardsInformation', 'getNumberOfGameCardInformation']);
         gameCardInfoService.getNumberOfGameCardInformation = () => {
-            testNumber.next(GAME_CARDS_TO_DISPLAY);
-            return testNumber.asObservable();
+            return of(GAME_CARDS_TO_DISPLAY);
         };
 
         testGameCardsInformation = new Subject<GameCardInformation[]>();
@@ -40,7 +38,7 @@ describe('GameSelectionComponent', () => {
 
         TestBed.configureTestingModule({
             declarations: [GameSelectionComponent, GameCardSelectionComponent, BestTimeComponent],
-            imports: [RouterTestingModule, MatIconModule, MatDialogModule],
+            imports: [RouterTestingModule, MatIconModule, MatDialogModule, HttpClientTestingModule],
             providers: [
                 { provide: GameCardInformationService, useValue: gameCardInfoService },
                 { provide: SocketService, useValue: socketServiceSpy },
@@ -167,11 +165,17 @@ describe('GameSelectionComponent', () => {
         expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.ScanForHost, ['123']);
     });
 
-    it('refreshGameCards() should call selectGameCards() and getGameCardsInformations()', () => {
+    it('refreshGameCards() should call selectGameCards() and getGameCardsInformations()', fakeAsync(() => {
+        const DELAY_BEFORE_REFRESH = 250;
+
         spyOn(component, 'selectGameCards').and.returnValue();
+        spyOn(gameCardInfoService, 'getNumberOfGameCardInformation').and.returnValue(of(GAME_CARDS_TO_DISPLAY));
+
         component.refreshGameCards();
+        tick(DELAY_BEFORE_REFRESH * 3);
+
+        expect(gameCardInfoService.getNumberOfGameCardInformation).toHaveBeenCalled();
         expect(component.numberOfGameInformations).toEqual(GAME_CARDS_TO_DISPLAY);
         expect(component.selectGameCards).toHaveBeenCalled();
-        // TODO set a false setTimeout
-    });
+    }));
 });

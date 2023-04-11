@@ -2,7 +2,7 @@ import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild }
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { PixelModificationService } from '@app/services/pixel-modification/pixel-modification.service';
-import { STAGE } from '@app/services/server-routes';
+import { IMAGE } from '@app/services/server-routes';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { DifferenceInformation } from '@common/difference-information';
 import { Observable } from 'rxjs';
@@ -48,7 +48,7 @@ export class ClickEventComponent implements OnInit {
 
         const image = new Image();
         image.crossOrigin = 'Anonymous';
-        image.src = `${STAGE}/image/${this.imagePath}`;
+        image.src = `${IMAGE}/${this.imagePath}`;
         image.onload = () => {
             const context = this.picture.nativeElement.getContext('2d') as CanvasRenderingContext2D;
             context.drawImage(image, 0, 0);

@@ -7,8 +7,6 @@ export const getFakeGameCard = (): GameCard => ({
     name: (Math.random() + 1).toString(36).substring(2),
     difficulty: 'Facile',
     differenceNumber: 6,
-    originalImageName: 'game.baseImage',
-    differenceImageName: 'game.differenceImage',
     soloTimes: [
         { time: 0, name: '--' },
         { time: 0, name: '--' },

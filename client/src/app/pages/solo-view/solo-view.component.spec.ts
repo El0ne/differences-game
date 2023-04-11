@@ -21,12 +21,14 @@ import { FoundDifferenceService } from '@app/services/found-differences/found-di
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
 import { GameParametersService } from '@app/services/game-parameters/game-parameters.service';
+import { ImagesService } from '@app/services/images/images.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { CHAT_EVENTS } from '@common/chat-gateway-events';
 import { DifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
 import { GameConstants } from '@common/game-constants';
 import { GameHistoryDTO } from '@common/game-history.dto';
+import { ImageObject } from '@common/image-object';
 import { MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
 import { of } from 'rxjs';
 import { SoloViewComponent } from './solo-view.component';
@@ -34,7 +36,8 @@ import { SoloViewComponent } from './solo-view.component';
 describe('SoloViewComponent', () => {
     let component: SoloViewComponent;
     let fixture: ComponentFixture<SoloViewComponent>;
-    let mockService: GameCardInformationService;
+    let gameCardInfoService: GameCardInformationService;
+    let imagesService: ImagesService;
     let socketServiceMock: SocketService;
     let foundDifferenceServiceSpy: FoundDifferenceService;
     let modalSpy: MatDialog;
@@ -71,9 +74,14 @@ describe('SoloViewComponent', () => {
             return returnArray;
         };
 
-        mockService = jasmine.createSpyObj('GameCardInformationService', ['getGameCardInfoFromId']);
-        mockService.getGameCardInfoFromId = () => {
+        gameCardInfoService = jasmine.createSpyObj('GameCardInformationService', ['getGameCardInfoFromId']);
+        gameCardInfoService.getGameCardInfoFromId = () => {
             return of(SERVICE_MOCK_GAME_CARD);
+        };
+
+        imagesService = jasmine.createSpyObj('ImagesService', ['getImageNames']);
+        imagesService.getImageNames = () => {
+            return of(SERVICE_MOCK_IMAGE_OBJECT);
         };
         socketServiceMock = jasmine.createSpyObj('SocketService', ['connect', 'disconnect', 'liveSocket', 'listen', 'send'], ['socketId']);
         socketServiceMock.sio = jasmine.createSpyObj('Socket', ['on', 'emit', 'disconnect']);
@@ -100,7 +108,8 @@ describe('SoloViewComponent', () => {
                 { provide: ClickEventService, useValue: clickEventServiceSpy },
                 { provide: ActivatedRoute, useValue: mockActivatedRoute },
                 { provide: Router, useValue: mockRouter },
-                { provide: GameCardInformationService, useValue: mockService },
+                { provide: GameCardInformationService, useValue: gameCardInfoService },
+                { provide: ImagesService, useValue: imagesService },
                 { provide: SocketService, useValue: socketServiceMock },
                 { provide: FoundDifferenceService, useValue: foundDifferenceServiceSpy },
                 { provide: MatDialog, useValue: modalSpy },
@@ -474,8 +483,6 @@ const SERVICE_MOCK_GAME_CARD: GameCardInformation = {
     name: 'game',
     difficulty: 'Facile',
     differenceNumber: 7,
-    originalImageName: 'game.baseImage',
-    differenceImageName: 'game.differenceImage',
     soloTimes: [
         { time: 0, name: '--' },
         { time: 0, name: '--' },
@@ -530,4 +537,9 @@ const MOCK_GAME_HISTORY_2: GameHistoryDTO = {
         hasAbandon: false,
         hasWon: false,
     },
+};
+const SERVICE_MOCK_IMAGE_OBJECT: ImageObject = {
+    _id: '0',
+    originalImageName: 'string',
+    differenceImageName: 'string',
 };

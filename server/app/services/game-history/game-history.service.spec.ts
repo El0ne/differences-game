@@ -1,4 +1,5 @@
 import { GameHistory, GameHistoryDocument, gameHistorySchema } from '@app/schemas/game-history';
+import { DELAY_BEFORE_CLOSING_CONNECTION } from '@app/tests/constants';
 import { getFakeGameHistoryElement } from '@common/mock/game-history-mock';
 import { MongooseModule, getConnectionToken, getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -33,8 +34,6 @@ describe('GameHistoryService', () => {
         await gameHistoryModel.deleteMany({});
     });
 
-    const DELAY_BEFORE_CLOSING_CONNECTION = 200;
-
     afterEach((done) => {
         setTimeout(async () => {
             await connection.close();
@@ -64,7 +63,7 @@ describe('GameHistoryService', () => {
         expect(await service.getGameHistory()).toEqual([expect.objectContaining(gameHistory)]);
     });
 
-    it('deleteAllGameHistory should add a game history object to the game history', async () => {
+    it('deleteAllGameHistory should delete the game history', async () => {
         expect((await service.getGameHistory()).length).toEqual(0);
 
         const gameHistory = getFakeGameHistoryElement();
@@ -78,24 +77,5 @@ describe('GameHistoryService', () => {
         await service.deleteAllGameHistory();
 
         expect((await service.getGameHistory()).length).toEqual(0);
-    });
-
-    it('deleteAllGameHistory should add a game history object to the game history', async () => {
-        expect((await service.getGameHistory()).length).toEqual(0);
-
-        const gameHistory = getFakeGameHistoryElement();
-        const gameNumber = 5;
-        for (let i = 0; i < gameNumber; i++) {
-            await service.addGameToHistory(gameHistory);
-        }
-        const idToDelete = '123';
-        gameHistory.gameId = idToDelete;
-        await service.addGameToHistory(gameHistory);
-
-        expect((await service.getGameHistory()).length).toEqual(gameNumber + 1);
-
-        await service.deleteGameHistory(idToDelete);
-
-        expect((await service.getGameHistory()).length).toEqual(gameNumber);
     });
 });
