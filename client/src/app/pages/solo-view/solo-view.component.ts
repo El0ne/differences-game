@@ -261,18 +261,34 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     winGame(winnerId: string): void {
+        let dialogRef;
         if (!this.left.endGame) {
             this.timerService.stopTimer();
             this.left.endGame = true;
             this.right.endGame = true;
             this.showNavBar = false;
-            const dialogRef = this.dialog.open(GameWinModalComponent, {
-                disableClose: true,
-                data: { isMultiplayer: this.isMultiplayer, winner: this.socketService.names.get(winnerId), isWinner: this.isWinner } as EndGame,
-            });
-            dialogRef.afterClosed().subscribe(() => {
-                this.resetPropertiesForReplay();
-            });
+            if (this.isReplayMode === false) {
+                dialogRef = this.dialog.open(GameWinModalComponent, {
+                    disableClose: true,
+                    data: { isMultiplayer: this.isMultiplayer, winner: this.socketService.names.get(winnerId), isWinner: this.isWinner } as EndGame,
+                });
+                dialogRef.afterClosed().subscribe(() => {
+                    this.resetPropertiesForReplay();
+                });
+            } else {
+                // this.timerService.stopTimer();
+                dialogRef = this.dialog.open(ReplayGameModalComponent, {
+                    disableClose: true,
+                });
+                dialogRef.afterClosed().subscribe((result) => {
+                    if (result === 'replay') {
+                        this.resetPropertiesForReplay();
+                    } else if (result === 'continue') {
+                        clearTimeout(this.replayTimeoutId);
+                    }
+                });
+                // return;
+            }
         }
     }
 
@@ -434,20 +450,20 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.commandIndex++;
                 console.log(this.commandIndex);
                 console.log(this.invoker.commands.length);
-                if (this.commandIndex >= this.invoker.commands.length) {
-                    this.timerService.stopTimer();
-                    const dialogRef = this.dialog.open(ReplayGameModalComponent, {
-                        disableClose: true,
-                    });
-                    dialogRef.afterClosed().subscribe((result) => {
-                        if (result === 'replay') {
-                            this.resetPropertiesForReplay();
-                        } else if (result === 'continue') {
-                            clearTimeout(this.replayTimeoutId);
-                        }
-                    });
-                    return;
-                }
+                // if (this.commandIndex >= this.invoker.commands.length) {
+                //     this.timerService.stopTimer();
+                //     const dialogRef = this.dialog.open(ReplayGameModalComponent, {
+                //         disableClose: true,
+                //     });
+                //     dialogRef.afterClosed().subscribe((result) => {
+                //         if (result === 'replay') {
+                //             this.resetPropertiesForReplay();
+                //         } else if (result === 'continue') {
+                //             clearTimeout(this.replayTimeoutId);
+                //         }
+                //     });
+                //     return;
+                // }
                 this.replayGame();
             } else {
                 this.replayGame();
