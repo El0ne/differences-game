@@ -17,6 +17,7 @@ import { ReplayGameModalComponent } from '@app/modals/replay-game-modal/replay-g
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
+import { EndGameCommand } from '@app/services/replay-game/replay-events-handler';
 import { SocketService } from '@app/services/socket/socket.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { EndGame } from '@common/chat-dialog-constants';
@@ -269,6 +270,10 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 dialogRef.afterClosed().subscribe(() => {
                     this.resetPropertiesForReplay();
                 });
+                if (!this.isWinner) {
+                    const endGameCommand = new EndGameCommand(this);
+                    this.addCommand(endGameCommand);
+                }
             } else {
                 // this.timerService.stopTimer();
                 dialogRef = this.dialog.open(ReplayGameModalComponent, {

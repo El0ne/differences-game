@@ -119,6 +119,16 @@ export class ModalCloseCommand implements Command {
     }
 }
 
+export class EndGameCommand implements Command {
+    soloView: SoloViewComponent;
+    constructor(soloView: SoloViewComponent) {
+        this.soloView = soloView;
+    }
+    execute(): void {
+        this.soloView.winGame(this.soloView.socketService.socketId);
+    }
+}
+
 export class Invoker {
     commands = new Array();
 
