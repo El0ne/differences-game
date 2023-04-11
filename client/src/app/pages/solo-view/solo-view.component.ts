@@ -256,6 +256,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     openReplayModal(): void {
+        this.timerService.stopTimer();
         const dialogRef = this.dialog.open(ReplayGameModalComponent, {
             disableClose: true,
         });
