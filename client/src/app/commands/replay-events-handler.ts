@@ -3,25 +3,6 @@
 import { SoloViewComponent } from '@app/pages/solo-view/solo-view.component';
 import { Command } from './command';
 
-export class OpenInfoModalCommand implements Command {
-    soloView: SoloViewComponent;
-    // private button: HTMLButtonElement;
-    constructor(soloView: SoloViewComponent) {
-        this.soloView = soloView;
-    }
-
-    // constructor(button: HTMLButtonElement) {
-    //     this.button = button;
-    // }
-
-    execute(): void {
-        console.log(this.soloView);
-        this.soloView.openInfoModal();
-        // console.log('click button : ', this.button);
-        console.log('modal info opened \n');
-    }
-}
-
 export class ModalCloseCommand implements Command {
     // private modal: MatDialogRef<GameInfoModalComponent>;
     soloView: SoloViewComponent;
