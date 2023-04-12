@@ -311,7 +311,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             },
         });
 
-        console.log('in component: ', dialogRef);
         if (this.isReplayMode === false) {
             this.addCommand(new OpenInfoModalCommand(this));
             dialogRef.afterClosed().subscribe(() => {
@@ -337,7 +336,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     inputIsChanging(): void {
-        console.log(this.messageContent);
         setTimeout(() => {
             const writeMessageCommand = new WriteMessageCommand(this.inputChat.nativeElement, this.messageContent);
             this.addCommand(writeMessageCommand);
@@ -468,6 +466,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.right.endGame = false;
         this.replayGame();
     }
+
     addCommand(command: Command): void {
         if (!this.isReplayMode) this.invoker.addCommand(command, this.timerService.currentTime);
     }
