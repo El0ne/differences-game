@@ -2,12 +2,31 @@
     <div *ngIf="isReplayMode" class="overlay"></div>
     <div class="nav-bar">
         <div class="options" *ngIf="showNavBar">
-            <button id="infoButton" class="normal-button option-buttons" type="button" (click)="openInfoModal()">
+            <button
+                id="infoButton"
+                class="normal-button option-buttons"
+                type="button"
+                (click)="openInfoModal()"
+                [ngStyle]="{
+                    'background-color': isReplayMode ? '#696565' : '#ff124f',
+                    color: isReplayMode ? '#E0E0E0' : '#fff'
+                }"
+            >
                 <mat-icon class="icon">info</mat-icon>
             </button>
         </div>
         <div class="info-option" *ngIf="showNavBar">
-            <button id="quitGame" class="normal-button option-buttons" type="button" (click)="quitGame()">
+            <button
+                id="quitGame"
+                class="normal-button option-buttons"
+                type="button"
+                (click)="quitGame()"
+                [ngStyle]="{
+                    'background-color': isReplayMode ? '#696565' : '#ff124f',
+                    color: isReplayMode ? '#E0E0E0' : '#fff'
+                }"
+            >
+                >
                 <mat-icon class="icon">logout</mat-icon>
             </button>
         </div>
