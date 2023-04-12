@@ -139,7 +139,12 @@
             <mat-icon class="icon">logout</mat-icon>
         </button>
 
-        <button class="replay-button normal-button" type="button" [ngClass]="{ 'play-button': isReplayPaused }" (click)="pauseReplay()">
+        <button
+            class="replay-button normal-button"
+            type="button"
+            [ngClass]="{ 'play-button': isReplayPaused }"
+            (click)="isReplayPaused = pauseReplay()"
+        >
             <mat-icon *ngIf="isReplayPaused; else play" class="icon">play_arrow</mat-icon>
         </button>
         <ng-template #play>

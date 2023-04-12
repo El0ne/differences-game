@@ -19,6 +19,7 @@ import { ReplayGameModalComponent } from '@app/modals/replay-game-modal/replay-g
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
+import { ReplayButtonsService } from '@app/services/replay-buttons/replay-buttons.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { EndGame } from '@common/chat-dialog-constants';
@@ -68,7 +69,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     isReplayMode: boolean = false;
     isReplayPaused: boolean = false;
-    timeMultiplier: number = 1;
+    // timeMultiplier: number = 1;
     replayTimeoutId: ReturnType<typeof setTimeout>;
 
     invoker: Invoker;
@@ -79,7 +80,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     // eslint-disable-next-line max-params
     constructor(
-        public timerService: TimerSoloService,
+        private timerService: TimerSoloService,
         private gameCardInfoService: GameCardInformationService,
         private foundDifferenceService: FoundDifferenceService,
         private route: ActivatedRoute,
@@ -87,6 +88,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private router: Router,
         public socketService: SocketService,
         private gameConstantsService: GameConstantsService,
+        private replayButtonsService: ReplayButtonsService,
     ) {
         this.invoker = new Invoker();
     }
@@ -333,7 +335,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         if (this.isReplayMode) {
             this.timerService.stopTimer();
             dialogRef.afterClosed().subscribe(() => {
-                this.timerService.restartTimer(this.timeMultiplier);
+                this.timerService.restartTimer(this.replayButtonsService.timeMultiplier);
             });
         }
     }
@@ -422,21 +424,23 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             }
         }
     }
-
-    pauseReplay(): void {
-        this.isReplayPaused = !this.isReplayPaused;
-        if (this.isReplayPaused) {
-            console.log('pause');
-            this.timerService.stopTimer(this.socketService.socketId);
-        } else {
-            this.timerService.restartTimer(this.timeMultiplier, this.socketService.socketId);
-        }
+    pauseReplay(): boolean {
+        return this.replayButtonsService.pauseReplay(this.isReplayPaused);
+        // this.isReplayPaused = !this.isReplayPaused;
+        // if (this.isReplayPaused) {
+        //     console.log('pause');
+        //     this.timerService.stopTimer(this.socketService.socketId);
+        // } else {
+        //     this.timerService.restartTimer(this.timeMultiplier, this.socketService.socketId);
+        // }
     }
 
     fastForwardReplay(multiplier: number): void {
-        this.timeMultiplier = multiplier;
-        this.timerService.restartTimer(this.timeMultiplier, this.socketService.socketId);
+        // this.timeMultiplier = multiplier;
+        // this.timerService.restartTimer(this.timeMultiplier, this.socketService.socketId);
+        this.replayButtonsService.fastForwardReplay(multiplier);
     }
+
     replayGame(): void {
         this.replayTimeoutId = setTimeout(() => {
             const command = this.invoker.commands[this.commandIndex];
@@ -449,6 +453,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.replayGame();
             }
         }, 50);
+        console.log(this.replayTimeoutId);
     }
     resetCanvas(): void {
         this.left.ngOnInit();
