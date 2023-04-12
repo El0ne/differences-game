@@ -8,6 +8,8 @@ export enum MATCH_EVENTS {
     Replay = 'Replay',
     SoloGameInformation = 'SoloGameInformation',
     Time = 'Time',
+    leaveRoom = 'leaveRoom',
+    joinReplayRoom = 'joinReplayRoom',
 }
 
 export const ONE_SECOND = 1000;
