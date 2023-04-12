@@ -17,17 +17,9 @@
 
     <div class="flex-game">
         <div class="image-container neon-border">
-            <app-click-event
-                #left
-                [id]="1"
-                [original]="'original'"
-                [gameCardId]="this.stageId"
-                [imagePath]="this.imagesInfo.originalImageName"
-                (differenceDetected)="differenceHandler($event)"
-                (mistake)="handleMistake()"
-                (cheatModeHandler)="resetDifferences($event)"
-                *ngIf="this.gameCardInfo"
-            ></app-click-event>
+            <app-click-event #left [id]="1" [original]="'original'" [gameCardId]="this.stageId"
+                [imagePath]="this.imagesInfo.originalImageName" (differenceDetected)="differenceHandler($event)"
+                (mistake)="handleMistake()" (cheatModeHandler)="resetDifferences($event)"></app-click-event>
         </div>
         <div class="game-options">
             <div id="double-score">
@@ -72,14 +64,13 @@
             <div class="text-box neon-border">
                 <div class="text-area" #scroll [scrollTop]="scroll.scrollHeight">
                     <div class="text-container" *ngFor="let data of messages">
-                        <div
-                            *ngIf="data.event === 'message'"
-                            [ngClass]="data.socketId === socketService.socketId ? 'player1 message' : 'player2 message'"
-                        >
+                        <div *ngIf="data.event === 'message'"
+                            [ngClass]="data.socketId === socketService.socketId ? 'player1 message' : 'player2 message'">
                             {{ data.message }}
                         </div>
                         <div *ngIf="data.event === 'event'" class="error message">
-                            {{ data.message }} {{ isMultiplayer && data.socketId === socketService.socketId ? player : opponent }}
+                            {{ data.message }} {{ isMultiplayer && data.socketId === socketService.socketId ? player :
+                            opponent }}
                         </div>
                         <div *ngIf="data.event === 'notification'" class="error message">
                             {{ data.message }}
@@ -87,32 +78,18 @@
                     </div>
                 </div>
                 <div class="answer-area" *ngIf="isMultiplayer">
-                    <input
-                        type="text"
-                        (keydown.enter)="sendMessage()"
-                        class="input-field"
-                        placeholder="Entrez votre message"
-                        [(ngModel)]="messageContent"
-                        (click)="removeCheatMode()"
-                        (blur)="addCheatMode()"
-                    />
+                    <input type="text" (keydown.enter)="sendMessage()" class="input-field"
+                        placeholder="Entrez votre message" [(ngModel)]="messageContent" (click)="removeCheatMode()"
+                        (blur)="addCheatMode()" />
                     <button class="send-button" (click)="sendMessage()"><mat-icon>send</mat-icon></button>
                 </div>
             </div>
         </div>
 
         <div class="image-container neon-border">
-            <app-click-event
-                #right
-                [id]="2"
-                [original]="'different'"
-                [gameCardId]="this.stageId"
-                [imagePath]="this.imagesInfo.differenceImageName"
-                (differenceDetected)="differenceHandler($event)"
-                (mistake)="handleMistake()"
-                (cheatModeHandler)="resetDifferences($event)"
-                *ngIf="this.gameCardInfo"
-            ></app-click-event>
+            <app-click-event #right [id]="2" [original]="'different'" [gameCardId]="this.stageId"
+                [imagePath]="this.imagesInfo.differenceImageName" (differenceDetected)="differenceHandler($event)"
+                (mistake)="handleMistake()" (cheatModeHandler)="resetDifferences($event)"></app-click-event>
         </div>
         <div class="hint-button">
             <button class="hint" type="button">
