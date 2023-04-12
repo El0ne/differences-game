@@ -19,6 +19,15 @@ export class TimerSoloService {
         });
     }
 
+    limitedTimeTimer(): void {
+        this.socket.listen<number>(MATCH_EVENTS.LimitedTimeTimer, (timerValue: number) => {
+            if (timerValue === 0) {
+                this.stopTimer();
+            }
+            this.currentTime = timerValue;
+        });
+    }
+
     stopTimer(): void {
         this.socket.send(MATCH_EVENTS.EndTime, this.socket.gameRoom);
     }

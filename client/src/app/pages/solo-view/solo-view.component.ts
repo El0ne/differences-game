@@ -21,8 +21,9 @@ import { GameCardInformation, StageInformation } from '@common/game-card';
 import { GameConstants } from '@common/game-constants';
 import { GameHistoryDTO } from '@common/game-history.dto';
 import { ImageObject } from '@common/image-object';
-import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
+import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, TWO_MINUTES } from '@common/match-gateway-communication';
 import { PlayerGameInfo } from '@common/player-game-info';
+import { TimerInformation } from '@common/timer-information';
 import { Subject } from 'rxjs';
 @Component({
     selector: 'app-solo-view',
@@ -92,6 +93,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.socketService.listen<StageInformation>(LIMITED_TIME_MODE_EVENTS.NewStageInformation, (newStageInfo: StageInformation) => {
                     Object.assign(this.gameCardInfo, newStageInfo);
                 });
+                this.socketService.send<TimerInformation>(LIMITED_TIME_MODE_EVENTS.StartTimer, {
+                    time: TWO_MINUTES,
+                    room: this.socketService.gameRoom,
+                });
+                this.timerService.limitedTimeTimer();
+                // TODO: ADD game card info for time added per difference found from game constants.
             } else {
                 this.gameCardInfoService.getGameCardInfoFromId(this.stageId).subscribe((gameCardData) => {
                     this.gameCardInfo = gameCardData;
@@ -113,14 +120,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                             },
                         };
                         this.socketService.send<GameHistoryDTO>(MATCH_EVENTS.SoloGameInformation, gameHistory);
-                        this.soloTimer = setInterval(() => {
-                            this.socketService.send<number>(MATCH_EVENTS.Time, this.timerService.currentTime);
-                        }, ONE_SECOND);
+                        this.showTime();
                     }
                 });
             }
         }
-        this.showTime();
         this.addCheatMode();
         this.configureSocketReactions();
     }
@@ -193,15 +197,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             });
         }
     }
-
     showTime(): void {
         this.timerService.startTimer();
     }
-
     timesConversion(): string {
         return this.timerService.convert(this.timerService.currentTime);
     }
-
     notifyNewBestTime(winnerId: string, isAbandon: boolean, mode: string): void {
         const winnerName: string = this.socketService.names.get(winnerId) as string;
         const player1: PlayerGameInfo = {
@@ -322,17 +323,28 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             event: 'Différence trouvée',
         });
     }
-
     effectHandler(information: PlayerDifference): void {
         if (!this.left.toggleCheatMode) {
             this.handleFlash(information.lastDifferences);
+        }
+        if (this.isLimitedTimeMode) {
+            if (this.timerService.currentTime + this.gameConstants.difference <= TWO_MINUTES) {
+                this.socketService.send<TimerInformation>(LIMITED_TIME_MODE_EVENTS.StartTimer, {
+                    time: this.timerService.currentTime + this.gameConstants.difference,
+                    room: this.socketService.gameRoom,
+                });
+            } else {
+                this.socketService.send<TimerInformation>(LIMITED_TIME_MODE_EVENTS.StartTimer, {
+                    time: TWO_MINUTES,
+                    room: this.socketService.gameRoom,
+                });
+            }
         }
         this.paintPixel(information.lastDifferences);
         this.incrementScore(information.socket);
         this.addDifferenceDetected(information.differencesPosition);
         this.endGameVerification();
     }
-
     endGameVerification(): void {
         if (this.isMultiplayer) {
             const endGameVerification = this.numberOfDifferences / 2;
