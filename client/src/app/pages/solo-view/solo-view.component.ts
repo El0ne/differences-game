@@ -2,12 +2,12 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CloseInfoModalCommand } from '@app/commands/close-info-modal-command/close-info-modal-command';
+import { CloseInfoModalCommand } from '@app/commands/close-info-modal/close-info-modal-command';
 import { Command, Invoker } from '@app/commands/command';
-import { EndGameCommand } from '@app/commands/end-game-command/endgame-command';
+import { EndGameCommand } from '@app/commands/end-game/end-game-command';
 import { KeyPressCommand } from '@app/commands/key-press/key-press-command';
 import { OpenInfoModalCommand } from '@app/commands/open-info-modal-command/open-info-modal-command';
-import { OpponentDifference } from '@app/commands/opponent-difference/opponent-difference';
+import { OpponentDifferenceCommand } from '@app/commands/opponent-difference/opponent-difference-command';
 import { SendMessageCommand } from '@app/commands/send-message/send-message-command';
 import { WriteMessageCommand } from '@app/commands/write-message/write-message';
 import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
@@ -145,6 +145,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             }
         });
         this.socketService.listen<RoomMessage>(CHAT_EVENTS.RoomMessage, (data: RoomMessage) => {
+            console.log('here');
             this.messages.push(data);
             this.addCommand(new SendMessageCommand(this, data));
         });
@@ -158,7 +159,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             }
         });
         this.socketService.listen<PlayerDifference>(MATCH_EVENTS.Difference, (data: PlayerDifference) => {
-            this.addCommand(new OpponentDifference(this, data));
+            this.addCommand(new OpponentDifferenceCommand(this, data));
+            console.log('here');
             this.effectHandler(data);
         });
         this.socketService.listen<string>(MATCH_EVENTS.Win, (socketId: string) => {
@@ -349,7 +351,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     handleMistake(): void {
-        this.socketService.send<RoomEvent>(CHAT_EVENTS.Event, { room: this.currentRoom, isMultiplayer: this.isMultiplayer, event: 'Erreur' });
+        if (!this.isReplayMode) {
+            this.socketService.send<RoomEvent>(CHAT_EVENTS.Event, { room: this.currentRoom, isMultiplayer: this.isMultiplayer, event: 'Erreur' });
+        }
     }
 
     hint(): void {
@@ -375,14 +379,17 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 lastDifferences: information.lastDifferences,
                 socket: this.socketService.socketId,
             };
+
             this.effectHandler(difference);
         }
         this.left.emitSound(false);
-        this.socketService.send<RoomEvent>(CHAT_EVENTS.Event, {
-            room: this.currentRoom,
-            isMultiplayer: this.isMultiplayer,
-            event: 'Différence trouvée',
-        });
+        if (!this.isReplayMode) {
+            this.socketService.send<RoomEvent>(CHAT_EVENTS.Event, {
+                room: this.currentRoom,
+                isMultiplayer: this.isMultiplayer,
+                event: 'Différence trouvée',
+            });
+        }
     }
 
     effectHandler(information: PlayerDifference): void {
