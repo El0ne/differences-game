@@ -149,10 +149,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.socketService.send<RoomManagement>(CHAT_EVENTS.RoomMessage, { room: this.currentRoom, message: validation.originalMessage });
             } else {
                 this.messages.push({ socketId: this.socketService.socketId, message: validation.originalMessage, event: 'notification' });
+                // this.addCommand(new SendMessageCommand(this, data));
             }
         });
         this.socketService.listen<RoomMessage>(CHAT_EVENTS.RoomMessage, (data: RoomMessage) => {
             this.messages.push(data);
+            this.addCommand(new SendMessageCommand(this, data));
         });
         this.socketService.listen<RoomMessage>(CHAT_EVENTS.Abandon, (message: RoomMessage) => {
             if (!this.left.endGame) {
@@ -160,11 +162,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.notifyNewBestTime(this.socketService.socketId, true, 'classique');
                 message.message = `${message.message} - ${this.opponent} a abandonné la partie.`;
                 this.messages.push(message);
+                this.addCommand(new SendMessageCommand(this, message));
             }
         });
         this.socketService.listen<PlayerDifference>(MATCH_EVENTS.Difference, (data: PlayerDifference) => {
             this.addCommand(new OpponentDifference(this, data));
-
             this.effectHandler(data);
         });
         this.socketService.listen<string>(MATCH_EVENTS.Win, (socketId: string) => {
@@ -365,7 +367,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     sendMessage(): void {
         this.socketService.send<string>(CHAT_EVENTS.Validate, this.messageContent);
-        this.addCommand(new SendMessageCommand(this));
         this.messageContent = '';
     }
 
