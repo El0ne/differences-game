@@ -18,7 +18,5 @@ export class ClickCommand implements Command {
             clientY: this.y,
         });
         this.clickEvent.isDifferent(event);
-
-        console.log('click : ', 'x :', this.x, 'y :', this.y, '\n');
     }
 }

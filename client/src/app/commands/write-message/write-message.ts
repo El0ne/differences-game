@@ -12,7 +12,5 @@ export class WriteMessageCommand implements Command {
     execute(): void {
         this.input.value = this.currentMessage;
         this.input.dispatchEvent(new Event('input'));
-        console.log('write message : ', this.currentMessage);
-        console.log(' \n');
     }
 }

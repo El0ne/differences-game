@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CloseInfoModalCommand } from '@app/commands/close-info-modal-command/close-info-modal-command';
 import { Command, Invoker } from '@app/commands/command';
+import { EndGameCommand } from '@app/commands/end-game-command/endgame-command';
 import { KeyPressCommand } from '@app/commands/key-press/key-press-command';
 import { OpenInfoModalCommand } from '@app/commands/open-info-modal-command/open-info-modal-command';
 import { OpponentDifference } from '@app/commands/opponent-difference/opponent-difference';
@@ -18,7 +19,6 @@ import { ReplayGameModalComponent } from '@app/modals/replay-game-modal/replay-g
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
-import { EndGameCommand } from '@app/services/replay-game/replay-events-handler';
 import { SocketService } from '@app/services/socket/socket.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { EndGame } from '@common/chat-dialog-constants';
@@ -77,7 +77,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     gameConstants: GameConstants;
 
     isCanvasEnabled: boolean = true;
-    // form: HTMLFormElement | null = document.querySelector('form');
 
     // eslint-disable-next-line max-params
     constructor(
@@ -87,9 +86,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private dialog: MatDialog,
         private router: Router,
-        // private elementRef: ElementRef,
         public socketService: SocketService,
-        private gameConstantsService: GameConstantsService, // private renderer: Renderer2, // private elementRef: ElementRef,
+        private gameConstantsService: GameConstantsService,
     ) {
         this.invoker = new Invoker();
     }
@@ -116,8 +114,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.gameCardInfo = gameCardData;
                 this.numberOfDifferences = this.gameCardInfo.differenceNumber;
                 if (!this.isMultiplayer) {
-                    // TODO change object implementation
-                    // abandon solo
                     const gameHistory: GameHistoryDTO = {
                         gameId: this.currentGameId,
                         gameName: this.gameCardInfo.name,
@@ -183,11 +179,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.socketService.disconnect();
         this.removeCheatMode();
     }
-
-    // resetHTML() {
-    //     const div = this.elementRef.nativeElement.querySelector('#myDiv');
-    //     this.renderer.setProperty(div, 'innerHTML', '');
-    // }
 
     invertDifferences(): void {
         this.left.toggleCheatMode = !this.left.toggleCheatMode;
@@ -294,9 +285,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                     this.addCommand(endGameCommand);
                 }
             } else {
-                // this.timerService.stopTimer();
                 this.openReplayModal();
-                // return;
             }
         }
     }
@@ -314,7 +303,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     openInfoModal(): void {
-        // const infoButton = this.elementRef.nativeElement.querySelector('#infoButton');
         const dialogRef = this.dialog.open(GameInfoModalComponent, {
             data: {
                 gameCardInfo: this.gameCardInfo,
@@ -336,15 +324,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.dialog.closeAll();
     }
 
-    // returnHome(): void {
-    //     const homeButton = this.elementRef.nativeElement.querySelector('#homeButton');
-    //     this.buttonPressCommand = new ButtonPressCommand(homeButton);
-    //     this.invoker.addCommand(this.buttonPressCommand, this.timerService.currentTime);
-    // }
-
     quitGame(): void {
-        // const quitButton = this.elementRef.nativeElement.querySelector('#quitGame');
-        // this.buttonPressCommand = new ButtonPressCommand(quitButton);
         const dialogRef = this.dialog.open(QuitGameModalComponent, {
             disableClose: true,
         });
@@ -354,7 +334,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.timerService.restartTimer(this.timeMultiplier);
             });
         }
-        // this.invoker.addCommand(this.buttonPressCommand, this.timerService.currentTime);
     }
 
     inputIsChanging(): void {
@@ -445,7 +424,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     pauseReplay(): void {
         this.isReplayPaused = !this.isReplayPaused;
         if (this.isReplayPaused) {
-            console.log('pause');
             this.timerService.stopTimer();
         } else {
             this.timerService.restartTimer(this.timeMultiplier);
@@ -462,22 +440,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             if (command.time === this.timerService.currentTime) {
                 command.action.execute();
                 this.commandIndex++;
-                console.log(this.commandIndex);
-                console.log(this.invoker.commands.length);
-                // if (this.commandIndex >= this.invoker.commands.length) {
-                //     this.timerService.stopTimer();
-                //     const dialogRef = this.dialog.open(ReplayGameModalComponent, {
-                //         disableClose: true,
-                //     });
-                //     dialogRef.afterClosed().subscribe((result) => {
-                //         if (result === 'replay') {
-                //             this.resetPropertiesForReplay();
-                //         } else if (result === 'continue') {
-                //             clearTimeout(this.replayTimeoutId);
-                //         }
-                //     });
-                //     return;
-                // }
+
                 this.replayGame();
             } else {
                 this.replayGame();
@@ -485,12 +448,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         }, 50);
     }
     resetCanvas(): void {
-        console.log('first');
-        // this.isCanvasEnabled = false;
-        // // this.changeDetector.detectChanges();
-        // setTimeout(() => {
-        //     this.isCanvasEnabled = true;
-        // }, 30);
         this.left.ngOnInit();
         this.right.ngOnInit();
     }
@@ -509,9 +466,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.showNavBar = true;
         this.left.endGame = false;
         this.right.endGame = false;
-        // this.addCheatMode();
-        // this.resetHTML(); NOT IN FIRST RESET
-        // this.form?.reset(); NOT IN FIRST RESET
         this.replayGame();
     }
     addCommand(command: Command): void {

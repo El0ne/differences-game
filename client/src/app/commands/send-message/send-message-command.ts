@@ -13,7 +13,6 @@ export class SendMessageCommand implements Command {
 
     execute(): void {
         this.soloView.messages.push(this.message);
-        console.log('send message');
-        console.log(' \n');
+        this.soloView.messageContent = '';
     }
 }

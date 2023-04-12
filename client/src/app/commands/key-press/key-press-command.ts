@@ -11,12 +11,8 @@ export class KeyPressCommand implements Command {
     }
 
     execute(): void {
-        // window.dispatchEvent(new KeyboardEvent('keydown', { key: this.key }));
         if (this.event.key === 't') {
-            // this.soloView.addCheatMode();
             this.soloView.activateCheatMode(this.event);
         }
-        console.log('key press : ', this.event.key);
-        console.log(' \n');
     }
 }
