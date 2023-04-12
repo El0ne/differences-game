@@ -13,6 +13,7 @@ export enum LIMITED_TIME_MODE_EVENTS {
     GetFirstStageInformation = 'getFirstStageInformation',
     NewStageInformation = 'newStageInformation',
     StartLimitedTimeGame = 'startLimitedTimeGame',
+    NextStage = 'nextStage',
 }
 
 export const ONE_SECOND = 1000;

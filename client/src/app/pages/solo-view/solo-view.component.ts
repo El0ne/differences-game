@@ -321,6 +321,10 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             isMultiplayer: this.isMultiplayer,
             event: 'Différence trouvée',
         });
+
+        if (this.isLimitedTimeMode) {
+            this.socketService.send<void>(LIMITED_TIME_MODE_EVENTS.NextStage);
+        }
     }
 
     effectHandler(information: PlayerDifference): void {
