@@ -89,14 +89,11 @@
             <div class="text-box neon-border">
                 <div class="text-area" #scroll [scrollTop]="scroll.scrollHeight">
                     <div class="text-container" *ngFor="let data of messages">
-                        <div
-                            *ngIf="data.event === 'message'"
-                            [ngClass]="data.socketId === socketService.socketId ? 'player1 message' : 'player2 message'"
-                        >
+                        <div *ngIf="data.event === 'message'" [ngClass]="data.socketId === getSocketId() ? 'player1 message' : 'player2 message'">
                             {{ data.message }}
                         </div>
                         <div *ngIf="data.event === 'event'" class="error message">
-                            {{ data.message }} {{ isMultiplayer && data.socketId === socketService.socketId ? player : opponent }}
+                            {{ data.message }} {{ isMultiplayer && data.socketId === getSocketId() ? player : opponent }}
                         </div>
                         <div *ngIf="data.event === 'notification'" class="error message">
                             {{ data.message }}
@@ -139,7 +136,12 @@
             <mat-icon class="icon">logout</mat-icon>
         </button>
 
-        <button class="replay-button normal-button" type="button" [ngClass]="{ 'play-button': isReplayPaused }" (click)="pauseReplay()">
+        <button
+            class="replay-button normal-button"
+            type="button"
+            [ngClass]="{ 'play-button': isReplayPaused }"
+            (click)="isReplayPaused = pauseReplay()"
+        >
             <mat-icon *ngIf="isReplayPaused; else play" class="icon">play_arrow</mat-icon>
         </button>
         <ng-template #play>
