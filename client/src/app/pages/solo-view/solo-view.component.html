@@ -95,10 +95,10 @@
                         >
                             {{ data.message }}
                         </div>
-                        <div *ngIf="data.event === 'notification'" class="error message">
+                        <div *ngIf="data.event === 'event'" class="error message">
                             {{ data.message }} {{ isMultiplayer && data.socketId === socketService.socketId ? player : opponent }}
                         </div>
-                        <div *ngIf="data.event === 'abandon'" class="error message">
+                        <div *ngIf="data.event === 'notification'" class="error message">
                             {{ data.message }}
                         </div>
                     </div>

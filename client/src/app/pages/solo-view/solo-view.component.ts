@@ -28,7 +28,7 @@ import { DifferenceInformation, MultiplayerDifferenceInformation, PlayerDifferen
 import { GameCardInformation } from '@common/game-card';
 import { GameConstants } from '@common/game-constants';
 import { GameHistoryDTO } from '@common/game-history.dto';
-import { MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
+import { MATCH_EVENTS } from '@common/match-gateway-communication';
 import { PlayerGameInfo } from '@common/player-game-info';
 import { Subject } from 'rxjs';
 
@@ -61,8 +61,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     gameCardInfo: GameCardInformation;
     currentRoom: string;
     startTime: string;
-    soloTimer: ReturnType<typeof setInterval>;
-    isClassique: boolean;
+    isClassic: boolean;
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
     inputElement = document.querySelector('input');
     isWinner: boolean = false;
@@ -103,7 +102,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.startTime = new Date().toLocaleString('fr-FR');
         const gameId = this.route.snapshot.paramMap.get('stageId');
         this.isMultiplayer = this.router.url.includes('multiplayer');
-        this.isClassique = !this.router.url.includes('limited');
+        this.isClassic = !this.router.url.includes('limited');
         this.gameConstantsService.getGameConstants().subscribe((gameConstants: GameConstants) => {
             this.gameConstants = gameConstants;
         });
@@ -128,9 +127,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                         },
                     };
                     this.socketService.send<GameHistoryDTO>(MATCH_EVENTS.SoloGameInformation, gameHistory);
-                    this.soloTimer = setInterval(() => {
-                        this.socketService.send<number>(MATCH_EVENTS.Time, this.timerService.currentTime);
-                    }, ONE_SECOND);
                 }
             });
         }
@@ -171,9 +167,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        if (!this.isMultiplayer) {
-            clearInterval(this.soloTimer);
-        }
         this.timerService.currentTime = 0;
         this.foundDifferenceService.clearDifferenceFound();
         this.socketService.disconnect();

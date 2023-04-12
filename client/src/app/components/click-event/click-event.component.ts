@@ -70,7 +70,7 @@ export class ClickEventComponent implements OnInit {
     }
 
     isDifferent(mouseEvent: MouseEvent): void {
-        const clickCommand = new ClickCommand(this, mouseEvent.clientX, mouseEvent.clientY);
+        const clickCommand = new ClickCommand(this, this.getCoordInImage(mouseEvent)[0], this.getCoordInImage(mouseEvent)[1]);
         this.command.emit(clickCommand);
 
         this.clickEventService
