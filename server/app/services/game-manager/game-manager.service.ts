@@ -82,7 +82,7 @@ export class GameManagerService {
             this.limitedTimeModeGames.set(room, {
                 gameStages: allStagesId,
                 playersInGame: numberOfPlayers,
-                stagesUsed: allStagesId,
+                stagesUsed: allStagesId.map((stageId) => stageId),
             });
         }
         return isGameCardsPopulated;
