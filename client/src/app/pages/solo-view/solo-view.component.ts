@@ -416,7 +416,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         }
         this.paintPixel(information.lastDifferences);
         this.incrementScore(information.socket);
-        this.addDifferenceDetected(information.differencesPosition);
+        if (!this.isReplayMode) this.addDifferenceDetected(information.differencesPosition);
         this.endGameVerification();
     }
 
