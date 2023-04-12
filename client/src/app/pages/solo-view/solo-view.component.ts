@@ -257,7 +257,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             };
             gameHistory.player2 = player2;
         }
-        this.socketService.send<GameHistoryDTO>(CHAT_EVENTS.BestTime, gameHistory);
+        if (!this.isReplayMode) this.socketService.send<GameHistoryDTO>(CHAT_EVENTS.BestTime, gameHistory);
     }
 
     openReplayModal(): void {
