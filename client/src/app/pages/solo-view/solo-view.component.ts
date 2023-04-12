@@ -376,7 +376,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     handleMistake(): void {
-        this.socketService.send<RoomEvent>(CHAT_EVENTS.Event, { room: this.currentRoom, isMultiplayer: this.isMultiplayer, event: 'Erreur' });
+        if (!this.isReplayMode) {
+            this.socketService.send<RoomEvent>(CHAT_EVENTS.Event, { room: this.currentRoom, isMultiplayer: this.isMultiplayer, event: 'Erreur' });
+        }
     }
 
     hint(): void {
@@ -405,11 +407,13 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.effectHandler(difference);
         }
         this.left.emitSound(false);
-        this.socketService.send<RoomEvent>(CHAT_EVENTS.Event, {
-            room: this.currentRoom,
-            isMultiplayer: this.isMultiplayer,
-            event: 'Différence trouvée',
-        });
+        if (!this.isReplayMode) {
+            this.socketService.send<RoomEvent>(CHAT_EVENTS.Event, {
+                room: this.currentRoom,
+                isMultiplayer: this.isMultiplayer,
+                event: 'Différence trouvée',
+            });
+        }
     }
 
     effectHandler(information: PlayerDifference): void {
