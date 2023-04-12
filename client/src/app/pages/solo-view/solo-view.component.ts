@@ -252,13 +252,13 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     openReplayModal(): void {
-        this.timerService.stopTimer();
+        this.timerService.stopTimer(this.socketService.socketId);
         const dialogRef = this.dialog.open(ReplayGameModalComponent, {
             disableClose: true,
         });
         dialogRef.afterClosed().subscribe((result) => {
             if (result === 'replay') {
-                this.resetPropertiesForReplay();
+                this.resetPropertiesForReplay(this.socketService.socketId);
             } else if (result === 'continue') {
                 clearTimeout(this.replayTimeoutId);
             }
@@ -278,9 +278,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                     data: { isMultiplayer: this.isMultiplayer, winner: this.socketService.names.get(winnerId), isWinner: this.isWinner } as EndGame,
                 });
                 dialogRef.afterClosed().subscribe(() => {
-                    this.resetPropertiesForReplay();
+                    this.socketService.send<string>(MATCH_EVENTS.leaveRoom, this.socketService.gameRoom);
+                    this.socketService.send<string>(MATCH_EVENTS.joinReplayRoom, this.socketService.socketId);
+                    this.resetPropertiesForReplay(this.socketService.socketId);
                 });
-                if (this.isMultiplayer && !this.isWinner) {
+                if (this.isMultiplayer) {
                     const endGameCommand = new EndGameCommand(this);
                     this.addCommand(endGameCommand);
                 }
@@ -353,9 +355,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     handleMistake(): void {
-        if (!this.isReplayMode) {
-            this.socketService.send<RoomEvent>(CHAT_EVENTS.Event, { room: this.currentRoom, isMultiplayer: this.isMultiplayer, event: 'Erreur' });
-        }
+        this.socketService.send<RoomEvent>(CHAT_EVENTS.Event, { room: this.currentRoom, isMultiplayer: this.isMultiplayer, event: 'Erreur' });
     }
 
     hint(): void {
@@ -384,13 +384,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.effectHandler(difference);
         }
         this.left.emitSound(false);
-        if (!this.isReplayMode) {
-            this.socketService.send<RoomEvent>(CHAT_EVENTS.Event, {
-                room: this.currentRoom,
-                isMultiplayer: this.isMultiplayer,
-                event: 'Différence trouvée',
-            });
-        }
+        this.socketService.send<RoomEvent>(CHAT_EVENTS.Event, {
+            room: this.currentRoom,
+            isMultiplayer: this.isMultiplayer,
+            event: 'Différence trouvée',
+        });
     }
 
     effectHandler(information: PlayerDifference): void {
@@ -422,15 +420,16 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     pauseReplay(): void {
         this.isReplayPaused = !this.isReplayPaused;
         if (this.isReplayPaused) {
-            this.timerService.stopTimer();
+            console.log('pause');
+            this.timerService.stopTimer(this.socketService.socketId);
         } else {
-            this.timerService.restartTimer(this.timeMultiplier);
+            this.timerService.restartTimer(this.timeMultiplier, this.socketService.socketId);
         }
     }
 
     fastForwardReplay(multiplier: number): void {
         this.timeMultiplier = multiplier;
-        this.timerService.restartTimer(this.timeMultiplier);
+        this.timerService.restartTimer(this.timeMultiplier, this.socketService.socketId);
     }
     replayGame(): void {
         this.replayTimeoutId = setTimeout(() => {
@@ -450,7 +449,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.right.ngOnInit();
     }
 
-    resetPropertiesForReplay(): void {
+    resetPropertiesForReplay(room: string): void {
         this.resetCanvas();
 
         this.isReplayMode = true;
@@ -458,7 +457,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.messages = [];
         this.currentScorePlayer = 0;
         this.currentScoreOpponent = 0;
-        this.timerService.restartTimer(1);
+        this.timerService.restartTimer(1, room);
         this.commandIndex = 0;
         this.foundDifferenceService.clearDifferenceFound();
         this.showNavBar = true;

@@ -20,13 +20,13 @@ export class TimerSoloService {
         });
     }
 
-    stopTimer(): void {
-        this.socket.send(MATCH_EVENTS.EndTime, this.socket.gameRoom);
+    stopTimer(gameRoom: string = this.socket.gameRoom): void {
+        this.socket.send(MATCH_EVENTS.EndTime, gameRoom);
     }
 
-    restartTimer(multiplier: number): void {
+    restartTimer(multiplier: number, gameRoom: string = this.socket.gameRoom): void {
         const restartTimerInformations: ReplayTimerInformations = {
-            room: this.socket.gameRoom,
+            room: gameRoom,
             currentTime: this.currentTime,
             timeMultiplier: multiplier,
         };

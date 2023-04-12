@@ -21,6 +21,16 @@ export class MatchGateway implements OnGatewayDisconnect {
         this.gameManagerService.addGame(stageId, 1);
     }
 
+    @SubscribeMessage(MATCH_EVENTS.leaveRoom)
+    leaveRoom(@ConnectedSocket() socket: Socket, @MessageBody() room: string): void {
+        socket.leave(room);
+    }
+
+    @SubscribeMessage(MATCH_EVENTS.joinReplayRoom)
+    joinReplayRoom(@ConnectedSocket() socket: Socket, @MessageBody() room: string): void {
+        socket.join(room);
+    }
+
     @SubscribeMessage(MATCH_EVENTS.EndTime)
     stopTimer(socket: Socket, room: string): void {
         clearInterval(this.timers.get(room));
