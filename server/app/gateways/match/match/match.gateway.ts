@@ -49,6 +49,11 @@ export class MatchGateway implements OnGatewayDisconnect {
             };
             this.server.to(data.room).emit(MATCH_EVENTS.Difference, differenceInformation);
         }
+        if (this.gameManagerService.limitedTimeModeGames.has(socket.data.room)) {
+            this.server
+                .to(socket.data.room)
+                .emit(LIMITED_TIME_MODE_EVENTS.NewStageInformation, this.gameManagerService.giveNextStage(socket.data.room));
+        }
     }
 
     @SubscribeMessage(MATCH_EVENTS.SoloGameInformation)

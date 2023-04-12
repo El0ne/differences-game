@@ -17,7 +17,7 @@ import { EndGame } from '@common/chat-dialog-constants';
 import { RoomMessage, Validation } from '@common/chat-gateway-constants';
 import { CHAT_EVENTS, RoomEvent, RoomManagement } from '@common/chat-gateway-events';
 import { DifferenceInformation, MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
-import { GameCardInformation, StageInformation } from '@common/game-card';
+import { GameCardInformation } from '@common/game-card';
 import { GameConstants } from '@common/game-constants';
 import { GameHistoryDTO } from '@common/game-history.dto';
 import { ImageObject } from '@common/image-object';
@@ -89,8 +89,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.imagesInfo = imageObject;
             });
             if (this.isLimitedTimeMode) {
-                this.socketService.listen<StageInformation>(LIMITED_TIME_MODE_EVENTS.NewStageInformation, (newStageInfo: StageInformation) => {
-                    Object.assign(this.gameCardInfo, newStageInfo);
+                this.socketService.listen<string>(LIMITED_TIME_MODE_EVENTS.NewStageInformation, (newStageId: string) => {
+                    this.gameParamService.gameParameters.stageId = newStageId;
                 });
             } else {
                 this.gameCardInfoService.getGameCardInfoFromId(this.stageId).subscribe((gameCardData) => {
