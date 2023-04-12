@@ -75,23 +75,24 @@ export class ClickEventComponent implements OnInit {
             .subscribe((data) => {
                 const clickCommand = new ClickCommand(this, data, mouseEvent);
                 this.command.emit(clickCommand);
-                this.differenceData = data;
-                if (
-                    this.differenceData.isADifference &&
-                    !this.foundDifferenceService.foundDifferences.includes(this.differenceData.differencesPosition)
-                ) {
-                    this.differenceDetected.emit({
-                        differencesPosition: this.differenceData.differencesPosition,
-                        lastDifferences: this.differenceData.differenceArray,
-                    });
-                    if (this.toggleCheatMode) {
-                        const keyEvent: KeyboardEvent = new KeyboardEvent('keydown', { key: 't' });
-                        this.cheatModeHandler.emit(keyEvent);
-                    }
-                } else {
-                    this.displayError(mouseEvent);
-                }
+                this.emitToSoloView(data, mouseEvent);
             });
+    }
+
+    emitToSoloView(data: ClickDifferenceVerification, mouseEvent: MouseEvent): void {
+        this.differenceData = data;
+        if (this.differenceData.isADifference && !this.foundDifferenceService.foundDifferences.includes(this.differenceData.differencesPosition)) {
+            this.differenceDetected.emit({
+                differencesPosition: this.differenceData.differencesPosition,
+                lastDifferences: this.differenceData.differenceArray,
+            });
+            if (this.toggleCheatMode) {
+                const keyEvent: KeyboardEvent = new KeyboardEvent('keydown', { key: 't' });
+                this.cheatModeHandler.emit(keyEvent);
+            }
+        } else {
+            this.displayError(mouseEvent);
+        }
     }
 
     async clearEffect(): Promise<void> {
