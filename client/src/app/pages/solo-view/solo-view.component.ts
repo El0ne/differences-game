@@ -30,10 +30,8 @@ import { Subject } from 'rxjs';
     styleUrls: ['./solo-view.component.scss'],
 })
 export class SoloViewComponent implements OnInit, OnDestroy {
-    @ViewChild('left')
-    left: ClickEventComponent;
-    @ViewChild('right')
-    right: ClickEventComponent;
+    @ViewChild('left') left: ClickEventComponent;
+    @ViewChild('right') right: ClickEventComponent;
     showErrorMessage: boolean = false;
     showTextBox: boolean = false;
     showNavBar: boolean = true;
@@ -89,45 +87,48 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.gameConstants = gameConstants;
         });
 
-        if (this.stageId) {
-            this.imagesService.getImageNames(this.stageId).subscribe((imageObject) => {
-                this.imagesInfo = imageObject;
+        this.getImagesNames();
+        if (this.isLimitedTimeMode) {
+            this.socketService.listen<string>(LIMITED_TIME_MODE_EVENTS.NewStageInformation, (newStageId: string) => {
+                this.gameParamService.gameParameters.stageId = newStageId;
+                this.getImagesNames();
             });
-            if (this.isLimitedTimeMode) {
-                this.socketService.listen<string>(LIMITED_TIME_MODE_EVENTS.NewStageInformation, (newStageId: string) => {
-                    this.gameParamService.gameParameters.stageId = newStageId;
-                });
-            } else {
-                this.gameCardInfoService.getGameCardInfoFromId(this.stageId).subscribe((gameCardData) => {
-                    this.gameCardInfo = gameCardData;
-                    this.numberOfDifferences = this.gameCardInfo.differenceNumber;
-                    if (!this.isMultiplayer) {
-                        // TODO change object implementation
-                        // abandon solo
-                        const gameHistory: GameHistoryDTO = {
-                            gameId: this.stageId,
-                            gameName: this.gameCardInfo.name,
-                            gameMode: 'classique',
-                            gameDuration: 0,
-                            startTime: this.startTime,
-                            isMultiplayer: this.isMultiplayer,
-                            player1: {
-                                name: this.player,
-                                hasAbandon: true,
-                                hasWon: false,
-                            },
-                        };
-                        this.socketService.send<GameHistoryDTO>(MATCH_EVENTS.SoloGameInformation, gameHistory);
-                        this.soloTimer = setInterval(() => {
-                            this.socketService.send<number>(MATCH_EVENTS.Time, this.timerService.currentTime);
-                        }, ONE_SECOND);
-                    }
-                });
-            }
+        } else {
+            this.gameCardInfoService.getGameCardInfoFromId(this.stageId).subscribe((gameCardData) => {
+                this.gameCardInfo = gameCardData;
+                this.numberOfDifferences = this.gameCardInfo.differenceNumber;
+                if (!this.isMultiplayer) {
+                    // TODO change object implementation
+                    // abandon solo
+                    const gameHistory: GameHistoryDTO = {
+                        gameId: this.stageId,
+                        gameName: this.gameCardInfo.name,
+                        gameMode: 'classique',
+                        gameDuration: 0,
+                        startTime: this.startTime,
+                        isMultiplayer: this.isMultiplayer,
+                        player1: {
+                            name: this.player,
+                            hasAbandon: true,
+                            hasWon: false,
+                        },
+                    };
+                    this.socketService.send<GameHistoryDTO>(MATCH_EVENTS.SoloGameInformation, gameHistory);
+                    this.soloTimer = setInterval(() => {
+                        this.socketService.send<number>(MATCH_EVENTS.Time, this.timerService.currentTime);
+                    }, ONE_SECOND);
+                }
+            });
         }
         this.showTime();
         this.addCheatMode();
         this.configureSocketReactions();
+    }
+
+    getImagesNames(): void {
+        this.imagesService.getImageNames(this.stageId).subscribe((imageObject) => {
+            this.imagesInfo = imageObject;
+        });
     }
 
     configureSocketReactions(): void {

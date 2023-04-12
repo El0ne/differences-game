@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { PixelModificationService } from '@app/services/pixel-modification/pixel-modification.service';
@@ -13,7 +13,7 @@ import { HEIGHT, WAIT_TIME_MS, WIDTH } from './click-event-constant';
     templateUrl: './click-event.component.html',
     styleUrls: ['./click-event.component.scss'],
 })
-export class ClickEventComponent implements OnInit {
+export class ClickEventComponent implements OnInit, OnChanges {
     @Input() differenceArray: number[][];
     @Input() events: Observable<void>;
     @Input() id: number;
@@ -45,7 +45,9 @@ export class ClickEventComponent implements OnInit {
         this.timeout = false;
         this.endGame = false;
         this.foundDifferences = [];
+    }
 
+    loadImage(): void {
         const image = new Image();
         image.crossOrigin = 'Anonymous';
         image.src = `${IMAGE}/${this.imagePath}`;
@@ -53,6 +55,12 @@ export class ClickEventComponent implements OnInit {
             const context = this.picture.nativeElement.getContext('2d') as CanvasRenderingContext2D;
             context.drawImage(image, 0, 0);
         };
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['imagePath'].currentValue !== changes['imagePath'].previousValue) {
+            this.loadImage();
+        }
     }
 
     getDifferences(id: string): Observable<number[][]> {
@@ -89,7 +97,7 @@ export class ClickEventComponent implements OnInit {
 
     async clearEffect(): Promise<void> {
         const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-        await this.pixelModificationService.turnOffYellow(originalContext, this.foundDifferenceService.foundDifferences);
+        this.pixelModificationService.turnOffYellow(originalContext, this.foundDifferenceService.foundDifferences);
     }
 
     async differenceEffect(currentDifferences: number[]): Promise<void> {
