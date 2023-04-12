@@ -304,6 +304,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 numberOfDifferences: this.numberOfDifferences,
                 numberOfPlayers: this.isMultiplayer ? 2 : 1,
             },
+            disableClose: this.isReplayMode,
         });
 
         if (this.isReplayMode === false) {
