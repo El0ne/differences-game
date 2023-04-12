@@ -126,19 +126,19 @@
         <ng-template #play>
             <mat-icon class="icon">pause</mat-icon>
         </ng-template>
-        <button class="replay-button fast-forward normal-button" type="button" (click)="fastForwardReplay(1)">
+        <button *ngIf="!isReplayPaused" class="replay-button fast-forward normal-button" type="button" (click)="fastForwardReplay(1)">
             <div>
                 <mat-icon class="icon">fast_forward</mat-icon>
                 <p>1x</p>
             </div>
         </button>
-        <button class="replay-button fast-forward normal-button" type="button" (click)="fastForwardReplay(0.5)">
+        <button *ngIf="!isReplayPaused" class="replay-button fast-forward normal-button" type="button" (click)="fastForwardReplay(0.5)">
             <div>
                 <mat-icon class="icon">fast_forward</mat-icon>
                 <p>2x</p>
             </div>
         </button>
-        <button class="replay-button fast-forward normal-button" type="button" (click)="fastForwardReplay(0.333333)">
+        <button *ngIf="!isReplayPaused" class="replay-button fast-forward normal-button" type="button" (click)="fastForwardReplay(0.333333)">
             <div>
                 <mat-icon class="icon">fast_forward</mat-icon>
                 <p>3x</p>
