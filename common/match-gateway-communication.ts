@@ -9,6 +9,7 @@ export enum MATCH_EVENTS {
     Time = 'Time',
     IncrementTimer = 'IncrementTimer',
     LimitedTimeTimer = 'LimitedTimeTimer',
+    Lose = 'Lose',
 }
 
 export enum LIMITED_TIME_MODE_EVENTS {

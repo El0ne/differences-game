@@ -52,6 +52,13 @@ export class MatchGateway implements OnGatewayDisconnect {
         }
     }
 
+    @SubscribeMessage(MATCH_EVENTS.Lose)
+    limitedTimeLost(socket: Socket, room: string) {
+        if (socket.rooms.has(room)) {
+            this.server.to(room).emit(MATCH_EVENTS.Lose, 'timeExpired');
+        }
+    }
+
     @SubscribeMessage(MATCH_EVENTS.SoloGameInformation)
     storeSoloGameInformation(socket: Socket, data: GameHistoryDTO) {
         data.gameDuration = Date.now();

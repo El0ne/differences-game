@@ -25,6 +25,7 @@ import { GameSelectionComponent } from './pages/game-selection/game-selection.co
 import { HomePageComponent } from './pages/home-page/home-page.component';
 import { LimitedTimeComponent } from './pages/limited-time/limited-time.component';
 import { SoloViewComponent } from './pages/solo-view/solo-view.component';
+import { GameLoseModalComponent } from './modals/game-lose-modal/game-lose-modal.component';
 
 /**
  * Main module that is used in main.ts.
@@ -51,6 +52,7 @@ import { SoloViewComponent } from './pages/solo-view/solo-view.component';
         LimitedTimeComponent,
         GameHistoryComponent,
         GameConstantsComponent,
+        GameLoseModalComponent,
     ],
     entryComponents: [ModalPageComponent],
     imports: [
