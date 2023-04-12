@@ -63,13 +63,9 @@ export class MatchGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage(MATCH_EVENTS.SoloGameInformation)
     storeSoloGameInformation(socket: Socket, data: GameHistoryDTO) {
+        data.gameDuration = Date.now();
         socket.data.soloGame = data;
         socket.data.isSolo = true;
-    }
-
-    @SubscribeMessage(MATCH_EVENTS.Time)
-    updateGameTime(socket: Socket, time: number) {
-        socket.data.soloGame.gameDuration = time;
     }
 
     timer(room: string): void {
@@ -93,6 +89,7 @@ export class MatchGateway implements OnGatewayDisconnect {
     async handleDisconnect(socket: Socket): Promise<void> {
         if (socket.data.stageId) {
             await this.gameManagerService.endGame(socket.data.stageId);
+            this.stopTimer(socket, socket.data.room);
         }
     }
 }
