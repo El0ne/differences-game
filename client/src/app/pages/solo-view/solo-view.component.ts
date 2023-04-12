@@ -163,6 +163,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             }
         });
         this.socketService.listen<PlayerDifference>(MATCH_EVENTS.Difference, (data: PlayerDifference) => {
+            this.addCommand(new OpponentDifference(this, data));
+
             this.effectHandler(data);
         });
         this.socketService.listen<string>(MATCH_EVENTS.Win, (socketId: string) => {
@@ -410,13 +412,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     effectHandler(information: PlayerDifference): void {
-        this.addCommand(new OpponentDifference(this, information));
         if (!this.left.toggleCheatMode) {
             this.handleFlash(information.lastDifferences);
         }
         this.paintPixel(information.lastDifferences);
         this.incrementScore(information.socket);
-        if (!this.isReplayMode) this.addDifferenceDetected(information.differencesPosition);
+        this.addDifferenceDetected(information.differencesPosition);
         this.endGameVerification();
     }
 
