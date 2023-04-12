@@ -157,6 +157,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.socketService.listen<string>(MATCH_EVENTS.Win, (socketId: string) => {
             this.winGame(socketId);
         });
+        this.socketService.listen<string>(MATCH_EVENTS.Lose, (endGame: string) => {
+            this.lose(endGame);
+        });
     }
 
     ngOnDestroy(): void {
