@@ -34,8 +34,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     left: ClickEventComponent;
     @ViewChild('right')
     right: ClickEventComponent;
-    isMultiplayer: boolean;
-    isLimitedTimeMode: boolean;
     showErrorMessage: boolean = false;
     showTextBox: boolean = false;
     showNavBar: boolean = true;
@@ -46,7 +44,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     currentScorePlayer: number = 0;
     currentScoreOpponent: number = 0;
     numberOfDifferences: number;
-    stageId: string;
     endGame: Subject<void> = new Subject<void>();
     gameCardInfo: GameCardInformation;
     imagesInfo: ImageObject;
@@ -54,8 +51,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     soloTimer: ReturnType<typeof setInterval>;
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
     gameConstants: GameConstants;
-    // reason: need all parameters for constructor
-    // eslint-disable-next-line max-params
+    // eslint-disable-next-line max-params -- need all parameters for constructor
     constructor(
         public timerService: TimerSoloService,
         private gameCardInfoService: GameCardInformationService,
@@ -68,14 +64,23 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private imagesService: ImagesService,
     ) {}
 
+    get stageId(): string {
+        return this.gameParamService.gameParameters.stageId;
+    }
+
+    get isLimitedTimeMode(): boolean {
+        return this.gameParamService.gameParameters.isLimitedTimeGame;
+    }
+
+    get isMultiplayer(): boolean {
+        return this.gameParamService.gameParameters.isMultiplayerGame;
+    }
+
     ngOnInit(): void {
         if (!this.socketService.liveSocket()) {
             this.router.navigate(['/home']);
             return;
         }
-        this.isLimitedTimeMode = this.gameParamService.gameParameters.isLimitedTimeGame;
-        this.isMultiplayer = this.gameParamService.gameParameters.isMultiplayerGame;
-        this.stageId = this.gameParamService.gameParameters.stageId;
 
         this.player = this.socketService.names.get(this.socketService.socketId) as string;
         this.opponent = this.socketService.names.get(this.socketService.opponentSocket) as string;
