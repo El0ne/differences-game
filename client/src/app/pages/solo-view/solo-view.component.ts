@@ -193,6 +193,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         setTimeout(() => {
             this.activateCheatMode(event);
         }, MAX_EFFECT_TIME);
+
+        if (!this.isReplayMode) {
+            const cheatModeCommand = new KeyPressCommand(event, this);
+            this.addCommand(cheatModeCommand);
+        }
     }
 
     activateCheatMode(event: KeyboardEvent): void {
@@ -202,7 +207,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 if (this.left.toggleCheatMode) this.handleFlash(this.foundDifferenceService.findPixelsFromDifference(data));
             });
 
-            if (this.isReplayMode === false) {
+            if (!this.isReplayMode) {
                 const cheatModeCommand = new KeyPressCommand(event, this);
                 this.addCommand(cheatModeCommand);
             }
