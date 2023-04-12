@@ -69,7 +69,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     isReplayMode: boolean = false;
     isReplayPaused: boolean = false;
-    // timeMultiplier: number = 1;
     replayTimeoutId: ReturnType<typeof setTimeout>;
 
     invoker: Invoker;
@@ -78,6 +77,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     isCanvasEnabled: boolean = true;
 
+    // we need more than 3 services in solo view
     // eslint-disable-next-line max-params
     constructor(
         private timerService: TimerSoloService,
@@ -86,7 +86,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private dialog: MatDialog,
         private router: Router,
-        public socketService: SocketService,
+        private socketService: SocketService,
         private gameConstantsService: GameConstantsService,
         private replayButtonsService: ReplayButtonsService,
     ) {
@@ -135,6 +135,10 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.showTime();
         this.addCheatMode();
         this.configureSocketReactions();
+    }
+
+    getSocketId(): string {
+        return this.socketService.socketId;
     }
 
     configureSocketReactions(): void {
@@ -426,18 +430,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
     pauseReplay(): boolean {
         return this.replayButtonsService.pauseReplay(this.isReplayPaused);
-        // this.isReplayPaused = !this.isReplayPaused;
-        // if (this.isReplayPaused) {
-        //     console.log('pause');
-        //     this.timerService.stopTimer(this.socketService.socketId);
-        // } else {
-        //     this.timerService.restartTimer(this.timeMultiplier, this.socketService.socketId);
-        // }
     }
 
     fastForwardReplay(multiplier: number): void {
-        // this.timeMultiplier = multiplier;
-        // this.timerService.restartTimer(this.timeMultiplier, this.socketService.socketId);
         this.replayButtonsService.fastForwardReplay(multiplier);
     }
 
