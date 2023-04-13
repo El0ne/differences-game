@@ -154,7 +154,7 @@ describe('GameManagerService', () => {
         expect(nextStage).toEqual(gameCard._id.toString());
         const noStageExpected = service.giveNextStage(ROOM);
         expect(noStageExpected).toEqual(undefined);
-        expect(service.limitedTimeModeGames.get(ROOM).stagesUsed).toEqual([gameCard._id]);
+        expect(service.limitedTimeModeGames.get(ROOM).stagesUsed).toStrictEqual([gameCard._id.toString()]);
     });
 
     it(`removePlayerFromLimitedTimeGame should remove the player from the game
