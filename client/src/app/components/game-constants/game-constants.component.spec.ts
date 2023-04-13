@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
 import { getDefaultGameConstants } from '@common/game-constants';
 import { Observable, of } from 'rxjs';
 
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { GameHistoryComponent } from '@app/components/game-history/game-history.component';
+import { ConfirmationModalComponent } from '@app/modals/confirmation-modal/confirmation-modal/confirmation-modal.component';
 import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
@@ -20,7 +21,9 @@ describe('GameConstantsComponent', () => {
     let gameConstantsService: GameConstantsService;
     let gameCardService: GameCardInformationService;
     let gameHistoryService: GameHistoryService;
-    let modalSpy: MatDialog;
+    let modalSpy: jasmine.SpyObj<MatDialog>;
+    let dialogRefSpy: jasmine.SpyObj<MatDialogRef<ConfirmationModalComponent>>;
+
     let socketServiceSpy: SocketService;
 
     beforeEach(async () => {
@@ -39,6 +42,13 @@ describe('GameConstantsComponent', () => {
         };
 
         modalSpy = jasmine.createSpyObj('MatDialog', ['open']);
+        // modalSpy.open = () => {
+        //     return {
+        //         new MatDialogRef()
+        //     };
+        // };
+        dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+
         gameHistoryService = jasmine.createSpyObj('GameHistoryService', ['deleteGameHistory']);
         gameHistoryService.deleteGameHistory = () => {
             return of();
@@ -110,11 +120,15 @@ describe('GameConstantsComponent', () => {
         expect(gameCardService.resetAllBestTimes).toHaveBeenCalled();
     });
 
-    it('deleteAllGames() should call deleteAllGames from the service', fakeAsync(() => {
+    it('deleteAllGames() should call socketService when confirmed', () => {
+        dialogRefSpy.afterClosed.and.returnValue(of(true));
+        modalSpy.open.and.returnValue(dialogRefSpy);
+
         component.deleteAllGames();
 
+        expect(modalSpy.open).toHaveBeenCalledWith(ConfirmationModalComponent, { data: { message: 'Supprimer toutes les parties?' } });
         expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.DeleteAllGames);
-    }));
+    });
 
     it('checkNumber() should return a number between the min and max value for the input', () => {
         const fakeFocusEvent = {
@@ -136,9 +150,15 @@ describe('GameConstantsComponent', () => {
         expect(modalSpy.open).toHaveBeenCalledWith(GameHistoryComponent);
     });
 
-    it('deleteGameHistory() should call deleteFameHistory method of the gameHistory service', () => {
+    it('deleteGameHistory ()should delete game history when confirmed', () => {
+        dialogRefSpy.afterClosed.and.returnValue(of(true));
+        modalSpy.open.and.returnValue(dialogRefSpy);
         spyOn(gameHistoryService, 'deleteGameHistory').and.returnValue(new Observable());
+
         component.deleteGameHistory();
+
+        expect(modalSpy.open).toHaveBeenCalledWith(ConfirmationModalComponent, { data: { message: "Supprimer l'historique de partie?" } });
+
         expect(gameHistoryService.deleteGameHistory).toHaveBeenCalled();
     });
 });
