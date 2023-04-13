@@ -42,7 +42,10 @@ describe('StageWaitingRoomGateway', () => {
         gateway = module.get<StageWaitingRoomGateway>(StageWaitingRoomGateway);
         gateway['server'] = server;
 
-        gateway.gameHosts.set('stage1', 'host1').set('stage4', 'host2').set('stage5', 'host3');
+        gateway.gameHosts
+            .set('stage1', { hostId: 'host1', waitingRoom: '1' })
+            .set('stage4', { hostId: 'host2', waitingRoom: '2' })
+            .set('stage5', { hostId: 'host3', waitingRoom: '3' });
         stub(socket, 'rooms').value(new Set([socket.id]));
     });
 
@@ -66,7 +69,7 @@ describe('StageWaitingRoomGateway', () => {
             },
         } as BroadcastOperator<unknown, unknown>);
         gateway.hostGame(socket, 'stage1');
-        expect(gateway.gameHosts.get('stage1')).toBe('123');
+        expect(gateway.gameHosts.get('stage1').hostId).toBe('123');
         expect(socket.to.calledWith('stage1')).toBeTruthy();
         expect(socket.data.stageInHosting).toEqual('stage1');
     });
@@ -78,7 +81,7 @@ describe('StageWaitingRoomGateway', () => {
         } as BroadcastOperator<unknown, unknown>);
         gateway.unhostGame(socket);
         expect(gateway.gameHosts.has('stage1')).toBeFalsy();
-        expect(socket.to.calledWith('stage1')).toBeTruthy();
+        expect(socket.to.calledWith('1')).toBeTruthy();
         expect(socket.data.stageInHosting).toBe(null);
     });
 
@@ -94,10 +97,12 @@ describe('StageWaitingRoomGateway', () => {
         gateway.joinHost(socket, request);
         expect(socket.to.calledWith('host1')).toBeTruthy();
         expect(socket.data.stageInWaiting).toBe('stage1');
+        expect(socket.join.calledWith('1')).toBeTruthy();
     });
 
     it('quitHost should send the correct requestMatch to the host', () => {
-        socket.data.stageInWaiting = 'stage1';
+        const request: JoinHostInWaitingRequest = { stageId: 'stage1', playerName: 'name' };
+        gateway.joinHost(socket, request);
         socket.to.returns({
             emit: (event: string, playerId: string) => {
                 expect(event).toEqual(WAITING_ROOM_EVENTS.UnrequestMatch);
@@ -107,6 +112,7 @@ describe('StageWaitingRoomGateway', () => {
         gateway.quitHost(socket);
         expect(socket.to.calledWith('host1')).toBeTruthy();
         expect(socket.data.stageInWaiting).toBe(null);
+        expect(socket.leave.calledWith('1')).toBeTruthy();
     });
 
     it(`accept opponent should set the 2 players in the same room, 
@@ -130,6 +136,7 @@ describe('StageWaitingRoomGateway', () => {
 
         await gateway.acceptOpponent(socket, { playerName: 'host1', playerSocketId: opponentSocketId, isLimitedTimeMode: false });
         expect(socket.to.calledWith('stage1')).toBeTruthy();
+        expect(socket.to.calledWith('1')).toBeTruthy();
         expect(socket.data.stageInHosting).toEqual(null);
         expect(opponentSocket.data.stageInWaiting).toEqual(null);
         expect(socket.data.room).not.toBe(undefined);
@@ -157,17 +164,18 @@ describe('StageWaitingRoomGateway', () => {
     });
 
     it('deleteGame should send a call services to delete game and emit to the stage room and clean the gameHost map of the stage', async () => {
-        gateway.gameHosts.set('stageId', 'host');
+        const STAGE_ID = 'stageId';
+        gateway.gameHosts.set(STAGE_ID, { hostId: 'host', waitingRoom: '4' });
         server.to.returns({
             emit: (event: string) => {},
         } as BroadcastOperator<unknown, unknown>);
         const deleteGameCardSpy = jest.spyOn(gameCardService, 'deleteGameCard');
         const deleteGameSpy = jest.spyOn(gameManagerService, 'deleteGameFromDb');
-        await gateway.deleteGame('stageId');
-        expect(deleteGameCardSpy).toBeCalledWith('stageId');
-        expect(deleteGameSpy).toBeCalledWith('stageId');
-        expect(server.to.calledWith('stageId')).toBeTruthy();
-        expect(gateway.gameHosts.has('stageId')).toBeFalsy();
+        await gateway.deleteGame(STAGE_ID);
+        expect(deleteGameCardSpy).toBeCalledWith(STAGE_ID);
+        expect(deleteGameSpy).toBeCalledWith(STAGE_ID);
+        expect(server.to.calledWith(STAGE_ID)).toBeTruthy();
+        expect(gateway.gameHosts.has(STAGE_ID)).toBeFalsy();
     });
     it('deleteAllGames should call deleteGame for all the stages gameCards returned by gameCardService', async () => {
         stub(gateway, 'deleteGame');
