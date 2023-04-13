@@ -36,7 +36,7 @@ import { Subject } from 'rxjs';
 @Component({
     selector: 'app-solo-view',
     templateUrl: './solo-view.component.html',
-    styleUrls: ['./solo-view.component.scss'],
+    styleUrls: ['./solo-view.component.scss', './score-and-timer.scss'],
 })
 export class SoloViewComponent implements OnInit, OnDestroy {
     @ViewChild('left')
