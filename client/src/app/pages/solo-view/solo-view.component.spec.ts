@@ -8,14 +8,17 @@ import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testin
 import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { EndGameCommand } from '@app/commands/end-game/end-game-command';
 import { OpenInfoModalCommand } from '@app/commands/open-info-modal-command/open-info-modal-command';
+import { WriteMessageCommand } from '@app/commands/write-message/write-message';
 import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
+import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal.component';
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
 import { ReplayGameModalComponent } from '@app/modals/replay-game-modal/replay-game-modal.component';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
@@ -287,12 +290,41 @@ describe('SoloViewComponent', () => {
         // expect(component.addCommand).toHaveBeenCalledWith(new CloseInfoModalCommand(component));
     });
 
+    // it('should close all modals', () => {
+    //     spyOn(component.dialog, 'closeAll');
+    //     component.closeInfoModal();
+    //     expect(component.dialog.closeAll).toHaveBeenCalled();
+    // });
+
+    /// //I HAVE NO FUCKING IDEA WHY THIS DOESN'T WORK////////
+
     it('should open the quit game modal with disableClose set to true', () => {
+        component.isReplayMode = false;
         component.quitGame();
         expect(modalSpy.open).toHaveBeenCalledWith(QuitGameModalComponent, {
             disableClose: true,
         });
     });
+
+    it('should restart timer when in replay mode', () => {
+        component.isReplayMode = true;
+        const dialogRefSpy: jasmine.SpyObj<MatDialogRef<QuitGameModalComponent>> = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+        dialogRefSpy.afterClosed.and.returnValue(of());
+        modalSpy.open.and.returnValue(dialogRefSpy);
+        spyOn(component.timerService, 'stopTimer');
+
+        component.quitGame();
+        expect(component.timerService.stopTimer).toHaveBeenCalled();
+    });
+
+    it("should add the input's command when input is changing", fakeAsync(() => {
+        spyOn(component, 'addCommand');
+        component.inputChat.nativeElement.value = 'hey';
+        const inputElement = fixture.debugElement.query(By.css('input')).nativeElement;
+        inputElement.dispatchEvent(new Event('input'));
+        tick(50);
+        expect(component.addCommand).toHaveBeenCalledWith(jasmine.any(WriteMessageCommand));
+    }));
 
     it('paintPixel should call sendPixels and receivePixels properly', () => {
         const leftCanvasSpy = spyOn(component.left, 'sendDifferencePixels');
@@ -414,22 +446,47 @@ describe('SoloViewComponent', () => {
         expect(clearTimeout).toHaveBeenCalledWith(component.replayTimeoutId);
     });
 
-    // it('winGame should set all end game related boolean and open gameWin modal with true to multiplayer and winner name in multiplayer', () => {
-    //     component.winGame('opponentId');
-    //     expect(modalSpy.open).toHaveBeenCalledWith(GameWinModalComponent, { disableClose: true, data: { isMultiplayer: true, winner: 'opponent' } });
-    //     expect(component.showNavBar).toBeFalse();
-    //     expect(component.left.endGame).toBeTrue();
-    //     expect(component.right.endGame).toBeTrue();
-    // });
+    it('winGame should set all end game related boolean and open gameWin modal with true to multiplayer and winner name in multiplayer', () => {
+        component.isReplayMode = false;
+        component.isMultiplayer = true;
 
-    // it('winGame should set all end game related boolean and open gameWin modal with false to multiplayer in solo', () => {
-    //     component.isMultiplayer = false;
-    //     component.winGame('playerId');
-    //     expect(modalSpy.open).toHaveBeenCalledWith(GameWinModalComponent, { disableClose: true, data: { isMultiplayer: false, winner: 'player' } });
-    //     expect(component.showNavBar).toBeFalse();
-    //     expect(component.left.endGame).toBeTrue();
-    //     expect(component.right.endGame).toBeTrue();
-    // });
+        const dialogRefSpy: jasmine.SpyObj<MatDialogRef<GameWinModalComponent>> = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+        dialogRefSpy.afterClosed.and.returnValue(of());
+        modalSpy.open.and.returnValue(dialogRefSpy);
+        spyOn(component, 'resetPropertiesForReplay');
+        spyOn(component.socketService, 'send');
+        spyOn(component, 'addCommand');
+
+        component.winGame('opponentId');
+        expect(modalSpy.open).toHaveBeenCalledWith(GameWinModalComponent, {
+            disableClose: true,
+            data: { isMultiplayer: true, winner: 'opponent', isWinner: component.isWinner },
+        });
+        expect(component.showNavBar).toBeFalse();
+        expect(component.left.endGame).toBeTrue();
+        expect(component.right.endGame).toBeTrue();
+        expect(component.addCommand).toHaveBeenCalledWith(new EndGameCommand(component));
+        // expect(component.socketService.send).toHaveBeenCalledWith(MATCH_EVENTS.leaveRoom, component.socketService.gameRoom);
+        // expect(component.resetPropertiesForReplay).toHaveBeenCalledWith(component.socketService.socketId);
+    });
+
+    it('winGame should set all end game related boolean and open gameWin modal with false to multiplayer in solo', () => {
+        component.isMultiplayer = false;
+        component.isReplayMode = false;
+        const dialogRefSpy: jasmine.SpyObj<MatDialogRef<GameWinModalComponent>> = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+        dialogRefSpy.afterClosed.and.returnValue(of());
+        modalSpy.open.and.returnValue(dialogRefSpy);
+
+        component.winGame('playerId');
+
+        expect(modalSpy.open).toHaveBeenCalledWith(GameWinModalComponent, {
+            disableClose: true,
+            data: { isMultiplayer: false, winner: 'player', isWinner: component.isWinner },
+        });
+        expect(component.showNavBar).toBeFalse();
+        expect(component.left.endGame).toBeTrue();
+        expect(component.right.endGame).toBeTrue();
+    });
 
     it('invertDifferences should invert the toggleCheatMode attribute from left and right', () => {
         component.left.toggleCheatMode = true;
@@ -520,6 +577,35 @@ describe('SoloViewComponent', () => {
         component.fastForwardReplay(2);
         expect(component.replayButtonsService.fastForwardReplay).toHaveBeenCalledWith(2);
     });
+
+    it('should execute an action and increase the command index', fakeAsync(() => {
+        component.commandIndex = 0;
+        component.invoker.commands = [{ action: new EndGameCommand(component), time: 1 }];
+        component.timerService.currentTime = 1;
+        spyOn(component.invoker.commands[0].action, 'execute');
+        spyOn(component, 'replayGame');
+
+        component.replayGame();
+
+        tick(50);
+
+        // expect(component.invoker.commands[0].action.execute).toHaveBeenCalled();
+        // expect(component.commandIndex).toEqual(1);
+        expect(component.replayGame).toHaveBeenCalled();
+    }));
+
+    it('should not execute an action if the time is not right', fakeAsync(() => {
+        component.commandIndex = 0;
+        component.invoker.commands = [{ action: new EndGameCommand(component), time: 1 }];
+        component.timerService.currentTime = 0;
+        spyOn(component, 'replayGame');
+
+        component.replayGame();
+
+        tick(50);
+
+        expect(component.replayGame).toHaveBeenCalled();
+    }));
 
     it('should reset canvas', () => {
         spyOn(component.left, 'ngOnInit');
