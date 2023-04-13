@@ -42,11 +42,7 @@ describe('GameConstantsComponent', () => {
         };
 
         modalSpy = jasmine.createSpyObj('MatDialog', ['open']);
-        // modalSpy.open = () => {
-        //     return {
-        //         new MatDialogRef()
-        //     };
-        // };
+
         dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
 
         gameHistoryService = jasmine.createSpyObj('GameHistoryService', ['deleteGameHistory']);

@@ -48,8 +48,8 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
 
     @SubscribeMessage(WAITING_ROOM_EVENTS.UnhostGame)
     unhostGame(@ConnectedSocket() socket: Socket): void {
-        this.gameHosts.delete(socket.data.stageInHosting);
         socket.to(this.gameHosts.get(socket.data.stageInHosting).waitingRoom).emit(WAITING_ROOM_EVENTS.MatchRefused, "la partie n'a plus d'hôte");
+        this.gameHosts.delete(socket.data.stageInHosting);
         socket.to(socket.data.stageInHosting).emit(WAITING_ROOM_EVENTS.MatchDeleted, socket.data.stageInHosting);
         socket.data.stageInHosting = null;
     }
