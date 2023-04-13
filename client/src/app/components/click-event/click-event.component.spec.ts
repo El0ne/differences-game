@@ -158,7 +158,7 @@ describe('ClickEventComponent', () => {
         component.ngOnInit();
 
         expect(window.Image).toHaveBeenCalledWith();
-        expect(imageSpyObj.src).toBe(`${IMAGE}/test.png`);
+        expect(imageSpyObj.src).toBe(`${IMAGE}/file/test.png`);
         expect(imageSpyObj.crossOrigin).toBe('Anonymous');
         imageSpyObj.onload();
         expect(CanvasRenderingContext2D.prototype.drawImage).toHaveBeenCalled();

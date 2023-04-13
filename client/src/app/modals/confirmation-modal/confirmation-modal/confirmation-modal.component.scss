@@ -1,9 +1,13 @@
-.win {
+.dimensions {
     width: 33rem;
     height: 14rem;
     justify-content: space-evenly;
 }
 
+.buttons-container {
+    display: flex;
+    justify-content: space-evenly;
+}
 button {
     width: 6rem;
     height: 3rem;

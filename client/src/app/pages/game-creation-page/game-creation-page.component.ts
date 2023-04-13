@@ -262,7 +262,7 @@ export class GameCreationPageComponent implements OnInit {
                     };
                     this.difficulty = data.gameDifficulty;
                     this.differenceNumber = data.gameDifferenceNumber;
-                    this.differenceImage = `${IMAGE}/difference-image.bmp`;
+                    this.differenceImage = `${IMAGE}/file/difference-image.bmp`;
                     this.openSaveModal();
                 } else {
                     alert("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
