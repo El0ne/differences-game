@@ -132,7 +132,7 @@ describe('GameManagerService', () => {
         expect(getAllGameCardsSpy).toHaveBeenCalled();
         const limitedTimeGameInfo = service.limitedTimeModeGames.get(ROOM);
         expect(limitedTimeGameInfo.playersInGame).toEqual(2);
-        expect(limitedTimeGameInfo.gameStages === limitedTimeGameInfo.stagesUsed).toBeTruthy();
+        expect(limitedTimeGameInfo.gameStages).toStrictEqual(limitedTimeGameInfo.stagesUsed);
         expect(limitedTimeGameInfo.gameStages[0]).toEqual(gameCard._id.toString());
         expect(addGameSpy).toBeCalledTimes(3);
         expect(addGameSpy).toBeCalledWith(gameCard._id.toString(), 2);
