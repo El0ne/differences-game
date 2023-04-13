@@ -80,15 +80,15 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     // we need more than 3 services in solo view
     // eslint-disable-next-line max-params
     constructor(
-        private timerService: TimerSoloService,
+        public timerService: TimerSoloService,
         private gameCardInfoService: GameCardInformationService,
-        private foundDifferenceService: FoundDifferenceService,
+        public foundDifferenceService: FoundDifferenceService,
         private route: ActivatedRoute,
-        private dialog: MatDialog,
+        public dialog: MatDialog,
         private router: Router,
-        private socketService: SocketService,
+        public socketService: SocketService,
         private gameConstantsService: GameConstantsService,
-        private replayButtonsService: ReplayButtonsService,
+        public replayButtonsService: ReplayButtonsService,
     ) {
         this.invoker = new Invoker();
     }
@@ -151,7 +151,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             }
         });
         this.socketService.listen<RoomMessage>(CHAT_EVENTS.RoomMessage, (data: RoomMessage) => {
-            console.log('here');
             this.messages.push(data);
             this.addCommand(new SendMessageCommand(this, data));
         });
@@ -166,7 +165,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         });
         this.socketService.listen<PlayerDifference>(MATCH_EVENTS.Difference, (data: PlayerDifference) => {
             this.addCommand(new OpponentDifferenceCommand(this, data));
-            console.log('here');
             this.effectHandler(data);
         });
         this.socketService.listen<string>(MATCH_EVENTS.Win, (socketId: string) => {
@@ -448,8 +446,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.replayGame();
             }
         }, 50);
-        console.log(this.replayTimeoutId);
     }
+
     resetCanvas(): void {
         this.left.ngOnInit();
         this.right.ngOnInit();
