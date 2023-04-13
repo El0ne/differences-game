@@ -48,7 +48,7 @@ export class ClickEventComponent implements OnInit {
 
         const image = new Image();
         image.crossOrigin = 'Anonymous';
-        image.src = `${IMAGE}/${this.imagePath}`;
+        image.src = `${IMAGE}/file/${this.imagePath}`;
         image.onload = () => {
             const context = this.picture.nativeElement.getContext('2d') as CanvasRenderingContext2D;
             context.drawImage(image, 0, 0);

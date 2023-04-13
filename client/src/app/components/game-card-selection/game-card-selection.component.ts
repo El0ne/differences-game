@@ -38,7 +38,7 @@ export class GameCardSelectionComponent implements OnInit {
     ) {}
     ngOnInit(): void {
         this.imagesService.getImageNames(this.gameCardInformation._id).subscribe((imageObject) => {
-            this.image = `${IMAGE}/${imageObject.originalImageName}`;
+            this.image = `${IMAGE}/file/${imageObject.originalImageName}`;
         });
     }
 

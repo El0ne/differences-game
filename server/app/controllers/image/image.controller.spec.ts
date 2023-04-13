@@ -59,9 +59,7 @@ describe('ImageController', () => {
             return fakeImage as any;
         });
 
-        const response = await request(httpServer)
-            .get('/image')
-            .query({ id: `${fakeImage._id}` });
+        const response = await request(httpServer).get(`/image/${fakeImage._id}`);
 
         expect(imageManagerService.getImageObjectById).toHaveBeenCalled();
         expect(response.status).toBe(HttpStatus.OK);
@@ -70,13 +68,7 @@ describe('ImageController', () => {
 
     it('getImageNames() should return 500 if there is an error', async () => {
         jest.spyOn(imageManagerService, 'getImageObjectById').mockRejectedValue(new Error('uiref'));
-        const response = await request(httpServer).get('/image');
-        expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
-    });
-
-    it('getImageNames() should return 500 if there is an error', async () => {
-        jest.spyOn(imageManagerService, 'getImageObjectById').mockRejectedValue(new Error('uiref'));
-        const response = await request(httpServer).get('/image');
+        const response = await request(httpServer).get('/image/file');
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 
@@ -86,7 +78,7 @@ describe('ImageController', () => {
         });
 
         image.write('assets/images/test.bmp');
-        const response = await request(httpServer).get('/image/test.bmp');
+        const response = await request(httpServer).get('/image/file/test.bmp');
         expect(response.statusCode).toEqual(HttpStatus.OK);
         fs.unlink('assets/images/test.bmp', (err) => {
             if (err) throw err;
@@ -98,7 +90,7 @@ describe('ImageController', () => {
             throw new Error();
         });
 
-        const response = await request(httpServer).get('/image/imageName');
+        const response = await request(httpServer).get('/image/file/imageName');
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 
