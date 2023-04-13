@@ -50,13 +50,13 @@
             <div id="double-score">
                 <div class="score">
                     <div class="player-name-container">
-                        <div class="playerName">{{ player }}</div>
+                        <div class="player-name">{{ player }}</div>
                     </div>
                     <!-- référence : https://codepen.io/Vivekp1118/pen/YzLOOVG -->
                     <div class="container neon-border">
                         <div class="row">
                             <div class="col col-heading">
-                                <div class="playerName">SCORE</div>
+                                <div class="player-name">SCORE</div>
                             </div>
                             <div class="col col-display" id="scoreHome">{{ currentScorePlayer }}</div>
                         </div>
@@ -64,13 +64,13 @@
                 </div>
                 <div class="score" *ngIf="isMultiplayer">
                     <div class="player-name-container">
-                        <div class="playerName">{{ opponent }}</div>
+                        <div class="player-name">{{ opponent }}</div>
                     </div>
                     <!-- référence : https://codepen.io/Vivekp1118/pen/YzLOOVG -->
                     <div class="container neon-border">
                         <div class="row">
                             <div class="col col-heading">
-                                <div class="playerName">SCORE</div>
+                                <div class="player-name">SCORE</div>
                             </div>
                             <div class="col col-display" id="scoreHome">{{ currentScoreOpponent }}</div>
                         </div>
