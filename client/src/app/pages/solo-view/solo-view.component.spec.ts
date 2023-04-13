@@ -6,15 +6,18 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { EndGameCommand } from '@app/commands/end-game/end-game-command';
+import { OpenInfoModalCommand } from '@app/commands/open-info-modal-command/open-info-modal-command';
 import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
+import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
+import { ReplayGameModalComponent } from '@app/modals/replay-game-modal/replay-game-modal.component';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
@@ -35,7 +38,7 @@ describe('SoloViewComponent', () => {
     let mockService: GameCardInformationService;
     let socketServiceMock: SocketService;
     let foundDifferenceServiceSpy: FoundDifferenceService;
-    let modalSpy: MatDialog;
+    let modalSpy: jasmine.SpyObj<MatDialog>;
     let clickEventServiceSpy: ClickEventService;
     let gameConstantsService: GameConstantsService;
 
@@ -241,29 +244,48 @@ describe('SoloViewComponent', () => {
         expect(foundDifferenceServiceSpy.addDifferenceFound).toHaveBeenCalled();
     });
 
-    // it('should open the game info modal with the correct data', () => {
-    //     component.isMultiplayer = true;
-    //     component.openInfoModal();
-    //     expect(modalSpy.open).toHaveBeenCalledWith(GameInfoModalComponent, {
-    //         data: {
-    //             gameCardInfo: component.gameCardInfo,
-    //             numberOfDifferences: component.numberOfDifferences,
-    //             numberOfPlayers: 2,
-    //         },
-    //     });
-    // });
+    it('should open the game info modal with the correct data during 1v1 game', () => {
+        component.isMultiplayer = true;
+        component.isReplayMode = true;
 
-    // it('should open the game info modal with the correct data', () => {
-    //     component.isMultiplayer = false;
-    //     component.openInfoModal();
-    //     expect(modalSpy.open).toHaveBeenCalledWith(GameInfoModalComponent, {
-    //         data: {
-    //             gameCardInfo: component.gameCardInfo,
-    //             numberOfDifferences: component.numberOfDifferences,
-    //             numberOfPlayers: 1,
-    //         },
-    //     });
-    // });
+        component.openInfoModal();
+        expect(modalSpy.open).toHaveBeenCalledWith(GameInfoModalComponent, {
+            data: {
+                gameCardInfo: component.gameCardInfo,
+                numberOfDifferences: component.numberOfDifferences,
+                numberOfPlayers: 2,
+            },
+            disableClose: component.isReplayMode,
+        });
+    });
+
+    it('should open the game info modal with the correct  during solo game', () => {
+        component.isMultiplayer = false;
+        component.isReplayMode = true;
+
+        component.openInfoModal();
+        expect(modalSpy.open).toHaveBeenCalledWith(GameInfoModalComponent, {
+            data: {
+                gameCardInfo: component.gameCardInfo,
+                numberOfDifferences: component.numberOfDifferences,
+                numberOfPlayers: 1,
+            },
+            disableClose: component.isReplayMode,
+        });
+    });
+
+    it('should add openInfoModalCommand when modal is closed if not in replay mode', () => {
+        component.isReplayMode = false;
+
+        const dialogRefSpy: jasmine.SpyObj<MatDialogRef<GameInfoModalComponent>> = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+        dialogRefSpy.afterClosed.and.returnValue(of());
+        modalSpy.open.and.returnValue(dialogRefSpy);
+        spyOn(component, 'addCommand');
+
+        component.openInfoModal();
+        expect(component.addCommand).toHaveBeenCalledWith(new OpenInfoModalCommand(component));
+        // expect(component.addCommand).toHaveBeenCalledWith(new CloseInfoModalCommand(component));
+    });
 
     it('should open the quit game modal with disableClose set to true', () => {
         component.quitGame();
@@ -364,32 +386,33 @@ describe('SoloViewComponent', () => {
         expect(notifyBestTimeSpy).toHaveBeenCalledWith(socketServiceMock.socketId, false, 'classique');
     });
 
-    // it('should open the replay game modal', () => {
-    //     component.openReplayModal();
-    //     expect(modalSpy.open).toHaveBeenCalledWith(ReplayGameModalComponent, {
-    //         disableClose: true,
-    //     });
-    // });
+    it('should reset properties once replay modal is closed by clicking on the replay button', () => {
+        const dialogRefSpy: jasmine.SpyObj<MatDialogRef<ReplayGameModalComponent>> = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+        dialogRefSpy.afterClosed.and.returnValue(of('replay'));
+        modalSpy.open.and.returnValue(dialogRefSpy);
+        spyOn(component, 'resetPropertiesForReplay');
 
-    // it('should reset properties once replay modal is closed by clicking on the replay button', () => {
-    //     spyOn(component.dialog, 'open').and.returnValue({
-    //         afterClosed: () => of('replay'),
-    //     } as MatDialogRef<ReplayGameModalComponent>);
+        component.openReplayModal();
 
-    //     component.openReplayModal();
+        expect(modalSpy.open).toHaveBeenCalledWith(ReplayGameModalComponent, {
+            disableClose: true,
+        });
+        expect(component.resetPropertiesForReplay).toHaveBeenCalledWith(component.socketService.socketId);
+    });
 
-    //     expect(component.resetPropertiesForReplay).toHaveBeenCalled();
-    // });
+    it('should clear timeout once replay modal is closed by clicking on the continue button', () => {
+        const dialogRefSpy: jasmine.SpyObj<MatDialogRef<ReplayGameModalComponent>> = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+        dialogRefSpy.afterClosed.and.returnValue(of('continue'));
+        modalSpy.open.and.returnValue(dialogRefSpy);
+        spyOn(window, 'clearTimeout');
 
-    // it('should clear timeout once replay modal is closed by clicking on the continue button', () => {
-    //     spyOn(component.dialog, 'open').and.returnValue({
-    //         afterClosed: () => of('continue'),
-    //     } as MatDialogRef<ReplayGameModalComponent>);
+        component.openReplayModal();
 
-    //     component.openReplayModal();
-
-    //     expect(clearTimeout).toHaveBeenCalledWith(component.replayTimeoutId);
-    // });
+        expect(modalSpy.open).toHaveBeenCalledWith(ReplayGameModalComponent, {
+            disableClose: true,
+        });
+        expect(clearTimeout).toHaveBeenCalledWith(component.replayTimeoutId);
+    });
 
     // it('winGame should set all end game related boolean and open gameWin modal with true to multiplayer and winner name in multiplayer', () => {
     //     component.winGame('opponentId');
