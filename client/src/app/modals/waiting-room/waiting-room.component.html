@@ -2,11 +2,7 @@
     <div *ngIf="waitingRoomInfo.isHost; else clientView">
         <div *ngIf="clientsInWaitingRoom.size === 0; else opponents">
             <h1 class="neon name-title-entry">En attente d'un joueur opposant...</h1>
-            <div class="hourglass-icon-container">
-                <div class="hourglass-icon">
-                    <mat-icon class="icon centered-icon">hourglass_empty</mat-icon>
-                </div>
-            </div>
+            <mat-icon class="hourglass-icon">hourglass_empty</mat-icon>
         </div>
     </div>
     <button class="cancel-button" (click)="handleCancel()">Annuler</button>
@@ -23,5 +19,8 @@
 </ng-template>
 
 <ng-template #clientView>
-    <h1 class="neon">En attente de la confirmation de l'hôte...</h1>
+    <div>
+        <h1 class="neon name-title-entry">En attente de la confirmation de l'hôte...</h1>
+        <mat-icon class="waiting-room-hourglass-icon">hourglass_empty</mat-icon>
+    </div>
 </ng-template>
