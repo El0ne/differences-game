@@ -101,8 +101,8 @@ describe('StageWaitingRoomGateway', () => {
     });
 
     it('quitHost should send the correct requestMatch to the host', () => {
-        const request: JoinHostInWaitingRequest = { stageId: 'stage1', playerName: 'name' };
-        gateway.joinHost(socket, request);
+        socket.data.stageInWaiting = 'stage1';
+
         socket.to.returns({
             emit: (event: string, playerId: string) => {
                 expect(event).toEqual(WAITING_ROOM_EVENTS.UnrequestMatch);
@@ -115,8 +115,8 @@ describe('StageWaitingRoomGateway', () => {
         expect(socket.leave.calledWith('1')).toBeTruthy();
     });
 
-    it(`accept opponent should set the 2 players in the same room, 
-    send a matchAccepted to the opponent and a matchConfirmed its socket 
+    it(`accept opponent should set the 2 players in the same room,
+    send a matchAccepted to the opponent and a matchConfirmed its socket
     when not in limited-time-game-mode`, async () => {
         const opponentSocket = createStubInstance<Socket>(Socket);
         const opponentSocketId = 'opponentId';

@@ -83,7 +83,6 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
         opponentSocket.join(roomId);
         opponentSocket.data.room = roomId;
         opponentSocket.data.stageId = socket.data.stageInHosting;
-        this.gameHosts.delete(socket.data.stageInHosting);
 
         const acceptationInfo: AcceptationInformation = { playerName: acceptation.playerName, playerSocketId: socket.id, roomId };
         socket.to(acceptation.playerSocketId).emit(WAITING_ROOM_EVENTS.MatchAccepted, acceptationInfo);
@@ -101,6 +100,7 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
             this.matchGateway.timer(roomId);
             this.gameManagerService.addGame(socket.data.stageInHosting, 2);
         }
+        this.gameHosts.delete(socket.data.stageInHosting);
 
         socket.data.stageInHosting = null;
         opponentSocket.data.stageInWaiting = null;
