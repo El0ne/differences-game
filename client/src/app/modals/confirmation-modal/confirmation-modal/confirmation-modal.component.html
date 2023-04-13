@@ -1,8 +1,11 @@
-<h2 mat-dialog-title>Confirmation</h2>
-<div mat-dialog-content>
-    {{ data.message }}
-</div>
-<div mat-dialog-actions>
-    <button mat-button (click)="cancel()">Cancel</button>
-    <button mat-button color="warn" (click)="confirm()">Confirm</button>
+<div class="neon modal-page dimensions">
+    <div class="modal-title">
+        <p>
+            {{ data.message }}
+        </p>
+    </div>
+    <div class="buttons-container">
+        <button class="normal-button" (click)="cancel()">Annuler</button>
+        <button class="normal-button" (click)="confirm()">Supprimer</button>
+    </div>
 </div>

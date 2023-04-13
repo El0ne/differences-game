@@ -50,7 +50,7 @@ export class GameConstantsComponent implements OnInit {
     }
 
     deleteAllGames(): void {
-        const dialog = this.dialog.open(ConfirmationModalComponent, { data: { message: 'Voulez-vous vraiment supprimer toutes les parties?' } });
+        const dialog = this.dialog.open(ConfirmationModalComponent, { data: { message: 'Supprimer toutes les parties?' } });
         dialog.afterClosed().subscribe((result: boolean) => {
             if (result) {
                 this.socketService.send(WAITING_ROOM_EVENTS.DeleteAllGames);
@@ -76,7 +76,7 @@ export class GameConstantsComponent implements OnInit {
     }
 
     deleteGameHistory(): void {
-        const dialog = this.dialog.open(ConfirmationModalComponent, { data: { message: "Voulez-vous vraiment supprimer l'historique de partie?" } });
+        const dialog = this.dialog.open(ConfirmationModalComponent, { data: { message: "Supprimer l'historique de partie?" } });
         dialog.afterClosed().subscribe((result: boolean) => {
             if (result) {
                 this.gameHistoryService.deleteGameHistory().subscribe();
