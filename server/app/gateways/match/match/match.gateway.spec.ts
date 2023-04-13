@@ -131,12 +131,6 @@ describe('MatchGateway', () => {
         expect(socket.data.soloGame).toEqual(FAKE_GAME_HISTORY_DTO);
         expect(socket.data.isSolo).toBe(true);
     });
-
-    it('updateGameTime Information should set the value of the internal timer', () => {
-        socket.data.soloGame = {};
-        gateway.updateGameTime(socket, 25);
-        expect(socket.data.soloGame.gameDuration).toEqual(25);
-    });
 });
 
 const FAKE_GAME_HISTORY_DTO: GameHistoryDTO = {

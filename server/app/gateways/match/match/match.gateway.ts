@@ -63,11 +63,6 @@ export class MatchGateway implements OnGatewayDisconnect {
         socket.data.isSolo = true;
     }
 
-    @SubscribeMessage(MATCH_EVENTS.Time)
-    updateGameTime(socket: Socket, time: number) {
-        socket.data.soloGame.gameDuration = time;
-    }
-
     timer(room: string): void {
         let timerCount = 0;
         const timer = setInterval(() => {

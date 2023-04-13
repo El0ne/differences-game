@@ -21,7 +21,7 @@ import { GameCardInformation } from '@common/game-card';
 import { GameConstants } from '@common/game-constants';
 import { GameHistoryDTO } from '@common/game-history.dto';
 import { ImageObject } from '@common/image-object';
-import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
+import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS } from '@common/match-gateway-communication';
 import { PlayerGameInfo } from '@common/player-game-info';
 import { Subject } from 'rxjs';
 @Component({
@@ -91,7 +91,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         if (this.isLimitedTimeMode) {
             this.socketService.listen<string>(LIMITED_TIME_MODE_EVENTS.NewStageInformation, (newStageId: string) => {
                 this.gameParamService.gameParameters.stageId = newStageId;
-                this.getImagesNames();
             });
         } else {
             this.gameCardInfoService.getGameCardInfoFromId(this.stageId).subscribe((gameCardData) => {
@@ -114,9 +113,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                         },
                     };
                     this.socketService.send<GameHistoryDTO>(MATCH_EVENTS.SoloGameInformation, gameHistory);
-                    this.soloTimer = setInterval(() => {
-                        this.socketService.send<number>(MATCH_EVENTS.Time, this.timerService.currentTime);
-                    }, ONE_SECOND);
                 }
             });
         }
