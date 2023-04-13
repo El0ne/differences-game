@@ -46,6 +46,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     gameCardInfo: GameCardInformation;
     imagesInfo: ImageObject;
     startTime: string;
+    // TODO: is soloTimer used?
     soloTimer: ReturnType<typeof setInterval>;
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
     gameConstants: GameConstants;
