@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
@@ -7,8 +7,11 @@ import { Router } from '@angular/router';
     templateUrl: './game-lose-modal.component.html',
     styleUrls: ['./game-lose-modal.component.scss'],
 })
-export class GameLoseModalComponent implements OnInit {
+export class GameLoseModalComponent {
     constructor(private matDialogRef: MatDialogRef<GameLoseModalComponent>, private router: Router) {}
 
-    ngOnInit(): void {}
+    confirm(): void {
+        this.matDialogRef.close();
+        this.router.navigate(['/home']);
+    }
 }

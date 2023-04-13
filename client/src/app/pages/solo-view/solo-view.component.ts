@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
+import { GameLoseModalComponent } from '@app/modals/game-lose-modal/game-lose-modal.component';
 import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal.component';
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
@@ -83,8 +84,14 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.startTime = new Date().toLocaleString('fr-FR');
         this.gameConstantsService.getGameConstants().subscribe((gameConstants: GameConstants) => {
             this.gameConstants = gameConstants;
+            if (this.isLimitedTimeMode) {
+                this.socketService.send<TimerInformation>(LIMITED_TIME_MODE_EVENTS.StartTimer, {
+                    time: this.gameConstants.countDown,
+                    room: this.socketService.gameRoom,
+                });
+                this.timerService.limitedTimeTimer();
+            }
         });
-
         if (this.stageId) {
             this.imagesService.getImageNames(this.stageId).subscribe((imageObject) => {
                 this.imagesInfo = imageObject;
@@ -93,11 +100,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.socketService.listen<StageInformation>(LIMITED_TIME_MODE_EVENTS.NewStageInformation, (newStageInfo: StageInformation) => {
                     Object.assign(this.gameCardInfo, newStageInfo);
                 });
-                this.socketService.send<TimerInformation>(LIMITED_TIME_MODE_EVENTS.StartTimer, {
-                    time: TWO_MINUTES,
-                    room: this.socketService.gameRoom,
-                });
-                this.timerService.limitedTimeTimer();
                 // TODO: ADD game card info for time added per difference found from game constants.
             } else {
                 this.gameCardInfoService.getGameCardInfoFromId(this.stageId).subscribe((gameCardData) => {
@@ -157,8 +159,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.socketService.listen<string>(MATCH_EVENTS.Win, (socketId: string) => {
             this.winGame(socketId);
         });
-        this.socketService.listen<string>(MATCH_EVENTS.Lose, (endGame: string) => {
-            this.lose(endGame);
+        this.socketService.listen<string>(MATCH_EVENTS.Lose, () => {
+            this.loseGame();
         });
     }
 
@@ -244,6 +246,17 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.dialog.open(GameWinModalComponent, {
                 disableClose: true,
                 data: { isMultiplayer: this.isMultiplayer, winner: this.socketService.names.get(winnerId) } as EndGame,
+            });
+        }
+    }
+
+    loseGame(): void {
+        if (!this.left.endGame) {
+            this.left.endGame = true;
+            this.right.endGame = true;
+            this.showNavBar = false;
+            this.dialog.open(GameLoseModalComponent, {
+                disableClose: true,
             });
         }
     }
