@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { GameCardInformation } from '@common/game-card';
 
 import { GameInfoModalComponent } from './game-info-modal.component';
@@ -27,9 +27,10 @@ describe('GameInfoModalComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should receive the proper values from constructor', () => {
-        expect(component.data.gameCardInfo).toEqual(new GameCardInformation());
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        expect(component.data.numberOfDifferences).toBe(1);
+    it('should close the modal page when calling close', () => {
+        const matDialogRefMock = TestBed.inject(MatDialogRef);
+        const closeSpy = spyOn(matDialogRefMock, 'close');
+        component.close();
+        expect(closeSpy).toHaveBeenCalled();
     });
 });

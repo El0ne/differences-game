@@ -10,13 +10,17 @@ import { GameCardInformation } from '@common/game-card';
 export class GameInfoModalComponent {
     constructor(
         @Inject(MAT_DIALOG_DATA)
-        public data: {
+        private data: {
             gameCardInfo: GameCardInformation;
             numberOfDifferences: number;
             numberOfPlayers: number;
         },
-        public matDialogRef: MatDialogRef<GameInfoModalComponent>,
+        private matDialogRef: MatDialogRef<GameInfoModalComponent>,
     ) {}
+
+    get gameData() {
+        return this.data;
+    }
 
     close() {
         this.matDialogRef.close();
