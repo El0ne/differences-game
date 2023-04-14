@@ -14,6 +14,7 @@ export class GameInfoModalComponent {
             gameCardInfo: GameCardInformation;
             numberOfDifferences: number;
             numberOfPlayers: number;
+            isReplayMode: boolean;
         },
         private matDialogRef: MatDialogRef<GameInfoModalComponent>,
     ) {}

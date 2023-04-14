@@ -13,6 +13,6 @@
         <!-- TODO add game mode -->
     </div>
     <div class="button-container">
-        <button class="normal-button" (click)="close()">Fermer</button>
+        <button [disabled]="gameData.isReplayMode" class="normal-button" (click)="close()">Fermer</button>
     </div>
 </div>

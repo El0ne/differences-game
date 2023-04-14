@@ -309,11 +309,13 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     openInfoModal(): void {
+        console.log(this.isReplayMode);
         const dialogRef = this.dialog.open(GameInfoModalComponent, {
             data: {
                 gameCardInfo: this.gameCardInfo,
                 numberOfDifferences: this.numberOfDifferences,
                 numberOfPlayers: this.isMultiplayer ? 2 : 1,
+                isReplayMode: this.isReplayMode,
             },
             disableClose: true,
         });
