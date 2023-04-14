@@ -1,4 +1,4 @@
-import { CloseInfoModalCommand } from '@app/commands/close-info-modal/close-info-modal-command';
+import { CloseInfoModalCommand } from '@app/commands/close-modal/close-info-modal-command';
 import { SoloViewComponent } from '@app/pages/solo-view/solo-view.component';
 
 describe('CloseInfoModalCommand', () => {

@@ -2,11 +2,11 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CloseInfoModalCommand } from '@app/commands/close-info-modal/close-info-modal-command';
+import { CloseModalCommand } from '@app/commands/close-modal/close-info-modal-command';
 import { Command, Invoker } from '@app/commands/command';
 import { EndGameCommand } from '@app/commands/end-game/end-game-command';
 import { KeyPressCommand } from '@app/commands/key-press/key-press-command';
-import { OpenInfoModalCommand } from '@app/commands/open-info-modal-command/open-info-modal-command';
+import { OpenModalCommand } from '@app/commands/open-modal-command/open-info-modal-command';
 import { OpponentDifferenceCommand } from '@app/commands/opponent-difference/opponent-difference-command';
 import { SendMessageCommand } from '@app/commands/send-message/send-message-command';
 import { WriteMessageCommand } from '@app/commands/write-message/write-message';
@@ -309,7 +309,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     openInfoModal(): void {
-        console.log(this.isReplayMode);
         const dialogRef = this.dialog.open(GameInfoModalComponent, {
             data: {
                 gameCardInfo: this.gameCardInfo,
@@ -321,14 +320,14 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         });
 
         if (!this.isReplayMode) {
-            this.addCommand(new OpenInfoModalCommand(this));
+            this.addCommand(new OpenModalCommand(this, true));
             dialogRef.afterClosed().subscribe(() => {
-                this.addCommand(new CloseInfoModalCommand(this));
+                this.addCommand(new CloseModalCommand(this));
             });
         }
     }
 
-    closeInfoModal(): void {
+    closeModals(): void {
         this.dialog.closeAll();
     }
 
@@ -336,12 +335,22 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         const dialogRef = this.dialog.open(QuitGameModalComponent, {
             disableClose: true,
         });
-        if (this.isReplayMode) {
-            this.timerService.stopTimer();
+        if (!this.isReplayMode) {
+            this.addCommand(new OpenModalCommand(this, false));
             dialogRef.afterClosed().subscribe(() => {
-                this.timerService.restartTimer(this.replayButtonsService.timeMultiplier);
+                this.addCommand(new CloseModalCommand(this));
             });
         }
+    }
+
+    quitGameReplay(): void {
+        const dialogRef = this.dialog.open(QuitGameModalComponent, {
+            disableClose: true,
+        });
+        this.timerService.stopTimer();
+        dialogRef.afterClosed().subscribe(() => {
+            this.timerService.restartTimer(this.replayButtonsService.timeMultiplier);
+        });
     }
 
     inputIsChanging(): void {

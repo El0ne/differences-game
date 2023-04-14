@@ -26,7 +26,6 @@
                     color: isReplayMode ? '#E0E0E0' : '#fff'
                 }"
             >
-                >
                 <mat-icon class="icon">logout</mat-icon>
             </button>
         </div>
@@ -132,7 +131,7 @@
         </div>
     </div>
     <div *ngIf="isReplayMode" class="replay-container">
-        <button class="replay-button normal-button" type="button" (click)="quitGame()">
+        <button class="replay-button normal-button" type="button" (click)="quitGameReplay()">
             <mat-icon class="icon">logout</mat-icon>
         </button>
 

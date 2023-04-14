@@ -1,4 +1,4 @@
-import { OpenInfoModalCommand } from '@app/commands/open-info-modal-command/open-info-modal-command';
+import { OpenInfoModalCommand } from '@app/commands/open-modal-command/open-info-modal-command';
 import { SoloViewComponent } from '@app/pages/solo-view/solo-view.component';
 
 describe('OpenInfoModalCommand', () => {

@@ -13,7 +13,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { EndGameCommand } from '@app/commands/end-game/end-game-command';
-import { OpenInfoModalCommand } from '@app/commands/open-info-modal-command/open-info-modal-command';
+import { OpenInfoModalCommand } from '@app/commands/open-modal-command/open-info-modal-command';
 import { WriteMessageCommand } from '@app/commands/write-message/write-message';
 import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
@@ -293,7 +293,7 @@ describe('SoloViewComponent', () => {
     });
 
     it('should close all modals', () => {
-        component.closeInfoModal();
+        component.closeModals();
         expect(component.dialog.closeAll).toHaveBeenCalled();
     });
 
