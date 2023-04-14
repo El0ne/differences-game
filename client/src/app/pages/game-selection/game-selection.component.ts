@@ -8,7 +8,7 @@ import { GameCardInformation } from '@common/game-card';
 import { WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
 
-const DELAY_BEFORE_REFRESH = 250;
+export const DELAY_BEFORE_REFRESH = 250;
 @Component({
     selector: 'app-game-selection',
     templateUrl: './game-selection.component.html',

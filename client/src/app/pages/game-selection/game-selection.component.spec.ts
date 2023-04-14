@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -10,9 +10,9 @@ import { GameCardInformationService } from '@app/services/game-card-information-
 import { SocketService } from '@app/services/socket/socket.service';
 import { GameCardInformation } from '@common/game-card';
 import { WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
-import { of, Subject } from 'rxjs';
+import { Subject, of } from 'rxjs';
 import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
-import { GameSelectionComponent } from './game-selection.component';
+import { DELAY_BEFORE_REFRESH, GameSelectionComponent } from './game-selection.component';
 
 describe('GameSelectionComponent', () => {
     let component: GameSelectionComponent;
@@ -124,6 +124,17 @@ describe('GameSelectionComponent', () => {
         component.index = component.numberOfGameInformations;
         expect(component.isShowingLastCard()).toBeTruthy();
     });
+
+    it('refreshGameCards() should call getNumberOfGameCardInformation and getGameCardsInformations', fakeAsync(() => {
+        const fakeData = 5;
+        spyOn(component.gameCardService, 'getNumberOfGameCardInformation').and.returnValue(of(fakeData));
+        spyOn(component, 'selectGameCards');
+        component.refreshGameCards();
+        tick(DELAY_BEFORE_REFRESH);
+        expect(component.numberOfGameInformations).toEqual(fakeData);
+        expect(component.gameCardService.getNumberOfGameCardInformation).toHaveBeenCalled();
+        expect(component.selectGameCards).toHaveBeenCalled();
+    }));
 
     it('MatchCreated event should call setGameCardCreateOrJoin with isCreate at false', () => {
         socketServiceSpy.listen = (event: string, callback: any) => {
