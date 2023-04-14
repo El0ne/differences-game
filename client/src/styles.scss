@@ -102,6 +102,11 @@ body {
     background-color: #ff124dc5;
 }
 
+.button-replay-disabled:hover {
+    cursor: not-allowed;
+    background-color: #ff124f;
+}
+
 .neon {
     color: #fff;
     text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #fff, 0 0 40px #5271ff, 0 0 80px #5271ff, 0 0 90px #5271ff, 0 0 100px #5271ff, 0 0 15px #5271ff;
