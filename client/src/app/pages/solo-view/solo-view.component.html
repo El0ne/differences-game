@@ -100,11 +100,12 @@
                     <button class="send-button" (click)="sendMessage()"></button>
                 </div>
             </div>
-            <div *ngIf="this.hintIcon && !this.isMultiplayer">
+            <div class="centered" *ngIf="this.hintIcon && !this.isMultiplayer">
                 <button class="hint hint-button" type="button" (click)="getDiffFromClick()">
                     <mat-icon>search</mat-icon>
                 </button>
                 <div class="playerName">{{ hintsRemaining() }}</div>
+                <div class="message centered">Temps par indice: {{ this.gameConstants.hint }} secondes</div>
             </div>
             <div *ngIf="this.thirdHint" class="centered">
                 <div class="third-hint-box neon-border" [ngStyle]="{ 'background-color': this.hintColor }"></div>
