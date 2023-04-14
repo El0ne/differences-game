@@ -333,6 +333,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     quitGame(): void {
         const dialogRef = this.dialog.open(QuitGameModalComponent, {
+            data: {
+                isButtonDisabled: this.isReplayMode,
+            },
             disableClose: true,
         });
         if (!this.isReplayMode) {
@@ -345,6 +348,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     quitGameReplay(): void {
         const dialogRef = this.dialog.open(QuitGameModalComponent, {
+            data: {
+                isButtonDisabled: false,
+            },
             disableClose: true,
         });
         this.timerService.stopTimer();

@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
+import { Component, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
 @Component({
@@ -9,7 +9,19 @@ import { Router } from '@angular/router';
 })
 export class QuitGameModalComponent {
     image: string = '../../../assets/crying-black-guy-meme.gif';
-    constructor(private matDialogRef: MatDialogRef<QuitGameModalComponent>, private router: Router) {}
+    constructor(
+        @Inject(MAT_DIALOG_DATA)
+        private data: {
+            isButtonDisabled: boolean;
+        },
+
+        private matDialogRef: MatDialogRef<QuitGameModalComponent>,
+        private router: Router,
+    ) {}
+
+    get gameData() {
+        return this.data;
+    }
 
     confirm(): void {
         this.matDialogRef.close();
