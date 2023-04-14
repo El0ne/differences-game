@@ -290,13 +290,10 @@ describe('SoloViewComponent', () => {
         // expect(component.addCommand).toHaveBeenCalledWith(new CloseInfoModalCommand(component));
     });
 
-    // it('should close all modals', () => {
-    //     spyOn(component.dialog, 'closeAll');
-    //     component.closeInfoModal();
-    //     expect(component.dialog.closeAll).toHaveBeenCalled();
-    // });
-
-    /// //I HAVE NO FUCKING IDEA WHY THIS DOESN'T WORK////////
+    it('should close all modals', () => {
+        component.closeInfoModal();
+        expect(component.dialog.closeAll).toHaveBeenCalled();
+    });
 
     it('should open the quit game modal with disableClose set to true', () => {
         component.isReplayMode = false;
