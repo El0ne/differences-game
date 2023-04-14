@@ -14,6 +14,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
+import { GameLoseModalComponent } from '@app/modals/game-lose-modal/game-lose-modal.component';
 import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal.component';
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
@@ -29,7 +30,7 @@ import { GameCardInformation } from '@common/game-card';
 import { GameConstants } from '@common/game-constants';
 import { GameHistoryDTO } from '@common/game-history.dto';
 import { ImageObject } from '@common/image-object';
-import { MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
+import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND, TWO_MINUTES } from '@common/match-gateway-communication';
 import { of } from 'rxjs';
 import { SoloViewComponent } from './solo-view.component';
 
@@ -140,10 +141,21 @@ describe('SoloViewComponent', () => {
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.ngOnInit();
         tick(ONE_SECOND);
-        expect(sendSpy).toHaveBeenCalledTimes(2);
-        expect(component.soloTimer).toBeTruthy();
+        expect(sendSpy).toHaveBeenCalledTimes(1);
         expect(component.gameConstants).toEqual(MOCK_GAME_CONSTANTS);
-        clearInterval(component.soloTimer);
+    }));
+
+    it('ngOnInit should listen to a new stage information if in limited time mode', fakeAsync(() => {
+        Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: true });
+        const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
+        socketServiceMock.listen = (event: string, callback: any) => {
+            if (event === LIMITED_TIME_MODE_EVENTS.NewStageInformation) {
+                callback(SERVICE_MOCK_IMAGE_OBJECT);
+            }
+        };
+        component.ngOnInit();
+        tick(ONE_SECOND);
+        expect(sendSpy).toHaveBeenCalledTimes(1);
     }));
 
     it('should set the current gameCard id according to value in route and request gameCard as well as game player information', () => {
@@ -186,6 +198,9 @@ describe('SoloViewComponent', () => {
                     callback('wrong');
                     break;
                 }
+                case MATCH_EVENTS.Lose: {
+                    callback();
+                }
                 // No default
             }
         };
@@ -194,7 +209,7 @@ describe('SoloViewComponent', () => {
         const finishGameSpy = spyOn(component, 'winGame');
         Object.defineProperty(socketServiceMock, 'socketId', { value: 'test' });
         component.configureSocketReactions();
-        expect(listenSpy).toHaveBeenCalledTimes(5);
+        expect(listenSpy).toHaveBeenCalledTimes(6);
         expect(component.messages.length).toEqual(3);
         expect(sendSpy).toHaveBeenCalled();
         expect(component.messages[component.messages.length - 2].socketId).toEqual('test');
@@ -464,6 +479,29 @@ describe('SoloViewComponent', () => {
         const sendSpy = spyOn(socketServiceMock, 'send');
         component.notifyNewBestTime('opponentId', false, 'classique');
         expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.BestTime, MOCK_GAME_HISTORY_2);
+    });
+
+    it('loseGame should open lose dialog component and set endGame conditions', () => {
+        component.loseGame();
+        expect(modalSpy.open).toHaveBeenCalledWith(GameLoseModalComponent, { disableClose: true });
+        expect(component.showNavBar).toBeFalse();
+        expect(component.left.endGame).toBeTrue();
+        expect(component.right.endGame).toBeTrue();
+    });
+
+    it('effect handler should update time in limited time mode', () => {
+        component.timerService.currentTime = 90;
+        component.gameConstants.difference = 10;
+        component.isLimitedTimeMode = true;
+        socketServiceMock.gameRoom = 'test';
+        const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
+        component.effectHandler(MOCK_PLAYER_DIFFERENCES);
+        expect(sendSpy).toHaveBeenCalledWith(LIMITED_TIME_MODE_EVENTS.StartTimer, { time: 100, room: 'test' });
+
+        component.timerService.currentTime = 120;
+        component.gameConstants.difference = 10;
+        component.effectHandler(MOCK_PLAYER_DIFFERENCES);
+        expect(sendSpy).toHaveBeenCalledWith(LIMITED_TIME_MODE_EVENTS.StartTimer, { time: TWO_MINUTES, room: 'test' });
     });
 });
 

@@ -122,8 +122,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                             },
                         };
                         this.socketService.send<GameHistoryDTO>(MATCH_EVENTS.SoloGameInformation, gameHistory);
-                        this.showTime();
                     }
+                    this.showTime();
                 });
             }
         }
