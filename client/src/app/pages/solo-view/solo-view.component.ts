@@ -195,7 +195,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     getRandomDifference(event: KeyboardEvent | null): void {
-        if (event?.key === 'i') {
+        if (event?.key === 'i' && !this.isMultiplayer) {
+            // TODO : Add limited time variant where time is substracted
             this.timerService.restartTimer(1, this.gameConstants.hint);
             if (this.hintsRemaining() > 0) this.socketService.send(CHAT_EVENTS.Hint, this.currentRoom);
             this.left.getDifferences(this.currentGameId).subscribe((data) => {
@@ -305,6 +306,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     addDifferenceDetected(differenceIndex: number): void {
+        // TODO : Maybe add time, ask charge
         this.foundDifferenceService.addDifferenceFound(differenceIndex);
     }
 

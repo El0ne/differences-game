@@ -100,14 +100,16 @@
                     <button class="send-button" (click)="sendMessage()"></button>
                 </div>
             </div>
-            <div *ngIf="this.hintIcon">
+            <div *ngIf="this.hintIcon && !this.isMultiplayer">
                 <button class="hint hint-button" type="button" (click)="getDiffFromClick()">
                     <mat-icon>search</mat-icon>
                 </button>
                 <div class="playerName">{{ hintsRemaining() }}</div>
             </div>
-            <div *ngIf="this.thirdHint" class="third-hint-box neon-border" [ngStyle]="{ 'background-color': this.hintColor }"></div>
-            <p *ngIf="this.thirdHint" class="message centered">Plus vous êtes proches de la différence, plus la carré est rouge</p>
+            <div *ngIf="this.thirdHint" class="centered">
+                <div class="third-hint-box neon-border" [ngStyle]="{ 'background-color': this.hintColor }"></div>
+                <p class="message centered">Plus vous êtes proches de la différence, plus la carré est rouge</p>
+            </div>
         </div>
 
         <div class="image-container neon-border">
