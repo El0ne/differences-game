@@ -1,9 +1,8 @@
-<body class='page-background'>
-    <div class="header">
-        <button id="previous" routerLink="/home">Retour</button>
-    </div>
+<body class="modal-page container">
+    <h1 class="neon name-entry-title">Veuillez choisir un mode de jeu</h1>
     <div class="row">
         <button class="normal-button option-button" (click)="selectPlayerName(false)">Solo</button>
         <button class="normal-button option-button" (click)="selectPlayerName(true)">Cooperatif</button>
     </div>
+    <button id="previous" class="normal-button return-button" routerLink="/home">Retour</button>
 </body>
