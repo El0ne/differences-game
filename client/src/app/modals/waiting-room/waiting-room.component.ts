@@ -1,5 +1,5 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { SocketService } from '@app/services/socket/socket.service';
 import { AcceptationInformation, PlayerInformations, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
@@ -24,12 +24,11 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
         private dialogRef: MatDialogRef<WaitingRoomComponent>,
         private router: Router,
         private socket: SocketService,
-        @Inject(MAT_DIALOG_DATA) data: WaitingRoomDataPassing,
-    ) {
-        this.waitingRoomInfo = data;
-    }
+        @Inject(MAT_DIALOG_DATA) private data: WaitingRoomDataPassing,
+    ) {}
 
     ngOnInit(): void {
+        this.waitingRoomInfo = this.data;
         if (this.waitingRoomInfo.isHost) {
             this.socket.listen<PlayerInformations>(WAITING_ROOM_EVENTS.RequestMatch, (opponentInformations: PlayerInformations) => {
                 this.clientsInWaitingRoom.set(opponentInformations.playerSocketId, opponentInformations.playerName);

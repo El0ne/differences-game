@@ -10,7 +10,11 @@ import { EndGame } from '@common/chat-dialog-constants';
 })
 export class GameWinModalComponent {
     isReplaySelected: boolean = false;
-    constructor(private matDialogRef: MatDialogRef<GameWinModalComponent>, private router: Router, @Inject(MAT_DIALOG_DATA) public data: EndGame) {}
+    constructor(private matDialogRef: MatDialogRef<GameWinModalComponent>, private router: Router, @Inject(MAT_DIALOG_DATA) private data: EndGame) {}
+
+    get endGameInfo(): EndGame {
+        return this.data;
+    }
 
     confirm(): void {
         this.matDialogRef.close();

@@ -1,8 +1,8 @@
 <div class="win modal-page">
-    <div *ngIf="data.isMultiplayer" class="text">
-        <p class="neon">{{ data.winner }} est le vainqueur!</p>
+    <div *ngIf="endGameInfo.isMultiplayer" class="text">
+        <p class="neon">{{ endGameInfo.winner }} est le vainqueur!</p>
 
-        <div *ngIf="data.isWinner; else elseWinner">
+        <div *ngIf="endGameInfo.isWinner; else elseWinner">
             <div class="endGameMessage">
                 <p>Vous Avez Gagné!</p>
                 <p>Bravo!</p>
@@ -15,7 +15,7 @@
             </div>
         </ng-template>
     </div>
-    <div *ngIf="!data.isMultiplayer" class="text neon">
+    <div *ngIf="!endGameInfo.isMultiplayer" class="text neon">
         <p>Vous Avez Gagné!</p>
         <p>Bravo!</p>
     </div>

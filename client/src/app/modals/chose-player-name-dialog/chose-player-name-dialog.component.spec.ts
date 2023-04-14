@@ -1,9 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { SocketService } from '@app/services/socket/socket.service';
-import { GameConditions } from '@common/chat-dialog-constants';
 
 import { ChosePlayerNameDialogComponent } from './chose-player-name-dialog.component';
 
@@ -12,7 +11,6 @@ describe('ChosePlayerNameDialogComponent', () => {
     let fixture: ComponentFixture<ChosePlayerNameDialogComponent>;
     let matDialogSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
     let socketServiceSpy: SocketService;
-    const data: GameConditions = { game: 'game', isMultiplayer: true };
 
     beforeEach(async () => {
         matDialogSpy = jasmine.createSpyObj('MatDialogRef<ChosePlayerNameDialogComponent>', ['close']);
@@ -28,7 +26,6 @@ describe('ChosePlayerNameDialogComponent', () => {
                     provide: SocketService,
                     useValue: socketServiceSpy,
                 },
-                { provide: MAT_DIALOG_DATA, useValue: data },
             ],
         }).compileComponents();
 
