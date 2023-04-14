@@ -452,10 +452,13 @@ describe('SoloViewComponent', () => {
         expect(gameHintServiceMock.setColor).toHaveBeenCalled();
     });
 
-    it('should set hint positions and hintsRemaining on left component', () => {
-        const mockDifference = [[1], [2], [3]];
+    it('getRandomDifference should set hint positions and hintsRemaining on left component', () => {
+        component.isMultiplayer = false;
+        const mockDifference = [[1]];
+        gameHintServiceMock.hintsRemaining = 2;
+        component.isClassic = true;
         spyOn(component.left, 'getDifferences').and.returnValue(of(mockDifference));
-        spyOn(foundDifferenceServiceSpy, 'findPixelsFromDifference').and.returnValue([4, 5, 6]);
+        spyOn(foundDifferenceServiceSpy, 'findPixelsFromDifference').and.returnValue([4]);
         spyOn(gameHintServiceMock, 'getPercentages').and.returnValue([0.25, 0.25]);
 
         component.getRandomDifference({ key: 'i' } as KeyboardEvent);
@@ -467,11 +470,80 @@ describe('SoloViewComponent', () => {
         expect(component.left.hintPosY).toBe('160');
     });
 
+    it('getRandomDifference should call activateThirdHint if the length of getPercentages is 0', () => {
+        component.isMultiplayer = false;
+        const mockDifference = [[1]];
+        gameHintServiceMock.hintsRemaining = 1;
+        component.isClassic = false;
+        const thirdHintSpy = spyOn(component, 'activateThirdHint');
+        spyOn(component.left, 'getDifferences').and.returnValue(of(mockDifference));
+        spyOn(foundDifferenceServiceSpy, 'findPixelsFromDifference').and.returnValue([4]);
+        spyOn(gameHintServiceMock, 'getPercentages').and.returnValue([]);
+
+        component.getRandomDifference({ key: 'i' } as KeyboardEvent);
+
+        expect(thirdHintSpy).toHaveBeenCalled();
+    });
+
     it('activateThirdHint should set hintFlag to false and thirdHint to true', () => {
         component.activateThirdHint();
         expect(component.thirdHint).toBeTrue();
         expect(component.hintIcon).toBeFalse();
     });
+
+    it('setCurrentHint should set hints properly', () => {
+        gameHintServiceMock.hintsRemaining = 2;
+        component.left.firstHint = false;
+        component.left.secondHint = false;
+        component.setCurrentHint();
+        expect(component.left.firstHint).toBeTrue();
+        expect(component.left.secondHint).toBeFalse();
+    });
+
+    it('setCurrentHint should set hints properly', () => {
+        gameHintServiceMock.hintsRemaining = 1;
+        component.left.firstHint = false;
+        component.left.secondHint = false;
+        component.setCurrentHint();
+        expect(component.left.firstHint).toBeFalse();
+        expect(component.left.secondHint).toBeTrue();
+    });
+
+    it('hintTimeouts should time out hints correctly', fakeAsync(() => {
+        component.right.firstHint = true;
+        component.right.secondHint = false;
+        component.thirdHint = false;
+
+        component.hintTimeouts();
+
+        tick(4000);
+
+        expect(component.left.firstHint).toBeFalse();
+    }));
+
+    it('hintTimeouts should time out hints correctly', fakeAsync(() => {
+        component.right.firstHint = false;
+        component.right.secondHint = true;
+        component.thirdHint = false;
+
+        component.hintTimeouts();
+
+        tick(4000);
+
+        expect(component.left.secondHint).toBeFalse();
+    }));
+
+    it('hintTimeouts should time out hints correctly', fakeAsync(() => {
+        component.right.firstHint = false;
+        component.right.secondHint = false;
+        component.thirdHint = true;
+
+        component.hintTimeouts();
+
+        tick(8000);
+
+        expect(component.thirdHint).toBeFalse();
+    }));
 
     it('notifyNewBestTime should send gameHistory information as well as current timer time', () => {
         component.player = 'player';

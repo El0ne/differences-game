@@ -9,7 +9,7 @@ export class GameHintService {
     hintsRemaining: number;
 
     constructor() {
-        this.hintsRemaining = 3;
+        this.hintsRemaining = 2;
     }
 
     getPercentages(positions: number[]): number[] {

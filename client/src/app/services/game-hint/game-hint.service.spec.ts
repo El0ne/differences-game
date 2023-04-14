@@ -53,4 +53,24 @@ describe('GameHintService', () => {
         const percentages = service.getPercentages(positions);
         expect(percentages).toEqual([0.75, 0.75]);
     });
+
+    it('should return red for small radius', () => {
+        const clickPosition = [50, 50];
+        const hintPosition = [60, 60];
+        const expected = '#FF2D00';
+
+        const result = service.setColor(clickPosition, hintPosition);
+
+        expect(result).toEqual(expected);
+    });
+
+    it('should return the correct color for large radius', () => {
+        const clickPosition = [480, 640];
+        const hintPosition = [0, 0];
+        const expected = 'rgb(-328, 0, 583)';
+
+        const result = service.setColor(clickPosition, hintPosition);
+
+        expect(result).toEqual(expected);
+    });
 });

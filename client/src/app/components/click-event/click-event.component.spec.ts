@@ -71,6 +71,14 @@ describe('ClickEventComponent', () => {
         expect(sound.src.endsWith('/assets/Error.mp3')).toBeTrue();
     });
 
+    it('handleMouseMove should emit properly', () => {
+        const emitSpy = spyOn(component.color, 'emit');
+        const event = new MouseEvent('mousemove');
+
+        component.handleMouseMove(event);
+        expect(emitSpy).toHaveBeenCalled();
+    });
+
     it('getCoordInImage() should reset the position in the y if click is negative', () => {
         const mockClick = new MouseEvent('click', { clientX: 0, clientY: -200 });
         const answer = component.getCoordInImage(mockClick);

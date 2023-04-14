@@ -196,8 +196,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     getRandomDifference(event: KeyboardEvent | null): void {
         if (event?.key === 'i' && !this.isMultiplayer) {
-            // TODO : Add limited time variant where time is substracted
-            this.timerService.restartTimer(1, this.gameConstants.hint);
+            // TODO : Verifier que ca fonctionne avec temps limite
+            if (this.isClassic) this.timerService.restartTimer(1, this.gameConstants.hint);
+            else {
+                this.timerService.restartTimer(1, -this.gameConstants.hint);
+            }
             if (this.hintsRemaining() > 0) this.socketService.send(CHAT_EVENTS.Hint, this.currentRoom);
             this.left.getDifferences(this.currentGameId).subscribe((data) => {
                 const pixelArray = this.foundDifferenceService.findPixelsFromDifference(data);
@@ -213,28 +216,35 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                     this.right.hintPosX = this.left.hintPosX;
                     this.right.hintPosY = this.left.hintPosY;
                 }
-
-                this.left.firstHint = this.gameHintService.hintsRemaining === 2;
-                this.left.secondHint = this.gameHintService.hintsRemaining === 1;
-
-                this.right.firstHint = this.gameHintService.hintsRemaining === 2;
-                this.right.secondHint = this.gameHintService.hintsRemaining === 1;
-                if (this.right.firstHint) {
-                    setTimeout(() => {
-                        this.left.firstHint = false;
-                        this.right.firstHint = false;
-                    }, HINT_TIME_IN_MS);
-                } else if (this.right.secondHint) {
-                    setTimeout(() => {
-                        this.left.secondHint = false;
-                        this.right.secondHint = false;
-                    }, HINT_TIME_IN_MS);
-                } else {
-                    setTimeout(() => {
-                        this.thirdHint = false;
-                    }, DOUBLE_HINT_TIME_IN_MS);
-                }
+                this.setCurrentHint();
+                this.hintTimeouts();
             });
+        }
+    }
+
+    setCurrentHint(): void {
+        this.left.firstHint = this.gameHintService.hintsRemaining === 2;
+        this.left.secondHint = this.gameHintService.hintsRemaining === 1;
+
+        this.right.firstHint = this.gameHintService.hintsRemaining === 2;
+        this.right.secondHint = this.gameHintService.hintsRemaining === 1;
+    }
+
+    hintTimeouts(): void {
+        if (this.right.firstHint) {
+            setTimeout(() => {
+                this.left.firstHint = false;
+                this.right.firstHint = false;
+            }, HINT_TIME_IN_MS);
+        } else if (this.right.secondHint) {
+            setTimeout(() => {
+                this.left.secondHint = false;
+                this.right.secondHint = false;
+            }, HINT_TIME_IN_MS);
+        } else {
+            setTimeout(() => {
+                this.thirdHint = false;
+            }, DOUBLE_HINT_TIME_IN_MS);
         }
     }
 
@@ -306,7 +316,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     addDifferenceDetected(differenceIndex: number): void {
-        // TODO : Maybe add time, ask charge
         this.foundDifferenceService.addDifferenceFound(differenceIndex);
     }
 
