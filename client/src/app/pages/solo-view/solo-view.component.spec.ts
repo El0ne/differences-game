@@ -86,7 +86,7 @@ describe('SoloViewComponent', () => {
         socketServiceMock.opponentSocket = 'opponentId';
         socketServiceMock.liveSocket = () => true;
 
-        modalSpy = jasmine.createSpyObj('MatDialog', ['open']);
+        modalSpy = jasmine.createSpyObj('MatDialog', ['open', 'closeAll']);
 
         socketServiceMock.send = (event: string, data?: unknown) => {
             if (data) socketServiceMock.sio.emit(event, data);
