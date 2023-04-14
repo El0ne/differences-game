@@ -37,6 +37,18 @@ describe('TimerSoloService', () => {
         expect(sendSpy).toHaveBeenCalledWith(MATCH_EVENTS.EndTime, 'test');
     }));
 
+    it('restartTimer should send a restart timer event', fakeAsync(() => {
+        const multiplier = 1;
+
+        service.restartTimer(multiplier);
+
+        expect(mockSocketService.send).toHaveBeenCalledWith(MATCH_EVENTS.Replay, {
+            room: mockSocketService.gameRoom,
+            currentTime: 0,
+            timeMultiplier: multiplier,
+        });
+    }));
+
     it('should be over 1 minute if there is more than 60 seconds', () => {
         expect(service.convert(SEVENTY_FIVE_SECONDS)).toEqual('1:15');
     });
