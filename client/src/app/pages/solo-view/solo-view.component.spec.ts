@@ -257,8 +257,9 @@ describe('SoloViewComponent', () => {
                 gameCardInfo: component.gameCardInfo,
                 numberOfDifferences: component.numberOfDifferences,
                 numberOfPlayers: 2,
+                isReplayMode: component.isReplayMode,
             },
-            disableClose: component.isReplayMode,
+            disableClose: true,
         });
     });
 
@@ -272,8 +273,9 @@ describe('SoloViewComponent', () => {
                 gameCardInfo: component.gameCardInfo,
                 numberOfDifferences: component.numberOfDifferences,
                 numberOfPlayers: 1,
+                isReplayMode: component.isReplayMode,
             },
-            disableClose: component.isReplayMode,
+            disableClose: true,
         });
     });
 
