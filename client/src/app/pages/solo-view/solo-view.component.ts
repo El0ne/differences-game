@@ -2,11 +2,11 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CloseModalCommand } from '@app/commands/close-modal/close-info-modal-command';
+import { CloseModalCommand } from '@app/commands/close-modal/close-modal-command';
 import { Command, Invoker } from '@app/commands/command';
 import { EndGameCommand } from '@app/commands/end-game/end-game-command';
 import { KeyPressCommand } from '@app/commands/key-press/key-press-command';
-import { OpenModalCommand } from '@app/commands/open-modal-command/open-info-modal-command';
+import { OpenModalCommand } from '@app/commands/open-modal-command/open-modal-command';
 import { OpponentDifferenceCommand } from '@app/commands/opponent-difference/opponent-difference-command';
 import { SendMessageCommand } from '@app/commands/send-message/send-message-command';
 import { WriteMessageCommand } from '@app/commands/write-message/write-message';
