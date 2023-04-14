@@ -276,7 +276,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.left.endGame = true;
             this.right.endGame = true;
             this.showNavBar = false;
-            if (this.isReplayMode === false) {
+            if (!this.isReplayMode) {
                 dialogRef = this.dialog.open(GameWinModalComponent, {
                     disableClose: true,
                     data: { isMultiplayer: this.isMultiplayer, winner: this.socketService.names.get(winnerId), isWinner: this.isWinner } as EndGame,
@@ -315,10 +315,10 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 numberOfDifferences: this.numberOfDifferences,
                 numberOfPlayers: this.isMultiplayer ? 2 : 1,
             },
-            disableClose: this.isReplayMode,
+            disableClose: true,
         });
 
-        if (this.isReplayMode === false) {
+        if (!this.isReplayMode) {
             this.addCommand(new OpenInfoModalCommand(this));
             dialogRef.afterClosed().subscribe(() => {
                 this.addCommand(new CloseInfoModalCommand(this));
