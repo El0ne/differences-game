@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogRef } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { ReplayGameModalComponent } from './replay-game-modal.component';
 
@@ -14,6 +15,7 @@ describe('ReplayGameModalComponent', () => {
         routerMock = jasmine.createSpyObj<Router>('Router', ['navigate']);
 
         await TestBed.configureTestingModule({
+            imports: [MatIconModule],
             declarations: [ReplayGameModalComponent],
             providers: [
                 { provide: MatDialogRef, useValue: matDialogRefMock },
