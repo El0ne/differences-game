@@ -100,9 +100,9 @@ export class GameCreationPageComponent implements OnInit {
         this.penService.writing.bind(this),
     ];
 
+    // we need more than 3 Services/Routers/Dialogs
     // eslint-disable-next-line max-params
     constructor(
-        // we need more than 3 Services/Routers/Dialogs
         private gameCardService: GameCardInformationService,
         public matDialog: MatDialog,
         public router: Router,
