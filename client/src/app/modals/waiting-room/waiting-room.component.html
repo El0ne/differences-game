@@ -1,3 +1,4 @@
+<! -- add scrolling-bar class to body element below if needed  -->
 <body class="modal-page container">
     <div *ngIf="waitingRoomInfo.isHost; else clientView">
         <div *ngIf="clientsInWaitingRoom.size === 0; else opponents">
@@ -9,11 +10,15 @@
 </body>
 
 <ng-template #opponents>
-    <div class="scrolling-bar opponents-container">
+    <div class="opponents-container">
         <div *ngFor="let opponentId of clientsInWaitingRoom.keys()">
-            <h2 class="neon">NOM : {{ clientsInWaitingRoom.get(opponentId) }}</h2>
-            <button (click)="acceptOpponent(opponentId)" class="normal-button">Accept</button>
-            <button (click)="declineOpponent(opponentId)" class="normal-button">Decline</button>
+            <div class="row">
+                <h2 class="neon">NOM : {{ clientsInWaitingRoom.get(opponentId) }}</h2>
+                <div class="buttons-container">
+                    <button (click)="acceptOpponent(opponentId)" class="normal-button">Accept</button>
+                    <button (click)="declineOpponent(opponentId)" class="normal-button">Decline</button>
+                </div>
+            </div>
         </div>
     </div>
 </ng-template>
