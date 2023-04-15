@@ -7,6 +7,7 @@ export enum MATCH_EVENTS {
     Win = 'Win',
     SoloGameInformation = 'SoloGameInformation',
     Time = 'Time',
+    TimeModification = 'TimeModification',
 }
 
 export const ONE_SECOND = 1000;

@@ -26,6 +26,7 @@
                 (differenceDetected)="differenceHandler($event)"
                 (mistake)="handleMistake()"
                 (cheatModeHandler)="resetDifferences($event)"
+                (color)="setColor($event)"
                 *ngIf="this.gameCardInfo"
             ></app-click-event>
         </div>
@@ -99,6 +100,17 @@
                     <button class="send-button" (click)="sendMessage()"></button>
                 </div>
             </div>
+            <div class="centered" *ngIf="this.hintIcon && !this.isMultiplayer">
+                <button class="hint hint-button" type="button" (click)="getDiffFromClick()">
+                    <mat-icon>search</mat-icon>
+                </button>
+                <div class="playerName">{{ hintsRemaining() }}</div>
+                <div class="message centered">Temps par indice: {{ this.gameConstants.hint }} secondes</div>
+            </div>
+            <div *ngIf="this.thirdHint" class="centered">
+                <div class="third-hint-box neon-border" [ngStyle]="{ 'background-color': this.hintColor }"></div>
+                <p class="message centered">Rouge: Proche<br />Bleu: Loin</p>
+            </div>
         </div>
 
         <div class="image-container neon-border">
@@ -111,13 +123,9 @@
                 (differenceDetected)="differenceHandler($event)"
                 (mistake)="handleMistake()"
                 (cheatModeHandler)="resetDifferences($event)"
+                (color)="setColor($event)"
                 *ngIf="this.gameCardInfo"
             ></app-click-event>
-        </div>
-        <div class="hint-button">
-            <button class="hint" type="button">
-                <mat-icon class="hint-button">search</mat-icon>
-            </button>
         </div>
     </div>
 </body>
