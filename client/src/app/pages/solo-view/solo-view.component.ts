@@ -195,7 +195,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     getRandomDifference(event: KeyboardEvent | null): void {
-        if (event?.key === 'i' && !this.isMultiplayer) {
+        if (event?.key === 'i' && !this.isMultiplayer && this.gameHintService.hintsRemaining > 0) {
             // TODO : Verifier que ca fonctionne avec temps limite
             if (this.isClassic) this.timerService.restartTimer(1, this.gameConstants.hint);
             else {
@@ -211,8 +211,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 if (randomPixelPosition.length === 0) {
                     this.activateThirdHint();
                 } else {
-                    this.left.hintPosX = (randomPixelPosition[1] * HEIGHT).toString();
-                    this.left.hintPosY = (randomPixelPosition[0] * WIDTH).toString();
+                    this.left.hintPosX = randomPixelPosition[1] * HEIGHT;
+                    this.left.hintPosY = randomPixelPosition[0] * WIDTH;
                     this.right.hintPosX = this.left.hintPosX;
                     this.right.hintPosY = this.left.hintPosY;
                 }

@@ -466,8 +466,8 @@ describe('SoloViewComponent', () => {
         expect(component.right.currentPixelHint).toBe(component.left.currentPixelHint);
         expect(component.right.hintPosX).toBe(component.left.hintPosX);
         expect(component.right.hintPosY).toBe(component.left.hintPosY);
-        expect(component.left.hintPosX).toBe('120');
-        expect(component.left.hintPosY).toBe('160');
+        expect(component.left.hintPosX).toBe(120);
+        expect(component.left.hintPosY).toBe(160);
     });
 
     it('getRandomDifference should call activateThirdHint if the length of getPercentages is 0', () => {

@@ -49,12 +49,12 @@ describe('GameHintService', () => {
     it('getPercentages should return the proper percentage if hintsRemaining equals 2', () => {
         service.hintsRemaining = 2;
 
-        const positions = [480, 640];
+        const positions = [639, 479];
         const percentages = service.getPercentages(positions);
         expect(percentages).toEqual([0.75, 0.75]);
     });
 
-    it('should return red for small radius', () => {
+    it('setColor should return red for small radius', () => {
         const clickPosition = [50, 50];
         const hintPosition = [60, 60];
         const expected = '#FF2D00';
@@ -64,7 +64,7 @@ describe('GameHintService', () => {
         expect(result).toEqual(expected);
     });
 
-    it('should return the correct color for large radius', () => {
+    it('setColor should return the correct color for large radius', () => {
         const clickPosition = [480, 640];
         const hintPosition = [0, 0];
         const expected = 'rgb(-328, 0, 583)';

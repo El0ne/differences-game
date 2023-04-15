@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HEIGHT, WIDTH } from '@app/components/click-event/click-event-constant';
-import { APPROXIMATE_RADIUS, FIFTY_PERCENT, MAX_RGB_VALUE, MINIMUM_RADIUS, SEVENTY_FIVE_PERCENT, TWENTY_FIVE_PERCENT } from './game-hint-constants';
+import { APPROXIMATE_RADIUS, FIFTY_PERCENT, FOUR, MAX_RGB_VALUE, MINIMUM_RADIUS } from './game-hint-constants';
 
 @Injectable({
     providedIn: 'root',
@@ -9,7 +9,7 @@ export class GameHintService {
     hintsRemaining: number;
 
     constructor() {
-        this.hintsRemaining = 2;
+        this.hintsRemaining = 3;
     }
 
     getPercentages(positions: number[]): number[] {
@@ -30,15 +30,9 @@ export class GameHintService {
     }
 
     roundDown(toRoundDown: number): number {
-        if (toRoundDown < TWENTY_FIVE_PERCENT) {
-            return 0;
-        } else if (toRoundDown < FIFTY_PERCENT) {
-            return TWENTY_FIVE_PERCENT;
-        } else if (toRoundDown < SEVENTY_FIVE_PERCENT) {
-            return FIFTY_PERCENT;
-        } else {
-            return SEVENTY_FIVE_PERCENT;
-        }
+        const temp = toRoundDown * FOUR;
+        const roundedDownTemp = Math.floor(temp);
+        return roundedDownTemp / FOUR;
     }
 
     roundDownFour(toRoundDown: number): number {

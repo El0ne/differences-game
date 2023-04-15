@@ -201,18 +201,4 @@ describe('ClickEventComponent', () => {
         await component.clearEffect();
         expect(getContextSpy).toHaveBeenCalled();
     });
-
-    it('isClickInHint should return true if click is in hint', () => {
-        const diffClicked = [0];
-        component.currentPixelHint = 0;
-        const isInDiff = component.isClickInHint(diffClicked);
-        expect(isInDiff).toBeTrue();
-    });
-
-    it('isClickInHint should return false if click is not in hint', () => {
-        const diffClicked = [1];
-        component.currentPixelHint = 0;
-        const isInDiff = component.isClickInHint(diffClicked);
-        expect(isInDiff).toBeFalse();
-    });
 });

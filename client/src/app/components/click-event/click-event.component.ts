@@ -37,8 +37,8 @@ export class ClickEventComponent implements OnInit {
     toggleCheatMode: boolean;
     firstHint: boolean;
     secondHint: boolean;
-    hintPosX: string;
-    hintPosY: string;
+    hintPosX: number;
+    hintPosY: number;
     currentPixelHint: number;
 
     constructor(
@@ -84,15 +84,6 @@ export class ClickEventComponent implements OnInit {
 
     convertPositionToPixel(toTransform: number): number[] {
         return this.pixelModificationService.positionToPixel(toTransform);
-    }
-
-    isClickInHint(differenceClicked: number[]): boolean {
-        for (const pixel of differenceClicked) {
-            if (pixel === this.currentPixelHint) {
-                return true;
-            }
-        }
-        return false;
     }
 
     isDifferent(mouseEvent: MouseEvent): void {
