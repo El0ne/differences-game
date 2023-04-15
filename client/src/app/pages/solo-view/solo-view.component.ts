@@ -78,6 +78,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         if (!this.socketService.liveSocket()) {
             this.router.navigate(['/home']);
+            console.log('yo');
             return;
         }
 
@@ -92,6 +93,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         if (this.isLimitedTimeMode) {
             this.socketService.listen<string>(LIMITED_TIME_MODE_EVENTS.NewStageInformation, (newStageId: string) => {
                 this.gameParamService.gameParameters.stageId = newStageId;
+                this.getImagesNames();
+                console.log(newStageId);
+                if (!newStageId) {
+                    this.winGame(this.socketService.socketId);
+                }
             });
         } else {
             this.gameCardInfoService.getGameCardInfoFromId(this.stageId).subscribe((gameCardData) => {
@@ -144,10 +150,14 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         });
         this.socketService.listen<RoomMessage>(CHAT_EVENTS.Abandon, (message: RoomMessage) => {
             if (!this.left.endGame) {
-                this.winGame(this.socketService.socketId);
-                this.notifyNewBestTime(this.socketService.socketId, true, 'classique');
                 message.message = `${message.message} - ${this.opponent} a abandonné la partie.`;
                 this.messages.push(message);
+                if (this.isLimitedTimeMode) {
+                    this.gameParamService.gameParameters.isMultiplayerGame = false;
+                } else {
+                    this.winGame(this.socketService.socketId);
+                    this.notifyNewBestTime(this.socketService.socketId, true, 'classique');
+                }
             }
         });
         this.socketService.listen<PlayerDifference>(MATCH_EVENTS.Difference, (data: PlayerDifference) => {
@@ -255,10 +265,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         }
     }
 
-    addDifferenceDetected(differenceIndex: number): void {
-        this.foundDifferenceService.addDifferenceFound(differenceIndex);
-    }
-
     openInfoModal(): void {
         this.dialog.open(GameInfoModalComponent, {
             data: {
@@ -336,8 +342,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         }
         this.paintPixel(information.lastDifferences);
         this.incrementScore(information.socket);
-        this.addDifferenceDetected(information.differencesPosition);
-        this.endGameVerification();
+        if (this.isLimitedTimeMode) {
+            console.log('fin du game');
+        } else {
+            this.foundDifferenceService.addDifferenceFound(information.differencesPosition);
+            this.endGameVerification();
+        }
     }
 
     endGameVerification(): void {

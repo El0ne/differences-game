@@ -243,12 +243,6 @@ describe('SoloViewComponent', () => {
         expect(startTimerSpy).toHaveBeenCalled();
     });
 
-    it('addDifferenceDetected should call addDifferenceFound of service', () => {
-        component.addDifferenceDetected(1);
-
-        expect(foundDifferenceServiceSpy.addDifferenceFound).toHaveBeenCalled();
-    });
-
     it('should open the game info modal with the correct data', () => {
         spyOnProperty(component, 'isMultiplayer', 'get').and.returnValue(true);
         component.openInfoModal();
@@ -304,13 +298,12 @@ describe('SoloViewComponent', () => {
         const handleFlashSpy = spyOn(component, 'handleFlash');
         const paintPixelSpy = spyOn(component, 'paintPixel');
         const incrementSpy = spyOn(component, 'incrementScore');
-        const addDiffSpy = spyOn(component, 'addDifferenceDetected');
         const endGameVerifSpy = spyOn(component, 'endGameVerification');
         component.effectHandler(MOCK_PLAYER_DIFFERENCES);
         expect(handleFlashSpy).toHaveBeenCalledWith(MOCK_PLAYER_DIFFERENCES.lastDifferences);
         expect(paintPixelSpy).toHaveBeenCalledWith(MOCK_PLAYER_DIFFERENCES.lastDifferences);
         expect(incrementSpy).toHaveBeenCalledWith(MOCK_PLAYER_DIFFERENCES.socket);
-        expect(addDiffSpy).toHaveBeenCalledWith(MOCK_PLAYER_DIFFERENCES.differencesPosition);
+        expect(foundDifferenceServiceSpy.addDifferenceFound).toHaveBeenCalledWith(MOCK_PLAYER_DIFFERENCES.differencesPosition);
         expect(endGameVerifSpy).toHaveBeenCalled();
     });
 
