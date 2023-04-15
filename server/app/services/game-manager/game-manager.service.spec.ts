@@ -132,7 +132,7 @@ describe('GameManagerService', () => {
         expect(getAllGameCardsSpy).toHaveBeenCalled();
         const limitedTimeGameInfo = service.limitedTimeModeGames.get(ROOM);
         expect(limitedTimeGameInfo.playersInGame).toEqual(2);
-        expect(limitedTimeGameInfo.gameStages === limitedTimeGameInfo.stagesUsed).toBeTruthy();
+        expect(limitedTimeGameInfo.gameStages).toStrictEqual(limitedTimeGameInfo.stagesUsed);
         expect(limitedTimeGameInfo.gameStages[0]).toEqual(gameCard._id.toString());
         expect(addGameSpy).toBeCalledTimes(3);
         expect(addGameSpy).toBeCalledWith(gameCard._id.toString(), 2);
@@ -146,13 +146,15 @@ describe('GameManagerService', () => {
         expect(addGameSpy).not.toBeCalled();
     });
 
-    it('giveNextStage should give the next stage if there is one, or undefined where there is none left', async () => {
+    it(`giveNextStage should give the next stage if there is one,
+        or undefined where there is none left.and stageUsed should not change`, async () => {
         jest.spyOn(gameCardService, 'getAllGameCards').mockReturnValue(Promise.resolve([gameCard]));
         await service.startLimitedTimeGame(ROOM, 2);
         const nextStage = service.giveNextStage(ROOM);
         expect(nextStage).toEqual(gameCard._id.toString());
         const noStageExpected = service.giveNextStage(ROOM);
         expect(noStageExpected).toEqual(undefined);
+        expect(service.limitedTimeModeGames.get(ROOM).stagesUsed).toStrictEqual([gameCard._id.toString()]);
     });
 
     it(`removePlayerFromLimitedTimeGame should remove the player from the game

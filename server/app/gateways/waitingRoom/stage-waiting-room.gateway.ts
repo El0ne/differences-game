@@ -15,11 +15,16 @@ import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, We
 import { randomUUID } from 'crypto';
 import { Server, Socket } from 'socket.io';
 
+interface WaitingRoomHost {
+    hostId: string;
+    waitingRoom: string;
+}
+
 @WebSocketGateway()
 @Injectable()
 export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
-    gameHosts: Map<string, string> = new Map<string, string>();
+    gameHosts: Map<string, WaitingRoomHost> = new Map<string, WaitingRoomHost>();
 
     constructor(private gameManagerService: GameManagerService, private gameCardService: GameCardService, private matchGateway: MatchGateway) {}
 
@@ -36,15 +41,15 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
 
     @SubscribeMessage(WAITING_ROOM_EVENTS.HostGame)
     hostGame(@ConnectedSocket() socket: Socket, @MessageBody() stageId: string): void {
-        this.gameHosts.set(stageId, socket.id);
+        this.gameHosts.set(stageId, { hostId: socket.id, waitingRoom: randomUUID() });
         socket.data.stageInHosting = stageId;
         socket.to(stageId).emit(WAITING_ROOM_EVENTS.MatchCreated, stageId);
     }
 
     @SubscribeMessage(WAITING_ROOM_EVENTS.UnhostGame)
     unhostGame(@ConnectedSocket() socket: Socket): void {
+        socket.to(this.gameHosts.get(socket.data.stageInHosting).waitingRoom).emit(WAITING_ROOM_EVENTS.MatchRefused, "la partie n'a plus d'hôte");
         this.gameHosts.delete(socket.data.stageInHosting);
-        socket.to(socket.data.stageInHosting).emit(WAITING_ROOM_EVENTS.MatchRefused, "la partie n'a plus d'hôte");
         socket.to(socket.data.stageInHosting).emit(WAITING_ROOM_EVENTS.MatchDeleted, socket.data.stageInHosting);
         socket.data.stageInHosting = null;
     }
@@ -53,12 +58,16 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
     joinHost(@ConnectedSocket() socket: Socket, @MessageBody() joinRequest: JoinHostInWaitingRequest): void {
         socket.data.stageInWaiting = joinRequest.stageId;
         const playerInformations: PlayerInformations = { playerName: joinRequest.playerName, playerSocketId: socket.id };
-        socket.to(this.gameHosts.get(joinRequest.stageId)).emit(WAITING_ROOM_EVENTS.RequestMatch, playerInformations);
+        const roomInfo = this.gameHosts.get(joinRequest.stageId);
+        socket.join(roomInfo.waitingRoom);
+        socket.to(roomInfo.hostId).emit(WAITING_ROOM_EVENTS.RequestMatch, playerInformations);
     }
 
     @SubscribeMessage(WAITING_ROOM_EVENTS.QuitHost)
     quitHost(@ConnectedSocket() socket: Socket): void {
-        socket.to(this.gameHosts.get(socket.data.stageInWaiting)).emit(WAITING_ROOM_EVENTS.UnrequestMatch, socket.id);
+        const roomInfo = this.gameHosts.get(socket.data.stageInWaiting);
+        socket.to(roomInfo.hostId).emit(WAITING_ROOM_EVENTS.UnrequestMatch, socket.id);
+        socket.leave(roomInfo.waitingRoom);
         socket.data.stageInWaiting = null;
     }
 
@@ -74,7 +83,6 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
         opponentSocket.join(roomId);
         opponentSocket.data.room = roomId;
         opponentSocket.data.stageId = socket.data.stageInHosting;
-        this.gameHosts.delete(socket.data.stageInHosting);
 
         const acceptationInfo: AcceptationInformation = { playerName: acceptation.playerName, playerSocketId: socket.id, roomId };
         socket.to(acceptation.playerSocketId).emit(WAITING_ROOM_EVENTS.MatchAccepted, acceptationInfo);
@@ -86,10 +94,13 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
             await this.gameManagerService.startLimitedTimeGame(roomId, 2);
             this.server.to(roomId).emit(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, this.gameManagerService.giveNextStage(roomId));
         } else {
-            socket.to(socket.data.stageInHosting).emit(WAITING_ROOM_EVENTS.MatchRefused, "l'hôte a trouvé un autre adversaire");
+            socket
+                .to(this.gameHosts.get(socket.data.stageInHosting).waitingRoom)
+                .emit(WAITING_ROOM_EVENTS.MatchRefused, "l'hôte a trouvé un autre adversaire");
             this.matchGateway.timer(roomId);
             this.gameManagerService.addGame(socket.data.stageInHosting, 2);
         }
+        this.gameHosts.delete(socket.data.stageInHosting);
 
         socket.data.stageInHosting = null;
         opponentSocket.data.stageInWaiting = null;

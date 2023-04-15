@@ -1,9 +1,9 @@
 <div class="win neon modal-page">
-    <div *ngIf="data.isMultiplayer" class="text">
+    <div *ngIf="data.isMultiplayer" class="modal-title">
         <p>{{ data.winner }} est le vainqueur!</p>
         <p>Bien joué!</p>
     </div>
-    <div *ngIf="!data.isMultiplayer" class="text">
+    <div *ngIf="!data.isMultiplayer" class="modal-title">
         <p>Vous Avez Gagné!</p>
         <p>Bravo!</p>
     </div>

@@ -1,18 +1,18 @@
 .opponents-container {
     display: center;
     text-overflow: hidden;
-    background-color: #360a21;
+    background-color: #240716;
 }
 
 .scrolling-bar {
-    width: 300px;
+    width: 450px;
     height: 100px;
     overflow-y: scroll;
     scrollbar-width: thin;
 }
 
 .ng-star-inserted {
-    height: 10rem;
+    height: 24rem;
 }
 
 body {
@@ -22,7 +22,7 @@ body {
 
 .container {
     width: 500px;
-    height: 250px;
+    height: 500px;
     justify-content: space-around;
     align-items: center;
     border-radius: 25px;
@@ -45,18 +45,24 @@ body {
     display: flexbox;
     justify-content: center;
     text-align: center;
-    margin-left: 40%;
-    width: 75px;
-    height: 75px;
+    margin-left: 22%;
+    margin-top: 28%;
+    width: 200px;
+    height: 200px;
     color: #fff;
+    font-size: 100px;
 }
 
-.hourglass-icon-container {
-    width: 100%;
-}
-
-.centered-icon {
-    margin-top: 36%;
+.waiting-room-hourglass-icon {
+    display: flexbox;
+    justify-content: center;
+    text-align: center;
+    margin-left: 26%;
+    margin-top: 25%;
+    width: 200px;
+    height: 200px;
+    color: #fff;
+    font-size: 100px;
 }
 
 .cancel-button {

@@ -158,6 +158,19 @@ describe('SoloViewComponent', () => {
         expect(sendSpy).toHaveBeenCalledTimes(1);
     }));
 
+    it('ngOnInit should not call win game in case of end of game reached ', fakeAsync(() => {
+        Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: true });
+        const winGameSpy = spyOn(component, 'winGame').and.callThrough();
+        socketServiceMock.listen = (event: string, callback: any) => {
+            if (event === LIMITED_TIME_MODE_EVENTS.NewStageInformation) {
+                callback(undefined);
+            }
+        };
+        component.ngOnInit();
+        tick(ONE_SECOND);
+        expect(winGameSpy).toHaveBeenCalled();
+    }));
+
     it('should set the current gameCard id according to value in route and request gameCard as well as game player information', () => {
         const showTimeSpy = spyOn(component, 'showTime');
         const configureSocketReactionsSpy = spyOn(component, 'configureSocketReactions');
@@ -218,6 +231,15 @@ describe('SoloViewComponent', () => {
         expect(finishGameSpy).toHaveBeenCalledWith('wrong');
     });
 
+    it('Abandon scenario in limited time should not cause an end game event according to configureSocketReaction', () => {
+        Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: true });
+        socketServiceMock.listen = (event: string, callback: any) => {
+            if (event === CHAT_EVENTS.Abandon) callback({ socketId: 'abandon', message: 'abandon' });
+        };
+        component.configureSocketReactions();
+        expect(component.isMultiplayer).toBeFalse();
+    });
+
     it('handleMistake should send an event called event to socket server with extra information', () => {
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.handleMistake();
@@ -260,14 +282,8 @@ describe('SoloViewComponent', () => {
         expect(startTimerSpy).toHaveBeenCalled();
     });
 
-    it('addDifferenceDetected should call addDifferenceFound of service', () => {
-        component.addDifferenceDetected(1);
-
-        expect(foundDifferenceServiceSpy.addDifferenceFound).toHaveBeenCalled();
-    });
-
     it('should open the game info modal with the correct data', () => {
-        component.isMultiplayer = true;
+        spyOnProperty(component, 'isMultiplayer', 'get').and.returnValue(true);
         component.openInfoModal();
         expect(modalSpy.open).toHaveBeenCalledWith(GameInfoModalComponent, {
             data: {
@@ -279,7 +295,7 @@ describe('SoloViewComponent', () => {
     });
 
     it('should open the game info modal with the correct data', () => {
-        component.isMultiplayer = false;
+        spyOnProperty(component, 'isMultiplayer', 'get').and.returnValue(false);
         component.openInfoModal();
         expect(modalSpy.open).toHaveBeenCalledWith(GameInfoModalComponent, {
             data: {
@@ -321,13 +337,12 @@ describe('SoloViewComponent', () => {
         const handleFlashSpy = spyOn(component, 'handleFlash');
         const paintPixelSpy = spyOn(component, 'paintPixel');
         const incrementSpy = spyOn(component, 'incrementScore');
-        const addDiffSpy = spyOn(component, 'addDifferenceDetected');
         const endGameVerifSpy = spyOn(component, 'endGameVerification');
         component.effectHandler(MOCK_PLAYER_DIFFERENCES);
         expect(handleFlashSpy).toHaveBeenCalledWith(MOCK_PLAYER_DIFFERENCES.lastDifferences);
         expect(paintPixelSpy).toHaveBeenCalledWith(MOCK_PLAYER_DIFFERENCES.lastDifferences);
         expect(incrementSpy).toHaveBeenCalledWith(MOCK_PLAYER_DIFFERENCES.socket);
-        expect(addDiffSpy).toHaveBeenCalledWith(MOCK_PLAYER_DIFFERENCES.differencesPosition);
+        expect(foundDifferenceServiceSpy.addDifferenceFound).toHaveBeenCalledWith(MOCK_PLAYER_DIFFERENCES.differencesPosition);
         expect(endGameVerifSpy).toHaveBeenCalled();
     });
 
@@ -346,8 +361,23 @@ describe('SoloViewComponent', () => {
         expect(component.left.emitSound).toHaveBeenCalledWith(false);
     });
 
+    it('difference handler should send event for a new difference when a difference detected and emitsound in limited mode', () => {
+        spyOn(component.left, 'emitSound').and.callFake((difference: boolean) => {
+            return difference;
+        });
+        Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: true });
+        const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
+        component.differenceHandler(MOCK_INFORMATION);
+        expect(sendSpy).toHaveBeenCalledWith(MATCH_EVENTS.Difference, {
+            room: 'room',
+            lastDifferences: [0, 1, 2, 3],
+            differencesPosition: 2,
+        });
+        expect(sendSpy).toHaveBeenCalledWith(LIMITED_TIME_MODE_EVENTS.NextStage);
+    });
+
     it('difference handler should call the effect handler and send a general event when difference detected', () => {
-        component.isMultiplayer = false;
+        spyOnProperty(component, 'isMultiplayer', 'get').and.returnValue(false);
         Object.defineProperty(socketServiceMock, 'socketId', { value: 'mockSocket' });
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         spyOn(component.left, 'emitSound').and.callFake((difference: boolean) => {
@@ -373,7 +403,7 @@ describe('SoloViewComponent', () => {
     });
 
     it('endGameVerification should call winGame if currentScore of player is equal to number of differences', () => {
-        component.isMultiplayer = false;
+        spyOnProperty(component, 'isMultiplayer', 'get').and.returnValue(false);
         component.currentScorePlayer = 2;
         component.numberOfDifferences = 2;
         const sendSpy = spyOn(socketServiceMock, 'send');
@@ -395,7 +425,7 @@ describe('SoloViewComponent', () => {
     });
 
     it('winGame should set all end game related boolean and open gameWin modal with false to multiplayer in solo', () => {
-        component.isMultiplayer = false;
+        spyOnProperty(component, 'isMultiplayer', 'get').and.returnValue(false);
         component.winGame('playerId');
         expect(modalSpy.open).toHaveBeenCalledWith(GameWinModalComponent, { disableClose: true, data: { isMultiplayer: false, winner: 'player' } });
         expect(component.showNavBar).toBeFalse();
@@ -461,7 +491,7 @@ describe('SoloViewComponent', () => {
 
     it('notifyNewBestTime should send gameHistory information as well as current timer time', () => {
         component.player = 'player';
-        component.stageId = '0';
+        spyOnProperty(component, 'stageId', 'get').and.returnValue('0');
         component.opponent = 'loser';
         component.timerService.currentTime = 23;
         component.startTime = 'date';
@@ -472,7 +502,7 @@ describe('SoloViewComponent', () => {
 
     it('notifyNewBestTime should send gameHistory information with correct names', () => {
         component.player = 'loser';
-        component.stageId = '0';
+        spyOnProperty(component, 'stageId', 'get').and.returnValue('0');
         component.opponent = 'opponent';
         component.timerService.currentTime = 23;
         component.startTime = 'date';
@@ -490,9 +520,9 @@ describe('SoloViewComponent', () => {
     });
 
     it('effect handler should update time in limited time mode', () => {
+        Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: true });
         component.timerService.currentTime = 90;
         component.gameConstants.difference = 10;
-        component.isLimitedTimeMode = true;
         socketServiceMock.gameRoom = 'test';
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.effectHandler(MOCK_PLAYER_DIFFERENCES);

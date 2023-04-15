@@ -18,6 +18,7 @@ describe('WaitingRoomComponent', () => {
     let matDialogSpy: MatDialogRef<WaitingRoomComponent>;
     let socketServiceSpy: SocketService;
     let routerSpy: Router;
+    let waitingRoomData: WaitingRoomDataPassing;
 
     beforeEach(async () => {
         matDialogSpy = jasmine.createSpyObj('MatDialogRef<ChosePlayerNameDialogComponent>', ['close']);
@@ -26,13 +27,15 @@ describe('WaitingRoomComponent', () => {
         socketServiceSpy.sio = jasmine.createSpyObj('Socket', ['connect', 'on', 'off', 'emit', 'disconnect', 'hasListeners']);
         routerSpy = jasmine.createSpyObj(Router, ['navigate']);
 
+        waitingRoomData = { stageId: '123', isHost: true, isLimitedTimeMode: false };
+
         await TestBed.configureTestingModule({
             declarations: [WaitingRoomComponent],
             imports: [RouterTestingModule, MatDialogModule],
             providers: [
                 { provide: MatDialogRef, useValue: matDialogSpy },
                 { provide: SocketService, useValue: socketServiceSpy },
-                { provide: MAT_DIALOG_DATA, useValue: { stageId: '123', isHost: true, isLimitedTimeMode: false } as WaitingRoomDataPassing },
+                { provide: MAT_DIALOG_DATA, useValue: waitingRoomData },
                 { provide: Router, useValue: routerSpy },
             ],
         }).compileComponents();
@@ -70,9 +73,15 @@ describe('WaitingRoomComponent', () => {
         expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.QuitHost);
     });
 
-    it('navigateToMultiplayer should close the dialog and navigate to the right game', () => {
+    it('navigateToMultiplayer should close the dialog and navigate to the right game unless in limitedTimeMode', () => {
         component.navigateToMultiplayer('gameRoom');
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/game']);
+    });
+
+    it('navigateToMultiplayer should close the dialog but not navigate to the game', () => {
+        waitingRoomData.isLimitedTimeMode = true;
+        component.navigateToMultiplayer('gameRoom');
+        expect(routerSpy.navigate).not.toHaveBeenCalled();
     });
 
     it('acceptOpponent should send an acceptOpponent event and add the opponent name to the map', () => {
@@ -99,6 +108,16 @@ describe('WaitingRoomComponent', () => {
         };
         component.ngOnInit();
         expect(component.clientsInWaitingRoom.get('opponentId')).toEqual('testName');
+    });
+
+    it('a requestMatch event should call acceptOpponentImmediately if it is in limitedTime', () => {
+        waitingRoomData.isLimitedTimeMode = true;
+        const acceptSpy = spyOn(component, 'acceptOpponent').and.returnValue();
+        socketServiceSpy.listen = (event: string, callback: any) => {
+            if (event === WAITING_ROOM_EVENTS.RequestMatch) callback({ playerName: 'testName', playerSocketId: 'opponentId' } as PlayerInformations);
+        };
+        component.ngOnInit();
+        expect(acceptSpy).toHaveBeenCalled();
     });
 
     it('a unrequestMatch event should remove opponent to the map', () => {

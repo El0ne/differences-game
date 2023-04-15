@@ -1,21 +1,21 @@
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
-import { Controller, Delete, Get, HttpStatus, Param, Query, Res } from '@nestjs/common';
+import { Controller, Delete, Get, HttpStatus, Param, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { join } from 'path';
 
 @Controller('image')
 export class ImageController {
     constructor(private imageManagerService: ImageManagerService) {}
-    @Get('')
-    async getImageNames(@Query('id') id: string, @Res() res: Response): Promise<void> {
+    @Get('/:id')
+    async getImageNames(@Param() param, @Res() res: Response): Promise<void> {
         try {
-            const image = await this.imageManagerService.getImageObjectById(id);
+            const image = await this.imageManagerService.getImageObjectById(param.id);
             res.status(HttpStatus.OK).send(image);
         } catch (err) {
             res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @Get('/:imageName')
+    @Get('/file/:imageName')
     async getImage(@Param() param, @Res() res: Response): Promise<void> {
         try {
             const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);

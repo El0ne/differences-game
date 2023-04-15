@@ -1,6 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { GameHistoryComponent } from '@app/components/game-history/game-history.component';
+import { ConfirmationModalComponent } from '@app/modals/confirmation-modal/confirmation-modal/confirmation-modal.component';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
 import { GameHistoryService } from '@app/services/game-history/game-history.service';
@@ -49,7 +50,12 @@ export class GameConstantsComponent implements OnInit {
     }
 
     deleteAllGames(): void {
-        this.socketService.send(WAITING_ROOM_EVENTS.DeleteAllGames);
+        const dialog = this.dialog.open(ConfirmationModalComponent, { data: { message: 'Supprimer toutes les parties?' } });
+        dialog.afterClosed().subscribe((result: boolean) => {
+            if (result) {
+                this.socketService.send(WAITING_ROOM_EVENTS.DeleteAllGames);
+            }
+        });
     }
 
     checkNumber(event: FocusEvent, minValue: number, maxValue: number): number {
@@ -70,6 +76,11 @@ export class GameConstantsComponent implements OnInit {
     }
 
     deleteGameHistory(): void {
-        this.gameHistoryService.deleteGameHistory().subscribe();
+        const dialog = this.dialog.open(ConfirmationModalComponent, { data: { message: "Supprimer l'historique de partie?" } });
+        dialog.afterClosed().subscribe((result: boolean) => {
+            if (result) {
+                this.gameHistoryService.deleteGameHistory().subscribe();
+            }
+        });
     }
 }
