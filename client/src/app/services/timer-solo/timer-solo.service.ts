@@ -39,15 +39,6 @@ export class TimerSoloService {
             currentTime: this.currentTime + timeModification,
             timeMultiplier: multiplier,
         };
-        this.socket.send(MATCH_EVENTS.Replay, timerModification);
+        this.socket.send(MATCH_EVENTS.TimeModification, timerModification);
     }
-    // TODO: check with JAsper if we can remove this
-    // restartTimer(multiplier: number, gameRoom: string = this.socket.gameRoom): void {
-    //     const restartTimerInformations: ReplayTimerInformations = {
-    //         room: gameRoom,
-    //         currentTime: this.currentTime,
-    //         timeMultiplier: multiplier,
-    //     };
-    //     this.socket.send(MATCH_EVENTS.Replay, restartTimerInformations);
-    // }
 }

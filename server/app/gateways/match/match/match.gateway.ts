@@ -56,9 +56,9 @@ export class MatchGateway implements OnGatewayDisconnect {
         }
     }
 
-    @SubscribeMessage(MATCH_EVENTS.Replay)
-    replay(socket: Socket, replayInformations: ReplayTimerInformations): void {
-        this.replayTimer(socket, replayInformations.room, replayInformations.currentTime, replayInformations.timeMultiplier);
+    @SubscribeMessage(MATCH_EVENTS.TimeModification)
+    updateTimer(socket: Socket, replayInformations: ReplayTimerInformations): void {
+        this.changeTimerValue(socket, replayInformations);
     }
 
     @SubscribeMessage(MATCH_EVENTS.SoloGameInformation)
@@ -67,21 +67,6 @@ export class MatchGateway implements OnGatewayDisconnect {
         socket.data.soloGame = data;
         socket.data.isSolo = true;
     }
-
-    // @SubscribeMessage(MATCH_EVENTS.TimeModification)
-    // modifiyTime(socket: Socket, data: TimerModification): void {
-    //     this.changeTimeValue(socket, data);
-    // }
-
-    // changeTimeValue(socket: Socket, data: TimerModification): void {
-    //     this.stopTimer(socket, data.room);
-    //     this.server.to(data.room).emit(MATCH_EVENTS.Timer, data.currentTime);
-    //     const timer = setInterval(() => {
-    //         data.currentTime++;
-    //         this.server.to(data.room).emit(MATCH_EVENTS.Timer, data.currentTime);
-    //     }, ONE_SECOND);
-    //     this.timers.set(data.room, timer);
-    // }
 
     timer(room: string): void {
         let timerCount = 0;
@@ -92,13 +77,13 @@ export class MatchGateway implements OnGatewayDisconnect {
         this.timers.set(room, timer);
     }
 
-    replayTimer(socket: Socket, room: string, timerCount: number, multiplier: number): void {
-        this.stopTimer(socket, room);
+    changeTimerValue(socket: Socket, replayInformations: ReplayTimerInformations): void {
+        this.stopTimer(socket, replayInformations.room);
         const timer = setInterval(() => {
-            timerCount++;
-            this.server.to(room).emit(MATCH_EVENTS.Timer, timerCount);
-        }, ONE_SECOND * multiplier);
-        this.timers.set(room, timer);
+            replayInformations.currentTime++;
+            this.server.to(replayInformations.room).emit(MATCH_EVENTS.Timer, replayInformations.currentTime);
+        }, ONE_SECOND * replayInformations.timeMultiplier);
+        this.timers.set(replayInformations.room, timer);
     }
 
     async handleDisconnect(socket: Socket): Promise<void> {

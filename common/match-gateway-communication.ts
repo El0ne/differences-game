@@ -5,7 +5,6 @@ export enum MATCH_EVENTS {
     StartTime = 'StartTime',
     Difference = 'Difference',
     Win = 'Win',
-    Replay = 'Replay',
     SoloGameInformation = 'SoloGameInformation',
     Time = 'Time',
     leaveRoom = 'leaveRoom',
