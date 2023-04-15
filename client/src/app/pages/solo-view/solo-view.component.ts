@@ -474,6 +474,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.resetCanvas();
 
         this.isReplayMode = true;
+        this.isReplayPaused = false;
         this.timerService.currentTime = 0;
         this.messages = [];
         this.currentScorePlayer = 0;
