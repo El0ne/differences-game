@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
@@ -16,6 +16,7 @@ export const LIMITED_TIME_MODE_ID = 'limitedTimeMode';
     styleUrls: ['./limited-time.component.scss'],
 })
 export class LimitedTimeComponent implements OnInit, OnDestroy {
+    @ViewChild('modal') modal!: ElementRef;
     createGameButton: boolean = true;
     // reason: needed more than 4 parameters for the constructor
     // eslint-disable-next-line max-params
@@ -81,5 +82,9 @@ export class LimitedTimeComponent implements OnInit, OnDestroy {
                 } else this.hostOrJoinGame();
             }
         });
+    }
+
+    closeModal() {
+        this.modal.nativeElement.remove();
     }
 }
