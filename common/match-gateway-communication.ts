@@ -7,16 +7,22 @@ export enum MATCH_EVENTS {
     Win = 'Win',
     SoloGameInformation = 'SoloGameInformation',
     Time = 'Time',
+    IncrementTimer = 'IncrementTimer',
+    LimitedTimeTimer = 'LimitedTimeTimer',
+    Lose = 'Lose',
 }
 
 export enum LIMITED_TIME_MODE_EVENTS {
     GetFirstStageInformation = 'getFirstStageInformation',
     NewStageInformation = 'newStageInformation',
     StartLimitedTimeGame = 'startLimitedTimeGame',
+    StartTimer = 'StartTimer',
     NextStage = 'nextStage',
 }
 
 export const ONE_SECOND = 1000;
+
+export const TWO_MINUTES = 120;
 
 export interface SoloGameCreation {
     stageId: string;

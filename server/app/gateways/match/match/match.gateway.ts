@@ -2,6 +2,7 @@ import { GameManagerService } from '@app/services/game-manager/game-manager.serv
 import { MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameHistoryDTO } from '@common/game-history.dto';
 import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND, SoloGameCreation } from '@common/match-gateway-communication';
+import { TimerInformation } from '@common/timer-information';
 import { Injectable } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -51,16 +52,28 @@ export class MatchGateway implements OnGatewayDisconnect {
         }
     }
 
+    @SubscribeMessage(MATCH_EVENTS.Lose)
+    limitedTimeLost(socket: Socket, room: string): void {
+        if (socket.rooms.has(room)) {
+            this.server.to(room).emit(MATCH_EVENTS.Lose, 'timeExpired');
+        }
+    }
+
     @SubscribeMessage(LIMITED_TIME_MODE_EVENTS.NextStage)
     nextStage(@ConnectedSocket() socket: Socket): void {
         this.server.to(socket.data.room).emit(LIMITED_TIME_MODE_EVENTS.NewStageInformation, this.gameManagerService.giveNextStage(socket.data.room));
     }
 
     @SubscribeMessage(MATCH_EVENTS.SoloGameInformation)
-    storeSoloGameInformation(socket: Socket, data: GameHistoryDTO) {
+    storeSoloGameInformation(socket: Socket, data: GameHistoryDTO): void {
         data.gameDuration = Date.now();
         socket.data.soloGame = data;
         socket.data.isSolo = true;
+    }
+
+    @SubscribeMessage(LIMITED_TIME_MODE_EVENTS.StartTimer)
+    startLimitedTimeTimer(socket: Socket, data: TimerInformation): void {
+        this.limitedTimeTimer(socket, data.room, data.time);
     }
 
     timer(room: string): void {
@@ -68,6 +81,16 @@ export class MatchGateway implements OnGatewayDisconnect {
         const timer = setInterval(() => {
             timerCount++;
             this.server.to(room).emit(MATCH_EVENTS.Timer, timerCount);
+        }, ONE_SECOND);
+        this.timers.set(room, timer);
+    }
+
+    limitedTimeTimer(socket: Socket, room: string, time: number): void {
+        this.stopTimer(socket, room);
+        this.server.to(room).emit(MATCH_EVENTS.LimitedTimeTimer, time);
+        const timer = setInterval(() => {
+            time--;
+            this.server.to(room).emit(MATCH_EVENTS.LimitedTimeTimer, time);
         }, ONE_SECOND);
         this.timers.set(room, timer);
     }

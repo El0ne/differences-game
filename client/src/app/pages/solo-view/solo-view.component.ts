@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
+import { GameLoseModalComponent } from '@app/modals/game-lose-modal/game-lose-modal.component';
 import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal.component';
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
@@ -21,8 +22,9 @@ import { GameCardInformation } from '@common/game-card';
 import { GameConstants } from '@common/game-constants';
 import { GameHistoryDTO } from '@common/game-history.dto';
 import { ImageObject } from '@common/image-object';
-import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS } from '@common/match-gateway-communication';
+import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, TWO_MINUTES } from '@common/match-gateway-communication';
 import { PlayerGameInfo } from '@common/player-game-info';
+import { TimerInformation } from '@common/timer-information';
 import { Subject } from 'rxjs';
 @Component({
     selector: 'app-solo-view',
@@ -78,7 +80,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         if (!this.socketService.liveSocket()) {
             this.router.navigate(['/home']);
-            console.log('yo');
             return;
         }
 
@@ -87,14 +88,19 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.startTime = new Date().toLocaleString('fr-FR');
         this.gameConstantsService.getGameConstants().subscribe((gameConstants: GameConstants) => {
             this.gameConstants = gameConstants;
+            if (this.isLimitedTimeMode) {
+                this.socketService.send<TimerInformation>(LIMITED_TIME_MODE_EVENTS.StartTimer, {
+                    time: this.gameConstants.countDown,
+                    room: this.socketService.gameRoom,
+                });
+                this.timerService.limitedTimeTimer();
+            }
         });
-
         this.getImagesNames();
         if (this.isLimitedTimeMode) {
             this.socketService.listen<string>(LIMITED_TIME_MODE_EVENTS.NewStageInformation, (newStageId: string) => {
                 this.gameParamService.gameParameters.stageId = newStageId;
                 this.getImagesNames();
-                console.log(newStageId);
                 if (!newStageId) {
                     this.winGame(this.socketService.socketId);
                 }
@@ -121,9 +127,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                     };
                     this.socketService.send<GameHistoryDTO>(MATCH_EVENTS.SoloGameInformation, gameHistory);
                 }
+                this.showTime();
             });
         }
-        this.showTime();
         this.addCheatMode();
         this.configureSocketReactions();
     }
@@ -166,6 +172,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.socketService.listen<string>(MATCH_EVENTS.Win, (socketId: string) => {
             this.winGame(socketId);
         });
+        this.socketService.listen<string>(MATCH_EVENTS.Lose, () => {
+            this.loseGame();
+        });
     }
 
     ngOnDestroy(): void {
@@ -206,15 +215,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             });
         }
     }
-
     showTime(): void {
         this.timerService.startTimer();
     }
-
     timesConversion(): string {
         return this.timerService.convert(this.timerService.currentTime);
     }
-
     notifyNewBestTime(winnerId: string, isAbandon: boolean, mode: string): void {
         const winnerName: string = this.socketService.names.get(winnerId) as string;
         const player1: PlayerGameInfo = {
@@ -255,6 +261,16 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 data: { isMultiplayer: this.isMultiplayer, winner: this.socketService.names.get(winnerId) } as EndGame,
             });
         }
+    }
+
+    loseGame(): void {
+        this.left.endGame = true;
+        this.right.endGame = true;
+        this.showNavBar = false;
+        if (!this.dialog.openDialogs.length)
+            this.dialog.open(GameLoseModalComponent, {
+                disableClose: true,
+            });
     }
 
     incrementScore(socket: string): void {
@@ -308,6 +324,20 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.right.differenceEffect(currentDifferences);
     }
 
+    addTimeToTimer(): void {
+        if (this.timerService.currentTime + this.gameConstants.difference <= TWO_MINUTES) {
+            this.socketService.send<TimerInformation>(LIMITED_TIME_MODE_EVENTS.StartTimer, {
+                time: this.timerService.currentTime + this.gameConstants.difference,
+                room: this.socketService.gameRoom,
+            });
+        } else {
+            this.socketService.send<TimerInformation>(LIMITED_TIME_MODE_EVENTS.StartTimer, {
+                time: TWO_MINUTES,
+                room: this.socketService.gameRoom,
+            });
+        }
+    }
+
     differenceHandler(information: DifferenceInformation): void {
         if (this.isMultiplayer) {
             const multiplayerInformation: MultiplayerDifferenceInformation = {
@@ -335,10 +365,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.socketService.send<void>(LIMITED_TIME_MODE_EVENTS.NextStage);
         }
     }
-
     effectHandler(information: PlayerDifference): void {
         if (!this.left.toggleCheatMode) {
             this.handleFlash(information.lastDifferences);
+        }
+        if (this.isLimitedTimeMode) {
+            this.addTimeToTimer();
         }
         this.paintPixel(information.lastDifferences);
         this.incrementScore(information.socket);
@@ -349,7 +381,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.endGameVerification();
         }
     }
-
     endGameVerification(): void {
         if (this.isMultiplayer) {
             const endGameVerification = this.numberOfDifferences / 2;
