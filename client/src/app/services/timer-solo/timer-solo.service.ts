@@ -24,15 +24,6 @@ export class TimerSoloService {
         this.socket.send(MATCH_EVENTS.EndTime, gameRoom);
     }
 
-    // restartTimer(multiplier: number, gameRoom: string = this.socket.gameRoom): void {
-    //     const restartTimerInformations: ReplayTimerInformations = {
-    //         room: gameRoom,
-    //         currentTime: this.currentTime,
-    //         timeMultiplier: multiplier,
-    //     };
-    //     this.socket.send(MATCH_EVENTS.Replay, restartTimerInformations);
-    // }
-
     convert(seconds: number): string {
         let minute = 0;
         while (seconds >= SECONDS_IN_MINUTE) {
@@ -42,12 +33,21 @@ export class TimerSoloService {
         return seconds < TEN ? `${minute}:0${seconds}` : `${minute}:${seconds}`;
     }
 
-    restartTimer(multiplier: number, timeModification: number): void {
+    restartTimer(multiplier: number, gameRoom: string, timeModification: number): void {
         const timerModification: TimerModification = {
-            room: this.socket.gameRoom,
+            room: gameRoom,
             currentTime: this.currentTime + timeModification,
             timeMultiplier: multiplier,
         };
-        this.socket.send(MATCH_EVENTS.TimeModification, timerModification);
+        this.socket.send(MATCH_EVENTS.Replay, timerModification);
     }
+    // TODO: check with JAsper if we can remove this
+    // restartTimer(multiplier: number, gameRoom: string = this.socket.gameRoom): void {
+    //     const restartTimerInformations: ReplayTimerInformations = {
+    //         room: gameRoom,
+    //         currentTime: this.currentTime,
+    //         timeMultiplier: multiplier,
+    //     };
+    //     this.socket.send(MATCH_EVENTS.Replay, restartTimerInformations);
+    // }
 }
