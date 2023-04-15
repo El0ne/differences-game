@@ -53,7 +53,7 @@ export class MatchGateway implements OnGatewayDisconnect {
     }
 
     @SubscribeMessage(MATCH_EVENTS.Lose)
-    limitedTimeLost(socket: Socket, room: string) {
+    limitedTimeLost(socket: Socket, room: string): void {
         if (socket.rooms.has(room)) {
             this.server.to(room).emit(MATCH_EVENTS.Lose, 'timeExpired');
         }
@@ -65,14 +65,14 @@ export class MatchGateway implements OnGatewayDisconnect {
     }
 
     @SubscribeMessage(MATCH_EVENTS.SoloGameInformation)
-    storeSoloGameInformation(socket: Socket, data: GameHistoryDTO) {
+    storeSoloGameInformation(socket: Socket, data: GameHistoryDTO): void {
         data.gameDuration = Date.now();
         socket.data.soloGame = data;
         socket.data.isSolo = true;
     }
 
     @SubscribeMessage(LIMITED_TIME_MODE_EVENTS.StartTimer)
-    startLimitedTimeTimer(socket: Socket, data: TimerInformation) {
+    startLimitedTimeTimer(socket: Socket, data: TimerInformation): void {
         this.limitedTimeTimer(socket, data.room, data.time);
     }
 

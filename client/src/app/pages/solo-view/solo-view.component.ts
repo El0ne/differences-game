@@ -264,14 +264,13 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     loseGame(): void {
-        if (!this.left.endGame) {
-            this.left.endGame = true;
-            this.right.endGame = true;
-            this.showNavBar = false;
+        this.left.endGame = true;
+        this.right.endGame = true;
+        this.showNavBar = false;
+        if (!this.dialog.openDialogs.length)
             this.dialog.open(GameLoseModalComponent, {
                 disableClose: true,
             });
-        }
     }
 
     incrementScore(socket: string): void {
@@ -325,6 +324,20 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.right.differenceEffect(currentDifferences);
     }
 
+    addTimeToTimer(): void {
+        if (this.timerService.currentTime + this.gameConstants.difference <= TWO_MINUTES) {
+            this.socketService.send<TimerInformation>(LIMITED_TIME_MODE_EVENTS.StartTimer, {
+                time: this.timerService.currentTime + this.gameConstants.difference,
+                room: this.socketService.gameRoom,
+            });
+        } else {
+            this.socketService.send<TimerInformation>(LIMITED_TIME_MODE_EVENTS.StartTimer, {
+                time: TWO_MINUTES,
+                room: this.socketService.gameRoom,
+            });
+        }
+    }
+
     differenceHandler(information: DifferenceInformation): void {
         if (this.isMultiplayer) {
             const multiplayerInformation: MultiplayerDifferenceInformation = {
@@ -357,17 +370,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.handleFlash(information.lastDifferences);
         }
         if (this.isLimitedTimeMode) {
-            if (this.timerService.currentTime + this.gameConstants.difference <= TWO_MINUTES) {
-                this.socketService.send<TimerInformation>(LIMITED_TIME_MODE_EVENTS.StartTimer, {
-                    time: this.timerService.currentTime + this.gameConstants.difference,
-                    room: this.socketService.gameRoom,
-                });
-            } else {
-                this.socketService.send<TimerInformation>(LIMITED_TIME_MODE_EVENTS.StartTimer, {
-                    time: TWO_MINUTES,
-                    room: this.socketService.gameRoom,
-                });
-            }
+            this.addTimeToTimer();
         }
         this.paintPixel(information.lastDifferences);
         this.incrementScore(information.socket);

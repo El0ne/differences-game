@@ -217,6 +217,7 @@ describe('SoloViewComponent', () => {
                 // No default
             }
         };
+        Object.defineProperty(modalSpy, 'openDialogs', { value: [] });
         const listenSpy = spyOn(socketServiceMock, 'listen').and.callThrough();
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         const finishGameSpy = spyOn(component, 'winGame');
@@ -512,6 +513,7 @@ describe('SoloViewComponent', () => {
     });
 
     it('loseGame should open lose dialog component and set endGame conditions', () => {
+        Object.defineProperty(modalSpy, 'openDialogs', { value: [] });
         component.loseGame();
         expect(modalSpy.open).toHaveBeenCalledWith(GameLoseModalComponent, { disableClose: true });
         expect(component.showNavBar).toBeFalse();
