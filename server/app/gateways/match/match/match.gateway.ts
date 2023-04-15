@@ -36,7 +36,7 @@ export class MatchGateway implements OnGatewayDisconnect {
     }
 
     @SubscribeMessage(MATCH_EVENTS.Difference)
-    difference(socket: Socket, data: MultiplayerDifferenceInformation) {
+    difference(socket: Socket, data: MultiplayerDifferenceInformation): void {
         if (socket.rooms.has(data.room)) {
             const differenceInformation: PlayerDifference = {
                 differencesPosition: data.differencesPosition,
@@ -48,14 +48,14 @@ export class MatchGateway implements OnGatewayDisconnect {
     }
 
     @SubscribeMessage(MATCH_EVENTS.SoloGameInformation)
-    storeSoloGameInformation(socket: Socket, data: GameHistoryDTO) {
+    storeSoloGameInformation(socket: Socket, data: GameHistoryDTO): void {
         data.gameDuration = Date.now();
         socket.data.soloGame = data;
         socket.data.isSolo = true;
     }
 
     @SubscribeMessage(MATCH_EVENTS.TimeModification)
-    modifiyTime(socket: Socket, data: TimerModification) {
+    modifiyTime(socket: Socket, data: TimerModification): void {
         this.changeTimeValue(socket, data);
     }
 

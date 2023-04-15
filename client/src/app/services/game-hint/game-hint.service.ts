@@ -21,9 +21,9 @@ export class GameHintService {
         const corners = [];
         for (const position of positions) {
             if (this.hintsRemaining === 2) {
-                corners.push(this.roundDownFour(position));
+                corners.push(Math.floor(position * 2) / 2);
             } else if (this.hintsRemaining === 1) {
-                corners.push(this.roundDown(position));
+                corners.push(Math.floor(position * FOUR) / FOUR);
             }
         }
         return corners;

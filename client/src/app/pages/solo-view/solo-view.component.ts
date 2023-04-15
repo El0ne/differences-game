@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+// we have to disable this rule because this file is too long
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -59,6 +60,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     gameConstants: GameConstants;
     boundGetRandomDifference: (event: KeyboardEvent) => void = this.getRandomDifference.bind(this);
 
+    // we have more than 3 services
     // eslint-disable-next-line max-params
     constructor(
         public timerService: TimerSoloService,
