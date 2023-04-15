@@ -104,6 +104,14 @@ body {
     background-color: var(--player2);
 }
 
+.centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+}
+
 .send-button {
     background-color: var(--basic-border);
     border-radius: 50%;
@@ -152,14 +160,23 @@ app-click-event {
     margin-bottom: 8%;
 }
 
-.hint-button {
-    position: absolute;
-    bottom: -1%;
-    right: 10px;
+.third-hint-box {
+    margin-top: 10px;
+    width: 40px;
+    height: 40px;
+    background-color: lightgrey;
+}
+
+.hint {
+    padding-top: 10px;
+    transform: scale(3);
+    border-style: hidden;
     justify-content: center;
     margin: 1rem;
+    background-color: rgba(255, 255, 255, 0);
 }
-.hint {
+.hint-button :hover {
+    cursor: pointer;
     transform: scale(1.5);
     border-style: hidden;
     align-self: end;
