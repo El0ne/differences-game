@@ -477,6 +477,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     differenceHandler(information: DifferenceInformation): void {
+        this.timerService.restartTimer(1, this.socketService.socketId, -this.gameConstants.difference);
         if (this.isMultiplayer) {
             const multiplayerInformation: MultiplayerDifferenceInformation = {
                 room: this.currentRoom,
