@@ -96,7 +96,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         public socketService: SocketService,
         private gameConstantsService: GameConstantsService,
         private gameHintService: GameHintService,
-        private replayButtonsService: ReplayButtonsService,
+        public replayButtonsService: ReplayButtonsService,
     ) {}
 
     ngOnInit(): void {
@@ -438,7 +438,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             },
             disableClose: true,
         });
-        this.timerService.stopTimer();
+        this.timerService.stopTimer(this.socketService.socketId);
         dialogRef.afterClosed().subscribe(() => {
             this.timerService.restartTimer(this.replayButtonsService.timeMultiplier, this.socketService.socketId, 0);
         });

@@ -1,17 +1,21 @@
 import { CloseModalCommand } from '@app/commands/close-modal/close-modal-command';
 import { SoloViewComponent } from '@app/pages/solo-view/solo-view.component';
 
-describe('CloseInfoModalCommand', () => {
+describe('CloseModalCommand', () => {
     let command: CloseModalCommand;
-    let soloView: jasmine.SpyObj<SoloViewComponent>;
+    let soloView: SoloViewComponent;
 
     beforeEach(() => {
-        soloView = jasmine.createSpyObj('SoloViewComponent', ['closeInfoModal']);
+        soloView = jasmine.createSpyObj('SoloViewComponent', ['closeModals']);
         command = new CloseModalCommand(soloView);
     });
 
-    it('should call close info modal method', () => {
-        command.execute(); // Execute the command
+    it('should create an instance', () => {
+        expect(command).toBeTruthy();
+    });
+
+    it('should execute closeModals on the SoloViewComponent', () => {
+        command.execute();
         expect(soloView.closeModals).toHaveBeenCalled();
     });
 });

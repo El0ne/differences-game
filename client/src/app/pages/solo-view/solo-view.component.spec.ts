@@ -307,21 +307,41 @@ describe('SoloViewComponent', () => {
 
     it('should open the quit game modal with disableClose set to true', () => {
         component.isReplayMode = false;
-        component.quitGame();
-        expect(modalSpy.open).toHaveBeenCalledWith(QuitGameModalComponent, {
-            disableClose: true,
-        });
-    });
-
-    it('should restart timer when in replay mode', () => {
-        component.isReplayMode = true;
         const dialogRefSpy: jasmine.SpyObj<MatDialogRef<QuitGameModalComponent>> = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
         dialogRefSpy.afterClosed.and.returnValue(of());
         modalSpy.open.and.returnValue(dialogRefSpy);
-        spyOn(component.timerService, 'stopTimer');
-
+        spyOn(component, 'addCommand');
         component.quitGame();
-        expect(component.timerService.stopTimer).toHaveBeenCalled();
+        expect(modalSpy.open).toHaveBeenCalledWith(QuitGameModalComponent, {
+            data: {
+                isButtonDisabled: component.isReplayMode,
+            },
+            disableClose: true,
+        });
+        expect(component.addCommand).toHaveBeenCalledWith(new OpenModalCommand(component, false));
+        // expect(component.addCommand).toHaveBeenCalledWith(new CloseModalCommand(component));
+    });
+
+    it('should open the quit game modal et restart timer once the modal is closed', () => {
+        const dialogRefSpy: jasmine.SpyObj<MatDialogRef<QuitGameModalComponent>> = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+        dialogRefSpy.afterClosed.and.returnValue(of());
+        modalSpy.open.and.returnValue(dialogRefSpy);
+        spyOn(component, 'addCommand');
+        spyOn(component.timerService, 'stopTimer');
+        spyOn(component.timerService, 'restartTimer');
+        component.quitGameReplay();
+        expect(modalSpy.open).toHaveBeenCalledWith(QuitGameModalComponent, {
+            data: {
+                isButtonDisabled: false,
+            },
+            disableClose: true,
+        });
+        expect(component.timerService.stopTimer).toHaveBeenCalledWith(component.socketService.socketId);
+        // expect(component.timerService.restartTimer).toHaveBeenCalledWith(
+        //     component.replayButtonsService.timeMultiplier,
+        //     component.socketService.socketId,
+        //     0,
+        // );
     });
 
     it("should add the input's command when input is changing", fakeAsync(() => {
@@ -736,7 +756,7 @@ describe('SoloViewComponent', () => {
         expect(component.messages).toEqual([]);
         expect(component.currentScoreOpponent).toEqual(0);
         expect(component.currentScoreOpponent).toEqual(0);
-        expect(component.timerService.restartTimer).toHaveBeenCalledWith(1, 'room1');
+        expect(component.timerService.restartTimer).toHaveBeenCalledWith(1, 'room1', 0);
         expect(component.commandIndex).toEqual(0);
         expect(component.foundDifferenceService.clearDifferenceFound).toHaveBeenCalled();
         expect(component.showNavBar).toBeTrue();

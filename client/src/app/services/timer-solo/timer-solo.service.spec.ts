@@ -40,9 +40,9 @@ describe('TimerSoloService', () => {
     it('restartTimer should send a restart timer event', fakeAsync(() => {
         const multiplier = 1;
 
-        service.restartTimer(multiplier);
+        service.restartTimer(multiplier, mockSocketService.gameRoom, 0);
 
-        expect(mockSocketService.send).toHaveBeenCalledWith(MATCH_EVENTS.Replay, {
+        expect(mockSocketService.send).toHaveBeenCalledWith(MATCH_EVENTS.TimeModification, {
             room: mockSocketService.gameRoom,
             currentTime: 0,
             timeMultiplier: multiplier,

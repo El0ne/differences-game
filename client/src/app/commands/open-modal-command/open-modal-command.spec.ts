@@ -1,23 +1,32 @@
 import { OpenModalCommand } from '@app/commands/open-modal-command/open-modal-command';
 import { SoloViewComponent } from '@app/pages/solo-view/solo-view.component';
 
-describe('OpenInfoModalCommand', () => {
+describe('OpenModalCommand', () => {
     let command: OpenModalCommand;
-    let soloView: jasmine.SpyObj<SoloViewComponent>;
+    let soloView: SoloViewComponent;
 
     beforeEach(() => {
-        soloView = jasmine.createSpyObj<SoloViewComponent>('SoloViewComponent', ['openInfoModal']);
-        // command = new OpenModalCommand(soloView);
+        soloView = jasmine.createSpyObj('SoloViewComponent', ['openInfoModal', 'quitGame']);
     });
 
-    it('should call method to open information modal ', () => {
-        command.isInfoModal = true;
+    it('should create an instance with isInfoModal = true', () => {
+        command = new OpenModalCommand(soloView, true);
+        expect(command).toBeTruthy();
+    });
+
+    it('should execute openInfoModal on the SoloViewComponent with isInfoModal = true', () => {
+        command = new OpenModalCommand(soloView, true);
         command.execute();
         expect(soloView.openInfoModal).toHaveBeenCalled();
     });
 
-    it('should call method to quit game', () => {
-        command.isInfoModal = false;
+    it('should create an instance with isInfoModal = false', () => {
+        command = new OpenModalCommand(soloView, false);
+        expect(command).toBeTruthy();
+    });
+
+    it('should execute quitGame on the SoloViewComponent with isInfoModal = false', () => {
+        command = new OpenModalCommand(soloView, false);
         command.execute();
         expect(soloView.quitGame).toHaveBeenCalled();
     });
