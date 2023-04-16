@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -18,7 +19,7 @@ import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { EndGame } from '@common/chat-dialog-constants';
 import { RoomMessage, Validation } from '@common/chat-gateway-constants';
 import { CHAT_EVENTS, RoomEvent, RoomManagement } from '@common/chat-gateway-events';
-import { DifferenceInformation, MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
+import { DifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
 import { GameConstants } from '@common/game-constants';
 import { GameHistoryDTO } from '@common/game-history.dto';
@@ -326,8 +327,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     differenceHandler(information: DifferenceInformation): void {
         if (this.isMultiplayer) {
-            const multiplayerInformation: MultiplayerDifferenceInformation = {
-                room: this.socketService.gameRoom,
+            const multiplayerInformation: DifferenceInformation = {
                 differencesPosition: information.differencesPosition,
                 lastDifferences: information.lastDifferences,
             };
@@ -371,7 +371,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         if (this.isMultiplayer) {
             const endGameVerification = this.numberOfDifferences / 2;
             if (this.currentScorePlayer >= endGameVerification) {
-                this.socketService.send<string>(MATCH_EVENTS.Win, this.socketService.gameRoom);
+                this.socketService.send(MATCH_EVENTS.Win);
                 this.notifyNewBestTime(this.socketService.socketId, false, 'classique');
             }
         } else {

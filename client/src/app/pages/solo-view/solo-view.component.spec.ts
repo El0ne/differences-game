@@ -353,7 +353,6 @@ describe('SoloViewComponent', () => {
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.differenceHandler(MOCK_INFORMATION);
         expect(sendSpy).toHaveBeenCalledWith(MATCH_EVENTS.Difference, {
-            room: 'room',
             lastDifferences: [0, 1, 2, 3],
             differencesPosition: 2,
         });
@@ -369,7 +368,6 @@ describe('SoloViewComponent', () => {
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.differenceHandler(MOCK_INFORMATION);
         expect(sendSpy).toHaveBeenCalledWith(MATCH_EVENTS.Difference, {
-            room: 'room',
             lastDifferences: [0, 1, 2, 3],
             differencesPosition: 2,
         });
@@ -398,7 +396,7 @@ describe('SoloViewComponent', () => {
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         const notifyBestTimeSpy = spyOn(component, 'notifyNewBestTime').and.callThrough();
         component.endGameVerification();
-        expect(sendSpy).toHaveBeenCalledWith(MATCH_EVENTS.Win, 'room');
+        expect(sendSpy).toHaveBeenCalledWith(MATCH_EVENTS.Win);
         expect(notifyBestTimeSpy).toHaveBeenCalledWith(socketServiceMock.socketId, false, 'classique');
     });
 

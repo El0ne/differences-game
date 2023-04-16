@@ -23,14 +23,14 @@ export class TimerSoloService {
         this.socket.listen<number>(MATCH_EVENTS.LimitedTimeTimer, (timerValue: number) => {
             if (timerValue === 0) {
                 this.stopTimer();
-                this.socket.send<string>(MATCH_EVENTS.Lose, this.socket.gameRoom);
+                this.socket.send(MATCH_EVENTS.Lose);
             }
             this.currentTime = timerValue;
         });
     }
 
     stopTimer(): void {
-        this.socket.send(MATCH_EVENTS.EndTime, this.socket.gameRoom);
+        this.socket.send(MATCH_EVENTS.EndTime);
     }
 
     convert(seconds: number): string {

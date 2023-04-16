@@ -28,13 +28,12 @@ describe('TimerSoloService', () => {
     }));
 
     it('stopTimer should send a stop timer event', fakeAsync(() => {
-        mockSocketService.gameRoom = 'test';
         mockSocketService.send = () => {
             return;
         };
         const sendSpy = spyOn(mockSocketService, 'send').and.callThrough();
         service.stopTimer();
-        expect(sendSpy).toHaveBeenCalledWith(MATCH_EVENTS.EndTime, 'test');
+        expect(sendSpy).toHaveBeenCalledWith(MATCH_EVENTS.EndTime);
     }));
 
     it('should be over 1 minute if there is more than 60 seconds', () => {
@@ -54,7 +53,6 @@ describe('TimerSoloService', () => {
     });
 
     it('limitedTimeTimer should stop timer if it reaches 0 and set time value', () => {
-        mockSocketService.gameRoom = 'test';
         mockSocketService.send = () => {
             return;
         };
@@ -65,7 +63,7 @@ describe('TimerSoloService', () => {
         };
         service.limitedTimeTimer();
         expect(stopSpy).toHaveBeenCalled();
-        expect(sendSpy).toHaveBeenCalledWith(MATCH_EVENTS.Lose, mockSocketService.gameRoom);
+        expect(sendSpy).toHaveBeenCalledWith(MATCH_EVENTS.Lose);
         expect(service.currentTime).toEqual(0);
     });
 });
