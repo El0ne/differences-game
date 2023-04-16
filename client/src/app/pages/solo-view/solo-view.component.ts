@@ -24,7 +24,6 @@ import { GameHistoryDTO } from '@common/game-history.dto';
 import { ImageObject } from '@common/image-object';
 import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, TWO_MINUTES } from '@common/match-gateway-communication';
 import { PlayerGameInfo } from '@common/player-game-info';
-import { TimerInformation } from '@common/timer-information';
 import { Subject } from 'rxjs';
 @Component({
     selector: 'app-solo-view',
@@ -89,10 +88,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.gameConstantsService.getGameConstants().subscribe((gameConstants: GameConstants) => {
             this.gameConstants = gameConstants;
             if (this.isLimitedTimeMode) {
-                this.socketService.send<TimerInformation>(LIMITED_TIME_MODE_EVENTS.StartTimer, {
-                    time: this.gameConstants.countDown,
-                    room: this.socketService.gameRoom,
-                });
+                this.socketService.send<number>(LIMITED_TIME_MODE_EVENTS.Timer, this.gameConstants.countDown);
+
                 this.timerService.limitedTimeTimer();
             }
         });
@@ -102,7 +99,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.gameParamService.gameParameters.stageId = newStageId;
                 this.getImagesNames();
                 if (!newStageId) {
-                    this.winGame(this.socketService.socketId);
+                    this.gameCompletion(true, this.socketService.socketId);
                 }
             });
         } else {
@@ -161,7 +158,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 if (this.isLimitedTimeMode) {
                     this.gameParamService.gameParameters.isMultiplayerGame = false;
                 } else {
-                    this.winGame(this.socketService.socketId);
+                    this.gameCompletion(true, this.socketService.socketId);
                     this.notifyNewBestTime(this.socketService.socketId, true, 'classique');
                 }
             }
@@ -170,10 +167,10 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.effectHandler(data);
         });
         this.socketService.listen<string>(MATCH_EVENTS.Win, (socketId: string) => {
-            this.winGame(socketId);
+            this.gameCompletion(true, socketId);
         });
         this.socketService.listen<string>(MATCH_EVENTS.Lose, () => {
-            this.loseGame();
+            this.gameCompletion(false);
         });
     }
 
@@ -250,27 +247,21 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.socketService.send<GameHistoryDTO>(CHAT_EVENTS.BestTime, gameHistory);
     }
 
-    winGame(winnerId: string): void {
-        if (!this.left.endGame) {
+    gameCompletion(win: boolean, winnerId?: string): void {
+        this.left.endGame = true;
+        this.right.endGame = true;
+        this.showNavBar = false;
+        if (win && !this.dialog.openDialogs.length && winnerId) {
             this.timerService.stopTimer();
-            this.left.endGame = true;
-            this.right.endGame = true;
-            this.showNavBar = false;
             this.dialog.open(GameWinModalComponent, {
                 disableClose: true,
                 data: { isMultiplayer: this.isMultiplayer, winner: this.socketService.names.get(winnerId) } as EndGame,
             });
-        }
-    }
-
-    loseGame(): void {
-        this.left.endGame = true;
-        this.right.endGame = true;
-        this.showNavBar = false;
-        if (!this.dialog.openDialogs.length)
+        } else if (!this.dialog.openDialogs.length) {
             this.dialog.open(GameLoseModalComponent, {
                 disableClose: true,
             });
+        }
     }
 
     incrementScore(socket: string): void {
@@ -325,17 +316,10 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     addTimeToTimer(): void {
-        if (this.timerService.currentTime + this.gameConstants.difference <= TWO_MINUTES) {
-            this.socketService.send<TimerInformation>(LIMITED_TIME_MODE_EVENTS.StartTimer, {
-                time: this.timerService.currentTime + this.gameConstants.difference,
-                room: this.socketService.gameRoom,
-            });
-        } else {
-            this.socketService.send<TimerInformation>(LIMITED_TIME_MODE_EVENTS.StartTimer, {
-                time: TWO_MINUTES,
-                room: this.socketService.gameRoom,
-            });
-        }
+        this.socketService.send<number>(
+            LIMITED_TIME_MODE_EVENTS.Timer,
+            Math.min(this.timerService.currentTime + this.gameConstants.difference, TWO_MINUTES),
+        );
     }
 
     differenceHandler(information: DifferenceInformation): void {
@@ -390,7 +374,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             }
         } else {
             if (this.currentScorePlayer === this.numberOfDifferences) {
-                this.winGame(this.socketService.socketId);
+                this.gameCompletion(true, this.socketService.socketId);
                 this.notifyNewBestTime(this.socketService.socketId, false, 'classique');
             }
         }

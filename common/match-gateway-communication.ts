@@ -16,7 +16,7 @@ export enum LIMITED_TIME_MODE_EVENTS {
     GetFirstStageInformation = 'getFirstStageInformation',
     NewStageInformation = 'newStageInformation',
     StartLimitedTimeGame = 'startLimitedTimeGame',
-    StartTimer = 'StartTimer',
+    Timer = 'Timer',
     NextStage = 'nextStage',
 }
 

@@ -4,7 +4,6 @@ import { GameManagerService } from '@app/services/game-manager/game-manager.serv
 import { PlayerDifference } from '@common/difference-information';
 import { GameHistoryDTO } from '@common/game-history.dto';
 import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
-import { TimerInformation } from '@common/timer-information';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { BroadcastOperator, Server, Socket } from 'socket.io';
@@ -145,25 +144,20 @@ describe('MatchGateway', () => {
         gateway.limitedTimeLost(socket, TEST_ROOM_ID);
     });
 
-    it('limitedTimeTimer should create a timer for a limited time match', async () => {
+    it('startLimitedTimeTimer should create a timer for a limited time match', async () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
             emit: (event: string) => {
                 expect(event).toEqual(MATCH_EVENTS.LimitedTimeTimer);
             },
         } as any);
+        socket.data.room = 'test';
         const stopTimerSpy = jest.spyOn(gateway, 'stopTimer').mockImplementation();
-        gateway.limitedTimeTimer(socket, 'test', 123);
+        gateway.startLimitedTimeTimer(socket, 123);
         jest.advanceTimersByTime(ONE_SECOND);
         expect(stopTimerSpy).toHaveBeenCalled();
         expect(gateway.timers.get('test')).toBeTruthy();
         clearInterval(gateway.timers.get('test'));
-    });
-
-    it('startLimitedTimeTimer should call limitedTimeTimer', () => {
-        const limitedTimerSpy = jest.spyOn(gateway, 'limitedTimeTimer').mockImplementation();
-        gateway.startLimitedTimeTimer(socket, MOCK_TIMER_INFORMATION);
-        expect(limitedTimerSpy).toHaveBeenCalled();
     });
 });
 
@@ -184,9 +178,4 @@ const FAKE_GAME_HISTORY_DTO: GameHistoryDTO = {
         hasAbandon: false,
         hasWon: false,
     },
-};
-
-const MOCK_TIMER_INFORMATION: TimerInformation = {
-    time: 123,
-    room: 'test',
 };
