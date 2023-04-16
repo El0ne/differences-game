@@ -1,7 +1,7 @@
 .opponents-container {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
 
     width: 14rem;
     height: 9rem;
@@ -20,5 +20,5 @@
 
 .text {
     align-self: center;
-    margin-top: 3rem;
+    margin-top: 2rem;
 }
