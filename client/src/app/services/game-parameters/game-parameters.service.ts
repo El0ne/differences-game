@@ -10,5 +10,5 @@ export interface GameParameters {
     providedIn: 'root',
 })
 export class GameParametersService {
-    gameParameters: GameParameters;
+    gameParameters: GameParameters = { isLimitedTimeGame: false, isMultiplayerGame: false, stageId: '' };
 }
