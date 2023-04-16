@@ -18,12 +18,10 @@ export class GameWinModalComponent {
 
     confirm(): void {
         this.matDialogRef.close(false);
-        // this.isReplaySelected = false;
         this.router.navigate(['/home']);
     }
 
     replay(): void {
         this.matDialogRef.close(true);
-        // this.isReplaySelected = true;
     }
 }
