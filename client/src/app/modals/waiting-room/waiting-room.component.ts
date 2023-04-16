@@ -1,6 +1,7 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { Routes } from '@app/modules/routes';
 import { SocketService } from '@app/services/socket/socket.service';
 import {
     AcceptOpponentInformation,
@@ -69,7 +70,7 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
         this.socket.gameRoom = gameRoom;
         this.dialogRef.close();
         if (!this.waitingRoomInfo.isLimitedTimeMode) {
-            this.router.navigate(['/game']);
+            this.router.navigate([`/${Routes.Game}`]);
         }
     }
 

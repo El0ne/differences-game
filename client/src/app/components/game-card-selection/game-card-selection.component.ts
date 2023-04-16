@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { WaitingRoomComponent, WaitingRoomDataPassing } from '@app/modals/waiting-room/waiting-room.component';
+import { Routes } from '@app/modules/routes';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameParametersService } from '@app/services/game-parameters/game-parameters.service';
 import { ImagesService } from '@app/services/images/images.service';
@@ -80,7 +81,7 @@ export class GameCardSelectionComponent implements OnInit {
                         stageId: this.gameCardInformation._id,
                         isLimitedTimeMode: false,
                     });
-                    this.router.navigate(['/game']);
+                    this.router.navigate([`/${Routes.Game}`]);
                 } else this.hostOrJoinGame();
             }
         });

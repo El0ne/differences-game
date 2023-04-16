@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { Routes } from '@app/modules/routes';
 
 @Component({
     selector: 'app-game-lose-modal',
@@ -12,6 +13,6 @@ export class GameLoseModalComponent {
 
     confirm(): void {
         this.matDialogRef.close();
-        this.router.navigate(['/home']);
+        this.router.navigate([`/${Routes.Home}`]);
     }
 }

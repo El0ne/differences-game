@@ -3,6 +3,7 @@
 import { Component, Inject, NgZone } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { Routes } from '@app/modules/routes';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { ImagesService } from '@app/services/images/images.service';
@@ -34,13 +35,13 @@ export class ModalPageComponent {
 
     createGame(): void {
         this.gameCardService.createGame(this.data.gameInfo).subscribe();
-        this.redirection('/config');
+        this.redirection(`/${Routes.Config}`);
     }
 
     dropGame(): void {
         this.clickService.deleteDifferences(this.data.gameInfo._id).subscribe();
         this.imagesServices.deleteImageObjects(this.data.gameInfo._id).subscribe();
-        this.redirection('/creatingGame');
+        this.redirection(`/${Routes.CreatingGame}`);
     }
 
     redirection(path: string): void {

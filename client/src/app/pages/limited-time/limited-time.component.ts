@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { WaitingRoomComponent, WaitingRoomDataPassing } from '@app/modals/waiting-room/waiting-room.component';
+import { Routes } from '@app/modules/routes';
 import { GameParametersService } from '@app/services/game-parameters/game-parameters.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, SoloGameCreation } from '@common/match-gateway-communication';
@@ -38,7 +39,7 @@ export class LimitedTimeComponent implements OnInit, OnDestroy {
 
         this.socketService.listen<string>(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, (stageId: string) => {
             this.gameParamService.gameParameters.stageId = stageId;
-            this.router.navigate(['/game']);
+            this.router.navigate([`/${Routes.Game}`]);
         });
 
         this.socketService.send(WAITING_ROOM_EVENTS.ScanForHost, [LIMITED_TIME_MODE_ID]);

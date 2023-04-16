@@ -3,6 +3,7 @@ import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
+import { Routes } from '@app/modules/routes';
 import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
 import { DrawManipulationService } from '@app/services/draw-manipulation/draw-manipulation.service';
 import { EraserService } from '@app/services/eraser/eraser.service';
@@ -200,7 +201,7 @@ export class GameCreationPageComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe((result) => {
             result.image = '';
-            this.router.navigate(['/config']);
+            this.router.navigate([`/${Routes.Config}`]);
         });
     }
 

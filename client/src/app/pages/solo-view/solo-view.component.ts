@@ -7,6 +7,7 @@ import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-mo
 import { GameLoseModalComponent } from '@app/modals/game-lose-modal/game-lose-modal.component';
 import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal.component';
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
+import { Routes } from '@app/modules/routes';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
@@ -78,7 +79,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         if (!this.socketService.liveSocket()) {
-            this.router.navigate(['/home']);
+            console.log('quit');
+            this.router.navigate([`/${Routes.Home}`]);
             return;
         }
 

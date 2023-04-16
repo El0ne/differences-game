@@ -5,15 +5,16 @@ import { GameSelectionComponent } from '@app/pages/game-selection/game-selection
 import { HomePageComponent } from '@app/pages/home-page/home-page.component';
 import { LimitedTimeComponent } from '@app/pages/limited-time/limited-time.component';
 import { SoloViewComponent } from '@app/pages/solo-view/solo-view.component';
+import { Routes as RoutesPaths } from './routes';
 
 const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
-    { path: 'home', component: HomePageComponent },
-    { path: 'creatingGame', component: GameCreationPageComponent },
-    { path: 'stage-selection', component: GameSelectionComponent },
-    { path: 'config', component: GameSelectionComponent },
-    { path: 'game', component: SoloViewComponent },
-    { path: 'limited-time', component: LimitedTimeComponent },
+    { path: RoutesPaths.Home, component: HomePageComponent },
+    { path: RoutesPaths.CreatingGame, component: GameCreationPageComponent },
+    { path: RoutesPaths.StageSelection, component: GameSelectionComponent },
+    { path: RoutesPaths.Config, component: GameSelectionComponent },
+    { path: RoutesPaths.Game, component: SoloViewComponent },
+    { path: RoutesPaths.LimitedTime, component: LimitedTimeComponent },
     { path: '**', redirectTo: '/home' },
 ];
 
