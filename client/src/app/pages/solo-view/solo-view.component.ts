@@ -243,9 +243,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     getRandomDifference(event: KeyboardEvent | null): void {
         if (event?.key === 'i' && !this.isMultiplayer && this.gameHintService.hintsRemaining > 0) {
             // TODO : Verifier que ca fonctionne avec temps limite
-            if (this.isClassic) this.timerService.restartTimer(1, this.socketService.socketId, this.gameConstants.hint);
+            if (this.isClassic) this.timerService.restartTimer(1, this.socketService.gameRoom, this.gameConstants.hint);
             else {
-                this.timerService.restartTimer(1, this.socketService.socketId, -this.gameConstants.hint);
+                this.timerService.restartTimer(1, this.socketService.gameRoom, -this.gameConstants.hint);
             }
             if (this.hintsRemaining() > 0) this.socketService.send(CHAT_EVENTS.Hint, this.currentRoom);
             this.left.getDifferences(this.currentGameId).subscribe((data) => {
