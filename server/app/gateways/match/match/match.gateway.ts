@@ -1,5 +1,5 @@
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
-import { MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
+import { DifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameHistoryDTO } from '@common/game-history.dto';
 import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND, SoloGameCreation } from '@common/match-gateway-communication';
 import { Injectable } from '@nestjs/common';
@@ -27,35 +27,29 @@ export class MatchGateway implements OnGatewayDisconnect {
     }
 
     @SubscribeMessage(MATCH_EVENTS.EndTime)
-    stopTimer(@ConnectedSocket() socket: Socket, @MessageBody() room: string): void {
-        clearInterval(this.timers.get(room));
-        this.timers.delete(room);
+    stopTimer(@ConnectedSocket() socket: Socket): void {
+        clearInterval(this.timers.get(socket.data.room));
+        this.timers.delete(socket.data.room);
     }
 
     @SubscribeMessage(MATCH_EVENTS.Win)
-    win(@ConnectedSocket() socket: Socket, @MessageBody() room: string): void {
-        if (socket.rooms.has(room)) {
-            this.server.to(room).emit(MATCH_EVENTS.Win, socket.id);
-        }
+    win(@ConnectedSocket() socket: Socket): void {
+        this.server.to(socket.data.room).emit(MATCH_EVENTS.Win, socket.id);
     }
 
     @SubscribeMessage(MATCH_EVENTS.Difference)
-    difference(@ConnectedSocket() socket: Socket, @MessageBody() data: MultiplayerDifferenceInformation): void {
-        if (socket.rooms.has(data.room)) {
-            const differenceInformation: PlayerDifference = {
-                differencesPosition: data.differencesPosition,
-                lastDifferences: data.lastDifferences,
-                socket: socket.id,
-            };
-            this.server.to(data.room).emit(MATCH_EVENTS.Difference, differenceInformation);
-        }
+    difference(@ConnectedSocket() socket: Socket, @MessageBody() data: DifferenceInformation): void {
+        const differenceInformation: PlayerDifference = {
+            differencesPosition: data.differencesPosition,
+            lastDifferences: data.lastDifferences,
+            socket: socket.id,
+        };
+        this.server.to(socket.data.room).emit(MATCH_EVENTS.Difference, differenceInformation);
     }
 
     @SubscribeMessage(MATCH_EVENTS.Lose)
-    limitedTimeLost(socket: Socket, room: string): void {
-        if (socket.rooms.has(room)) {
-            this.server.to(room).emit(MATCH_EVENTS.Lose, 'timeExpired');
-        }
+    limitedTimeLost(@ConnectedSocket() socket: Socket): void {
+        this.server.to(socket.data.room).emit(MATCH_EVENTS.Lose, 'timeExpired');
     }
 
     @SubscribeMessage(LIMITED_TIME_MODE_EVENTS.NextStage)
@@ -72,7 +66,7 @@ export class MatchGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage(LIMITED_TIME_MODE_EVENTS.Timer)
     startLimitedTimeTimer(socket: Socket, time: number): void {
-        this.stopTimer(socket, socket.data.room);
+        this.stopTimer(socket);
         this.server.to(socket.data.room).emit(MATCH_EVENTS.LimitedTimeTimer, time);
         const timer = setInterval(() => {
             time--;

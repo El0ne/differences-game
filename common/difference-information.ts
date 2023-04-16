@@ -3,10 +3,6 @@ export interface DifferenceInformation {
     lastDifferences: number[];
 }
 
-export interface MultiplayerDifferenceInformation extends DifferenceInformation {
-    room: string;
-}
-
 export interface PlayerDifference extends DifferenceInformation {
     socket: string;
 }

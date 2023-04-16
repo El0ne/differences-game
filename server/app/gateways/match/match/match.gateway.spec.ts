@@ -30,6 +30,7 @@ describe('MatchGateway', () => {
         } as BroadcastOperator<unknown, unknown>);
 
         socket.data = {};
+        socket.data.room = TEST_ROOM_ID;
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [MatchGateway, { provide: GameManagerService, useValue: gameManagerServiceSpy }],
@@ -44,7 +45,6 @@ describe('MatchGateway', () => {
     });
 
     it('difference() should emit to room a difference Event when room exists', () => {
-        stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
             emit: (event: string, data: PlayerDifference) => {
                 expect(event).toEqual(MATCH_EVENTS.Difference);
@@ -52,13 +52,7 @@ describe('MatchGateway', () => {
             },
         } as any);
 
-        gateway.difference(socket, { differencesPosition: 3, lastDifferences: [0, 1, 2], room: TEST_ROOM_ID });
-    });
-
-    it('difference() should not emit when room does not exists', () => {
-        stub(socket, 'rooms').value(new Set());
-        gateway.difference(socket, { differencesPosition: 3, lastDifferences: [0, 1, 2], room: TEST_ROOM_ID });
-        expect(server.to.called).toBeFalsy();
+        gateway.difference(socket, { differencesPosition: 3, lastDifferences: [0, 1, 2] });
     });
 
     it('win() should emit to room a win Event when room exists', () => {
@@ -70,13 +64,7 @@ describe('MatchGateway', () => {
             },
         } as any);
 
-        gateway.win(socket, TEST_ROOM_ID);
-    });
-
-    it('win() should not emit when room does not exists', () => {
-        stub(socket, 'rooms').value(new Set());
-        gateway.win(socket, TEST_ROOM_ID);
-        expect(server.to.called).toBeFalsy();
+        gateway.win(socket);
     });
 
     it('createSoloGame should call gameManagerService.addGame or startLimitedTimeGame depending on isLimitedTimeMode', async () => {
@@ -102,10 +90,9 @@ describe('MatchGateway', () => {
         const endgameSpy = jest.spyOn(gameManagerServiceSpy, 'endGame').mockImplementation();
         const removeLimitedTimePlayerSpy = jest.spyOn(gameManagerServiceSpy, 'removePlayerFromLimitedTimeGame').mockImplementation();
         socket.data.stageId = 'stageId';
-        socket.data.room = 'room';
         await gateway.handleDisconnect(socket);
         expect(endgameSpy).toHaveBeenCalledWith('stageId');
-        expect(removeLimitedTimePlayerSpy).toHaveBeenCalledWith('room');
+        expect(removeLimitedTimePlayerSpy).toHaveBeenCalledWith(TEST_ROOM_ID);
     });
 
     it('timer should add a new timer to timer map', async () => {
@@ -117,13 +104,13 @@ describe('MatchGateway', () => {
 
     it('timer should stop a timer according to room given', async () => {
         gateway.timers.set(
-            'room',
+            TEST_ROOM_ID,
             setTimeout(() => {
                 return;
             }, ONE_SECOND),
         );
-        gateway.stopTimer(socket, 'room');
-        expect(gateway.timers.has('room')).toBeFalsy();
+        gateway.stopTimer(socket);
+        expect(gateway.timers.has(TEST_ROOM_ID)).toBeFalsy();
     });
 
     it('storeSoloGame Information should store solo game information for in case of abandon', () => {
@@ -133,7 +120,6 @@ describe('MatchGateway', () => {
     });
 
     it('limitedTimeLost should emit a lose event', () => {
-        stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
             emit: (event: string, data: string) => {
                 expect(event).toEqual(MATCH_EVENTS.Lose);
@@ -141,7 +127,7 @@ describe('MatchGateway', () => {
             },
         } as any);
 
-        gateway.limitedTimeLost(socket, TEST_ROOM_ID);
+        gateway.limitedTimeLost(socket);
     });
 
     it('startLimitedTimeTimer should create a timer for a limited time match', async () => {
