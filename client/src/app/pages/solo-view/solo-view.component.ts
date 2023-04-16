@@ -405,6 +405,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 isReplayMode: this.isReplayMode,
             },
             disableClose: true,
+            hasBackdrop: !this.isReplayMode,
         });
 
         if (!this.isReplayMode) {
@@ -425,6 +426,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 isButtonDisabled: this.isReplayMode,
             },
             disableClose: true,
+            hasBackdrop: !this.isReplayMode,
         });
         if (!this.isReplayMode) {
             this.addCommand(new OpenModalCommand(this, false));
@@ -560,7 +562,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     resetPropertiesForReplay(room: string): void {
         this.resetCanvas();
-
+        this.closeModals();
         this.isReplayMode = true;
         this.isReplayPaused = false;
         this.timerService.currentTime = 0;
