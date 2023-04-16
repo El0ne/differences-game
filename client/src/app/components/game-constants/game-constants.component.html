@@ -5,13 +5,13 @@
         secondes
     </div>
     <div class="game-constants">
-        Durée du compte à rebours (entre 10 et 60 secondes):
+        Durée du compte à rebours (entre 10 et 120 secondes):
         <input
             type="number"
             [(ngModel)]="gameConstants.countDown"
             [min]="10"
-            [max]="60"
-            (blur)="gameConstants.countDown = checkNumber($event, 10, 60)"
+            [max]="120"
+            (blur)="gameConstants.countDown = checkNumber($event, 10, 120)"
         />
         secondes
     </div>
