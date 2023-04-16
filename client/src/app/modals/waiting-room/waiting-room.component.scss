@@ -1,16 +1,11 @@
 .opponents-container {
-    display: center;
-    text-overflow: hidden;
+    display: flex;
+    flex-direction: column;
     width: 400px;
     height: 400px;
+    overflow-y: auto;
+    text-overflow: hidden;
 }
-
-// .scrolling-bar {
-//     width: 450px;
-//     height: 100px;
-//     overflow-y: scroll;
-//     scrollbar-width: thin;
-// }
 
 .ng-star-inserted {
     margin-top: 15px;
@@ -27,6 +22,8 @@ body {
     justify-content: space-around;
     align-items: center;
     border-radius: 25px;
+    max-height: calc(100% - 100px);
+    overflow: hidden;
 }
 
 .name-entry-title {
