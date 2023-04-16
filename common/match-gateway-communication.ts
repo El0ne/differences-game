@@ -1,4 +1,4 @@
-export enum MATCH_EVENTS {
+export const enum MATCH_EVENTS {
     createSoloGame = 'createSoloGame',
     Timer = 'Timer',
     EndTime = 'EndTime',
@@ -12,7 +12,7 @@ export enum MATCH_EVENTS {
     Lose = 'Lose',
 }
 
-export enum LIMITED_TIME_MODE_EVENTS {
+export const enum LIMITED_TIME_MODE_EVENTS {
     GetFirstStageInformation = 'getFirstStageInformation',
     NewStageInformation = 'newStageInformation',
     StartLimitedTimeGame = 'startLimitedTimeGame',

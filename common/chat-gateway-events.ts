@@ -1,4 +1,4 @@
-export enum CHAT_EVENTS {
+export const enum CHAT_EVENTS {
     Abandon = 'abandon',
     Hint = 'hint',
     Event = 'event',
