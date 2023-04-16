@@ -117,11 +117,11 @@
                 </div>
             </div>
             <div class="centered" *ngIf="this.hintIcon && !this.isMultiplayer">
-                <button class="hint hint-button" type="button" (click)="getDiffFromClick()">
+                <button [ngStyle]="{ color: 'white' }" class="hint hint-button" type="button" (click)="getDiffFromClick()">
                     <mat-icon>search</mat-icon>
                 </button>
-                <div class="playerName">{{ hintsRemaining() }}</div>
-                <div class="message centered">Temps par indice: {{ this.gameConstants.hint }} secondes</div>
+                <div class="message">Indices restants: {{ hintsRemaining() }}</div>
+                <div class="message centered">Pénalité utilisation indice: {{ this.gameConstants.hint }} secondes</div>
             </div>
             <div *ngIf="this.thirdHint" class="centered">
                 <div class="third-hint-box neon-border" [ngStyle]="{ 'background-color': this.hintColor }"></div>
