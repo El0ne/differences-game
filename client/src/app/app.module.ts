@@ -19,6 +19,7 @@ import { ConfirmationModalComponent } from './modals/confirmation-modal/confirma
 import { GameInfoModalComponent } from './modals/game-info-modal/game-info-modal.component';
 import { GameLoseModalComponent } from './modals/game-lose-modal/game-lose-modal.component';
 import { GameWinModalComponent } from './modals/game-win-modal/game-win-modal.component';
+import { LimitedTimeModalComponent } from './modals/limited-time-modal/limited-time-modal.component';
 import { ModalPageComponent } from './modals/modal-page/modal-page.component';
 import { QuitGameModalComponent } from './modals/quit-game-modal/quit-game-modal.component';
 import { WaitingRoomComponent } from './modals/waiting-room/waiting-room.component';
@@ -55,8 +56,9 @@ import { SoloViewComponent } from './pages/solo-view/solo-view.component';
         GameConstantsComponent,
         GameLoseModalComponent,
         ConfirmationModalComponent,
+        LimitedTimeModalComponent,
     ],
-    entryComponents: [ModalPageComponent],
+    entryComponents: [ModalPageComponent, LimitedTimeModalComponent],
     imports: [
         AppMaterialModule,
         AppRoutingModule,
