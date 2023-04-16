@@ -166,8 +166,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         });
         this.socketService.listen<RoomMessage>(CHAT_EVENTS.Abandon, (message: RoomMessage) => {
             if (!this.left.endGame) {
-                this.winGame(this.socketService.socketId);
                 this.notifyNewBestTime(this.socketService.socketId, true, 'classique');
+                this.winGame(this.socketService.socketId);
                 message.message = `${message.message} - ${this.opponent} a abandonné la partie.`;
                 this.messages.push(message);
                 this.addCommand(new SendMessageCommand(this, message));
@@ -312,6 +312,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     notifyNewBestTime(winnerId: string, isAbandon: boolean, mode: string): void {
+        this.isWinner = winnerId === this.socketService.socketId;
         const winnerName: string = this.socketService.names.get(winnerId) as string;
         const player1: PlayerGameInfo = {
             name: winnerName,
@@ -366,10 +367,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                     disableClose: true,
                     data: { isMultiplayer: this.isMultiplayer, winner: this.socketService.names.get(winnerId), isWinner: this.isWinner } as EndGame,
                 });
-                dialogRef.afterClosed().subscribe(() => {
-                    this.socketService.send<string>(MATCH_EVENTS.leaveRoom, this.socketService.gameRoom);
-                    this.socketService.send<string>(MATCH_EVENTS.joinReplayRoom, this.socketService.socketId);
-                    this.resetPropertiesForReplay(this.socketService.socketId);
+                dialogRef.afterClosed().subscribe((isReplaySelected) => {
+                    if (isReplaySelected) {
+                        this.socketService.send<string>(MATCH_EVENTS.leaveRoom, this.socketService.gameRoom);
+                        this.socketService.send<string>(MATCH_EVENTS.joinReplayRoom, this.socketService.socketId);
+                        this.resetPropertiesForReplay(this.socketService.socketId);
+                    }
                 });
                 if (this.isMultiplayer) {
                     const endGameCommand = new EndGameCommand(this);
@@ -518,7 +521,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         if (this.isMultiplayer) {
             const endGameVerification = this.numberOfDifferences / 2;
             if (this.currentScorePlayer >= endGameVerification) {
-                this.isWinner = true;
                 this.socketService.send<string>(MATCH_EVENTS.Win, this.currentRoom);
                 this.notifyNewBestTime(this.socketService.socketId, false, 'classique');
             }

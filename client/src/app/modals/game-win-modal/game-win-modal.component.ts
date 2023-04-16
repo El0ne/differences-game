@@ -17,13 +17,13 @@ export class GameWinModalComponent {
     }
 
     confirm(): void {
-        this.matDialogRef.close();
-        this.isReplaySelected = false;
+        this.matDialogRef.close(false);
+        // this.isReplaySelected = false;
         this.router.navigate(['/home']);
     }
 
     replay(): void {
-        this.matDialogRef.close();
-        this.isReplaySelected = true;
+        this.matDialogRef.close(true);
+        // this.isReplaySelected = true;
     }
 }
