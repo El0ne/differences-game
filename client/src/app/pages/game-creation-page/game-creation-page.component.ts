@@ -253,7 +253,7 @@ export class GameCreationPageComponent implements OnInit {
             const originalBlob = this.mergeCanvas(this.originalCanvas.nativeElement, this.originalDrawnCanvas.nativeElement);
             const differenceBlob = this.mergeCanvas(this.differenceCanvas.nativeElement, this.differenceDrawnCanvas.nativeElement);
             this.gameCardService.uploadImages(originalBlob, differenceBlob, this.differenceRadius).subscribe((data) => {
-                if (data.gameDifferenceNumber) {
+                if (data) {
                     this.createdGameInfo = {
                         _id: data.gameId,
                         name: this.gameTitle,
