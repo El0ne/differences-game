@@ -21,7 +21,7 @@ export class DifferencesCounterService {
 
                 while (queue.length !== 0) {
                     const currentPos = queue.shift();
-                    for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(currentPos, ADJACENT_PIXELS_RADIUS, false)) {
+                    for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(currentPos, false, ADJACENT_PIXELS_RADIUS)) {
                         if (differencesArray[adjacentPixel] && !visitedDifferences[adjacentPixel]) {
                             visitedPixels[numberOfDifferences].push(adjacentPixel);
                             queue.push(adjacentPixel);

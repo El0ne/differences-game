@@ -7,6 +7,7 @@ import { DifferenceDetectionService } from '@app/services/difference-detection/d
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameDifficultyService } from '@app/services/game-difficulty/game-difficulty.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
+import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { ImageUploadDto } from '@common/image-upload.dto';
 import { ImageDto } from '@common/image.dto';
@@ -39,6 +40,7 @@ export class StageController {
         private differenceService: DifferenceDetectionService,
         private differenceClickService: DifferenceClickService,
         private bestTimesService: BestTimesService,
+        private pixelRadiusService: PixelRadiusService,
     ) {}
 
     @Get('/')
@@ -88,7 +90,8 @@ export class StageController {
         try {
             if (Object.keys(files).length) {
                 const fileArray: ImageDto[] = files.file;
-                const differencesArray = await this.differenceService.compareImages(fileArray[0].path, fileArray[1].path, param.radius);
+                this.pixelRadiusService.radius = param.radius;
+                const differencesArray = await this.differenceService.compareImages(fileArray[0].path, fileArray[1].path);
                 if (this.gameDifficultyService.isGameValid(differencesArray)) {
                     const differenceObjectId = await this.differenceClickService.createDifferenceArray(differencesArray);
                     const imageData: Images = {
