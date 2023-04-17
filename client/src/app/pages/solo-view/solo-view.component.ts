@@ -1,9 +1,9 @@
+// we have to disable this rule because this file is too long
 /* eslint-disable max-lines */
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { HEIGHT, MAX_EFFECT_TIME, WIDTH } from '@app/components/click-event/click-event-constant';
-// we have to disable this rule because this file is too long
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
 import { GameLoseModalComponent } from '@app/modals/game-lose-modal/game-lose-modal.component';
@@ -62,7 +62,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     hintIcon: boolean;
     thirdHint: boolean;
     hintColor: string;
-    isClassic: boolean;
     boundGetRandomDifference: (event: KeyboardEvent) => void = this.getRandomDifference.bind(this);
 
     // we have more than 3 services

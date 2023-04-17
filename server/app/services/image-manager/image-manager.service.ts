@@ -20,10 +20,10 @@ export class ImageManagerService {
 
     async deleteImageObject(id: string): Promise<void> {
         const imageObject = await this.imagesModel.findByIdAndDelete(new ObjectId(id));
-        console.log(imageObject);
-        // TODO solution au undefined: mettre un if this.imageObject. Je comprend pas pourquoi il pourrait être undefined
-        this.deleteImage(imageObject.originalImageName);
-        this.deleteImage(imageObject.differenceImageName);
+        if (imageObject) {
+            this.deleteImage(imageObject.originalImageName);
+            this.deleteImage(imageObject.differenceImageName);
+        }
     }
 
     deleteImage(imageName: string): void {

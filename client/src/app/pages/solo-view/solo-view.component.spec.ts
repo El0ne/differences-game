@@ -514,6 +514,8 @@ describe('SoloViewComponent', () => {
         const mockDifference = [[1]];
         gameHintServiceMock.hintsRemaining = 2;
         component.isClassic = true;
+        Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: false });
+        Object.defineProperty(gameParamService.gameParameters, 'isMultiplayerGame', { value: false });
         spyOn(component.left, 'getDifferences').and.returnValue(of(mockDifference));
         spyOn(foundDifferenceServiceSpy, 'findPixelsFromDifference').and.returnValue([4]);
         spyOn(gameHintServiceMock, 'getPercentages').and.returnValue([0.25, 0.25]);
@@ -531,6 +533,8 @@ describe('SoloViewComponent', () => {
         const mockDifference = [[1]];
         gameHintServiceMock.hintsRemaining = 1;
         component.isClassic = false;
+        Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: true });
+        Object.defineProperty(gameParamService.gameParameters, 'isMultiplayerGame', { value: false });
         const thirdHintSpy = spyOn(component, 'activateThirdHint');
         spyOn(component.left, 'getDifferences').and.returnValue(of(mockDifference));
         spyOn(foundDifferenceServiceSpy, 'findPixelsFromDifference').and.returnValue([4]);
