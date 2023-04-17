@@ -23,6 +23,7 @@ describe('LimitedTimeComponent', () => {
     let waitingRoomAfterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
     let gameParamService: GameParametersService;
     let routerSpy: Router;
+    let dialogMock: MatDialogRef<LimitedTimeComponent>;
 
     beforeEach(async () => {
         modalSpy = jasmine.createSpyObj('MatDialog', ['open']);
@@ -34,6 +35,7 @@ describe('LimitedTimeComponent', () => {
         socketServiceSpy.names = new Map<string, string>();
         gameParamService = jasmine.createSpyObj('GameParametersService', ['gameParameters']);
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+        dialogMock = jasmine.createSpyObj('MatDialogRef', ['close']);
 
         await TestBed.configureTestingModule({
             declarations: [LimitedTimeComponent],
@@ -44,6 +46,7 @@ describe('LimitedTimeComponent', () => {
                 { provide: GameParametersService, useValue: gameParamService },
                 { provide: SocketService, useValue: socketServiceSpy },
                 { provide: Router, useValue: routerSpy },
+                { provide: MatDialogRef, useValue: dialogMock },
             ],
         }).compileComponents();
 
@@ -143,5 +146,10 @@ describe('LimitedTimeComponent', () => {
         component.ngOnInit();
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/game']);
         expect(gameParamService.gameParameters.stageId).toBe('stageId');
+    });
+
+    it('closeModal should close the dialog when closeModal() is called', () => {
+        component.closeModal();
+        expect(dialogMock.close).toHaveBeenCalled();
     });
 });

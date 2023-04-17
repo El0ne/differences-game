@@ -62,6 +62,7 @@ export class LimitedTimeComponent implements OnInit, OnDestroy {
         }
         const data: WaitingRoomDataPassing = { stageId: LIMITED_TIME_MODE_ID, isHost: this.createGameButton, isLimitedTimeMode: true };
         this.dialog.open(WaitingRoomComponent, { disableClose: true, data });
+        this.router.navigate(['/game']);
     }
 
     selectPlayerName(isMultiplayerGame: boolean): void {
@@ -79,6 +80,7 @@ export class LimitedTimeComponent implements OnInit, OnDestroy {
                         stageId: LIMITED_TIME_MODE_ID,
                         isLimitedTimeMode: true,
                     });
+                    this.router.navigate(['/game']);
                 } else this.hostOrJoinGame();
             }
         });
