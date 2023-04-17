@@ -1,4 +1,3 @@
-<! -- add scrolling-bar class to body element below if needed  -->
 <body class="modal-page container">
     <div *ngIf="waitingRoomInfo.isHost; else clientView">
         <div *ngIf="clientsInWaitingRoom.size === 0; else opponents">
