@@ -16,8 +16,9 @@ export const enum LIMITED_TIME_MODE_EVENTS {
     GetFirstStageInformation = 'getFirstStageInformation',
     NewStageInformation = 'newStageInformation',
     StartLimitedTimeGame = 'startLimitedTimeGame',
-    Timer = 'Timer',
+    Timer = 'timer',
     NextStage = 'nextStage',
+    TimeModification = 'timeModification',
 }
 
 export const ONE_SECOND = 1000;

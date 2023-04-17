@@ -23,6 +23,8 @@ export class ClickEventComponent implements OnInit, OnChanges {
     @Output() differenceDetected: EventEmitter<DifferenceInformation> = new EventEmitter<DifferenceInformation>();
     @Output() mistake: EventEmitter<void> = new EventEmitter<void>();
     @Output() cheatModeHandler: EventEmitter<KeyboardEvent> = new EventEmitter<KeyboardEvent>();
+    @Output() color: EventEmitter<number[]> = new EventEmitter<number[]>();
+    @Output() thirdHint: EventEmitter<boolean> = new EventEmitter<boolean>();
     @ViewChild('picture', { static: true })
     picture: ElementRef<HTMLCanvasElement>;
     @ViewChild('modification', { static: true })
@@ -33,6 +35,11 @@ export class ClickEventComponent implements OnInit, OnChanges {
     endGame: boolean;
     foundDifferences: number[];
     toggleCheatMode: boolean;
+    firstHint: boolean;
+    secondHint: boolean;
+    hintPosX: number;
+    hintPosY: number;
+    currentPixelHint: number;
 
     constructor(
         private clickEventService: ClickEventService,
@@ -44,10 +51,14 @@ export class ClickEventComponent implements OnInit, OnChanges {
         this.toggleCheatMode = false;
         this.timeout = false;
         this.endGame = false;
+        this.firstHint = false;
+        this.secondHint = false;
         this.foundDifferences = [];
     }
 
     loadImage(): void {
+        this.modification.nativeElement.addEventListener('mousemove', this.handleMouseMove.bind(this));
+
         const image = new Image();
         image.crossOrigin = 'Anonymous';
         image.src = `${IMAGE}/file/${this.imagePath}`;
@@ -63,6 +74,13 @@ export class ClickEventComponent implements OnInit, OnChanges {
         }
     }
 
+    handleMouseMove(event: MouseEvent): void {
+        const rect = this.picture.nativeElement.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        this.color.emit([x, y]);
+    }
+
     getDifferences(id: string): Observable<number[][]> {
         return this.clickEventService.getDifferences(id);
     }
@@ -70,6 +88,10 @@ export class ClickEventComponent implements OnInit, OnChanges {
     getCoordInImage(mouseEvent: MouseEvent): number[] {
         const rect = this.modification.nativeElement.getBoundingClientRect();
         return this.pixelModificationService.getCoordInImage(mouseEvent, rect);
+    }
+
+    convertPositionToPixel(toTransform: number): number[] {
+        return this.pixelModificationService.positionToPixel(toTransform);
     }
 
     isDifferent(mouseEvent: MouseEvent): void {
@@ -91,6 +113,7 @@ export class ClickEventComponent implements OnInit, OnChanges {
                     }
                 } else {
                     this.displayError(mouseEvent);
+                    this.color.emit([this.getCoordInImage(mouseEvent)[0], this.getCoordInImage(mouseEvent)[1]]);
                 }
             });
     }

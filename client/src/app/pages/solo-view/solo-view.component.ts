@@ -3,6 +3,8 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
+// we have to disable this rule because this file is too long
+import { HEIGHT, WIDTH } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
 import { GameLoseModalComponent } from '@app/modals/game-lose-modal/game-lose-modal.component';
@@ -12,6 +14,7 @@ import { Routes } from '@app/modules/routes';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
+import { GameHintService } from '@app/services/game-hint/game-hint.service';
 import { GameParametersService } from '@app/services/game-parameters/game-parameters.service';
 import { ImagesService } from '@app/services/images/images.service';
 import { SocketService } from '@app/services/socket/socket.service';
@@ -27,6 +30,8 @@ import { ImageObject } from '@common/image-object';
 import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, TWO_MINUTES } from '@common/match-gateway-communication';
 import { PlayerGameInfo } from '@common/player-game-info';
 import { Subject } from 'rxjs';
+import { DOUBLE_HINT_TIME_IN_MS, HINT_TIME_IN_MS } from './solo-view-constants';
+
 @Component({
     selector: 'app-solo-view',
     templateUrl: './solo-view.component.html',
@@ -54,6 +59,15 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
     gameConstants: GameConstants;
     // eslint-disable-next-line max-params -- need all parameters for constructor
+    currentRoom: string;
+    hintIcon: boolean;
+    thirdHint: boolean;
+    hintColor: string;
+    isClassic: boolean;
+    boundGetRandomDifference: (event: KeyboardEvent) => void = this.getRandomDifference.bind(this);
+
+    // we have more than 3 services
+    // eslint-disable-next-line max-params
     constructor(
         public timerService: TimerSoloService,
         private gameCardInfoService: GameCardInformationService,
@@ -64,6 +78,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private gameConstantsService: GameConstantsService,
         private gameParamService: GameParametersService,
         private imagesService: ImagesService,
+        private gameHintService: GameHintService,
     ) {}
 
     get stageId(): string {
@@ -79,11 +94,21 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this.thirdHint = false;
+        this.hintIcon = true;
+
         if (!this.socketService.liveSocket()) {
             console.log('quit');
             this.router.navigate([`/${Routes.Home}`]);
             return;
         }
+        this.player = this.socketService.names.get(this.socketService.socketId) as string;
+        this.opponent = this.socketService.names.get(this.socketService.opponentSocket) as string;
+        this.currentRoom = this.socketService.gameRoom;
+        this.startTime = new Date().toLocaleString('fr-FR');
+        this.gameConstantsService.getGameConstants().subscribe((gameConstants: GameConstants) => {
+            this.gameConstants = gameConstants;
+        });
 
         this.player = this.socketService.names.get(this.socketService.socketId) as string;
         this.opponent = this.socketService.names.get(this.socketService.opponentSocket) as string;
@@ -178,6 +203,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         if (!this.isMultiplayer) {
             clearInterval(this.soloTimer);
         }
+        this.gameHintService.hintsRemaining = 3;
         this.timerService.currentTime = 0;
         this.foundDifferenceService.clearDifferenceFound();
         this.socketService.disconnect();
@@ -191,10 +217,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     removeCheatMode(): void {
         document.removeEventListener('keydown', this.boundActivateCheatMode);
+        document.removeEventListener('keydown', this.boundGetRandomDifference);
     }
 
     addCheatMode(): void {
         document.addEventListener('keydown', this.boundActivateCheatMode);
+        document.addEventListener('keydown', this.boundGetRandomDifference);
     }
 
     resetDifferences(event: KeyboardEvent): void {
@@ -212,12 +240,86 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             });
         }
     }
+
+    getDiffFromClick(): void {
+        const keyEvent: KeyboardEvent = new KeyboardEvent('keydown', { key: 'i' });
+        this.getRandomDifference(keyEvent);
+    }
+
+    setColor(clickPosition: number[]): void {
+        this.hintColor = this.gameHintService.setColor(clickPosition, this.left.convertPositionToPixel(this.left.currentPixelHint));
+    }
+
+    getRandomDifference(event: KeyboardEvent | null): void {
+        if (event?.key === 'i' && !this.isMultiplayer && this.gameHintService.hintsRemaining > 0) {
+            // TODO : Verifier que ca fonctionne avec temps limite
+            if (this.isClassic) this.timerService.restartTimer(1, this.gameConstants.hint);
+            else {
+                this.timerService.restartTimer(1, -this.gameConstants.hint);
+            }
+            if (this.hintsRemaining() > 0) this.socketService.send(CHAT_EVENTS.Hint, this.currentRoom);
+            this.left.getDifferences(this.stageId).subscribe((data) => {
+                const pixelArray = this.foundDifferenceService.findPixelsFromDifference(data);
+                const randomPixel = pixelArray[Math.floor(Math.random() * pixelArray.length)];
+                this.left.currentPixelHint = randomPixel;
+                this.right.currentPixelHint = this.left.currentPixelHint;
+                const randomPixelPosition = this.gameHintService.getPercentages(this.left.convertPositionToPixel(randomPixel));
+                if (randomPixelPosition.length === 0) {
+                    this.activateThirdHint();
+                } else {
+                    this.left.hintPosX = randomPixelPosition[1] * HEIGHT;
+                    this.left.hintPosY = randomPixelPosition[0] * WIDTH;
+                    this.right.hintPosX = this.left.hintPosX;
+                    this.right.hintPosY = this.left.hintPosY;
+                }
+                this.setCurrentHint();
+                this.hintTimeouts();
+            });
+        }
+    }
+
+    setCurrentHint(): void {
+        this.left.firstHint = this.gameHintService.hintsRemaining === 2;
+        this.left.secondHint = this.gameHintService.hintsRemaining === 1;
+
+        this.right.firstHint = this.gameHintService.hintsRemaining === 2;
+        this.right.secondHint = this.gameHintService.hintsRemaining === 1;
+    }
+
+    hintTimeouts(): void {
+        if (this.right.firstHint) {
+            setTimeout(() => {
+                this.left.firstHint = false;
+                this.right.firstHint = false;
+            }, HINT_TIME_IN_MS);
+        } else if (this.right.secondHint) {
+            setTimeout(() => {
+                this.left.secondHint = false;
+                this.right.secondHint = false;
+            }, HINT_TIME_IN_MS);
+        } else {
+            setTimeout(() => {
+                this.thirdHint = false;
+            }, DOUBLE_HINT_TIME_IN_MS);
+        }
+    }
+
+    activateThirdHint(): void {
+        this.thirdHint = true;
+        this.hintIcon = false;
+    }
+
     showTime(): void {
         this.timerService.startTimer();
     }
     timesConversion(): string {
         return this.timerService.convert(this.timerService.currentTime);
     }
+
+    hintsRemaining(): number {
+        return this.gameHintService.hintsRemaining;
+    }
+
     notifyNewBestTime(winnerId: string, isAbandon: boolean, mode: string): void {
         const winnerName: string = this.socketService.names.get(winnerId) as string;
         const player1: PlayerGameInfo = {

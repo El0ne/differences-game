@@ -31,7 +31,6 @@ describe('GameCardService', () => {
     let gameCardModel: Model<GameCardDocument>;
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
-
     let bestTimesService: BestTimesService;
 
     let FAKE_RANKING_BOARD: RankingBoard[];
@@ -68,7 +67,6 @@ describe('GameCardService', () => {
         }).compile();
 
         service = module.get<GameCardService>(GameCardService);
-
         bestTimesService = module.get<BestTimesService>(BestTimesService);
         gameCardModel = module.get<Model<GameCardDocument>>(getModelToken(GameCard.name));
         connection = await module.get(getConnectionToken());
