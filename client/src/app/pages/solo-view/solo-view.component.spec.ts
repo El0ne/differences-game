@@ -243,13 +243,13 @@ describe('SoloViewComponent', () => {
     it('handleMistake should send an event called event to socket server with extra information', () => {
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.handleMistake();
-        expect(sendSpy).toHaveBeenCalledWith('event', { room: 'room', isMultiplayer: true, event: 'Erreur' });
+        expect(sendSpy).toHaveBeenCalledWith('event', { isMultiplayer: true, event: 'Erreur' });
     });
 
     it('hint should send a hint event to socket server with the room information', () => {
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.hint();
-        expect(sendSpy).toHaveBeenCalledWith('hint', 'room');
+        expect(sendSpy).toHaveBeenCalledWith('hint');
     });
 
     it('sendMessage should validate message on the server', () => {
@@ -356,7 +356,7 @@ describe('SoloViewComponent', () => {
             lastDifferences: [0, 1, 2, 3],
             differencesPosition: 2,
         });
-        expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.Event, { room: 'room', isMultiplayer: true, event: 'Différence trouvée' });
+        expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.Event, { isMultiplayer: true, event: 'Différence trouvée' });
         expect(component.left.emitSound).toHaveBeenCalledWith(false);
     });
 
@@ -383,7 +383,7 @@ describe('SoloViewComponent', () => {
         });
         spyOn(component, 'effectHandler');
         component.differenceHandler(MOCK_INFORMATION);
-        expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.Event, { room: 'room', isMultiplayer: false, event: 'Différence trouvée' });
+        expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.Event, { isMultiplayer: false, event: 'Différence trouvée' });
         expect(component.left.emitSound).toHaveBeenCalledWith(false);
         const information: PlayerDifference = { lastDifferences: [0, 1, 2, 3], differencesPosition: 2, socket: socketServiceMock.socketId };
         expect(component.effectHandler).toHaveBeenCalledWith(information);

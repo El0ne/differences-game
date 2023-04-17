@@ -20,11 +20,6 @@ export const enum CHAT_EVENTS {
     BestTime = 'BestTime',
 }
 
-export interface RoomManagement {
-    room: string;
-    message: string;
-}
-
 export interface Room {
     gameId: string;
     roomId: string;
@@ -37,7 +32,6 @@ export interface MultiplayerRequestInformation {
 }
 
 export interface RoomEvent {
-    room: string;
     event: string;
     isMultiplayer: boolean;
 }

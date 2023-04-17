@@ -18,7 +18,7 @@ import { SocketService } from '@app/services/socket/socket.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { EndGame } from '@common/chat-dialog-constants';
 import { RoomMessage, Validation } from '@common/chat-gateway-constants';
-import { CHAT_EVENTS, RoomEvent, RoomManagement } from '@common/chat-gateway-events';
+import { CHAT_EVENTS, RoomEvent } from '@common/chat-gateway-events';
 import { DifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
 import { GameConstants } from '@common/game-constants';
@@ -143,10 +143,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     configureSocketReactions(): void {
         this.socketService.listen<Validation>(CHAT_EVENTS.WordValidated, (validation: Validation) => {
             if (validation.isValidated) {
-                this.socketService.send<RoomManagement>(CHAT_EVENTS.RoomMessage, {
-                    room: this.socketService.gameRoom,
-                    message: validation.originalMessage,
-                });
+                this.socketService.send<string>(CHAT_EVENTS.RoomMessage, validation.originalMessage);
             } else {
                 this.messages.push({ socketId: this.socketService.socketId, message: validation.originalMessage, event: 'notification' });
             }
@@ -303,14 +300,13 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     handleMistake(): void {
         this.socketService.send<RoomEvent>(CHAT_EVENTS.Event, {
-            room: this.socketService.gameRoom,
             isMultiplayer: this.isMultiplayer,
             event: 'Erreur',
         });
     }
 
     hint(): void {
-        this.socketService.send<string>(CHAT_EVENTS.Hint, this.socketService.gameRoom);
+        this.socketService.send<string>(CHAT_EVENTS.Hint);
     }
 
     handleFlash(currentDifferences: number[]): void {
@@ -342,7 +338,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         }
         this.left.emitSound(false);
         this.socketService.send<RoomEvent>(CHAT_EVENTS.Event, {
-            room: this.socketService.gameRoom,
             isMultiplayer: this.isMultiplayer,
             event: 'Différence trouvée',
         });
