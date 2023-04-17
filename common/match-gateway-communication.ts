@@ -10,6 +10,7 @@ export enum MATCH_EVENTS {
     leaveRoom = 'leaveRoom',
     joinReplayRoom = 'joinReplayRoom',
     TimeModification = 'TimeModification',
+    Catch = 'Catch',
 }
 
 export const ONE_SECOND = 1000;

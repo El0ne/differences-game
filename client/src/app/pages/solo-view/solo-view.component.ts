@@ -10,6 +10,7 @@ import { KeyPressCommand } from '@app/commands/key-press/key-press-command';
 import { OpenModalCommand } from '@app/commands/open-modal-command/open-modal-command';
 import { OpponentDifferenceCommand } from '@app/commands/opponent-difference/opponent-difference-command';
 import { SendMessageCommand } from '@app/commands/send-message/send-message-command';
+import { ThirdHintColorCommand } from '@app/commands/third-hint-color/third-hint-color-command';
 import { WriteMessageCommand } from '@app/commands/write-message/write-message';
 import { HEIGHT, MAX_EFFECT_TIME, WIDTH } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
@@ -78,6 +79,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     isReplayMode: boolean = false;
     isReplayPaused: boolean = false;
     replayTimeoutId: ReturnType<typeof setTimeout>;
+    previousTime: number = 0;
 
     invoker: Invoker;
     commandIndex: number = 0;
@@ -188,6 +190,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         this.gameHintService.hintsRemaining = 3;
         this.timerService.currentTime = 0;
+        this.timerService.eventTimer = 0;
         this.foundDifferenceService.clearDifferenceFound();
         this.socketService.disconnect();
         this.removeCheatMode();
@@ -241,6 +244,16 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     setColor(clickPosition: number[]): void {
         this.hintColor = this.gameHintService.setColor(clickPosition, this.left.convertPositionToPixel(this.left.currentPixelHint));
+        if (!this.isReplayMode && this.thirdHint) {
+            // setTimeout(() => {
+            if (this.timerService.eventTimer > this.previousTime) {
+                const thirdHintCommand = new ThirdHintColorCommand(this, this.hintColor);
+                this.addCommand(thirdHintCommand);
+                this.previousTime = this.timerService.eventTimer;
+            }
+
+            // }, 1000);
+        }
     }
 
     getRandomDifference(event: KeyboardEvent | null): void {
@@ -552,7 +565,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     replayGame(): void {
         this.replayTimeoutId = setTimeout(() => {
             const command = this.invoker.commands[this.commandIndex];
-            if (command.time === this.timerService.currentTime) {
+            if (command.time === this.timerService.eventTimer) {
                 command.action.execute();
                 this.commandIndex++;
 
@@ -574,6 +587,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.isReplayMode = true;
         this.isReplayPaused = false;
         this.timerService.currentTime = 0;
+        this.timerService.eventTimer = 0;
         this.messages = [];
         this.currentScorePlayer = 0;
         this.currentScoreOpponent = 0;
@@ -589,6 +603,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     addCommand(command: Command): void {
-        if (!this.isReplayMode) this.invoker.addCommand(command, this.timerService.currentTime);
+        if (!this.isReplayMode) this.invoker.addCommand(command, this.timerService.eventTimer);
     }
 }

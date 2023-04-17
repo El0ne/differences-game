@@ -10,6 +10,7 @@ import { SECONDS_IN_MINUTE, TEN } from './timer-solo.constants';
 })
 export class TimerSoloService {
     currentTime: number = 0;
+    eventTimer: number = 0;
     subArray: Subscription[] = [];
 
     constructor(private socket: SocketService) {}
@@ -17,6 +18,9 @@ export class TimerSoloService {
     startTimer(): void {
         this.socket.listen<number>(MATCH_EVENTS.Timer, (timerValue: number) => {
             this.currentTime = timerValue;
+        });
+        this.socket.listen<number>(MATCH_EVENTS.Catch, (timerValue: number) => {
+            this.eventTimer = timerValue;
         });
     }
 

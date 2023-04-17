@@ -12,6 +12,7 @@ import { Server, Socket } from 'socket.io';
 export class MatchGateway implements OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
     timers: Map<string, ReturnType<typeof setInterval>> = new Map<string, ReturnType<typeof setInterval>>();
+    eventTimers: Map<string, ReturnType<typeof setInterval>> = new Map<string, ReturnType<typeof setInterval>>();
     constructor(private gameManagerService: GameManagerService) {}
 
     @SubscribeMessage(MATCH_EVENTS.createSoloGame)
@@ -34,7 +35,9 @@ export class MatchGateway implements OnGatewayDisconnect {
     @SubscribeMessage(MATCH_EVENTS.EndTime)
     stopTimer(socket: Socket, room: string): void {
         clearInterval(this.timers.get(room));
+        clearInterval(this.eventTimers.get(room));
         this.timers.delete(room);
+        this.eventTimers.delete(room);
     }
 
     @SubscribeMessage(MATCH_EVENTS.Win)
@@ -70,21 +73,34 @@ export class MatchGateway implements OnGatewayDisconnect {
 
     timer(room: string): void {
         let timerCount = 0;
+        let eventTimerCount = 0;
         const timer = setInterval(() => {
             timerCount++;
             this.server.to(room).emit(MATCH_EVENTS.Timer, timerCount);
         }, ONE_SECOND);
+        const eventTimer = setInterval(() => {
+            eventTimerCount += 0.25;
+            this.server.to(room).emit(MATCH_EVENTS.Catch, eventTimerCount);
+        }, 250);
         this.timers.set(room, timer);
+        this.eventTimers.set(room, eventTimer);
     }
 
     changeTimerValue(socket: Socket, replayInformations: ReplayTimerInformations): void {
         this.stopTimer(socket, replayInformations.room);
         this.server.to(replayInformations.room).emit(MATCH_EVENTS.Timer, Math.max(replayInformations.currentTime, 0));
+        this.server.to(replayInformations.room).emit(MATCH_EVENTS.Catch, replayInformations.currentTime);
+        let time = replayInformations.currentTime;
         const timer = setInterval(() => {
             replayInformations.currentTime++;
             this.server.to(replayInformations.room).emit(MATCH_EVENTS.Timer, Math.max(replayInformations.currentTime, 0));
         }, ONE_SECOND * replayInformations.timeMultiplier);
+        const eventTimer = setInterval(() => {
+            time += 0.25;
+            this.server.to(replayInformations.room).emit(MATCH_EVENTS.Catch, time);
+        }, 250);
         this.timers.set(replayInformations.room, timer);
+        this.eventTimers.set(replayInformations.room, eventTimer);
     }
 
     async handleDisconnect(socket: Socket): Promise<void> {
