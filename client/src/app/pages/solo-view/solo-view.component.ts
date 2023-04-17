@@ -35,9 +35,9 @@ import { GameHistoryDTO } from '@common/game-history.dto';
 import { MATCH_EVENTS } from '@common/match-gateway-communication';
 import { PlayerGameInfo } from '@common/player-game-info';
 import { Subject } from 'rxjs';
-import { DOUBLE_HINT_TIME_IN_MS, HINT_TIME_IN_MS } from './solo-view-constants';
+import { HINT_TIME_IN_MS, THIRD_HINT_TIME_IN_MS } from './solo-view-constants';
 
-const EXECUTE_COMMAND_DELAY = 50;
+const EXECUTE_COMMAND_DELAY = 100;
 
 @Component({
     selector: 'app-solo-view',
@@ -284,9 +284,10 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     // TODO : Verifier que ca fonctionne avec temps limite
     handleHint(): void {
-        if (this.isClassic) this.timerService.restartTimer(1, this.socketService.socketId, this.gameConstants.hint);
+        if (this.isClassic)
+            this.timerService.restartTimer(this.replayButtonsService.timeMultiplier, this.socketService.socketId, this.gameConstants.hint);
         else {
-            this.timerService.restartTimer(1, this.socketService.socketId, -this.gameConstants.hint);
+            this.timerService.restartTimer(this.replayButtonsService.timeMultiplier, this.socketService.socketId, -this.gameConstants.hint);
         }
     }
 
@@ -312,7 +313,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         } else {
             setTimeout(() => {
                 this.thirdHint = false;
-            }, DOUBLE_HINT_TIME_IN_MS);
+            }, THIRD_HINT_TIME_IN_MS);
         }
     }
 
@@ -565,7 +566,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     replayGame(): void {
         this.replayTimeoutId = setTimeout(() => {
             const command = this.invoker.commands[this.commandIndex];
-            if (command.time === this.timerService.eventTimer) {
+            if (command.time <= this.timerService.eventTimer) {
                 command.action.execute();
                 this.commandIndex++;
 
@@ -598,7 +599,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.left.endGame = false;
         this.right.endGame = false;
         this.hintIcon = true;
+        this.thirdHint = false;
         this.gameHintService.hintsRemaining = 3;
+        this.replayButtonsService.timeMultiplier = 1;
         this.replayGame();
     }
 

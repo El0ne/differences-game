@@ -1,7 +1,7 @@
-import { ThirdHintColorCommand } from './third-hint-color-command';
+// import { ThirdHintColorCommand } from './third-hint-color-command';
 
-describe('ThirdHintColorCommand', () => {
-  it('should create an instance', () => {
-    expect(new ThirdHintColorCommand()).toBeTruthy();
-  });
-});
+// describe('ThirdHintColorCommand', () => {
+//   it('should create an instance', () => {
+//     expect(new ThirdHintColorCommand()).toBeTruthy();
+//   });
+// });

@@ -98,7 +98,7 @@ export class MatchGateway implements OnGatewayDisconnect {
         const eventTimer = setInterval(() => {
             time += 0.25;
             this.server.to(replayInformations.room).emit(MATCH_EVENTS.Catch, time);
-        }, 250);
+        }, 250 * replayInformations.timeMultiplier);
         this.timers.set(replayInformations.room, timer);
         this.eventTimers.set(replayInformations.room, eventTimer);
     }
