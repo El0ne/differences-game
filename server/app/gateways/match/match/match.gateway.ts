@@ -57,7 +57,11 @@ export class MatchGateway implements OnGatewayDisconnect {
 
     @SubscribeMessage(LIMITED_TIME_MODE_EVENTS.NextStage)
     nextStage(@ConnectedSocket() socket: Socket): void {
-        this.server.to(socket.data.room).emit(LIMITED_TIME_MODE_EVENTS.NewStageInformation, this.gameManagerService.giveNextStage(socket.data.room));
+        const nextStage = this.gameManagerService.giveNextStage(socket.data.room);
+        if (!nextStage) {
+            socket.emit(LIMITED_TIME_MODE_EVENTS.EndGame);
+        }
+        this.server.to(socket.data.room).emit(LIMITED_TIME_MODE_EVENTS.NewStageInformation, nextStage);
     }
 
     @SubscribeMessage(MATCH_EVENTS.SoloGameInformation)

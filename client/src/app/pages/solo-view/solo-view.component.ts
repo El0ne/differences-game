@@ -120,12 +120,14 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         });
         this.getImagesNames();
         if (this.isLimitedTimeMode) {
+            this.socketService.listen<void>(LIMITED_TIME_MODE_EVENTS.EndGame, () => {
+                this.notifyEndGameLimitedTime();
+            });
             this.socketService.listen<string>(LIMITED_TIME_MODE_EVENTS.NewStageInformation, (newStageId: string) => {
                 this.gameParamService.gameParameters.stageId = newStageId;
                 this.getImagesNames();
                 if (!newStageId) {
                     this.gameCompletion(false);
-                    this.notifyEndGameLimitedTime();
                     this.timerService.stopTimer();
                 }
             });
@@ -285,7 +287,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     getRandomDifference(event: KeyboardEvent | null): void {
         if (event?.key === 'i' && !this.isMultiplayer && this.gameHintService.hintsRemaining > 0) {
-            // TODO : Verifier que ca fonctionne avec temps limite
             if (!this.isLimitedTimeMode) this.timerService.restartTimer(1, this.gameConstants.hint);
             else {
                 const timeLeft = this.timerService.currentTime - this.gameConstants.hint;
@@ -294,7 +295,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 } else {
                     this.timerService.stopTimer();
                     this.socketService.send(MATCH_EVENTS.Lose);
-                    this.notifyEndGameLimitedTime();
                     return;
                 }
             }
@@ -411,7 +411,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.dialog.open(GameLoseModalComponent, {
                 disableClose: true,
             });
-            this.notifyEndGameLimitedTime();
         }
     }
 

@@ -99,6 +99,7 @@ export class ChatGateway implements OnGatewayDisconnect {
         const startTime = data.gameDuration;
         const duration = Math.floor((endGameTime - startTime) / SECOND_CONVERTION);
         socket.data.isLimitedSolo = false;
+        socket.data.end = true;
         data.gameDuration = duration;
         this.addGameTimeHistory(socket, data);
     }
