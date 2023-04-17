@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CloseModalCommand } from '@app/commands/close-modal/close-modal-command';
 import { Command, Invoker } from '@app/commands/command';
 import { EndGameCommand } from '@app/commands/end-game/end-game-command';
+import { HintCommand } from '@app/commands/hint/hint-command';
 import { KeyPressCommand } from '@app/commands/key-press/key-press-command';
 import { OpenModalCommand } from '@app/commands/open-modal-command/open-modal-command';
 import { OpponentDifferenceCommand } from '@app/commands/opponent-difference/opponent-difference-command';
@@ -95,7 +96,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private router: Router,
         public socketService: SocketService,
         private gameConstantsService: GameConstantsService,
-        private gameHintService: GameHintService,
+        public gameHintService: GameHintService,
         public replayButtonsService: ReplayButtonsService,
     ) {}
 
@@ -243,10 +244,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     getRandomDifference(event: KeyboardEvent | null): void {
         if (event?.key === 'i' && !this.isMultiplayer && this.gameHintService.hintsRemaining > 0) {
             // TODO : Verifier que ca fonctionne avec temps limite
-            if (this.isClassic) this.timerService.restartTimer(1, this.socketService.socketId, this.gameConstants.hint);
-            else {
-                this.timerService.restartTimer(1, this.socketService.socketId, -this.gameConstants.hint);
-            }
+            this.handleHint();
             if (this.hintsRemaining() > 0) this.socketService.send(CHAT_EVENTS.Hint, this.currentRoom);
             this.left.getDifferences(this.currentGameId).subscribe((data) => {
                 const pixelArray = this.foundDifferenceService.findPixelsFromDifference(data);
@@ -262,9 +260,18 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                     this.right.hintPosX = this.left.hintPosX;
                     this.right.hintPosY = this.left.hintPosY;
                 }
+                const hintCommand = new HintCommand(this.left.hintPosX, this.left.hintPosY, this);
+                this.addCommand(hintCommand);
                 this.setCurrentHint();
                 this.hintTimeouts();
             });
+        }
+    }
+
+    handleHint(): void {
+        if (this.isClassic) this.timerService.restartTimer(1, this.socketService.socketId, this.gameConstants.hint);
+        else {
+            this.timerService.restartTimer(1, this.socketService.socketId, -this.gameConstants.hint);
         }
     }
 
@@ -477,7 +484,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     differenceHandler(information: DifferenceInformation): void {
-        this.timerService.restartTimer(1, this.socketService.socketId, -this.gameConstants.difference);
         if (this.isMultiplayer) {
             const multiplayerInformation: MultiplayerDifferenceInformation = {
                 room: this.currentRoom,
@@ -571,6 +577,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.showNavBar = true;
         this.left.endGame = false;
         this.right.endGame = false;
+        this.gameHintService.hintsRemaining = 3;
         this.replayGame();
     }
 
