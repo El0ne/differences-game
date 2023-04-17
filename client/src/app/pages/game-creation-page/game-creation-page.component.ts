@@ -2,6 +2,7 @@
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
 import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
 import { DrawManipulationService } from '@app/services/draw-manipulation/draw-manipulation.service';
@@ -101,8 +102,8 @@ export class GameCreationPageComponent implements OnInit {
     ];
 
     // eslint-disable-next-line max-params
+    // we need more than 3 Services/Routers/Dialogs
     constructor(
-        // we need more than 3 Services/Routers/Dialogs
         private gameCardService: GameCardInformationService,
         public matDialog: MatDialog,
         public router: Router,
@@ -212,20 +213,6 @@ export class GameCreationPageComponent implements OnInit {
         await this.fileManipulationService.fileValidation(event);
     }
 
-    saveVerification(): boolean {
-        if (this.gameTitle === '' && !this.originalFile && !this.differentFile) {
-            alert('Il manque une image et un titre à votre jeu !');
-            return false;
-        } else if (this.gameTitle === '') {
-            alert("N'oubliez pas d'ajouter un titre à votre jeu !");
-            return false;
-        } else if (!this.originalFile || !this.differentFile) {
-            alert('Un jeu de différences sans image est pour ainsi dire... intéressant ? Ajoutez une image.');
-            return false;
-        }
-        return true;
-    }
-
     mergeCanvas(canvas: HTMLCanvasElement, canvas2: HTMLCanvasElement): Blob {
         const context = canvas.getContext('2d');
         if (context) {
@@ -243,35 +230,42 @@ export class GameCreationPageComponent implements OnInit {
         return new Blob([uint8Array], { type: 'image/bmp' });
     }
 
+    async choseGameTitle(): Promise<void> {
+        const dialogRef = this.matDialog.open(ChosePlayerNameDialogComponent, { disableClose: true, data: { isChosingGameTitle: true } });
+        dialogRef.afterClosed().subscribe((gameTitle: string) => {
+            this.gameTitle = gameTitle;
+            console.log(this.gameTitle);
+            // this.save();
+        });
+    }
+
     async save(): Promise<void> {
         const updatedFiles = this.fileManipulationService.updateFiles();
         this.originalFile = updatedFiles[0];
         this.differentFile = updatedFiles[1];
-        if (this.saveVerification() && this.originalFile && this.differentFile) {
-            this.isSaveDisabled = true;
-            const originalBlob = this.mergeCanvas(this.originalCanvas.nativeElement, this.originalDrawnCanvas.nativeElement);
-            const differenceBlob = this.mergeCanvas(this.differenceCanvas.nativeElement, this.differenceDrawnCanvas.nativeElement);
-            this.gameCardService.uploadImages(originalBlob, differenceBlob, this.differenceRadius).subscribe((data) => {
-                if (data.gameDifferenceNumber) {
-                    this.createdGameInfo = {
-                        _id: data.gameId,
-                        name: this.gameTitle,
-                        difficulty: data.gameDifficulty,
-                        baseImage: data.originalImageName,
-                        differenceImage: data.differenceImageName,
-                        radius: this.differenceRadius,
-                        differenceNumber: data.gameDifferenceNumber,
-                    };
-                    this.difficulty = data.gameDifficulty;
-                    this.differenceNumber = data.gameDifferenceNumber;
-                    this.differenceImage = `${STAGE}/image/difference-image.bmp`;
-                    this.openSaveModal();
-                } else {
-                    alert("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
-                }
-                this.isSaveDisabled = false;
-            });
-        }
+        this.isSaveDisabled = true;
+        const originalBlob = this.mergeCanvas(this.originalCanvas.nativeElement, this.originalDrawnCanvas.nativeElement);
+        const differenceBlob = this.mergeCanvas(this.differenceCanvas.nativeElement, this.differenceDrawnCanvas.nativeElement);
+        this.gameCardService.uploadImages(originalBlob, differenceBlob, this.differenceRadius).subscribe((data) => {
+            if (data.gameDifferenceNumber) {
+                this.createdGameInfo = {
+                    _id: data.gameId,
+                    name: this.gameTitle,
+                    difficulty: data.gameDifficulty,
+                    baseImage: data.originalImageName,
+                    differenceImage: data.differenceImageName,
+                    radius: this.differenceRadius,
+                    differenceNumber: data.gameDifferenceNumber,
+                };
+                this.difficulty = data.gameDifficulty;
+                this.differenceNumber = data.gameDifferenceNumber;
+                this.differenceImage = `${STAGE}/image/difference-image.bmp`;
+                this.openSaveModal();
+            } else {
+                alert("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");
+            }
+            this.isSaveDisabled = false;
+        });
     }
 
     drawPen(): void {
