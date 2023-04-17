@@ -3,6 +3,7 @@ import { MultiplayerDifferenceInformation, PlayerDifference } from '@common/diff
 import { GameHistoryDTO } from '@common/game-history.dto';
 import { MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
 
+import { TimerModification } from '@common/timer-modification';
 import { Injectable } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -35,7 +36,7 @@ export class MatchGateway implements OnGatewayDisconnect {
     }
 
     @SubscribeMessage(MATCH_EVENTS.Difference)
-    difference(socket: Socket, data: MultiplayerDifferenceInformation) {
+    difference(socket: Socket, data: MultiplayerDifferenceInformation): void {
         if (socket.rooms.has(data.room)) {
             const differenceInformation: PlayerDifference = {
                 differencesPosition: data.differencesPosition,
@@ -47,10 +48,25 @@ export class MatchGateway implements OnGatewayDisconnect {
     }
 
     @SubscribeMessage(MATCH_EVENTS.SoloGameInformation)
-    storeSoloGameInformation(socket: Socket, data: GameHistoryDTO) {
+    storeSoloGameInformation(socket: Socket, data: GameHistoryDTO): void {
         data.gameDuration = Date.now();
         socket.data.soloGame = data;
         socket.data.isSolo = true;
+    }
+
+    @SubscribeMessage(MATCH_EVENTS.TimeModification)
+    modifiyTime(socket: Socket, data: TimerModification): void {
+        this.changeTimeValue(socket, data);
+    }
+
+    changeTimeValue(socket: Socket, data: TimerModification): void {
+        this.stopTimer(socket, data.room);
+        this.server.to(data.room).emit(MATCH_EVENTS.Timer, data.currentTime);
+        const timer = setInterval(() => {
+            data.currentTime++;
+            this.server.to(data.room).emit(MATCH_EVENTS.Timer, data.currentTime);
+        }, ONE_SECOND);
+        this.timers.set(data.room, timer);
     }
 
     timer(room: string): void {
