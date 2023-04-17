@@ -37,11 +37,6 @@ export class LimitedTimeComponent implements OnInit, OnDestroy {
             this.createGameButton = true;
         });
 
-        this.socketService.listen<string>(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, (stageId: string) => {
-            this.gameParamService.gameParameters.stageId = stageId;
-            this.router.navigate(['/game']);
-        });
-
         this.socketService.send(WAITING_ROOM_EVENTS.ScanForHost, [LIMITED_TIME_MODE_ID]);
     }
 
@@ -54,18 +49,10 @@ export class LimitedTimeComponent implements OnInit, OnDestroy {
     hostOrJoinGame(): void {
         if (this.createGameButton) {
             this.socketService.send<string>(WAITING_ROOM_EVENTS.HostGame, LIMITED_TIME_MODE_ID);
-            this.socketService.listen<string>(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, (stageId: string) => {
-                this.gameParamService.gameParameters.stageId = stageId;
-                this.router.navigate(['/game']);
-            });
         } else {
             this.socketService.send<JoinHostInWaitingRequest>(WAITING_ROOM_EVENTS.JoinHost, {
                 stageId: LIMITED_TIME_MODE_ID,
                 playerName: this.socketService.names.get(this.socketService.socketId) as string,
-            });
-            this.socketService.listen<string>(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, (stageId: string) => {
-                this.gameParamService.gameParameters.stageId = stageId;
-                this.router.navigate(['/game']);
             });
         }
         const data: WaitingRoomDataPassing = { stageId: LIMITED_TIME_MODE_ID, isHost: this.createGameButton, isLimitedTimeMode: true };
@@ -76,6 +63,10 @@ export class LimitedTimeComponent implements OnInit, OnDestroy {
         const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true });
         dialogRef.afterClosed().subscribe((isNameEntered: boolean) => {
             if (isNameEntered) {
+                this.socketService.listen<string>(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, (stageId: string) => {
+                    this.gameParamService.gameParameters.stageId = stageId;
+                    this.router.navigate(['/game']);
+                });
                 this.gameParamService.gameParameters = {
                     isLimitedTimeGame: true,
                     isMultiplayerGame,
@@ -86,10 +77,6 @@ export class LimitedTimeComponent implements OnInit, OnDestroy {
                     this.socketService.send<SoloGameCreation>(MATCH_EVENTS.createSoloGame, {
                         stageId: LIMITED_TIME_MODE_ID,
                         isLimitedTimeMode: true,
-                    });
-                    this.socketService.listen<string>(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, (stageId: string) => {
-                        this.gameParamService.gameParameters.stageId = stageId;
-                        this.router.navigate(['/game']);
                     });
                 } else this.hostOrJoinGame();
             }
