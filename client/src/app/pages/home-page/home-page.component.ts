@@ -1,5 +1,5 @@
-import { Dialog } from '@angular/cdk/dialog';
 import { Component } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { LimitedTimeComponent } from '@app/modals/limited-time/limited-time.component';
 
 @Component({
@@ -8,7 +8,7 @@ import { LimitedTimeComponent } from '@app/modals/limited-time/limited-time.comp
     styleUrls: ['./home-page.component.scss'],
 })
 export class HomePageComponent {
-    constructor(private dialog: Dialog) {}
+    constructor(private dialog: MatDialog) {}
 
     openLimitedTimeDialog() {
         this.dialog.open(LimitedTimeComponent);
