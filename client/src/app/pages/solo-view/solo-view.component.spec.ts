@@ -268,6 +268,7 @@ describe('SoloViewComponent', () => {
                 isReplayMode: component.isReplayMode,
             },
             disableClose: true,
+            hasBackdrop: !component.isReplayMode,
         });
     });
 
@@ -284,6 +285,7 @@ describe('SoloViewComponent', () => {
                 isReplayMode: component.isReplayMode,
             },
             disableClose: true,
+            hasBackdrop: !component.isReplayMode,
         });
     });
 
@@ -317,9 +319,9 @@ describe('SoloViewComponent', () => {
                 isButtonDisabled: component.isReplayMode,
             },
             disableClose: true,
+            hasBackdrop: !component.isReplayMode,
         });
         expect(component.addCommand).toHaveBeenCalledWith(new OpenModalCommand(component, false));
-        // expect(component.addCommand).toHaveBeenCalledWith(new CloseModalCommand(component));
     });
 
     it('should open the quit game modal et restart timer once the modal is closed', () => {
