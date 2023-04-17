@@ -36,13 +36,12 @@ describe('GameWinModalComponent', () => {
 
     it('should close the modal page and navigate to home when calling confirm', () => {
         component.confirm();
-        expect(matDialogRefMock.close).toHaveBeenCalled();
+        expect(matDialogRefMock.close).toHaveBeenCalledOnceWith(false);
         expect(routerMock.navigate).toHaveBeenCalledWith(['/home']);
     });
 
     it('should close the modal page and set isReplaySelected to true when calling replay', () => {
         component.replay();
-        expect(matDialogRefMock.close).toHaveBeenCalled();
-        expect(component.isReplaySelected).toBeTrue();
+        expect(matDialogRefMock.close).toHaveBeenCalledOnceWith(true);
     });
 });
