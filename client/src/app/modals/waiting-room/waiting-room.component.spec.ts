@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SocketService } from '@app/services/socket/socket.service';
@@ -31,7 +32,7 @@ describe('WaitingRoomComponent', () => {
 
         await TestBed.configureTestingModule({
             declarations: [WaitingRoomComponent],
-            imports: [RouterTestingModule, MatDialogModule],
+            imports: [RouterTestingModule, MatDialogModule, MatIconModule],
             providers: [
                 { provide: MatDialogRef, useValue: matDialogSpy },
                 { provide: SocketService, useValue: socketServiceSpy },

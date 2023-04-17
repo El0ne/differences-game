@@ -1,0 +1,8 @@
+<div class="modal-page container" #modal>
+    <h1 class="neon name-entry-title">Veuillez choisir un mode de jeu</h1>
+    <div class="row">
+        <button class="normal-button option-button" (click)="selectPlayerName(false); closeModal()">Solo</button>
+        <button class="normal-button option-button" (click)="selectPlayerName(true); closeModal()">Cooperatif</button>
+    </div>
+    <button id="previous" class="normal-button return-button" (click)="closeModal()">Retour</button>
+</div>
