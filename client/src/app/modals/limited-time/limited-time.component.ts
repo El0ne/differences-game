@@ -54,15 +54,22 @@ export class LimitedTimeComponent implements OnInit, OnDestroy {
     hostOrJoinGame(): void {
         if (this.createGameButton) {
             this.socketService.send<string>(WAITING_ROOM_EVENTS.HostGame, LIMITED_TIME_MODE_ID);
+            this.socketService.listen<string>(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, (stageId: string) => {
+                this.gameParamService.gameParameters.stageId = stageId;
+                this.router.navigate(['/game']);
+            });
         } else {
             this.socketService.send<JoinHostInWaitingRequest>(WAITING_ROOM_EVENTS.JoinHost, {
                 stageId: LIMITED_TIME_MODE_ID,
                 playerName: this.socketService.names.get(this.socketService.socketId) as string,
             });
+            this.socketService.listen<string>(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, (stageId: string) => {
+                this.gameParamService.gameParameters.stageId = stageId;
+                this.router.navigate(['/game']);
+            });
         }
         const data: WaitingRoomDataPassing = { stageId: LIMITED_TIME_MODE_ID, isHost: this.createGameButton, isLimitedTimeMode: true };
         this.dialog.open(WaitingRoomComponent, { disableClose: true, data });
-        this.router.navigate(['/game']);
     }
 
     selectPlayerName(isMultiplayerGame: boolean): void {
@@ -80,7 +87,10 @@ export class LimitedTimeComponent implements OnInit, OnDestroy {
                         stageId: LIMITED_TIME_MODE_ID,
                         isLimitedTimeMode: true,
                     });
-                    this.router.navigate(['/game']);
+                    this.socketService.listen<string>(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, (stageId: string) => {
+                        this.gameParamService.gameParameters.stageId = stageId;
+                        this.router.navigate(['/game']);
+                    });
                 } else this.hostOrJoinGame();
             }
         });
