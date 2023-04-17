@@ -3,6 +3,7 @@ import { GameHistoryService } from '@app/services/game-history/game-history.serv
 import { RoomMessage } from '@common/chat-gateway-constants';
 import { CHAT_EVENTS, MESSAGE_MAX_LENGTH, RoomEvent, SECOND_CONVERTION } from '@common/chat-gateway-events';
 import { GameHistoryDTO } from '@common/game-history.dto';
+import { LIMITED_TIME_MODE_EVENTS } from '@common/match-gateway-communication';
 import { RankingBoard } from '@common/ranking-board';
 import { Injectable } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -87,6 +88,21 @@ export class ChatGateway implements OnGatewayDisconnect {
         }
     }
 
+    @SubscribeMessage(LIMITED_TIME_MODE_EVENTS.GameHistory)
+    addGameTimeHistory(socket: Socket, data: GameHistoryDTO): void {
+        this.gameHistoryService.addGameToHistory(data);
+    }
+
+    @SubscribeMessage(LIMITED_TIME_MODE_EVENTS.EndGame)
+    limitedEndGame(socket: Socket, data: GameHistoryDTO): void {
+        const endGameTime = Date.now();
+        const startTime = data.gameDuration;
+        const duration = Math.floor((endGameTime - startTime) / SECOND_CONVERTION);
+        socket.data.isLimitedSolo = false;
+        data.gameDuration = duration;
+        this.addGameTimeHistory(socket, data);
+    }
+
     handleDisconnect(socket: Socket): void {
         if (socket.data.room) {
             this.server
@@ -99,6 +115,13 @@ export class ChatGateway implements OnGatewayDisconnect {
             const duration = Math.floor((endGameTime - startTime) / SECOND_CONVERTION);
             socket.data.soloGame.gameDuration = duration;
             this.bestTime(socket, socket.data.soloGame);
+        } else if (socket.data.isLimitedSolo) {
+            const endGameTime = Date.now();
+            const startTime = socket.data.limitedHistory.gameDuration;
+            const duration = Math.floor((endGameTime - startTime) / SECOND_CONVERTION);
+            socket.data.limitedHistory.gameDuration = duration;
+            socket.data.limitedHistory.player1.hasAbandon = true;
+            this.addGameTimeHistory(socket, socket.data.limitedHistory);
         }
     }
 

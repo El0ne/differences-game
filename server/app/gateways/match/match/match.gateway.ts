@@ -1,3 +1,4 @@
+import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { DifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameHistoryDTO } from '@common/game-history.dto';
@@ -11,7 +12,7 @@ import { Server, Socket } from 'socket.io';
 export class MatchGateway implements OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
     timers: Map<string, ReturnType<typeof setInterval>> = new Map<string, ReturnType<typeof setInterval>>();
-    constructor(private gameManagerService: GameManagerService) {}
+    constructor(private gameManagerService: GameManagerService, private gameHistoryService: GameHistoryService) {}
 
     @SubscribeMessage(MATCH_EVENTS.createSoloGame)
     async createSoloGame(@ConnectedSocket() socket: Socket, @MessageBody() gameInfo: SoloGameCreation): Promise<void> {
@@ -73,6 +74,12 @@ export class MatchGateway implements OnGatewayDisconnect {
             this.server.to(socket.data.room).emit(MATCH_EVENTS.LimitedTimeTimer, time);
         }, ONE_SECOND);
         this.timers.set(socket.data.room, timer);
+    }
+
+    @SubscribeMessage(LIMITED_TIME_MODE_EVENTS.StoreLimitedGameInfo)
+    storeGameHistoryDtoAfterOpponentAbandon(socket: Socket, data: GameHistoryDTO): void {
+        socket.data.limitedHistory = data;
+        socket.data.isLimitedSolo = true;
     }
 
     timer(room: string): void {

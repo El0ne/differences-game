@@ -49,8 +49,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     gameCardInfo: GameCardInformation;
     imagesInfo: ImageObject;
     startTime: string;
-    // TODO: is soloTimer used?
-    soloTimer: ReturnType<typeof setInterval>;
+    limitedMultiDto: GameHistoryDTO;
+    limitedSoloDto: GameHistoryDTO;
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
     gameConstants: GameConstants;
     // eslint-disable-next-line max-params -- need all parameters for constructor
@@ -80,7 +80,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         if (!this.socketService.liveSocket()) {
-            console.log('quit');
             this.router.navigate([`/${Routes.Home}`]);
             return;
         }
@@ -92,8 +91,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.gameConstants = gameConstants;
             if (this.isLimitedTimeMode) {
                 this.socketService.send<number>(LIMITED_TIME_MODE_EVENTS.Timer, this.gameConstants.countDown);
-
                 this.timerService.limitedTimeTimer();
+                this.createLimitedTimeGameHistory();
             }
         });
         this.getImagesNames();
@@ -105,17 +104,32 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                     this.gameCompletion(true, this.socketService.socketId);
                 }
             });
+            if (!this.isMultiplayer) {
+                this.limitedSoloDto = {
+                    gameId: 'Limited',
+                    gameName: 'Limited',
+                    gameMode: 'Temps Limitée',
+                    gameDuration: Date.now(),
+                    startTime: this.startTime,
+                    isMultiplayer: this.isMultiplayer,
+                    player1: {
+                        name: this.player,
+                        hasAbandon: true,
+                        hasWon: false,
+                    },
+                };
+                this.socketService.send<GameHistoryDTO>(LIMITED_TIME_MODE_EVENTS.StoreLimitedGameInfo, this.limitedSoloDto);
+            }
         } else {
             this.gameCardInfoService.getGameCardInfoFromId(this.stageId).subscribe((gameCardData) => {
                 this.gameCardInfo = gameCardData;
                 this.numberOfDifferences = this.gameCardInfo.differenceNumber;
+                this.showTime();
                 if (!this.isMultiplayer) {
-                    // TODO change object implementation
-                    // abandon solo
                     const gameHistory: GameHistoryDTO = {
                         gameId: this.stageId,
                         gameName: this.gameCardInfo.name,
-                        gameMode: 'classique',
+                        gameMode: 'Classique',
                         gameDuration: 0,
                         startTime: this.startTime,
                         isMultiplayer: this.isMultiplayer,
@@ -127,7 +141,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                     };
                     this.socketService.send<GameHistoryDTO>(MATCH_EVENTS.SoloGameInformation, gameHistory);
                 }
-                this.showTime();
             });
         }
         this.addCheatMode();
@@ -157,6 +170,13 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.messages.push(message);
                 if (this.isLimitedTimeMode) {
                     this.gameParamService.gameParameters.isMultiplayerGame = false;
+                    const name: string = this.socketService.names.get(this.socketService.socketId) as string;
+                    if (this.limitedMultiDto.player1.name === name && this.limitedMultiDto.player2) {
+                        this.limitedMultiDto.player2.hasAbandon = true;
+                    } else {
+                        this.limitedMultiDto.player1.hasAbandon = true;
+                    }
+                    this.socketService.send<GameHistoryDTO>(LIMITED_TIME_MODE_EVENTS.StoreLimitedGameInfo, this.limitedMultiDto);
                 } else {
                     this.gameCompletion(true, this.socketService.socketId);
                     this.notifyNewBestTime(this.socketService.socketId, true, 'classique');
@@ -175,13 +195,31 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        if (!this.isMultiplayer) {
-            clearInterval(this.soloTimer);
-        }
         this.timerService.currentTime = 0;
         this.foundDifferenceService.clearDifferenceFound();
         this.socketService.disconnect();
         this.removeCheatMode();
+    }
+
+    createLimitedTimeGameHistory(): void {
+        this.limitedMultiDto = {
+            gameId: 'limited',
+            gameName: 'limited',
+            gameMode: 'Temps limité',
+            gameDuration: Date.now(),
+            startTime: this.startTime,
+            isMultiplayer: true,
+            player1: {
+                name: this.player,
+                hasAbandon: false,
+                hasWon: false,
+            },
+            player2: {
+                name: this.opponent,
+                hasAbandon: false,
+                hasWon: false,
+            },
+        };
     }
 
     invertDifferences(): void {
@@ -218,6 +256,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     timesConversion(): string {
         return this.timerService.convert(this.timerService.currentTime);
     }
+
+    notifyEndGameLimitedTime(): void {
+        if (!this.isMultiplayer) this.limitedSoloDto.player1.hasAbandon = false;
+        this.socketService.send<GameHistoryDTO>(LIMITED_TIME_MODE_EVENTS.EndGame, this.isMultiplayer ? this.limitedMultiDto : this.limitedSoloDto);
+    }
+
     notifyNewBestTime(winnerId: string, isAbandon: boolean, mode: string): void {
         const winnerName: string = this.socketService.names.get(winnerId) as string;
         const player1: PlayerGameInfo = {
@@ -261,6 +305,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.dialog.open(GameLoseModalComponent, {
                 disableClose: true,
             });
+            this.notifyEndGameLimitedTime();
         }
     }
 
@@ -367,12 +412,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             const endGameVerification = this.numberOfDifferences / 2;
             if (this.currentScorePlayer >= endGameVerification) {
                 this.socketService.send(MATCH_EVENTS.Win);
-                this.notifyNewBestTime(this.socketService.socketId, false, 'classique');
+                this.notifyNewBestTime(this.socketService.socketId, false, 'Classique');
             }
         } else {
             if (this.currentScorePlayer === this.numberOfDifferences) {
                 this.gameCompletion(true, this.socketService.socketId);
-                this.notifyNewBestTime(this.socketService.socketId, false, 'classique');
+                this.notifyNewBestTime(this.socketService.socketId, false, 'Classique');
             }
         }
     }
