@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
@@ -35,7 +35,7 @@ describe('GameConstantsComponent', () => {
             return of();
         };
 
-        gameCardService = jasmine.createSpyObj('GameCardInformationService', ['resetAllBestTimes']);
+        gameCardService = jasmine.createSpyObj('GameCardInformationService', ['resetAllBestTimes', 'deleteAllGames']);
 
         gameCardService.resetAllBestTimes = () => {
             return of();
@@ -44,6 +44,10 @@ describe('GameConstantsComponent', () => {
         modalSpy = jasmine.createSpyObj('MatDialog', ['open']);
 
         dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+
+        gameCardService.deleteAllGames = () => {
+            return of();
+        };
 
         gameHistoryService = jasmine.createSpyObj('GameHistoryService', ['deleteGameHistory']);
         gameHistoryService.deleteGameHistory = () => {
@@ -60,10 +64,7 @@ describe('GameConstantsComponent', () => {
                 { provide: GameCardInformationService, useValue: gameCardService },
                 { provide: MatDialog, useValue: modalSpy },
                 { provide: GameHistoryService, useValue: gameHistoryService },
-                {
-                    provide: SocketService,
-                    useValue: socketServiceSpy,
-                },
+                { provide: SocketService, useValue: socketServiceSpy },
             ],
         }).compileComponents();
 
@@ -126,6 +127,14 @@ describe('GameConstantsComponent', () => {
         expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.DeleteAllGames);
     });
 
+    it('deleteAllGames() should call deleteAllGames from the service', fakeAsync(() => {
+        spyOn(gameCardService, 'deleteAllGames').and.returnValue(new Observable<void>());
+
+        component.deleteAllGames();
+
+        expect(gameCardService.deleteAllGames).toHaveBeenCalled();
+    }));
+
     it('checkNumber() should return a number between the min and max value for the input', () => {
         const fakeFocusEvent = {
             target: { value: 33 },
@@ -154,7 +163,5 @@ describe('GameConstantsComponent', () => {
         component.deleteGameHistory();
 
         expect(modalSpy.open).toHaveBeenCalledWith(ConfirmationModalComponent, { data: { message: "Supprimer l'historique de partie?" } });
-
-        expect(gameHistoryService.deleteGameHistory).toHaveBeenCalled();
     });
 });

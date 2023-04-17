@@ -3,6 +3,8 @@ import { GameManagerService } from '@app/services/game-manager/game-manager.serv
 import { DifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameHistoryDTO } from '@common/game-history.dto';
 import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND, SoloGameCreation } from '@common/match-gateway-communication';
+
+import { TimerModification } from '@common/timer-modification';
 import { Injectable } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -59,20 +61,23 @@ export class MatchGateway implements OnGatewayDisconnect {
     }
 
     @SubscribeMessage(MATCH_EVENTS.SoloGameInformation)
-    storeSoloGameInformation(socket: Socket, data: GameHistoryDTO): void {
+    storeSoloGameInformation(@ConnectedSocket() socket: Socket, @MessageBody() data: GameHistoryDTO): void {
         data.gameDuration = Date.now();
         socket.data.soloGame = data;
         socket.data.isSolo = true;
     }
 
     @SubscribeMessage(LIMITED_TIME_MODE_EVENTS.Timer)
-    startLimitedTimeTimer(socket: Socket, time: number): void {
+    startLimitedTimeTimer(@ConnectedSocket() socket: Socket, @MessageBody() time: number): void {
         this.stopTimer(socket);
         this.server.to(socket.data.room).emit(MATCH_EVENTS.LimitedTimeTimer, time);
         const timer = setInterval(() => {
             time--;
             this.server.to(socket.data.room).emit(MATCH_EVENTS.LimitedTimeTimer, time);
         }, ONE_SECOND);
+        if (!socket.data.time) {
+            socket.data.time = true;
+        }
         this.timers.set(socket.data.room, timer);
     }
 
@@ -80,6 +85,21 @@ export class MatchGateway implements OnGatewayDisconnect {
     storeGameHistoryDtoAfterOpponentAbandon(socket: Socket, data: GameHistoryDTO): void {
         socket.data.limitedHistory = data;
         socket.data.isLimitedSolo = true;
+    }
+
+    @SubscribeMessage(LIMITED_TIME_MODE_EVENTS.TimeModification)
+    modifiyTime(@ConnectedSocket() socket: Socket, @MessageBody() data: TimerModification): void {
+        this.changeTimeValue(socket, data);
+    }
+
+    changeTimeValue(socket: Socket, data: TimerModification): void {
+        this.stopTimer(socket);
+        this.server.to(socket.data.room).emit(MATCH_EVENTS.Timer, data.currentTime);
+        const timer = setInterval(() => {
+            data.currentTime++;
+            this.server.to(socket.data.room).emit(MATCH_EVENTS.Timer, data.currentTime);
+        }, ONE_SECOND);
+        this.timers.set(socket.data.room, timer);
     }
 
     timer(room: string): void {
@@ -93,7 +113,9 @@ export class MatchGateway implements OnGatewayDisconnect {
 
     async handleDisconnect(socket: Socket): Promise<void> {
         await this.gameManagerService.endGame(socket.data.stageId);
-        this.timers.delete(socket.data.room);
+        if (!socket.data.time) {
+            this.timers.delete(socket.data.room);
+        }
         this.gameManagerService.removePlayerFromLimitedTimeGame(socket.data.room);
     }
 }

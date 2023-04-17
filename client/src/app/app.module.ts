@@ -51,10 +51,10 @@ import { SoloViewComponent } from './pages/solo-view/solo-view.component';
         QuitGameModalComponent,
         GameWinModalComponent,
         LimitedTimeComponent,
-        GameHistoryComponent,
         GameConstantsComponent,
         GameLoseModalComponent,
         ConfirmationModalComponent,
+        GameHistoryComponent,
     ],
     entryComponents: [ModalPageComponent],
     imports: [

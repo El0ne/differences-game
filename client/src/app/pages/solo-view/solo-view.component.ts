@@ -2,7 +2,8 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
+import { HEIGHT, MAX_EFFECT_TIME, WIDTH } from '@app/components/click-event/click-event-constant';
+// we have to disable this rule because this file is too long
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
 import { GameLoseModalComponent } from '@app/modals/game-lose-modal/game-lose-modal.component';
@@ -12,6 +13,7 @@ import { Routes } from '@app/modules/routes';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
+import { GameHintService } from '@app/services/game-hint/game-hint.service';
 import { GameParametersService } from '@app/services/game-parameters/game-parameters.service';
 import { ImagesService } from '@app/services/images/images.service';
 import { SocketService } from '@app/services/socket/socket.service';
@@ -27,6 +29,8 @@ import { ImageObject } from '@common/image-object';
 import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, TWO_MINUTES } from '@common/match-gateway-communication';
 import { PlayerGameInfo } from '@common/player-game-info';
 import { Subject } from 'rxjs';
+import { DOUBLE_HINT_TIME_IN_MS, HINT_TIME_IN_MS } from './solo-view-constants';
+
 @Component({
     selector: 'app-solo-view',
     templateUrl: './solo-view.component.html',
@@ -54,6 +58,15 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
     gameConstants: GameConstants;
     // eslint-disable-next-line max-params -- need all parameters for constructor
+    currentRoom: string;
+    hintIcon: boolean;
+    thirdHint: boolean;
+    hintColor: string;
+    isClassic: boolean;
+    boundGetRandomDifference: (event: KeyboardEvent) => void = this.getRandomDifference.bind(this);
+
+    // we have more than 3 services
+    // eslint-disable-next-line max-params
     constructor(
         public timerService: TimerSoloService,
         private gameCardInfoService: GameCardInformationService,
@@ -64,6 +77,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private gameConstantsService: GameConstantsService,
         private gameParamService: GameParametersService,
         private imagesService: ImagesService,
+        private gameHintService: GameHintService,
     ) {}
 
     get stageId(): string {
@@ -79,10 +93,20 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this.thirdHint = false;
+        this.hintIcon = true;
+
         if (!this.socketService.liveSocket()) {
             this.router.navigate([`/${Routes.Home}`]);
             return;
         }
+        this.player = this.socketService.names.get(this.socketService.socketId) as string;
+        this.opponent = this.socketService.names.get(this.socketService.opponentSocket) as string;
+        this.currentRoom = this.socketService.gameRoom;
+        this.startTime = new Date().toLocaleString('fr-FR');
+        this.gameConstantsService.getGameConstants().subscribe((gameConstants: GameConstants) => {
+            this.gameConstants = gameConstants;
+        });
 
         this.player = this.socketService.names.get(this.socketService.socketId) as string;
         this.opponent = this.socketService.names.get(this.socketService.opponentSocket) as string;
@@ -92,7 +116,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             if (this.isLimitedTimeMode) {
                 this.socketService.send<number>(LIMITED_TIME_MODE_EVENTS.Timer, this.gameConstants.countDown);
                 this.timerService.limitedTimeTimer();
-                this.createLimitedTimeGameHistory();
+                if (this.isMultiplayer) this.createLimitedTimeGameHistory();
             }
         });
         this.getImagesNames();
@@ -101,7 +125,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.gameParamService.gameParameters.stageId = newStageId;
                 this.getImagesNames();
                 if (!newStageId) {
-                    this.gameCompletion(true, this.socketService.socketId);
+                    this.gameCompletion(false);
+                    this.notifyEndGameLimitedTime();
+                    this.timerService.stopTimer();
                 }
             });
             if (!this.isMultiplayer) {
@@ -170,12 +196,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.messages.push(message);
                 if (this.isLimitedTimeMode) {
                     this.gameParamService.gameParameters.isMultiplayerGame = false;
-                    const name: string = this.socketService.names.get(this.socketService.socketId) as string;
-                    if (this.limitedMultiDto.player1.name === name && this.limitedMultiDto.player2) {
-                        this.limitedMultiDto.player2.hasAbandon = true;
-                    } else {
-                        this.limitedMultiDto.player1.hasAbandon = true;
-                    }
+                    if (this.limitedMultiDto.player2) this.limitedMultiDto.player2.hasAbandon = true;
                     this.socketService.send<GameHistoryDTO>(LIMITED_TIME_MODE_EVENTS.StoreLimitedGameInfo, this.limitedMultiDto);
                 } else {
                     this.gameCompletion(true, this.socketService.socketId);
@@ -195,6 +216,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        this.gameHintService.hintsRemaining = 3;
         this.timerService.currentTime = 0;
         this.foundDifferenceService.clearDifferenceFound();
         this.socketService.disconnect();
@@ -229,10 +251,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     removeCheatMode(): void {
         document.removeEventListener('keydown', this.boundActivateCheatMode);
+        document.removeEventListener('keydown', this.boundGetRandomDifference);
     }
 
     addCheatMode(): void {
         document.addEventListener('keydown', this.boundActivateCheatMode);
+        document.addEventListener('keydown', this.boundGetRandomDifference);
     }
 
     resetDifferences(event: KeyboardEvent): void {
@@ -250,6 +274,83 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             });
         }
     }
+
+    getDiffFromClick(): void {
+        const keyEvent: KeyboardEvent = new KeyboardEvent('keydown', { key: 'i' });
+        this.getRandomDifference(keyEvent);
+    }
+
+    setColor(clickPosition: number[]): void {
+        this.hintColor = this.gameHintService.setColor(clickPosition, this.left.convertPositionToPixel(this.left.currentPixelHint));
+    }
+
+    getRandomDifference(event: KeyboardEvent | null): void {
+        if (event?.key === 'i' && !this.isMultiplayer && this.gameHintService.hintsRemaining > 0) {
+            // TODO : Verifier que ca fonctionne avec temps limite
+            if (!this.isLimitedTimeMode) this.timerService.restartTimer(1, this.gameConstants.hint);
+            else {
+                const timeLeft = this.timerService.currentTime - this.gameConstants.hint;
+                if (timeLeft > 0) {
+                    this.socketService.send<number>(LIMITED_TIME_MODE_EVENTS.Timer, timeLeft);
+                } else {
+                    this.timerService.stopTimer();
+                    this.socketService.send(MATCH_EVENTS.Lose);
+                    this.notifyEndGameLimitedTime();
+                    return;
+                }
+            }
+            if (this.hintsRemaining() > 0) this.socketService.send(CHAT_EVENTS.Hint, this.currentRoom);
+            this.left.getDifferences(this.stageId).subscribe((data) => {
+                const pixelArray = this.foundDifferenceService.findPixelsFromDifference(data);
+                const randomPixel = pixelArray[Math.floor(Math.random() * pixelArray.length)];
+                this.left.currentPixelHint = randomPixel;
+                this.right.currentPixelHint = this.left.currentPixelHint;
+                const randomPixelPosition = this.gameHintService.getPercentages(this.left.convertPositionToPixel(randomPixel));
+                if (randomPixelPosition.length === 0) {
+                    this.activateThirdHint();
+                } else {
+                    this.left.hintPosX = randomPixelPosition[1] * HEIGHT;
+                    this.left.hintPosY = randomPixelPosition[0] * WIDTH;
+                    this.right.hintPosX = this.left.hintPosX;
+                    this.right.hintPosY = this.left.hintPosY;
+                }
+                this.setCurrentHint();
+                this.hintTimeouts();
+            });
+        }
+    }
+
+    setCurrentHint(): void {
+        this.left.firstHint = this.gameHintService.hintsRemaining === 2;
+        this.left.secondHint = this.gameHintService.hintsRemaining === 1;
+
+        this.right.firstHint = this.gameHintService.hintsRemaining === 2;
+        this.right.secondHint = this.gameHintService.hintsRemaining === 1;
+    }
+
+    hintTimeouts(): void {
+        if (this.right.firstHint) {
+            setTimeout(() => {
+                this.left.firstHint = false;
+                this.right.firstHint = false;
+            }, HINT_TIME_IN_MS);
+        } else if (this.right.secondHint) {
+            setTimeout(() => {
+                this.left.secondHint = false;
+                this.right.secondHint = false;
+            }, HINT_TIME_IN_MS);
+        } else {
+            setTimeout(() => {
+                this.thirdHint = false;
+            }, DOUBLE_HINT_TIME_IN_MS);
+        }
+    }
+
+    activateThirdHint(): void {
+        this.thirdHint = true;
+        this.hintIcon = false;
+    }
+
     showTime(): void {
         this.timerService.startTimer();
     }
@@ -258,8 +359,14 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     notifyEndGameLimitedTime(): void {
-        if (!this.isMultiplayer) this.limitedSoloDto.player1.hasAbandon = false;
-        this.socketService.send<GameHistoryDTO>(LIMITED_TIME_MODE_EVENTS.EndGame, this.isMultiplayer ? this.limitedMultiDto : this.limitedSoloDto);
+        if (this.limitedSoloDto) {
+            this.limitedSoloDto.player1.hasAbandon = false;
+            this.socketService.send<GameHistoryDTO>(LIMITED_TIME_MODE_EVENTS.EndGame, this.limitedSoloDto);
+        } else if (this.limitedMultiDto) this.socketService.send<GameHistoryDTO>(LIMITED_TIME_MODE_EVENTS.EndGame, this.limitedMultiDto);
+    }
+
+    hintsRemaining(): number {
+        return this.gameHintService.hintsRemaining;
     }
 
     notifyNewBestTime(winnerId: string, isAbandon: boolean, mode: string): void {
@@ -291,11 +398,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.socketService.send<GameHistoryDTO>(CHAT_EVENTS.BestTime, gameHistory);
     }
 
-    gameCompletion(win: boolean, winnerId?: string): void {
+    gameCompletion(classic: boolean, winnerId?: string): void {
         this.left.endGame = true;
         this.right.endGame = true;
         this.showNavBar = false;
-        if (win && !this.dialog.openDialogs.length && winnerId) {
+        if (classic && !this.dialog.openDialogs.length && winnerId) {
             this.timerService.stopTimer();
             this.dialog.open(GameWinModalComponent, {
                 disableClose: true,
@@ -400,9 +507,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         }
         this.paintPixel(information.lastDifferences);
         this.incrementScore(information.socket);
-        if (this.isLimitedTimeMode) {
-            console.log('fin du game');
-        } else {
+        if (!this.isLimitedTimeMode) {
             this.foundDifferenceService.addDifferenceFound(information.differencesPosition);
             this.endGameVerification();
         }

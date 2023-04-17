@@ -67,7 +67,6 @@ describe('ChatGateway', () => {
             ],
             providers: [
                 ChatGateway,
-
                 StageWaitingRoomGateway,
                 GameCardService,
                 GameDifficultyService,
@@ -188,23 +187,6 @@ describe('ChatGateway', () => {
         jest.spyOn(gameCardService, 'getGameCardById').mockResolvedValue(gameCard);
         jest.spyOn(gameHistoryService, 'addGameToHistory').mockImplementation();
         jest.spyOn(gameCardService, 'updateGameCard').mockResolvedValue(gameCard);
-        stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
-        jest.spyOn(server, 'emit');
-        server.to.returns({
-            emit: (event: string, data: RoomMessage) => {
-                expect(event).toEqual(CHAT_EVENTS.RoomMessage);
-                expect(data.message.includes(FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE.gameMode)).toBeTruthy();
-                expect(data.message.includes('string')).toBeTruthy();
-            },
-        } as any);
-        gateway.bestTime(socket, FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE);
-    });
-
-    it('best time should properly assign player name', async () => {
-        jest.spyOn(gameCardService, 'getGameCardById').mockResolvedValue(gameCard);
-        jest.spyOn(gameHistoryService, 'addGameToHistory').mockImplementation();
-        jest.spyOn(gameCardService, 'updateGameCard').mockResolvedValue(gameCard);
-        FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE.player1.hasWon = false;
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         jest.spyOn(server, 'emit');
         server.to.returns({

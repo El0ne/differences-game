@@ -1,4 +1,6 @@
 <div id="container">
+    <div class="hint-boxes small-box" *ngIf="secondHint" [ngStyle]="{ top: hintPosX + 'px', left: hintPosY + 'px' }"></div>
+    <div class="hint-boxes big-box" *ngIf="firstHint" [ngStyle]="{ top: hintPosX + 'px', left: hintPosY + 'px' }"></div>
     <canvas #picture [attr.id]="id" class="canvas" width="640" height="480"></canvas>
-    <canvas #modification [attr.id]="original" class="canvas" width="640" height="480" (click)="isDifferent($event)"></canvas>
+    <canvas #modification [attr.id]="original" class="canvas" width="640" height="480" (click)="isDifferent($event)"> </canvas>
 </div>

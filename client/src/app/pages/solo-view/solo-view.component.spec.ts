@@ -21,6 +21,7 @@ import { ClickEventService } from '@app/services/click-event/click-event.service
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameConstantsService } from '@app/services/game-constants/game-constants.service';
+import { GameHintService } from '@app/services/game-hint/game-hint.service';
 import { GameParametersService } from '@app/services/game-parameters/game-parameters.service';
 import { ImagesService } from '@app/services/images/images.service';
 import { SocketService } from '@app/services/socket/socket.service';
@@ -41,6 +42,7 @@ describe('SoloViewComponent', () => {
     let imagesService: ImagesService;
     let socketServiceMock: SocketService;
     let foundDifferenceServiceSpy: FoundDifferenceService;
+    let gameHintServiceMock: GameHintService;
     let modalSpy: MatDialog;
     let clickEventServiceSpy: ClickEventService;
     let gameConstantsService: GameConstantsService;
@@ -52,6 +54,11 @@ describe('SoloViewComponent', () => {
     beforeEach(async () => {
         clickEventServiceSpy = jasmine.createSpyObj<ClickEventService>('ClickEventService', ['getDifferences', 'isADifference', 'getDifferences']);
         clickEventServiceSpy.getDifferences = () => of([[1, 2, 3], [4, 5], [6], [], [7, 8, 9]]);
+
+        gameHintServiceMock = jasmine.createSpyObj<GameHintService>('GameHintService', ['setColor', 'getPercentages']);
+        gameHintServiceMock.getPercentages = () => {
+            return [0.25, 0.25];
+        };
 
         mockRouter = jasmine.createSpyObj<Router>('Router', ['navigate'], ['url']);
         Object.defineProperty(mockRouter, 'url', { value: 'game' });
@@ -114,8 +121,9 @@ describe('SoloViewComponent', () => {
                 { provide: SocketService, useValue: socketServiceMock },
                 { provide: FoundDifferenceService, useValue: foundDifferenceServiceSpy },
                 { provide: MatDialog, useValue: modalSpy },
-                { provide: GameConstantsService, useValue: gameConstantsService },
                 { provide: GameParametersService, useValue: gameParamService },
+                { provide: GameHintService, useValue: gameHintServiceMock },
+                { provide: GameConstantsService, useValue: gameConstantsService },
             ],
             teardown: { destroyAfterEach: false },
         }).compileComponents();
@@ -138,6 +146,7 @@ describe('SoloViewComponent', () => {
 
     it('ngOnInit should prepare an eventual abandon case if in solo mode ', fakeAsync(() => {
         Object.defineProperty(gameParamService.gameParameters, 'isMultiplayerGame', { value: false });
+        Object.defineProperty(mockRouter, 'url', { value: 'solo/234' });
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.ngOnInit();
         tick(ONE_SECOND);
@@ -490,6 +499,108 @@ describe('SoloViewComponent', () => {
         expect(flashSpy).toHaveBeenCalledWith([1, 2, 3, 4, 5, 6, 7, 8, 9]);
     });
 
+    it('getDiffFromClick should call getRandomDifference', () => {
+        const getRandomDifferenceSpy = spyOn(component, 'getRandomDifference');
+        component.getDiffFromClick();
+        expect(getRandomDifferenceSpy).toHaveBeenCalled();
+    });
+
+    it('setColor should call setColor from gameHintService', () => {
+        component.setColor([]);
+        expect(gameHintServiceMock.setColor).toHaveBeenCalled();
+    });
+
+    it('getRandomDifference should set hint positions and hintsRemaining on left component', () => {
+        const mockDifference = [[1]];
+        gameHintServiceMock.hintsRemaining = 2;
+        component.isClassic = true;
+        spyOn(component.left, 'getDifferences').and.returnValue(of(mockDifference));
+        spyOn(foundDifferenceServiceSpy, 'findPixelsFromDifference').and.returnValue([4]);
+        spyOn(gameHintServiceMock, 'getPercentages').and.returnValue([0.25, 0.25]);
+
+        component.getRandomDifference({ key: 'i' } as KeyboardEvent);
+
+        expect(component.right.currentPixelHint).toBe(component.left.currentPixelHint);
+        expect(component.right.hintPosX).toBe(component.left.hintPosX);
+        expect(component.right.hintPosY).toBe(component.left.hintPosY);
+        expect(component.left.hintPosX).toBe(120);
+        expect(component.left.hintPosY).toBe(160);
+    });
+
+    it('getRandomDifference should call activateThirdHint if the length of getPercentages is 0', () => {
+        const mockDifference = [[1]];
+        gameHintServiceMock.hintsRemaining = 1;
+        component.isClassic = false;
+        const thirdHintSpy = spyOn(component, 'activateThirdHint');
+        spyOn(component.left, 'getDifferences').and.returnValue(of(mockDifference));
+        spyOn(foundDifferenceServiceSpy, 'findPixelsFromDifference').and.returnValue([4]);
+        spyOn(gameHintServiceMock, 'getPercentages').and.returnValue([]);
+
+        component.getRandomDifference({ key: 'i' } as KeyboardEvent);
+
+        expect(thirdHintSpy).toHaveBeenCalled();
+    });
+
+    it('activateThirdHint should set hintFlag to false and thirdHint to true', () => {
+        component.activateThirdHint();
+        expect(component.thirdHint).toBeTrue();
+        expect(component.hintIcon).toBeFalse();
+    });
+
+    it('setCurrentHint should set hints properly', () => {
+        gameHintServiceMock.hintsRemaining = 2;
+        component.left.firstHint = false;
+        component.left.secondHint = false;
+        component.setCurrentHint();
+        expect(component.left.firstHint).toBeTrue();
+        expect(component.left.secondHint).toBeFalse();
+    });
+
+    it('setCurrentHint should set hints properly', () => {
+        gameHintServiceMock.hintsRemaining = 1;
+        component.left.firstHint = false;
+        component.left.secondHint = false;
+        component.setCurrentHint();
+        expect(component.left.firstHint).toBeFalse();
+        expect(component.left.secondHint).toBeTrue();
+    });
+
+    it('hintTimeouts should time out hints correctly', fakeAsync(() => {
+        component.right.firstHint = true;
+        component.right.secondHint = false;
+        component.thirdHint = false;
+
+        component.hintTimeouts();
+
+        tick(4000);
+
+        expect(component.left.firstHint).toBeFalse();
+    }));
+
+    it('hintTimeouts should time out hints correctly', fakeAsync(() => {
+        component.right.firstHint = false;
+        component.right.secondHint = true;
+        component.thirdHint = false;
+
+        component.hintTimeouts();
+
+        tick(4000);
+
+        expect(component.left.secondHint).toBeFalse();
+    }));
+
+    it('hintTimeouts should time out hints correctly', fakeAsync(() => {
+        component.right.firstHint = false;
+        component.right.secondHint = false;
+        component.thirdHint = true;
+
+        component.hintTimeouts();
+
+        tick(8000);
+
+        expect(component.thirdHint).toBeFalse();
+    }));
+
     it('notifyNewBestTime should send gameHistory information as well as current timer time', () => {
         component.player = 'player';
         spyOnProperty(component, 'stageId', 'get').and.returnValue('0');
@@ -608,6 +719,7 @@ const MOCK_GAME_HISTORY_2: GameHistoryDTO = {
         hasWon: false,
     },
 };
+
 const SERVICE_MOCK_IMAGE_OBJECT: ImageObject = {
     _id: '0',
     originalImageName: 'string',

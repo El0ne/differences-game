@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SocketService } from '@app/services/socket/socket.service';
-import { MATCH_EVENTS } from '@common/match-gateway-communication';
+import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS } from '@common/match-gateway-communication';
+import { TimerModification } from '@common/timer-modification';
 import { Subscription } from 'rxjs';
 import { SECONDS_IN_MINUTE, TEN } from './timer-solo.constants';
 
@@ -40,5 +41,13 @@ export class TimerSoloService {
             seconds -= SECONDS_IN_MINUTE;
         }
         return seconds < TEN ? `${minute}:0${seconds}` : `${minute}:${seconds}`;
+    }
+
+    restartTimer(multiplier: number, timeModification: number): void {
+        const timerModification: TimerModification = {
+            currentTime: this.currentTime + timeModification,
+            timeMultiplier: multiplier,
+        };
+        this.socket.send(LIMITED_TIME_MODE_EVENTS.TimeModification, timerModification);
     }
 }

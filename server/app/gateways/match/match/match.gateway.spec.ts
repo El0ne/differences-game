@@ -145,6 +145,12 @@ describe('MatchGateway', () => {
         expect(gateway.timers.get('test')).toBeTruthy();
         clearInterval(gateway.timers.get('test'));
     });
+
+    it('storeSoloGame Information should store solo game information for in case of abandon', () => {
+        gateway.storeSoloGameInformation(socket, FAKE_GAME_HISTORY_DTO);
+        expect(socket.data.soloGame).toBeDefined();
+        expect(socket.data.isSolo).toBe(true);
+    });
 });
 
 const FAKE_GAME_HISTORY_DTO: GameHistoryDTO = {

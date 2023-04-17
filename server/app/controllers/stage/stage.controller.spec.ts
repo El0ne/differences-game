@@ -36,6 +36,7 @@ describe('StageController', () => {
     let getGameCardsNumberStub;
     let getGameCardByIdStub;
     let gameCardService: GameCardService;
+    let imageManagerService: ImageManagerService;
     let bestTimesService: BestTimesService;
 
     let mongoServer: MongoMemoryServer;
@@ -75,6 +76,7 @@ describe('StageController', () => {
         httpServer = app.getHttpServer();
         controller = module.get<StageController>(StageController);
         gameCardService = module.get<GameCardService>(GameCardService);
+        imageManagerService = module.get<ImageManagerService>(ImageManagerService);
         bestTimesService = module.get<BestTimesService>(BestTimesService);
         connection = await module.get(getConnectionToken());
         getGameCardStub = stub(gameCardService, 'getGameCards');
@@ -172,6 +174,40 @@ describe('StageController', () => {
 
     it('uploadImages() should return 500 if there is an error', async () => {
         const response = await request(httpServer).post('/stage/image/3');
+        expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    });
+
+    it('resetAllBestTimes() should call resetAllGameCards', async () => {
+        const resetMock = jest.spyOn(bestTimesService, 'resetAllBestTimes');
+        const response = await request(httpServer).put('/stage/best-times');
+
+        expect(resetMock).toHaveBeenCalled();
+        expect(response.status).toBe(HttpStatus.NO_CONTENT);
+    });
+
+    it('resetAllBestTimes() should return 500 if the request is invalid', async () => {
+        jest.spyOn(bestTimesService, 'resetAllBestTimes').mockImplementationOnce(() => {
+            throw new Error();
+        });
+        const response = await request(httpServer).put('/stage/best-times');
+
+        expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    });
+
+    it('resetBestTimes() should call resetGameCard', async () => {
+        const resetMock = jest.spyOn(bestTimesService, 'resetBestTimes').mockImplementation();
+        const response = await request(httpServer).put('/stage/best-times/5');
+
+        expect(resetMock).toHaveBeenCalled();
+        expect(response.status).toBe(HttpStatus.NO_CONTENT);
+    });
+
+    it('resetBestTimes() should return 500 if the request is invalid', async () => {
+        jest.spyOn(bestTimesService, 'resetBestTimes').mockImplementationOnce(() => {
+            throw new Error();
+        });
+        const response = await request(httpServer).put('/stage/best-times/4');
+
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 

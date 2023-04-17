@@ -66,14 +66,13 @@ describe('GameCardSelectionComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('deleteGame should call socket send', () => {
+    it('deleteGame should call gameDeleted.emit', () => {
         component.deleteGame();
         expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.DeleteGame, '123');
     });
 
     it('resetBestTimes() should call resetBestTime from the service', () => {
         component.resetBestTimes();
-
         expect(gameCardServiceSpyObj.resetBestTime).toHaveBeenCalled();
     });
 
