@@ -35,6 +35,8 @@ import { PlayerGameInfo } from '@common/player-game-info';
 import { Subject } from 'rxjs';
 import { DOUBLE_HINT_TIME_IN_MS, HINT_TIME_IN_MS } from './solo-view-constants';
 
+const EXECUTE_COMMAND_DELAY = 50;
+
 @Component({
     selector: 'app-solo-view',
     templateUrl: './solo-view.component.html',
@@ -453,7 +455,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         setTimeout(() => {
             const writeMessageCommand = new WriteMessageCommand(this.inputChat.nativeElement, this.messageContent);
             this.addCommand(writeMessageCommand);
-        }, 50);
+        }, EXECUTE_COMMAND_DELAY);
     }
 
     sendMessage(): void {
@@ -552,7 +554,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             } else {
                 this.replayGame();
             }
-        }, 50);
+        }, EXECUTE_COMMAND_DELAY);
     }
 
     resetCanvas(): void {
