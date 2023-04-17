@@ -26,6 +26,5 @@ export class HintCommand {
 
         this.soloView.hintTimeouts();
         this.soloView.handleHint();
-        // this.soloView.getRandomDifference();
     }
 }

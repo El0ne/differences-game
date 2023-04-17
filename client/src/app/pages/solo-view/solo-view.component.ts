@@ -583,6 +583,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.showNavBar = true;
         this.left.endGame = false;
         this.right.endGame = false;
+        this.hintIcon = true;
         this.gameHintService.hintsRemaining = 3;
         this.replayGame();
     }
