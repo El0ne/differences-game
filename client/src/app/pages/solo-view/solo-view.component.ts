@@ -245,8 +245,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     getRandomDifference(event: KeyboardEvent | null): void {
         if (event?.key === 'i' && !this.isMultiplayer && this.gameHintService.hintsRemaining > 0) {
-            // TODO : Verifier que ca fonctionne avec temps limite
-            this.handleHint();
             if (this.hintsRemaining() > 0) this.socketService.send(CHAT_EVENTS.Hint, this.currentRoom);
             this.left.getDifferences(this.currentGameId).subscribe((data) => {
                 const pixelArray = this.foundDifferenceService.findPixelsFromDifference(data);
@@ -266,10 +264,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.addCommand(hintCommand);
                 this.setCurrentHint();
                 this.hintTimeouts();
+                this.handleHint();
             });
         }
     }
 
+    // TODO : Verifier que ca fonctionne avec temps limite
     handleHint(): void {
         if (this.isClassic) this.timerService.restartTimer(1, this.socketService.socketId, this.gameConstants.hint);
         else {

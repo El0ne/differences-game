@@ -79,6 +79,7 @@ export class MatchGateway implements OnGatewayDisconnect {
 
     changeTimerValue(socket: Socket, replayInformations: ReplayTimerInformations): void {
         this.stopTimer(socket, replayInformations.room);
+        this.server.to(replayInformations.room).emit(MATCH_EVENTS.Timer, Math.max(replayInformations.currentTime, 0));
         const timer = setInterval(() => {
             replayInformations.currentTime++;
             this.server.to(replayInformations.room).emit(MATCH_EVENTS.Timer, Math.max(replayInformations.currentTime, 0));
