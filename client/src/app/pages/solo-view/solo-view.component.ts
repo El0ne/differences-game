@@ -1,10 +1,9 @@
+// we have to disable this rule because this file is too long
 /* eslint-disable max-lines */
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
-// we have to disable this rule because this file is too long
-import { HEIGHT, WIDTH } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
 import { GameLoseModalComponent } from '@app/modals/game-lose-modal/game-lose-modal.component';
@@ -63,7 +62,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     hintIcon: boolean;
     thirdHint: boolean;
     hintColor: string;
-    isClassic: boolean;
     boundGetRandomDifference: (event: KeyboardEvent) => void = this.getRandomDifference.bind(this);
 
     // we have more than 3 services
@@ -98,7 +96,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.hintIcon = true;
 
         if (!this.socketService.liveSocket()) {
-            console.log('quit');
             this.router.navigate([`/${Routes.Home}`]);
             return;
         }
@@ -251,9 +248,13 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     getRandomDifference(event: KeyboardEvent | null): void {
+        console.log(event);
+        console.log(this.isMultiplayer);
+        console.log(this.gameParamService.gameParameters.isMultiplayerGame);
+        console.log(this.gameHintService.hintsRemaining);
         if (event?.key === 'i' && !this.isMultiplayer && this.gameHintService.hintsRemaining > 0) {
             // TODO : Verifier que ca fonctionne avec temps limite
-            if (this.isClassic) this.timerService.restartTimer(1, this.gameConstants.hint);
+            if (!this.isLimitedTimeMode) this.timerService.restartTimer(1, this.gameConstants.hint);
             else {
                 this.timerService.restartTimer(1, -this.gameConstants.hint);
             }
