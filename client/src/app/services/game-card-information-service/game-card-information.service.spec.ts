@@ -63,8 +63,6 @@ describe('GameCardInformationService', () => {
             _id: '1',
             name: 'name',
             difficulty: 'difficult',
-            baseImage: 'string',
-            differenceImage: 'string',
             radius: 3,
             differenceNumber: 3,
         };
@@ -73,11 +71,46 @@ describe('GameCardInformationService', () => {
         expect(postSpy).toHaveBeenCalled();
     });
 
-    it('deleteImage should call delete on httpManager', () => {
-        const deleteSpy = spyOn(service.http, 'delete');
+    it('resetAllBestTimes() should reset best times of all the game cards', () => {
+        service.resetAllBestTimes().subscribe(() => {
+            expect().nothing();
+        });
 
-        service.deleteImage('');
-        expect(deleteSpy).toHaveBeenCalled();
+        const req = httpController.expectOne(`${STAGE}/best-times`);
+        expect(req.request.method).toBe('PUT');
+        req.flush(null);
+    });
+
+    it('resetBestTime() should reset the best times of the game card with the id passed in the request', () => {
+        const id = '4';
+        service.resetBestTime(id).subscribe(() => {
+            expect().nothing();
+        });
+
+        const req = httpController.expectOne(`${STAGE}/best-times/${id}`);
+        expect(req.request.method).toBe('PUT');
+        req.flush(null);
+    });
+
+    it('resetAllBestTimes() should reset best times of all the game cards', () => {
+        service.resetAllBestTimes().subscribe(() => {
+            expect().nothing();
+        });
+
+        const req = httpController.expectOne(`${STAGE}/best-times`);
+        expect(req.request.method).toBe('PUT');
+        req.flush(null);
+    });
+
+    it('resetBestTime() should reset the best times of the game card with the id passed in the request', () => {
+        const id = '4';
+        service.resetBestTime(id).subscribe(() => {
+            expect().nothing();
+        });
+
+        const req = httpController.expectOne(`${STAGE}/best-times/${id}`);
+        expect(req.request.method).toBe('PUT');
+        req.flush(null);
     });
 
     it('resetAllBestTimes() should reset best times of all the game cards', () => {

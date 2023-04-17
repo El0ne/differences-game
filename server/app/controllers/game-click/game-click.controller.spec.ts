@@ -6,17 +6,16 @@ import { DifferencesCounterService } from '@app/services/differences-counter/dif
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
+import { DELAY_BEFORE_CLOSING_CONNECTION } from '@app/tests/constants';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { HttpStatus } from '@nestjs/common';
-import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
+import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection } from 'mongoose';
 import { stub } from 'sinon';
 import * as request from 'supertest';
 import { GameClickController } from './game-click.controller';
-
-const DELAY_BEFORE_CLOSING_CONNECTION = 200;
 
 describe('GameClickController', () => {
     let controller: GameClickController;

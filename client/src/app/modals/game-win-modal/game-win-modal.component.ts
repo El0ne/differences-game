@@ -1,6 +1,7 @@
 import { Component, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { Routes } from '@app/modules/routes';
 import { EndGame } from '@common/chat-dialog-constants';
 
 @Component({
@@ -13,6 +14,6 @@ export class GameWinModalComponent {
 
     confirm(): void {
         this.matDialogRef.close();
-        this.router.navigate(['/home']);
+        this.router.navigate([`/${Routes.Home}`]);
     }
 }

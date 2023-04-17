@@ -115,4 +115,16 @@ body {
     display: flex;
     flex-direction: column;
     background: black;
+    border-radius: 25px;
+}
+
+.page-background {
+    background: linear-gradient(black, #7a04eb, #bd04eb);
+}
+
+.modal-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: xx-large;
 }

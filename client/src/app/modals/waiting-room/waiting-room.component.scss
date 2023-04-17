@@ -1,3 +1,98 @@
 .opponents-container {
     display: flex;
+    flex-direction: column;
+    width: 400px;
+    height: 400px;
+    overflow-y: auto;
+    text-overflow: hidden;
+}
+
+.ng-star-inserted {
+    margin-top: 15px;
+}
+
+body {
+    height: 10em;
+    width: 20em;
+}
+
+.container {
+    width: 500px;
+    height: 500px;
+    justify-content: space-around;
+    align-items: center;
+    border-radius: 25px;
+    max-height: calc(100% - 100px);
+    overflow: hidden;
+}
+
+.name-entry-title {
+    font-size: 2.5em;
+}
+
+.normal-button {
+    margin-left: 10px;
+    justify-content: center;
+    width: 70px;
+    height: 30px;
+}
+
+.hourglass-icon {
+    display: flexbox;
+    justify-content: center;
+    text-align: center;
+    margin-left: 22%;
+    margin-top: 28%;
+    width: 200px;
+    height: 200px;
+    color: #fff;
+    font-size: 100px;
+}
+
+.waiting-room-hourglass-icon {
+    display: flexbox;
+    justify-content: center;
+    text-align: center;
+    margin-left: 26%;
+    margin-top: 25%;
+    width: 200px;
+    height: 200px;
+    color: #fff;
+    font-size: 100px;
+}
+
+.cancel-button {
+    cursor: pointer;
+    display: flexbox;
+    justify-content: left;
+    text-align: center;
+    width: 80px;
+    height: 40px;
+    color: #fff;
+    background-color: #ff124f;
+    border-radius: 15px;
+    box-shadow: 0 5px #999;
+}
+
+.cancel-button:enabled:active {
+    background-color: #ff124dc5;
+    box-shadow: 0 5px #666;
+    transform: translateY(4px);
+}
+
+.cancel-button:hover {
+    background-color: #ff124dc5;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.buttons-container {
+    width: 160;
+    display: flex;
+    flex-direction: row;
+    text-align: right;
 }

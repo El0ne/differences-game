@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { SocketService } from '@app/services/socket/socket.service';
 import { GameConditions } from '@common/chat-dialog-constants';
@@ -54,5 +54,10 @@ describe('ChosePlayerNameDialogComponent', () => {
         component.validateName();
         expect(component.showNameErrorMessage).toBeFalsy();
         expect(namesMapSpy).toHaveBeenCalledWith('123', 'good name');
+    });
+
+    it('cancelNameInput should close dialog with false', () => {
+        component.cancelNameInput();
+        expect(matDialogSpy.close).toHaveBeenCalledWith(false);
     });
 });

@@ -51,14 +51,14 @@ describe('DifferenceDetectionService', () => {
     it('compareImages() should set differenceArray to the same length as firstImageArray (and secondImageArray)', async () => {
         stub(service, 'createArray').returns(Promise.resolve([1, 2, 3]));
         stub(service, 'createDifferenceImage').returns(Promise.resolve([]));
-        await service.compareImages(TEST_IMAGE_1, TEST_IMAGE_2, 1);
+        await service.compareImages(TEST_IMAGE_1, TEST_IMAGE_2);
         expect(service.differenceArray.length).toEqual(imageDimensionsService.getNumberOfPixels());
     });
 
     it('compareImages() should call createArray twice and createDifferenceImage', async () => {
         const createArrayStub = stub(service, 'createArray').returns(Promise.resolve([1, 2, 3]));
         const createDifferenceImageStub = stub(service, 'createDifferenceImage').returns(Promise.resolve([]));
-        await service.compareImages(TEST_IMAGE_1, TEST_IMAGE_2, 1);
+        await service.compareImages(TEST_IMAGE_1, TEST_IMAGE_2);
         assert(createArrayStub.calledTwice);
         assert(createDifferenceImageStub.calledOnce);
     });
@@ -68,7 +68,6 @@ describe('DifferenceDetectionService', () => {
         imageHeightStub.returns(10);
 
         service.differenceArray = new Array(imageDimensionsService.getNumberOfPixels());
-        service.radius = 0;
         const image = new Jimp(imageDimensionsService.getWidth(), imageDimensionsService.getHeight(), 'white', (err) => {
             if (err) throw err;
         });

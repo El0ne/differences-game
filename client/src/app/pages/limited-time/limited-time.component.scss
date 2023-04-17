@@ -1,0 +1,12 @@
+.header {
+    display: flex;
+    color: white;
+    font-size: 23px;
+    height: 10%;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}

@@ -4,6 +4,7 @@
 import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
 import { GameCard, GameCardDocument, gameCardSchema } from '@app/schemas/game-cards.schemas';
 import { GameHistory, gameHistorySchema } from '@app/schemas/game-history';
+import { Images, imagesSchema } from '@app/schemas/images.schema';
 import { BestTimesService } from '@app/services/best-times/best-times.service';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
@@ -14,14 +15,15 @@ import { ImageManagerService } from '@app/services/image-manager/image-manager.s
 import { getFakeGameCard } from '@app/services/mock/fake-game-card';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
+import { DELAY_BEFORE_CLOSING_CONNECTION } from '@app/tests/constants';
 import { GameCardDto } from '@common/game-card.dto';
 import { RankingBoard } from '@common/ranking-board';
-import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
+import { MongooseModule, getConnectionToken, getModelToken } from '@nestjs/mongoose';
 import { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing/test';
 import { ObjectId } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { Connection, Model, Query } from 'mongoose';
+import { Connection, Model } from 'mongoose';
 import { stub } from 'sinon';
 import { GameCardService } from './game-card.service';
 describe('GameCardService', () => {
@@ -29,8 +31,6 @@ describe('GameCardService', () => {
     let gameCardModel: Model<GameCardDocument>;
     let mongoServer: MongoMemoryServer;
     let connection: Connection;
-    let imageManagerService: ImageManagerService;
-    let gameManagerService: GameManagerService;
     let bestTimesService: BestTimesService;
 
     let FAKE_RANKING_BOARD: RankingBoard[];
@@ -49,6 +49,7 @@ describe('GameCardService', () => {
                     { name: GameCard.name, schema: gameCardSchema },
                     { name: Differences.name, schema: differencesSchema },
                     { name: GameHistory.name, schema: gameHistorySchema },
+                    { name: Images.name, schema: imagesSchema },
                 ]),
             ],
             providers: [
@@ -66,8 +67,6 @@ describe('GameCardService', () => {
         }).compile();
 
         service = module.get<GameCardService>(GameCardService);
-        imageManagerService = module.get<ImageManagerService>(ImageManagerService);
-        gameManagerService = module.get<GameManagerService>(GameManagerService);
         bestTimesService = module.get<BestTimesService>(BestTimesService);
         gameCardModel = module.get<Model<GameCardDocument>>(getModelToken(GameCard.name));
         connection = await module.get(getConnectionToken());
@@ -88,8 +87,6 @@ describe('GameCardService', () => {
             },
         ];
     });
-
-    const DELAY_BEFORE_CLOSING_CONNECTION = 200;
 
     afterEach((done) => {
         setTimeout(async () => {
@@ -153,35 +150,11 @@ describe('GameCardService', () => {
         expect(game).toEqual(expect.objectContaining(fakeGameCard));
     });
 
-    it('deleteGameCard should delete a gameCard, its 2 images and call the deleteDifferences service', async () => {
-        const gameCard = getFakeGameCard();
-        const imageManagerServiceMock = jest.spyOn(imageManagerService, 'deleteImage').mockImplementation();
-
-        await gameCardModel.create(gameCard);
-
-        await service.deleteGameCard(gameCard._id.toHexString());
-
-        expect(imageManagerServiceMock).toHaveBeenCalledWith(gameCard.originalImageName);
-        expect(imageManagerServiceMock).toHaveBeenCalledWith(gameCard.differenceImageName);
-    });
-
-    it('deleteAllGameCards should delete all the gameCards, and call game manager delete game for each game cards', async () => {
-        const fakeGameCardArray: GameCard[] = [];
-
-        jest.spyOn(service, 'deleteGameCard').mockImplementation();
-        jest.spyOn(gameManagerService, 'deleteGame').mockImplementation();
-
-        for (let i = 0; i < 5; i++) {
-            fakeGameCardArray.push(getFakeGameCard());
-        }
-        jest.spyOn(gameCardModel, 'find').mockReturnValueOnce(
-            Promise.resolve(fakeGameCardArray) as unknown as Query<unknown[] | null, GameCardDocument>,
-        );
-        await service.deleteAllGameCards();
-
-        expect(gameCardModel.find).toBeCalled();
-        expect(service.deleteGameCard).toBeCalledTimes(fakeGameCardArray.length);
-        expect(gameManagerService.deleteGame).toBeCalledTimes(fakeGameCardArray.length);
+    it('deleteGameCard should call gameCardModel.findByIdAndDelete with a certain id', async () => {
+        jest.spyOn(gameCardModel, 'findByIdAndDelete').mockImplementation();
+        const id = new ObjectId(123);
+        await service.deleteGameCard(id.toHexString());
+        expect(gameCardModel.findByIdAndDelete).toBeCalledWith(id);
     });
 
     it('generateGameCard should create a game card from a game informations', async () => {
@@ -243,8 +216,6 @@ const FAKE_GAME_INFO: GameCardDto = {
     _id: '00000000773db8b853265f32',
     name: 'game.name',
     difficulty: 'Facile',
-    baseImage: 'game.baseImage',
-    differenceImage: 'game.differenceImage',
     radius: 3,
     differenceNumber: 6,
 };

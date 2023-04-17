@@ -3,6 +3,7 @@ import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
+import { Routes } from '@app/modules/routes';
 import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
 import { DrawManipulationService } from '@app/services/draw-manipulation/draw-manipulation.service';
 import { EraserService } from '@app/services/eraser/eraser.service';
@@ -10,7 +11,7 @@ import { FileManipulationService } from '@app/services/file-manipulation/file-ma
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { PenService } from '@app/services/pen-service/pen-service.service';
 import { RectangleService } from '@app/services/rectangle/rectangle.service';
-import { STAGE } from '@app/services/server-routes';
+import { IMAGE } from '@app/services/server-routes';
 import { UndoRedoService } from '@app/services/undo-redo/undo-redo.service';
 import { CanvasInformations } from '@common/canvas-informations';
 import { GameCardDto } from '@common/game-card.dto';
@@ -100,9 +101,9 @@ export class GameCreationPageComponent implements OnInit {
         this.penService.writing.bind(this),
     ];
 
+    // we need more than 3 Services/Routers/Dialogs
     // eslint-disable-next-line max-params
     constructor(
-        // we need more than 3 Services/Routers/Dialogs
         private gameCardService: GameCardInformationService,
         public matDialog: MatDialog,
         public router: Router,
@@ -200,7 +201,7 @@ export class GameCreationPageComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe((result) => {
             result.image = '';
-            this.router.navigate(['/config']);
+            this.router.navigate([`/${Routes.Config}`]);
         });
     }
 
@@ -252,19 +253,17 @@ export class GameCreationPageComponent implements OnInit {
             const originalBlob = this.mergeCanvas(this.originalCanvas.nativeElement, this.originalDrawnCanvas.nativeElement);
             const differenceBlob = this.mergeCanvas(this.differenceCanvas.nativeElement, this.differenceDrawnCanvas.nativeElement);
             this.gameCardService.uploadImages(originalBlob, differenceBlob, this.differenceRadius).subscribe((data) => {
-                if (data.gameDifferenceNumber) {
+                if (data) {
                     this.createdGameInfo = {
                         _id: data.gameId,
                         name: this.gameTitle,
                         difficulty: data.gameDifficulty,
-                        baseImage: data.originalImageName,
-                        differenceImage: data.differenceImageName,
                         radius: this.differenceRadius,
                         differenceNumber: data.gameDifferenceNumber,
                     };
                     this.difficulty = data.gameDifficulty;
                     this.differenceNumber = data.gameDifferenceNumber;
-                    this.differenceImage = `${STAGE}/image/difference-image.bmp`;
+                    this.differenceImage = `${IMAGE}/file/difference-image.bmp`;
                     this.openSaveModal();
                 } else {
                     alert("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -10,28 +11,25 @@ import { GameCardInformationService } from '@app/services/game-card-information-
 import { SocketService } from '@app/services/socket/socket.service';
 import { GameCardInformation } from '@common/game-card';
 import { WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
-import { of, Subject } from 'rxjs';
+import { Subject, of } from 'rxjs';
 import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
 import { GameSelectionComponent } from './game-selection.component';
 
 describe('GameSelectionComponent', () => {
     let component: GameSelectionComponent;
     let fixture: ComponentFixture<GameSelectionComponent>;
-    let mockService: GameCardInformationService;
-    let testNumber: Subject<number>;
+    let gameCardInfoService: GameCardInformationService;
     let testGameCardsInformation: Subject<GameCardInformation[]>;
     let socketServiceSpy: SocketService;
 
     beforeEach(() => {
-        testNumber = new Subject<number>();
-        mockService = jasmine.createSpyObj('GameCardInformationService', ['getGameCardsInformation', 'getNumberOfGameCardInformation']);
-        mockService.getNumberOfGameCardInformation = () => {
-            testNumber.next(GAME_CARDS_TO_DISPLAY);
-            return testNumber.asObservable();
+        gameCardInfoService = jasmine.createSpyObj('GameCardInformationService', ['getGameCardsInformation', 'getNumberOfGameCardInformation']);
+        gameCardInfoService.getNumberOfGameCardInformation = () => {
+            return of(GAME_CARDS_TO_DISPLAY);
         };
 
         testGameCardsInformation = new Subject<GameCardInformation[]>();
-        mockService.getGameCardsInformations = () => {
+        gameCardInfoService.getGameCardsInformations = () => {
             testGameCardsInformation.next(GAMES.slice(0, GAME_CARDS_TO_DISPLAY));
             return testGameCardsInformation.asObservable();
         };
@@ -40,9 +38,9 @@ describe('GameSelectionComponent', () => {
 
         TestBed.configureTestingModule({
             declarations: [GameSelectionComponent, GameCardSelectionComponent, BestTimeComponent],
-            imports: [RouterTestingModule, MatIconModule, MatDialogModule],
+            imports: [RouterTestingModule, MatIconModule, MatDialogModule, HttpClientTestingModule],
             providers: [
-                { provide: GameCardInformationService, useValue: mockService },
+                { provide: GameCardInformationService, useValue: gameCardInfoService },
                 { provide: SocketService, useValue: socketServiceSpy },
             ],
         }).compileComponents();
@@ -166,4 +164,18 @@ describe('GameSelectionComponent', () => {
         component.selectGameCards();
         expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.ScanForHost, ['123']);
     });
+
+    it('refreshGameCards() should call selectGameCards() and getGameCardsInformations()', fakeAsync(() => {
+        const DELAY_BEFORE_REFRESH = 250;
+
+        spyOn(component, 'selectGameCards').and.returnValue();
+        spyOn(gameCardInfoService, 'getNumberOfGameCardInformation').and.returnValue(of(GAME_CARDS_TO_DISPLAY));
+
+        component.refreshGameCards();
+        tick(DELAY_BEFORE_REFRESH * 3);
+
+        expect(gameCardInfoService.getNumberOfGameCardInformation).toHaveBeenCalled();
+        expect(component.numberOfGameInformations).toEqual(GAME_CARDS_TO_DISPLAY);
+        expect(component.selectGameCards).toHaveBeenCalled();
+    }));
 });

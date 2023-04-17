@@ -1,7 +1,7 @@
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
-import { MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
+import { DifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameHistoryDTO } from '@common/game-history.dto';
-import { MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
+import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND, SoloGameCreation } from '@common/match-gateway-communication';
 
 import { TimerModification } from '@common/timer-modification';
 import { Injectable } from '@nestjs/common';
@@ -16,57 +16,80 @@ export class MatchGateway implements OnGatewayDisconnect {
     constructor(private gameManagerService: GameManagerService) {}
 
     @SubscribeMessage(MATCH_EVENTS.createSoloGame)
-    createSoloGame(@ConnectedSocket() socket: Socket, @MessageBody() stageId: string): void {
-        socket.data.stageId = stageId;
-        this.timer(socket.id);
-        this.gameManagerService.addGame(stageId, 1);
+    async createSoloGame(@ConnectedSocket() socket: Socket, @MessageBody() gameInfo: SoloGameCreation): Promise<void> {
+        socket.data.stageId = gameInfo.stageId;
+        socket.data.room = socket.id;
+        if (gameInfo.isLimitedTimeMode) {
+            await this.gameManagerService.startLimitedTimeGame(socket.data.room, 1);
+            socket.emit(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, this.gameManagerService.giveNextStage(socket.data.room));
+        } else {
+            this.timer(socket.data.room);
+            this.gameManagerService.addGame(gameInfo.stageId, 1);
+        }
     }
 
     @SubscribeMessage(MATCH_EVENTS.EndTime)
-    stopTimer(socket: Socket, room: string): void {
-        clearInterval(this.timers.get(room));
-        this.timers.delete(room);
+    stopTimer(@ConnectedSocket() socket: Socket): void {
+        clearInterval(this.timers.get(socket.data.room));
+        this.timers.delete(socket.data.room);
     }
 
     @SubscribeMessage(MATCH_EVENTS.Win)
-    win(socket: Socket, room: string): void {
-        if (socket.rooms.has(room)) {
-            this.server.to(room).emit(MATCH_EVENTS.Win, socket.id);
-        }
+    win(@ConnectedSocket() socket: Socket): void {
+        this.server.to(socket.data.room).emit(MATCH_EVENTS.Win, socket.id);
     }
 
     @SubscribeMessage(MATCH_EVENTS.Difference)
-    difference(socket: Socket, data: MultiplayerDifferenceInformation): void {
-        if (socket.rooms.has(data.room)) {
-            const differenceInformation: PlayerDifference = {
-                differencesPosition: data.differencesPosition,
-                lastDifferences: data.lastDifferences,
-                socket: socket.id,
-            };
-            this.server.to(data.room).emit(MATCH_EVENTS.Difference, differenceInformation);
-        }
+    difference(@ConnectedSocket() socket: Socket, @MessageBody() data: DifferenceInformation): void {
+        const differenceInformation: PlayerDifference = {
+            differencesPosition: data.differencesPosition,
+            lastDifferences: data.lastDifferences,
+            socket: socket.id,
+        };
+        this.server.to(socket.data.room).emit(MATCH_EVENTS.Difference, differenceInformation);
+    }
+
+    @SubscribeMessage(MATCH_EVENTS.Lose)
+    limitedTimeLost(@ConnectedSocket() socket: Socket): void {
+        this.server.to(socket.data.room).emit(MATCH_EVENTS.Lose, 'timeExpired');
+    }
+
+    @SubscribeMessage(LIMITED_TIME_MODE_EVENTS.NextStage)
+    nextStage(@ConnectedSocket() socket: Socket): void {
+        this.server.to(socket.data.room).emit(LIMITED_TIME_MODE_EVENTS.NewStageInformation, this.gameManagerService.giveNextStage(socket.data.room));
     }
 
     @SubscribeMessage(MATCH_EVENTS.SoloGameInformation)
-    storeSoloGameInformation(socket: Socket, data: GameHistoryDTO): void {
+    storeSoloGameInformation(@ConnectedSocket() socket: Socket, @MessageBody() data: GameHistoryDTO): void {
         data.gameDuration = Date.now();
         socket.data.soloGame = data;
         socket.data.isSolo = true;
     }
 
-    @SubscribeMessage(MATCH_EVENTS.TimeModification)
-    modifiyTime(socket: Socket, data: TimerModification): void {
+    @SubscribeMessage(LIMITED_TIME_MODE_EVENTS.Timer)
+    startLimitedTimeTimer(@ConnectedSocket() socket: Socket, @MessageBody() time: number): void {
+        this.stopTimer(socket);
+        this.server.to(socket.data.room).emit(MATCH_EVENTS.LimitedTimeTimer, time);
+        const timer = setInterval(() => {
+            time--;
+            this.server.to(socket.data.room).emit(MATCH_EVENTS.LimitedTimeTimer, time);
+        }, ONE_SECOND);
+        this.timers.set(socket.data.room, timer);
+    }
+
+    @SubscribeMessage(LIMITED_TIME_MODE_EVENTS.TimeModification)
+    modifiyTime(@ConnectedSocket() socket: Socket, @MessageBody() data: TimerModification): void {
         this.changeTimeValue(socket, data);
     }
 
     changeTimeValue(socket: Socket, data: TimerModification): void {
-        this.stopTimer(socket, data.room);
-        this.server.to(data.room).emit(MATCH_EVENTS.Timer, data.currentTime);
+        this.stopTimer(socket);
+        this.server.to(socket.data.room).emit(MATCH_EVENTS.Timer, data.currentTime);
         const timer = setInterval(() => {
             data.currentTime++;
-            this.server.to(data.room).emit(MATCH_EVENTS.Timer, data.currentTime);
+            this.server.to(socket.data.room).emit(MATCH_EVENTS.Timer, data.currentTime);
         }, ONE_SECOND);
-        this.timers.set(data.room, timer);
+        this.timers.set(socket.data.room, timer);
     }
 
     timer(room: string): void {
@@ -79,9 +102,8 @@ export class MatchGateway implements OnGatewayDisconnect {
     }
 
     async handleDisconnect(socket: Socket): Promise<void> {
-        if (socket.data.stageId) {
-            await this.gameManagerService.endGame(socket.data.stageId);
-            this.stopTimer(socket, socket.data.room);
-        }
+        await this.gameManagerService.endGame(socket.data.stageId);
+        this.timers.delete(socket.data.room);
+        this.gameManagerService.removePlayerFromLimitedTimeGame(socket.data.room);
     }
 }

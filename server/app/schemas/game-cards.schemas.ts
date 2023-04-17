@@ -19,12 +19,6 @@ export class GameCard {
     @Prop()
     differenceNumber: number;
 
-    @Prop()
-    originalImageName: string;
-
-    @Prop()
-    differenceImageName: string;
-
     @Prop([RankingBoard])
     soloTimes: RankingBoard[];
 
