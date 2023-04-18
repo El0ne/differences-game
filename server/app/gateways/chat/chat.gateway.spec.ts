@@ -1,7 +1,7 @@
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
-import { MatchGateway } from '@app/gateways/match/match/match.gateway';
+import { MatchGateway } from '@app/gateways/match/match1/match.gateway';
 import { StageWaitingRoomGateway } from '@app/gateways/waitingRoom/stage-waiting-room.gateway';
 import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
 import { GameCard, gameCardSchema } from '@app/schemas/game-cards.schemas';

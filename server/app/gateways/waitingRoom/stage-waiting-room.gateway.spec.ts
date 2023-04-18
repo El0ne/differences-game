@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable no-unused-vars */
-import { MatchGateway } from '@app/gateways/match/match/match.gateway';
+import { MatchGateway } from '@app/gateways/match/match1/match.gateway';
 import { GameCard } from '@app/schemas/game-cards.schemas';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';

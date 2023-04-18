@@ -72,7 +72,6 @@ export class GameManagerService {
         const isGameCardsPopulated = gameCards.length !== 0;
         if (isGameCardsPopulated) {
             for (let i = allStagesId.length - 1; i > 0; i--) {
-                // TODO test if no gameCArds are in bd when starting game
                 const j = Math.floor(Math.random() * (i + 1));
                 const temp: string = allStagesId[i];
                 allStagesId[i] = allStagesId[j];
