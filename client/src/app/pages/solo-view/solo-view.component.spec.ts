@@ -159,7 +159,7 @@ describe('SoloViewComponent', () => {
     });
 
     it("should get the socket's id", () => {
-        const socketId = component.getSocketId();
+        const socketId = component.socketId;
         expect(socketId).toEqual(component.socketService.socketId);
     });
 

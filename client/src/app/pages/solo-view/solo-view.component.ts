@@ -88,7 +88,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     isCanvasEnabled: boolean = true;
 
     boundGetRandomDifference: (event: KeyboardEvent) => void = this.getRandomDifference.bind(this);
-
     // we have more than 3 services
     // eslint-disable-next-line max-params
     constructor(
@@ -103,6 +102,10 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         public gameHintService: GameHintService,
         public replayButtonsService: ReplayButtonsService,
     ) {}
+
+    get socketId(): string {
+        return this.socketService.socketId;
+    }
 
     ngOnInit(): void {
         this.invoker = new Invoker();
@@ -150,10 +153,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.showTime();
         this.addCheatMode();
         this.configureSocketReactions();
-    }
-
-    getSocketId(): string {
-        return this.socketService.socketId;
     }
 
     configureSocketReactions(): void {
