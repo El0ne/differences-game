@@ -22,9 +22,9 @@ export const enum LIMITED_TIME_MODE_EVENTS {
     TimeModification = 'timeModification',
 }
 
-export const ONE_SECOND = 1000;
+export const ONE_SECOND_MS = 1000;
 
-export const TWO_MINUTES = 120;
+export const TWO_MINUTES_SECONDS = 120;
 
 export interface SoloGameCreation {
     stageId: string;

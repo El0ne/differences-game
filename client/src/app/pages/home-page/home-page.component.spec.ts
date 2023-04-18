@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { RouterTestingModule } from '@angular/router/testing';
 import { LimitedTimeComponent } from '@app/modals/limited-time/limited-time.component';
+import { Routes } from '@app/modules/routes';
 import { of } from 'rxjs';
 import { HomePageComponent } from './home-page.component';
 
@@ -32,5 +33,9 @@ describe('HomePageComponent', () => {
         dialogSpy.open.and.returnValue(dialogRefSpyObject);
         component.openLimitedTimeDialog();
         expect(dialogSpy.open).toHaveBeenCalledWith(LimitedTimeComponent);
+    });
+
+    it('routes should return routes', () => {
+        expect(component.routes.Config).toEqual(Routes.Config);
     });
 });

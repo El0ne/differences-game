@@ -1,4 +1,4 @@
-export const enum Routes {
+export enum Routes {
     Home = 'home',
     CreatingGame = 'creatingGame',
     StageSelection = 'stage-selection',

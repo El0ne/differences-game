@@ -1,11 +1,5 @@
 import { RankingBoard } from './ranking-board';
 
-export interface StageInformation {
-    _id: string;
-    originalImageName: string;
-    differenceImageName: string;
-}
-
 export interface GameCardInformation {
     _id: string;
     name: string;

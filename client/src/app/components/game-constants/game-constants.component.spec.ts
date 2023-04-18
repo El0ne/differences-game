@@ -45,10 +45,6 @@ describe('GameConstantsComponent', () => {
 
         dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
 
-        gameCardService.deleteAllGames = () => {
-            return of();
-        };
-
         gameHistoryService = jasmine.createSpyObj('GameHistoryService', ['deleteGameHistory']);
         gameHistoryService.deleteGameHistory = () => {
             return of();

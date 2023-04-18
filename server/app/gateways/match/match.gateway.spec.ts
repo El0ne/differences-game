@@ -3,7 +3,7 @@
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { PlayerDifference } from '@common/difference-information';
 import { GameHistoryDTO } from '@common/game-history.dto';
-import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
+import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND_MS } from '@common/match-gateway-communication';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { BroadcastOperator, Server, Socket } from 'socket.io';
@@ -117,7 +117,7 @@ describe('MatchGateway', () => {
     it('timer should add a new timer to timer map', async () => {
         stub(socket, 'rooms').value(new Set(['test']));
         gateway.timer('test');
-        jest.advanceTimersByTime(ONE_SECOND);
+        jest.advanceTimersByTime(ONE_SECOND_MS);
         expect(gateway.timers.has('test')).toBeTruthy();
     });
 
@@ -126,7 +126,7 @@ describe('MatchGateway', () => {
             TEST_ROOM_ID,
             setTimeout(() => {
                 return;
-            }, ONE_SECOND),
+            }, ONE_SECOND_MS),
         );
         gateway.stopTimer(socket);
         expect(gateway.timers.has(TEST_ROOM_ID)).toBeFalsy();
@@ -159,7 +159,7 @@ describe('MatchGateway', () => {
         socket.data.room = 'test';
         const stopTimerSpy = jest.spyOn(gateway, 'stopTimer').mockImplementation();
         gateway.startLimitedTimeTimer(socket, 123);
-        jest.advanceTimersByTime(ONE_SECOND);
+        jest.advanceTimersByTime(ONE_SECOND_MS);
         expect(stopTimerSpy).toHaveBeenCalled();
         expect(gateway.timers.get('test')).toBeTruthy();
         clearInterval(gateway.timers.get('test'));

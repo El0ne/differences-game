@@ -31,7 +31,7 @@ import { GameCardInformation } from '@common/game-card';
 import { GameConstants } from '@common/game-constants';
 import { GameHistoryDTO } from '@common/game-history.dto';
 import { ImageObject } from '@common/image-object';
-import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND, TWO_MINUTES } from '@common/match-gateway-communication';
+import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND_MS, TWO_MINUTES_SECONDS } from '@common/match-gateway-communication';
 import { of } from 'rxjs';
 import { SoloViewComponent } from './solo-view.component';
 
@@ -149,7 +149,7 @@ describe('SoloViewComponent', () => {
         Object.defineProperty(mockRouter, 'url', { value: 'solo/234' });
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.ngOnInit();
-        tick(ONE_SECOND);
+        tick(ONE_SECOND_MS);
         expect(sendSpy).toHaveBeenCalledTimes(1);
         expect(component.gameConstants).toEqual(MOCK_GAME_CONSTANTS);
     }));
@@ -163,7 +163,7 @@ describe('SoloViewComponent', () => {
             }
         };
         component.ngOnInit();
-        tick(ONE_SECOND);
+        tick(ONE_SECOND_MS);
         expect(sendSpy).toHaveBeenCalledTimes(1);
     }));
 
@@ -177,7 +177,7 @@ describe('SoloViewComponent', () => {
             }
         };
         component.ngOnInit();
-        tick(ONE_SECOND);
+        tick(ONE_SECOND_MS);
         expect(winGameSpy).toHaveBeenCalled();
     }));
 
@@ -646,7 +646,7 @@ describe('SoloViewComponent', () => {
         component['timerService'].currentTime = 120;
         component.gameConstants.difference = 10;
         component.effectHandler(MOCK_PLAYER_DIFFERENCES);
-        expect(sendSpy).toHaveBeenCalledWith(LIMITED_TIME_MODE_EVENTS.Timer, TWO_MINUTES);
+        expect(sendSpy).toHaveBeenCalledWith(LIMITED_TIME_MODE_EVENTS.Timer, TWO_MINUTES_SECONDS);
     });
 
     it('getter of socketId should return the id in socketService', () => {

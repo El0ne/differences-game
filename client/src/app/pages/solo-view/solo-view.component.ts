@@ -26,7 +26,7 @@ import { GameCardInformation } from '@common/game-card';
 import { GameConstants } from '@common/game-constants';
 import { GameHistoryDTO } from '@common/game-history.dto';
 import { ImageObject } from '@common/image-object';
-import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, TWO_MINUTES } from '@common/match-gateway-communication';
+import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, TWO_MINUTES_SECONDS } from '@common/match-gateway-communication';
 import { PlayerGameInfo } from '@common/player-game-info';
 import { Subject } from 'rxjs';
 import { DOUBLE_HINT_TIME_IN_MS, HINT_TIME_IN_MS } from './solo-view-constants';
@@ -420,7 +420,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     addTimeToTimer(): void {
         this.socketService.send<number>(
             LIMITED_TIME_MODE_EVENTS.Timer,
-            Math.min(this.timerService.currentTime + this.gameConstants.difference, TWO_MINUTES),
+            Math.min(this.timerService.currentTime + this.gameConstants.difference, TWO_MINUTES_SECONDS),
         );
     }
 
@@ -458,9 +458,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         }
         this.paintPixel(information.lastDifferences);
         this.incrementScore(information.socket);
-        if (this.isLimitedTimeMode) {
-            // TODO : condition de fin de game
-        } else {
+        if (!this.isLimitedTimeMode) {
             this.foundDifferenceService.addDifferenceFound(information.differencesPosition);
             this.endGameVerification();
         }

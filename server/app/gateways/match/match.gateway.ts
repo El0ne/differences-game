@@ -1,7 +1,7 @@
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { DifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameHistoryDTO } from '@common/game-history.dto';
-import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND, SoloGameCreation } from '@common/match-gateway-communication';
+import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND_MS, SoloGameCreation } from '@common/match-gateway-communication';
 
 import { TimerModification } from '@common/timer-modification';
 import { Injectable } from '@nestjs/common';
@@ -72,7 +72,7 @@ export class MatchGateway implements OnGatewayDisconnect {
         const timer = setInterval(() => {
             time--;
             this.server.to(socket.data.room).emit(MATCH_EVENTS.LimitedTimeTimer, time);
-        }, ONE_SECOND);
+        }, ONE_SECOND_MS);
         this.timers.set(socket.data.room, timer);
     }
 
@@ -87,7 +87,7 @@ export class MatchGateway implements OnGatewayDisconnect {
         const timer = setInterval(() => {
             data.currentTime++;
             this.server.to(socket.data.room).emit(MATCH_EVENTS.Timer, data.currentTime);
-        }, ONE_SECOND);
+        }, ONE_SECOND_MS);
         this.timers.set(socket.data.room, timer);
     }
 
@@ -96,7 +96,7 @@ export class MatchGateway implements OnGatewayDisconnect {
         const timer = setInterval(() => {
             timerCount++;
             this.server.to(room).emit(MATCH_EVENTS.Timer, timerCount);
-        }, ONE_SECOND);
+        }, ONE_SECOND_MS);
         this.timers.set(room, timer);
     }
 
