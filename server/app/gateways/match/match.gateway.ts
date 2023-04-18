@@ -20,12 +20,7 @@ export class MatchGateway implements OnGatewayDisconnect {
         socket.data.stageId = gameInfo.stageId;
         socket.data.room = socket.id;
         if (gameInfo.isLimitedTimeMode) {
-            const isGamePossible = await this.gameManagerService.startLimitedTimeGame(socket.data.room, 1);
-            if (isGamePossible) {
-                socket.emit(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, this.gameManagerService.giveNextStage(socket.data.room));
-            } else {
-                socket.emit(LIMITED_TIME_MODE_EVENTS.AbortLimitedTimeGame);
-            }
+            this.createLimitedTimeGame(socket.data.room, 1);
         } else {
             this.timer(socket.data.room);
             this.gameManagerService.addGame(gameInfo.stageId, 1);
@@ -103,6 +98,14 @@ export class MatchGateway implements OnGatewayDisconnect {
             this.server.to(room).emit(MATCH_EVENTS.Timer, timerCount);
         }, ONE_SECOND);
         this.timers.set(room, timer);
+    }
+
+    async createLimitedTimeGame(room: string, numberOfPlayers: number): Promise<void> {
+        if (await this.gameManagerService.startLimitedTimeGame(room, numberOfPlayers)) {
+            this.server.to(room).emit(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, this.gameManagerService.giveNextStage(room));
+        } else {
+            this.server.to(room).emit(LIMITED_TIME_MODE_EVENTS.AbortLimitedTimeGame);
+        }
     }
 
     async handleDisconnect(socket: Socket): Promise<void> {

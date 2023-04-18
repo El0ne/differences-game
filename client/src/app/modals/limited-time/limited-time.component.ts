@@ -60,7 +60,7 @@ export class LimitedTimeComponent implements OnInit, OnDestroy {
         this.dialog.open(WaitingRoomComponent, { disableClose: true, data });
     }
 
-    configureSocketForGame() {
+    configureSocketForGame(): void {
         this.socketService.listen<string>(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, (stageId: string) => {
             this.gameParamService.gameParameters.stageId = stageId;
             this.router.navigate(['/game']);
@@ -91,7 +91,7 @@ export class LimitedTimeComponent implements OnInit, OnDestroy {
         });
     }
 
-    closeModal() {
+    closeModal(): void {
         this.dialogRef.close();
     }
 }

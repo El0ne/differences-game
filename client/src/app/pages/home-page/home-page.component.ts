@@ -10,7 +10,7 @@ import { LimitedTimeComponent } from '@app/modals/limited-time/limited-time.comp
 export class HomePageComponent {
     constructor(private dialog: MatDialog) {}
 
-    openLimitedTimeDialog() {
+    openLimitedTimeDialog(): void {
         this.dialog.open(LimitedTimeComponent);
     }
 }

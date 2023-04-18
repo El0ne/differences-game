@@ -36,7 +36,6 @@ describe('StageController', () => {
     let getGameCardsNumberStub;
     let getGameCardByIdStub;
     let gameCardService: GameCardService;
-    let imageManagerService: ImageManagerService;
     let bestTimesService: BestTimesService;
 
     let mongoServer: MongoMemoryServer;
@@ -76,7 +75,6 @@ describe('StageController', () => {
         httpServer = app.getHttpServer();
         controller = module.get<StageController>(StageController);
         gameCardService = module.get<GameCardService>(GameCardService);
-        imageManagerService = module.get<ImageManagerService>(ImageManagerService);
         bestTimesService = module.get<BestTimesService>(BestTimesService);
         connection = await module.get(getConnectionToken());
         getGameCardStub = stub(gameCardService, 'getGameCards');

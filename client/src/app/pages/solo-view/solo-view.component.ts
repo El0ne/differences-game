@@ -459,7 +459,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.paintPixel(information.lastDifferences);
         this.incrementScore(information.socket);
         if (this.isLimitedTimeMode) {
-            console.log('fin du game');
+            // TODO : condition de fin de game
         } else {
             this.foundDifferenceService.addDifferenceFound(information.differencesPosition);
             this.endGameVerification();
