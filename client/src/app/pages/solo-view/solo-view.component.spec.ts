@@ -8,12 +8,12 @@ import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testin
 import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { EndGameCommand } from '@app/commands/end-game/end-game-command';
 import { OpenModalCommand } from '@app/commands/open-modal-command/open-modal-command';
+import { ThirdHintColorCommand } from '@app/commands/third-hint-color/third-hint-color-command';
 import { WriteMessageCommand } from '@app/commands/write-message/write-message';
 import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
@@ -188,7 +188,6 @@ describe('SoloViewComponent', () => {
                     callback('wrong');
                     break;
                 }
-                // No default
             }
         };
         const listenSpy = spyOn(socketServiceMock, 'listen').and.callThrough();
@@ -299,7 +298,6 @@ describe('SoloViewComponent', () => {
 
         component.openInfoModal();
         expect(component.addCommand).toHaveBeenCalledWith(new OpenModalCommand(component, true));
-        // expect(component.addCommand).toHaveBeenCalledWith(new CloseInfoModalCommand(component));
     });
 
     it('should close all modals', () => {
@@ -339,20 +337,17 @@ describe('SoloViewComponent', () => {
             disableClose: true,
         });
         expect(component.timerService.stopTimer).toHaveBeenCalledWith(component.socketService.socketId);
-        // expect(component.timerService.restartTimer).toHaveBeenCalledWith(
-        //     component.replayButtonsService.timeMultiplier,
-        //     component.socketService.socketId,
-        //     0,
-        // );
     });
 
     it("should add the input's command when input is changing", fakeAsync(() => {
+        const command = new WriteMessageCommand(component.inputChat.nativeElement, 'hey');
+        component.messageContent = 'hey';
         spyOn(component, 'addCommand');
-        component.inputChat.nativeElement.value = 'hey';
-        const inputElement = fixture.debugElement.query(By.css('input')).nativeElement;
-        inputElement.dispatchEvent(new Event('input'));
-        tick(50);
-        expect(component.addCommand).toHaveBeenCalledWith(jasmine.any(WriteMessageCommand));
+
+        component.inputIsChanging();
+        tick(100);
+
+        expect(component.addCommand).toHaveBeenCalledWith(command);
     }));
 
     it('paintPixel should call sendPixels and receivePixels properly', () => {
@@ -438,7 +433,6 @@ describe('SoloViewComponent', () => {
         component.currentScorePlayer = 2;
         component.numberOfDifferences = 2;
         const sendSpy = spyOn(socketServiceMock, 'send');
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
         const notifyBestTimeSpy = spyOn(component, 'notifyNewBestTime').and.callFake(() => {});
         spyOn(component, 'winGame');
         component.endGameVerification();
@@ -495,8 +489,6 @@ describe('SoloViewComponent', () => {
         expect(component.left.endGame).toBeTrue();
         expect(component.right.endGame).toBeTrue();
         expect(component.addCommand).toHaveBeenCalledWith(new EndGameCommand(component));
-        // expect(component.socketService.send).toHaveBeenCalledWith(MATCH_EVENTS.leaveRoom, component.socketService.gameRoom);
-        // expect(component.resetPropertiesForReplay).toHaveBeenCalledWith(component.socketService.socketId);
     });
 
     it('winGame should set all end game related boolean and open gameWin modal with false to multiplayer in solo', () => {
@@ -515,6 +507,13 @@ describe('SoloViewComponent', () => {
         expect(component.showNavBar).toBeFalse();
         expect(component.left.endGame).toBeTrue();
         expect(component.right.endGame).toBeTrue();
+    });
+
+    it('should call openReplayModal if in replay mode', () => {
+        component.isReplayMode = true;
+        spyOn(component, 'openReplayModal');
+        component.winGame('playerId');
+        expect(component.openReplayModal).toHaveBeenCalled();
     });
 
     it('invertDifferences should invert the toggleCheatMode attribute from left and right', () => {
@@ -579,9 +578,21 @@ describe('SoloViewComponent', () => {
         expect(getRandomDifferenceSpy).toHaveBeenCalled();
     });
 
-    it('setColor should call setColor from gameHintService', () => {
-        component.setColor([]);
-        expect(gameHintServiceMock.setColor).toHaveBeenCalled();
+    it('should set the hint color and add a third hint command if applicable', () => {
+        component.isReplayMode = false;
+        component.thirdHint = true;
+        component.previousTime = 0;
+        component.timerService.eventTimer = 100;
+
+        const command = new ThirdHintColorCommand(component, component.hintColor);
+
+        const clickPosition = [1, 2];
+
+        spyOn(component, 'addCommand');
+
+        component.setColor(clickPosition);
+        expect(component.gameHintService.setColor).toHaveBeenCalled();
+        expect(component.addCommand).toHaveBeenCalledWith(command);
     });
 
     it('getRandomDifference should set hint positions and hintsRemaining on left component', () => {
@@ -712,23 +723,18 @@ describe('SoloViewComponent', () => {
     });
 
     it('should execute an action and increase the command index', fakeAsync(() => {
-        component.commandIndex = 0;
-        component.invoker.commands = [{ action: new EndGameCommand(component), time: 1 }];
-        component.timerService.currentTime = 1;
-        spyOn(component.invoker.commands[0].action, 'execute');
+        const command = new EndGameCommand(component);
+        component.timerService.eventTimer = 1;
+        component.addCommand(command);
+        component.timerService.eventTimer = 2;
         spyOn(component, 'replayGame');
-
         component.replayGame();
-
         tick(50);
 
-        // expect(component.invoker.commands[0].action.execute).toHaveBeenCalled();
-        // expect(component.commandIndex).toEqual(1);
         expect(component.replayGame).toHaveBeenCalled();
     }));
 
     it('should not execute an action if the time is not right', fakeAsync(() => {
-        component.commandIndex = 0;
         component.invoker.commands = [{ action: new EndGameCommand(component), time: 1 }];
         component.timerService.currentTime = 0;
         spyOn(component, 'replayGame');

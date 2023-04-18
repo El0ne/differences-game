@@ -245,14 +245,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     setColor(clickPosition: number[]): void {
         this.hintColor = this.gameHintService.setColor(clickPosition, this.left.convertPositionToPixel(this.left.currentPixelHint));
         if (!this.isReplayMode && this.thirdHint) {
-            // setTimeout(() => {
             if (this.timerService.eventTimer > this.previousTime) {
                 const thirdHintCommand = new ThirdHintColorCommand(this, this.hintColor);
                 this.addCommand(thirdHintCommand);
                 this.previousTime = this.timerService.eventTimer;
             }
-
-            // }, 1000);
         }
     }
 
