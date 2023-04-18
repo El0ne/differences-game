@@ -15,6 +15,5 @@ export class ClickCommand implements Command {
 
     execute(): void {
         this.clickEvent.emitToSoloView(this.data, this.mouseEvent);
-        console.log(this.mouseEvent);
     }
 }

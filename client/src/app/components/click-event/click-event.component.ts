@@ -83,8 +83,7 @@ export class ClickEventComponent implements OnInit {
     getCoordInImage(mouseEvent: MouseEvent): number[] {
         const rect = this.modification.nativeElement.getBoundingClientRect();
         const coordinates = this.pixelModificationService.getCoordInImage(mouseEvent, rect);
-        // const clickCommand = new ClickCommand(coordinates[0], coordinates[1]);
-        // this.soloView.invoker.addCommand(clickCommand, this.soloView.timerService.currentTime);
+
         return coordinates;
     }
 

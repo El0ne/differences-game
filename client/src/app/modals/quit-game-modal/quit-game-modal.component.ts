@@ -19,7 +19,7 @@ export class QuitGameModalComponent {
         private router: Router,
     ) {}
 
-    get gameData() {
+    get gameData(): { isButtonDisabled: boolean } {
         return this.data;
     }
 

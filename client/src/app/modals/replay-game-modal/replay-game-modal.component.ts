@@ -11,11 +11,11 @@ export class ReplayGameModalComponent {
     constructor(private matDialogRef: MatDialogRef<ReplayGameModalComponent>, private router: Router) {}
 
     confirm(): void {
-        this.matDialogRef.close('quit');
+        this.matDialogRef.close(false);
         this.router.navigate(['/home']);
     }
 
     replay(): void {
-        this.matDialogRef.close('replay');
+        this.matDialogRef.close(true);
     }
 }

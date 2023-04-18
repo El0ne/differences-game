@@ -6,7 +6,6 @@ import { ReplayButtonsService } from './replay-buttons.service';
 
 describe('ReplayButtonsService', () => {
     let service: ReplayButtonsService;
-    // const timerService = TestBed.inject(TimerSoloService);
     let timerServiceSpy: jasmine.SpyObj<TimerSoloService>;
     let socketServiceSpy: jasmine.SpyObj<SocketService>;
 

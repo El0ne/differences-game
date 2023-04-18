@@ -161,7 +161,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.socketService.send<RoomManagement>(CHAT_EVENTS.RoomMessage, { room: this.currentRoom, message: validation.originalMessage });
             } else {
                 this.messages.push({ socketId: this.socketService.socketId, message: validation.originalMessage, event: 'notification' });
-                // this.addCommand(new SendMessageCommand(this, data));
             }
         });
         this.socketService.listen<RoomMessage>(CHAT_EVENTS.RoomMessage, (data: RoomMessage) => {
@@ -278,7 +277,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         }
     }
 
-    // TODO : Verifier que ca fonctionne avec temps limite
     handleHint(): void {
         if (this.isClassic)
             this.timerService.restartTimer(this.replayButtonsService.timeMultiplier, this.socketService.socketId, this.gameConstants.hint);
@@ -366,9 +364,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             disableClose: true,
         });
         dialogRef.afterClosed().subscribe((result) => {
-            if (result === 'replay') {
+            if (result === true) {
                 this.resetPropertiesForReplay(this.socketService.socketId);
-            } else if (result === 'continue') {
+            } else {
                 clearTimeout(this.replayTimeoutId);
             }
         });
@@ -551,6 +549,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             }
         }
     }
+
     pauseReplay(): boolean {
         return this.replayButtonsService.pauseReplay(this.isReplayPaused);
     }

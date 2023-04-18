@@ -14,3 +14,7 @@ export enum MATCH_EVENTS {
 }
 
 export const ONE_SECOND = 1000;
+
+export const EVENT_TIMER_INTERVAL = 250;
+
+export const EVENT_TIMER_INCREMENT = 0.25;

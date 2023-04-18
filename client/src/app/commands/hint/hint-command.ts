@@ -1,6 +1,7 @@
+import { Command } from '@app/commands/command';
 import { SoloViewComponent } from '@app/pages/solo-view/solo-view.component';
 
-export class HintCommand {
+export class HintCommand implements Command {
     hintPosX: number;
     hintPosY: number;
     soloView: SoloViewComponent;

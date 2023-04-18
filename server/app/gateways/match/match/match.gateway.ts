@@ -1,7 +1,7 @@
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameHistoryDTO } from '@common/game-history.dto';
-import { MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
+import { EVENT_TIMER_INCREMENT, EVENT_TIMER_INTERVAL, MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
 import { ReplayTimerInformations } from '@common/replay-timer-informations';
 import { Injectable } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -74,14 +74,15 @@ export class MatchGateway implements OnGatewayDisconnect {
     timer(room: string): void {
         let timerCount = 0;
         let eventTimerCount = 0;
+
         const timer = setInterval(() => {
             timerCount++;
             this.server.to(room).emit(MATCH_EVENTS.Timer, timerCount);
         }, ONE_SECOND);
         const eventTimer = setInterval(() => {
-            eventTimerCount += 0.25;
+            eventTimerCount += EVENT_TIMER_INCREMENT;
             this.server.to(room).emit(MATCH_EVENTS.Catch, eventTimerCount);
-        }, 250);
+        }, EVENT_TIMER_INTERVAL);
         this.timers.set(room, timer);
         this.eventTimers.set(room, eventTimer);
     }
@@ -96,9 +97,9 @@ export class MatchGateway implements OnGatewayDisconnect {
             this.server.to(replayInformations.room).emit(MATCH_EVENTS.Timer, Math.max(replayInformations.currentTime, 0));
         }, ONE_SECOND * replayInformations.timeMultiplier);
         const eventTimer = setInterval(() => {
-            time += 0.25;
+            time += EVENT_TIMER_INCREMENT;
             this.server.to(replayInformations.room).emit(MATCH_EVENTS.Catch, time);
-        }, 250 * replayInformations.timeMultiplier);
+        }, EVENT_TIMER_INTERVAL * replayInformations.timeMultiplier);
         this.timers.set(replayInformations.room, timer);
         this.eventTimers.set(replayInformations.room, eventTimer);
     }

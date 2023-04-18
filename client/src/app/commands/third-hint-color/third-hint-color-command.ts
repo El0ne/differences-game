@@ -1,6 +1,7 @@
+import { Command } from '@app/commands/command';
 import { SoloViewComponent } from '@app/pages/solo-view/solo-view.component';
 
-export class ThirdHintColorCommand {
+export class ThirdHintColorCommand implements Command {
     soloView: SoloViewComponent;
     color: string;
 

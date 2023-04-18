@@ -19,11 +19,11 @@ export class GameInfoModalComponent {
         private matDialogRef: MatDialogRef<GameInfoModalComponent>,
     ) {}
 
-    get gameData() {
+    get gameData(): { gameCardInfo: GameCardInformation; numberOfDifferences: number; numberOfPlayers: number; isReplayMode: boolean } {
         return this.data;
     }
 
-    close() {
+    close(): void {
         this.matDialogRef.close();
     }
 }

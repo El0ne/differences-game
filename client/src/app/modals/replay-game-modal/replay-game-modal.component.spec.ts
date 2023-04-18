@@ -37,13 +37,13 @@ describe('ReplayGameModalComponent', () => {
     it('should close the modal and navigate to home page', () => {
         component.confirm();
 
-        expect(matDialogRefMock.close).toHaveBeenCalledWith('quit');
+        expect(matDialogRefMock.close).toHaveBeenCalledWith(false);
         expect(routerMock.navigate).toHaveBeenCalledWith(['/home']);
     });
 
     it('should close the modal', () => {
         component.replay();
 
-        expect(matDialogRefMock.close).toHaveBeenCalledWith('replay');
+        expect(matDialogRefMock.close).toHaveBeenCalledWith(true);
     });
 });
