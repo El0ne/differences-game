@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+// Due to previous implementation, we have too many dependencies related to each other
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -101,8 +102,8 @@ export class GameCreationPageComponent implements OnInit {
         this.penService.writing.bind(this),
     ];
 
-    // eslint-disable-next-line max-params
     // we need more than 3 Services/Routers/Dialogs
+    // eslint-disable-next-line max-params
     constructor(
         private gameCardService: GameCardInformationService,
         public matDialog: MatDialog,
@@ -207,6 +208,7 @@ export class GameCreationPageComponent implements OnInit {
 
     clearFile(canvas: HTMLCanvasElement, id: string, file: File | null): void {
         this.fileManipulationService.clearFile(canvas, id, file);
+        file = null;
     }
 
     async fileValidation(event: Event): Promise<void> {
@@ -238,11 +240,29 @@ export class GameCreationPageComponent implements OnInit {
         });
     }
 
+    drawWhiteCanvas(canvas: HTMLCanvasElement): void {
+        const context = canvas.getContext('2d');
+        if (context) {
+            context.drawImage(this.originalDrawnCanvas.nativeElement, 0, 0);
+            context.fillStyle = 'white';
+
+            context.fillRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+        }
+    }
+
     async save(): Promise<void> {
         const updatedFiles = this.fileManipulationService.updateFiles();
         this.originalFile = updatedFiles[0];
         this.differentFile = updatedFiles[1];
+        if (!this.originalFile) {
+            this.drawWhiteCanvas(this.originalCanvas.nativeElement);
+        }
+
+        if (!this.differentFile) {
+            this.drawWhiteCanvas(this.differenceCanvas.nativeElement);
+        }
         this.isSaveDisabled = true;
+
         const originalBlob = this.mergeCanvas(this.originalCanvas.nativeElement, this.originalDrawnCanvas.nativeElement);
         const differenceBlob = this.mergeCanvas(this.differenceCanvas.nativeElement, this.differenceDrawnCanvas.nativeElement);
         this.gameCardService.uploadImages(originalBlob, differenceBlob, this.differenceRadius).subscribe((data) => {
