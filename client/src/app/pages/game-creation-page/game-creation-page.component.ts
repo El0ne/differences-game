@@ -32,6 +32,7 @@ export class GameCreationPageComponent implements OnInit {
 
     @ViewChild('drawingCanvas1') originalDrawnCanvas: ElementRef;
     @ViewChild('drawingCanvas2') differenceDrawnCanvas: ElementRef;
+
     @ViewChild('drawingCanvas3') differenceRectangleCanvas: ElementRef;
     @ViewChild('drawingCanvas4') originalRectangleCanvas: ElementRef;
 
@@ -213,16 +214,34 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     saveVerification(): boolean {
-        if (this.gameTitle === '' && !this.originalFile && !this.differentFile) {
+        const differenceCanvasContext = this.differenceCanvas.nativeElement.getContext('2d');
+        const originalCanvasContext = this.originalCanvas.nativeElement.getContext('2d');
+
+        differenceCanvasContext.drawImage(this.differenceDrawnCanvas.nativeElement, 0, 0);
+        originalCanvasContext.drawImage(this.originalDrawnCanvas.nativeElement, 0, 0);
+
+        const differenceImageData = differenceCanvasContext.getImageData(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height).data;
+        const originalImageData = originalCanvasContext.getImageData(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height).data;
+
+        if (
+            this.gameTitle === '' &&
+            !originalImageData.some((channel: number) => channel !== 0) &&
+            !differenceImageData.some((channel: number) => channel !== 0)
+        ) {
             alert('Il manque une image et un titre à votre jeu !');
+            console.log('nope');
             return false;
         } else if (this.gameTitle === '') {
             alert("N'oubliez pas d'ajouter un titre à votre jeu !");
+            console.log('nope');
             return false;
-        } else if (!this.originalFile || !this.differentFile) {
+        } else if (!originalImageData.some((channel: number) => channel !== 0) || !differenceImageData.some((channel: number) => channel !== 0)) {
             alert('Un jeu de différences sans image est pour ainsi dire... intéressant ? Ajoutez une image.');
+            console.log('nope');
             return false;
         }
+
+        console.log('ok');
         return true;
     }
 
@@ -247,7 +266,8 @@ export class GameCreationPageComponent implements OnInit {
         const updatedFiles = this.fileManipulationService.updateFiles();
         this.originalFile = updatedFiles[0];
         this.differentFile = updatedFiles[1];
-        if (this.saveVerification() && this.originalFile && this.differentFile) {
+
+        if (this.saveVerification()) {
             this.isSaveDisabled = true;
             const originalBlob = this.mergeCanvas(this.originalCanvas.nativeElement, this.originalDrawnCanvas.nativeElement);
             const differenceBlob = this.mergeCanvas(this.differenceCanvas.nativeElement, this.differenceDrawnCanvas.nativeElement);
