@@ -10,7 +10,11 @@ import { EndGame } from '@common/chat-dialog-constants';
     styleUrls: ['./game-win-modal.component.scss'],
 })
 export class GameWinModalComponent {
-    constructor(private matDialogRef: MatDialogRef<GameWinModalComponent>, private router: Router, @Inject(MAT_DIALOG_DATA) public data: EndGame) {}
+    constructor(private matDialogRef: MatDialogRef<GameWinModalComponent>, private router: Router, @Inject(MAT_DIALOG_DATA) private data: EndGame) {}
+
+    get endGameInfo(): EndGame {
+        return this.data;
+    }
 
     confirm(): void {
         this.matDialogRef.close();
