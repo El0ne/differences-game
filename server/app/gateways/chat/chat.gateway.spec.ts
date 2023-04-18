@@ -153,7 +153,7 @@ describe('ChatGateway', () => {
                 expect(data.message.includes('solo')).toBeTruthy();
             },
         } as any);
-        await gateway.bestTime(socket, FAKE_GAME_HISTORY_SINGLE);
+        await gateway.endGameEvents(socket, FAKE_GAME_HISTORY_SINGLE);
         expect(getGameCardSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_SINGLE.gameId);
         expect(socket.data.isSolo).toBe(false);
         expect(addGameSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_SINGLE);
@@ -176,7 +176,7 @@ describe('ChatGateway', () => {
             },
         } as any);
         FAKE_GAME_HISTORY_SINGLE.player1.hasWon = false;
-        await gateway.bestTime(socket, FAKE_GAME_HISTORY_SINGLE);
+        await gateway.endGameEvents(socket, FAKE_GAME_HISTORY_SINGLE);
         expect(getGameCardSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_SINGLE.gameId);
         expect(socket.data.isSolo).toBe(false);
         expect(addGameSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_SINGLE);
@@ -196,7 +196,7 @@ describe('ChatGateway', () => {
                 expect(data.message.includes('string')).toBeTruthy();
             },
         } as any);
-        gateway.bestTime(socket, FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE);
+        gateway.endGameEvents(socket, FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE);
     });
 
     it('best time should include choose correct ranking', async () => {
@@ -214,7 +214,7 @@ describe('ChatGateway', () => {
                 expect(data.message.includes('solo')).toBeTruthy();
             },
         } as any);
-        gateway.bestTime(socket, FAKE_GAME_HISTORY_SINGLE);
+        gateway.endGameEvents(socket, FAKE_GAME_HISTORY_SINGLE);
         FAKE_GAME_HISTORY_SINGLE.isMultiplayer = true;
     });
 
@@ -238,7 +238,7 @@ describe('ChatGateway', () => {
                 expect(data.message.includes('2')).toBeTruthy();
             },
         } as any);
-        await gateway.bestTime(socket, FAKE_GAME_HISTORY_SINGLE);
+        await gateway.endGameEvents(socket, FAKE_GAME_HISTORY_SINGLE);
         expect(getGameCardSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_SINGLE.gameId);
         expect(socket.data.isSolo).toBe(false);
         expect(addGameSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_SINGLE);
@@ -263,7 +263,7 @@ describe('ChatGateway', () => {
                 expect(data.message.includes('2')).toBeTruthy();
             },
         } as any);
-        await gateway.bestTime(socket, FAKE_GAME_HISTORY_SINGLE);
+        await gateway.endGameEvents(socket, FAKE_GAME_HISTORY_SINGLE);
         expect(getGameCardSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_SINGLE.gameId);
         expect(addGameSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_SINGLE);
         expect(sendSpy).toHaveBeenCalled();
@@ -283,7 +283,7 @@ describe('ChatGateway', () => {
         const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockImplementation();
         jest.spyOn(gameCardService, 'updateGameCard').mockResolvedValue(gameCard);
         const sendSpy = jest.spyOn(server, 'emit');
-        await gateway.bestTime(socket, FAKE_GAME_HISTORY_SINGLE);
+        await gateway.endGameEvents(socket, FAKE_GAME_HISTORY_SINGLE);
         expect(getGameCardSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_SINGLE.gameId);
         expect(socket.data.isSolo).toBe(false);
         expect(addGameSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_SINGLE);
@@ -297,14 +297,14 @@ describe('ChatGateway', () => {
         };
 
         FAKE_GAME_HISTORY_SINGLE.player2.hasAbandon = true;
-        await gateway.bestTime(socket, FAKE_GAME_HISTORY_SINGLE);
+        await gateway.endGameEvents(socket, FAKE_GAME_HISTORY_SINGLE);
         expect(getGameCardSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_SINGLE.gameId);
         expect(socket.data.isSolo).toBe(false);
         expect(addGameSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_SINGLE);
         expect(sendSpy).not.toHaveBeenCalled();
 
         FAKE_GAME_HISTORY_SINGLE.player1.hasAbandon = true;
-        await gateway.bestTime(socket, FAKE_GAME_HISTORY_SINGLE);
+        await gateway.endGameEvents(socket, FAKE_GAME_HISTORY_SINGLE);
         expect(getGameCardSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_SINGLE.gameId);
         expect(socket.data.isSolo).toBe(false);
         expect(addGameSpy).toHaveBeenCalledWith(FAKE_GAME_HISTORY_SINGLE);
@@ -363,7 +363,7 @@ describe('ChatGateway', () => {
         socket.data.room = undefined;
         socket.data.isSolo = true;
         socket.data.soloGame = FAKE_GAME_HISTORY_SINGLE;
-        const bestTimeSpy = jest.spyOn(gateway, 'bestTime').mockImplementation();
+        const bestTimeSpy = jest.spyOn(gateway, 'endGameEvents').mockImplementation();
         gateway.handleDisconnect(socket);
         expect(bestTimeSpy).toHaveBeenCalledWith(socket, FAKE_GAME_HISTORY_SINGLE);
     });
@@ -375,6 +375,51 @@ describe('ChatGateway', () => {
         const expectedDate = gateway.dateCreator();
         expect(expectedDate.includes(hour)).toBe(true);
         expect(expectedDate.includes(minutes)).toBe(true);
+    });
+
+    it('addGameTimeHistory should add game History', () => {
+        const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockImplementation();
+        gateway.addGameTimeHistory(socket, FAKE_GAME_HISTORY_SINGLE);
+        expect(addGameSpy).toHaveBeenCalled();
+    });
+
+    it('limitedEndGame should calculate time duration of limited game and call addGameTimeHistory ', () => {
+        const addGameTimeHistorySpy = jest.spyOn(gateway, 'addGameTimeHistory').mockImplementation();
+        gateway.limitedEndGame(socket, FAKE_GAME_HISTORY_SINGLE);
+        expect(addGameTimeHistorySpy).toHaveBeenCalled();
+    });
+
+    it('handleDisconnect should add gameTimeHistory in solo mode', () => {
+        socket.data.isLimitedSolo = true;
+        socket.data.limitedHistory = FAKE_GAME_HISTORY_SINGLE;
+        stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
+        server.to.returns({
+            emit: (event: string, data: RoomMessage) => {
+                expect(event).toEqual(CHAT_EVENTS.Abandon);
+                expect(data.event).toEqual('notification');
+                expect(data.socketId).toEqual('id');
+            },
+        } as any);
+        const addGameTimeHistorySpy = jest.spyOn(gateway, 'addGameTimeHistory').mockImplementation();
+        gateway.handleDisconnect(socket);
+        expect(addGameTimeHistorySpy).toHaveBeenCalled();
+    });
+
+    it('updateBestTime should update the game card', async () => {
+        const updateGameCardSpy = jest.spyOn(gameCardService, 'updateGameCard').mockImplementation();
+        jest.spyOn(gameCardService, 'getGameCardById').mockResolvedValue(gameCard);
+        const gameHistory = FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE;
+        gameHistory.player1.hasWon = false;
+        await gateway.updateBestTime(gameHistory);
+        expect(updateGameCardSpy).toHaveBeenCalled();
+    });
+
+    it('broadcastNewBestTime should send broadcast to all sockets of new best time', () => {
+        const gameHistory = FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE;
+        gameHistory.player1.hasWon = false;
+        const emitSpy = jest.spyOn(server, 'emit').mockImplementation();
+        gateway.broadcastNewBestTime(gameHistory, gameCard);
+        expect(emitSpy).toHaveBeenCalled();
     });
 });
 

@@ -1,4 +1,3 @@
-import { GameHistoryService } from '@app/services/game-history/game-history.service';
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { DifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameHistoryDTO } from '@common/game-history.dto';
@@ -14,7 +13,7 @@ import { Server, Socket } from 'socket.io';
 export class MatchGateway implements OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
     timers: Map<string, ReturnType<typeof setInterval>> = new Map<string, ReturnType<typeof setInterval>>();
-    constructor(private gameManagerService: GameManagerService, private gameHistoryService: GameHistoryService) {}
+    constructor(private gameManagerService: GameManagerService) {}
 
     @SubscribeMessage(MATCH_EVENTS.createSoloGame)
     async createSoloGame(@ConnectedSocket() socket: Socket, @MessageBody() gameInfo: SoloGameCreation): Promise<void> {
