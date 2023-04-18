@@ -57,6 +57,7 @@ export class ClickEventComponent implements OnInit, OnChanges {
     }
 
     loadImage(): void {
+        // TODO peut etre dans le nGonInit demander a julien
         this.modification.nativeElement.addEventListener('mousemove', this.handleMouseMove.bind(this));
 
         const image = new Image();

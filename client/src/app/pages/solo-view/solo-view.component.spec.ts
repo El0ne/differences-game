@@ -648,6 +648,11 @@ describe('SoloViewComponent', () => {
         component.effectHandler(MOCK_PLAYER_DIFFERENCES);
         expect(sendSpy).toHaveBeenCalledWith(LIMITED_TIME_MODE_EVENTS.Timer, TWO_MINUTES);
     });
+
+    it('getter of socketId should return the id in socketService', () => {
+        Object.defineProperty(socketServiceMock, 'socketId', { value: 'test' });
+        expect(component.socketId).toEqual('test');
+    });
 });
 
 const MOCK_INFORMATION: DifferenceInformation = {

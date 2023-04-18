@@ -44,6 +44,7 @@ export class LimitedTimeComponent implements OnInit, OnDestroy {
         this.socketService.delete(WAITING_ROOM_EVENTS.MatchCreated);
         this.socketService.delete(WAITING_ROOM_EVENTS.MatchDeleted);
         this.socketService.delete(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame);
+        this.socketService.delete(LIMITED_TIME_MODE_EVENTS.AbortLimitedTimeGame);
     }
 
     hostOrJoinGame(): void {
@@ -59,14 +60,21 @@ export class LimitedTimeComponent implements OnInit, OnDestroy {
         this.dialog.open(WaitingRoomComponent, { disableClose: true, data });
     }
 
+    configureSocketForGame() {
+        this.socketService.listen<string>(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, (stageId: string) => {
+            this.gameParamService.gameParameters.stageId = stageId;
+            this.router.navigate(['/game']);
+        });
+        this.socketService.listen(LIMITED_TIME_MODE_EVENTS.AbortLimitedTimeGame, () => {
+            alert("Il n'y a pas de parties disponibles pour jouer en mode temps limité");
+        });
+    }
+
     selectPlayerName(isMultiplayerGame: boolean): void {
         const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true });
         dialogRef.afterClosed().subscribe((isNameEntered: boolean) => {
             if (isNameEntered) {
-                this.socketService.listen<string>(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, (stageId: string) => {
-                    this.gameParamService.gameParameters.stageId = stageId;
-                    this.router.navigate(['/game']);
-                });
+                this.configureSocketForGame();
                 this.gameParamService.gameParameters = {
                     isLimitedTimeGame: true,
                     isMultiplayerGame,

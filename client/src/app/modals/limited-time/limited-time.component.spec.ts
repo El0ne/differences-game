@@ -139,13 +139,23 @@ describe('LimitedTimeComponent', () => {
     });
 
     it('StartLimitedTimeGame event should redirect to the gamePage and set the first stageId for gameParamService', () => {
-        // const navigateSpy = spyOn(routerSpy, 'navigate');
         socketServiceSpy.listen = (event: string, callback: any) => {
             if (event === LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame) callback('stageId');
         };
-        component.ngOnInit();
+        component.configureSocketForGame();
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/game']);
         expect(gameParamService.gameParameters.stageId).toBe('stageId');
+    });
+
+    it('configureSocketForGame should listen for AbortLimitedTimeGame', () => {
+        socketServiceSpy.listen = (event: string, callback: any) => {
+            if (event === LIMITED_TIME_MODE_EVENTS.AbortLimitedTimeGame) callback();
+        };
+        spyOn(window, 'alert').and.callFake(() => {
+            return;
+        });
+        component.configureSocketForGame();
+        expect(window.alert).toHaveBeenCalled();
     });
 
     it('closeModal should close the dialog when closeModal() is called', () => {
