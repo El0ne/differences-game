@@ -60,7 +60,7 @@ export class GameCardSelectionComponent implements OnInit {
     }
 
     selectPlayerName(isSoloGame: boolean): void {
-        const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true });
+        const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true, data: { isChosingGameTitle: false } });
         dialogRef.afterClosed().subscribe(() => {
             if (isSoloGame) {
                 this.socketService.gameRoom = this.socketService.socketId;
