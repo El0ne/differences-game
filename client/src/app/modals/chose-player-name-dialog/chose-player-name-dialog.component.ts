@@ -24,7 +24,7 @@ export class ChosePlayerNameDialogComponent {
     validateName(): void {
         const testName = this.playerName;
         if (testName.replace(/\s/g, '') !== '') {
-            if (this.isChosingGameTitle) {
+            if (!this.isChosingGameTitle) {
                 this.socketService.names.set(this.socketService.socketId, testName);
             }
             this.dialogRef.close(testName);

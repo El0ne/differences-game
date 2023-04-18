@@ -234,8 +234,7 @@ export class GameCreationPageComponent implements OnInit {
         const dialogRef = this.matDialog.open(ChosePlayerNameDialogComponent, { disableClose: true, data: { isChosingGameTitle: true } });
         dialogRef.afterClosed().subscribe((gameTitle: string) => {
             this.gameTitle = gameTitle;
-            console.log(this.gameTitle);
-            // this.save();
+            this.save();
         });
     }
 
