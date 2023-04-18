@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import { MatchGateway } from '@app/gateways/match/match1/match.gateway';
+import { MatchGateway } from '@app/gateways/match/match.gateway';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { LIMITED_TIME_MODE_EVENTS } from '@common/match-gateway-communication';
