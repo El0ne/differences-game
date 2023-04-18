@@ -280,3 +280,10 @@ button {
     align-self: center;
     text-align: center;
 }
+
+.normal-button:disabled,
+.normal-button[disabled] {
+    border: 1px solid #424242;
+    background-color: #666666;
+    color: #999999;
+}

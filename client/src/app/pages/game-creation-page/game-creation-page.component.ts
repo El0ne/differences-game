@@ -216,9 +216,11 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     mergeCanvas(canvas: HTMLCanvasElement, canvas2: HTMLCanvasElement): Blob {
-        const context = canvas.getContext('2d');
-        if (context) {
-            context.drawImage(canvas2, 0, 0);
+        const contextCanvas = canvas.getContext('2d');
+        const contextCanvas2 = canvas2.getContext('2d');
+        if (contextCanvas && contextCanvas2) {
+            contextCanvas.drawImage(canvas2, 0, 0);
+            contextCanvas2.clearRect(0, 0, canvas2.width, canvas2.height);
         }
 
         return this.createBlob(canvas);
@@ -233,6 +235,8 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     async choseGameTitle(): Promise<void> {
+        this.isSaveDisabled = true;
+
         const dialogRef = this.matDialog.open(ChosePlayerNameDialogComponent, { disableClose: true, data: { isChosingGameTitle: true } });
         dialogRef.afterClosed().subscribe((gameTitle: string) => {
             this.gameTitle = gameTitle;
@@ -261,10 +265,10 @@ export class GameCreationPageComponent implements OnInit {
         if (!this.differentFile) {
             this.drawWhiteCanvas(this.differenceCanvas.nativeElement);
         }
-        this.isSaveDisabled = true;
 
         const originalBlob = this.mergeCanvas(this.originalCanvas.nativeElement, this.originalDrawnCanvas.nativeElement);
         const differenceBlob = this.mergeCanvas(this.differenceCanvas.nativeElement, this.differenceDrawnCanvas.nativeElement);
+
         this.gameCardService.uploadImages(originalBlob, differenceBlob, this.differenceRadius).subscribe((data) => {
             if (data.gameDifferenceNumber) {
                 this.createdGameInfo = {
