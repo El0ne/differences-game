@@ -241,7 +241,7 @@ describe('SoloViewComponent', () => {
     });
 
     it('showTime should call startTimer of service', () => {
-        const startTimerSpy = spyOn(component.timerService, 'startTimer');
+        const startTimerSpy = spyOn(component['timerService'], 'startTimer');
 
         component.showTime();
 
@@ -302,7 +302,7 @@ describe('SoloViewComponent', () => {
 
     it('should close all modals', () => {
         component.closeModals();
-        expect(component.dialog.closeAll).toHaveBeenCalled();
+        expect(component['dialog'].closeAll).toHaveBeenCalled();
     });
 
     it('should open the quit game modal with disableClose set to true', () => {
@@ -327,8 +327,8 @@ describe('SoloViewComponent', () => {
         dialogRefSpy.afterClosed.and.returnValue(of());
         modalSpy.open.and.returnValue(dialogRefSpy);
         spyOn(component, 'addCommand');
-        spyOn(component.timerService, 'stopTimer');
-        spyOn(component.timerService, 'restartTimer');
+        spyOn(component['timerService'], 'stopTimer');
+        spyOn(component['timerService'], 'restartTimer');
         component.quitGameReplay();
         expect(modalSpy.open).toHaveBeenCalledWith(QuitGameModalComponent, {
             data: {
@@ -336,7 +336,7 @@ describe('SoloViewComponent', () => {
             },
             disableClose: true,
         });
-        expect(component.timerService.stopTimer).toHaveBeenCalledWith(component.socketService.socketId);
+        expect(component['timerService'].stopTimer).toHaveBeenCalledWith(component.socketService.socketId);
     });
 
     it("should add the input's command when input is changing", fakeAsync(() => {
@@ -433,6 +433,7 @@ describe('SoloViewComponent', () => {
         component.currentScorePlayer = 2;
         component.numberOfDifferences = 2;
         const sendSpy = spyOn(socketServiceMock, 'send');
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         const notifyBestTimeSpy = spyOn(component, 'notifyNewBestTime').and.callFake(() => {});
         spyOn(component, 'winGame');
         component.endGameVerification();
@@ -443,7 +444,7 @@ describe('SoloViewComponent', () => {
 
     it('should reset properties once replay modal is closed by clicking on the replay button', () => {
         const dialogRefSpy: jasmine.SpyObj<MatDialogRef<ReplayGameModalComponent>> = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
-        dialogRefSpy.afterClosed.and.returnValue(of('replay'));
+        dialogRefSpy.afterClosed.and.returnValue(of(true));
         modalSpy.open.and.returnValue(dialogRefSpy);
         spyOn(component, 'resetPropertiesForReplay');
 
@@ -457,7 +458,7 @@ describe('SoloViewComponent', () => {
 
     it('should clear timeout once replay modal is closed by clicking on the continue button', () => {
         const dialogRefSpy: jasmine.SpyObj<MatDialogRef<ReplayGameModalComponent>> = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
-        dialogRefSpy.afterClosed.and.returnValue(of('continue'));
+        dialogRefSpy.afterClosed.and.returnValue(of(false));
         modalSpy.open.and.returnValue(dialogRefSpy);
         spyOn(window, 'clearTimeout');
 
@@ -582,7 +583,7 @@ describe('SoloViewComponent', () => {
         component.isReplayMode = false;
         component.thirdHint = true;
         component.previousTime = 0;
-        component.timerService.eventTimer = 100;
+        component['timerService'].eventTimer = 100;
 
         const command = new ThirdHintColorCommand(component, component.hintColor);
 
@@ -692,7 +693,7 @@ describe('SoloViewComponent', () => {
         component.player = 'player';
         component.currentGameId = '0';
         component.opponent = 'loser';
-        component.timerService.currentTime = 23;
+        component['timerService'].currentTime = 23;
         component.startTime = 'date';
         const sendSpy = spyOn(socketServiceMock, 'send');
         component.notifyNewBestTime('playerId', false, 'classique');
@@ -703,7 +704,7 @@ describe('SoloViewComponent', () => {
         component.player = 'loser';
         component.currentGameId = '0';
         component.opponent = 'opponent';
-        component.timerService.currentTime = 23;
+        component['timerService'].currentTime = 23;
         component.startTime = 'date';
         const sendSpy = spyOn(socketServiceMock, 'send');
         component.notifyNewBestTime('opponentId', false, 'classique');
@@ -711,22 +712,22 @@ describe('SoloViewComponent', () => {
     });
 
     it('should pause replay', () => {
-        spyOn(component.replayButtonsService, 'pauseReplay').and.returnValue(true);
+        spyOn(component['replayButtonsService'], 'pauseReplay').and.returnValue(true);
         const result = component.pauseReplay();
         expect(result).toBeTruthy();
     });
 
     it('should fast forward replay', () => {
-        spyOn(component.replayButtonsService, 'fastForwardReplay');
+        spyOn(component['replayButtonsService'], 'fastForwardReplay');
         component.fastForwardReplay(2);
-        expect(component.replayButtonsService.fastForwardReplay).toHaveBeenCalledWith(2);
+        expect(component['replayButtonsService'].fastForwardReplay).toHaveBeenCalledWith(2);
     });
 
     it('should execute an action and increase the command index', fakeAsync(() => {
         const command = new EndGameCommand(component);
-        component.timerService.eventTimer = 1;
+        component['timerService'].eventTimer = 1;
         component.addCommand(command);
-        component.timerService.eventTimer = 2;
+        component['timerService'].eventTimer = 2;
         spyOn(component, 'replayGame');
         component.replayGame();
         tick(50);
@@ -736,7 +737,7 @@ describe('SoloViewComponent', () => {
 
     it('should not execute an action if the time is not right', fakeAsync(() => {
         component.invoker.commands = [{ action: new EndGameCommand(component), time: 1 }];
-        component.timerService.currentTime = 0;
+        component['timerService'].currentTime = 0;
         spyOn(component, 'replayGame');
 
         component.replayGame();
@@ -756,17 +757,17 @@ describe('SoloViewComponent', () => {
 
     it('should reset properties for replay', () => {
         spyOn(component, 'replayGame');
-        spyOn(component.timerService, 'restartTimer');
+        spyOn(component['timerService'], 'restartTimer');
         component.resetPropertiesForReplay('room1');
 
         expect(component.isReplayMode).toBeTrue();
-        expect(component.timerService.currentTime).toEqual(0);
+        expect(component['timerService'].currentTime).toEqual(0);
         expect(component.messages).toEqual([]);
         expect(component.currentScoreOpponent).toEqual(0);
         expect(component.currentScoreOpponent).toEqual(0);
-        expect(component.timerService.restartTimer).toHaveBeenCalledWith(1, 'room1', 0);
+        expect(component['timerService'].restartTimer).toHaveBeenCalledWith(1, 'room1', 0);
         expect(component.commandIndex).toEqual(0);
-        expect(component.foundDifferenceService.clearDifferenceFound).toHaveBeenCalled();
+        expect(component['foundDifferenceService'].clearDifferenceFound).toHaveBeenCalled();
         expect(component.showNavBar).toBeTrue();
         expect(component.left.endGame).toBeFalse();
         expect(component.right.endGame).toBeFalse();

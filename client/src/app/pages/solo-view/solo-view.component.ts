@@ -91,16 +91,16 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     // we have more than 3 services
     // eslint-disable-next-line max-params
     constructor(
-        public timerService: TimerSoloService,
+        private timerService: TimerSoloService,
         private gameCardInfoService: GameCardInformationService,
-        public foundDifferenceService: FoundDifferenceService,
+        private foundDifferenceService: FoundDifferenceService,
         private route: ActivatedRoute,
-        public dialog: MatDialog,
+        private dialog: MatDialog,
         private router: Router,
         public socketService: SocketService,
         private gameConstantsService: GameConstantsService,
         public gameHintService: GameHintService,
-        public replayButtonsService: ReplayButtonsService,
+        private replayButtonsService: ReplayButtonsService,
     ) {}
 
     get socketId(): string {
