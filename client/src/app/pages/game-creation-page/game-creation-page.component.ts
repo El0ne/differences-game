@@ -105,8 +105,8 @@ export class GameCreationPageComponent implements OnInit {
     // eslint-disable-next-line max-params
     constructor(
         private gameCardService: GameCardInformationService,
-        public matDialog: MatDialog,
-        public router: Router,
+        private matDialog: MatDialog,
+        private router: Router,
         private fileManipulationService: FileManipulationService,
         private canvasSelectionService: CanvasSelectionService,
         private penService: PenService,

@@ -284,7 +284,7 @@ describe('SoloViewComponent', () => {
     });
 
     it('showTime should call startTimer of service', () => {
-        const startTimerSpy = spyOn(component.timerService, 'startTimer');
+        const startTimerSpy = spyOn(component['timerService'], 'startTimer');
 
         component.showTime();
 
@@ -607,7 +607,7 @@ describe('SoloViewComponent', () => {
         component.player = 'player';
         spyOnProperty(component, 'stageId', 'get').and.returnValue('0');
         component.opponent = 'loser';
-        component.timerService.currentTime = 23;
+        component['timerService'].currentTime = 23;
         component.startTime = 'date';
         const sendSpy = spyOn(socketServiceMock, 'send');
         component.notifyNewBestTime('playerId', false, 'classique');
@@ -618,7 +618,7 @@ describe('SoloViewComponent', () => {
         component.player = 'loser';
         spyOnProperty(component, 'stageId', 'get').and.returnValue('0');
         component.opponent = 'opponent';
-        component.timerService.currentTime = 23;
+        component['timerService'].currentTime = 23;
         component.startTime = 'date';
         const sendSpy = spyOn(socketServiceMock, 'send');
         component.notifyNewBestTime('opponentId', false, 'classique');
@@ -636,14 +636,14 @@ describe('SoloViewComponent', () => {
 
     it('effect handler should update time in limited time mode', () => {
         Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: true });
-        component.timerService.currentTime = 90;
+        component['timerService'].currentTime = 90;
         component.gameConstants.difference = 10;
         socketServiceMock.gameRoom = 'test';
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.effectHandler(MOCK_PLAYER_DIFFERENCES);
         expect(sendSpy).toHaveBeenCalledWith(LIMITED_TIME_MODE_EVENTS.Timer, 100);
 
-        component.timerService.currentTime = 120;
+        component['timerService'].currentTime = 120;
         component.gameConstants.difference = 10;
         component.effectHandler(MOCK_PLAYER_DIFFERENCES);
         expect(sendSpy).toHaveBeenCalledWith(LIMITED_TIME_MODE_EVENTS.Timer, TWO_MINUTES);

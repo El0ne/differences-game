@@ -46,7 +46,7 @@ describe('ModalPageComponent', () => {
         dialogRefSpyObject = jasmine.createSpyObj({ afterClosed: of({}), close: null });
         fixture = TestBed.createComponent(ModalPageComponent);
         component = fixture.componentInstance;
-        component.matDialogRef = dialogRefSpyObject;
+        component['matDialogRef'] = dialogRefSpyObject;
         fixture.detectChanges();
         gameCardService = TestBed.inject(GameCardInformationService);
         clickService = TestBed.inject(ClickEventService);
@@ -68,7 +68,7 @@ describe('ModalPageComponent', () => {
         const deleteDifferencesMock = spyOn(clickService, 'deleteDifferences').and.returnValue(of());
         const deleteImagesObjectMock = spyOn(imagesServices, 'deleteImageObjects').and.returnValue(of());
 
-        component.data = {
+        component['data'] = {
             image: 'string',
             difference: 0,
             difficulty: 'e',
@@ -76,8 +76,8 @@ describe('ModalPageComponent', () => {
         };
         component.dropGame();
 
-        expect(deleteDifferencesMock).toHaveBeenCalledOnceWith(component.data.gameInfo._id);
-        expect(deleteImagesObjectMock).toHaveBeenCalledOnceWith(component.data.gameInfo._id);
+        expect(deleteDifferencesMock).toHaveBeenCalledOnceWith(component['data'].gameInfo._id);
+        expect(deleteImagesObjectMock).toHaveBeenCalledOnceWith(component['data'].gameInfo._id);
         expect(redirectionMock).toHaveBeenCalledOnceWith('/creatingGame');
     });
 
@@ -85,6 +85,18 @@ describe('ModalPageComponent', () => {
         component.createGame();
 
         expect(dialogRefSpyObject.close).toHaveBeenCalled();
+    });
+
+    it('getter should return the good elements', () => {
+        component['data'] = {
+            image: 'string',
+            difference: 0,
+            difficulty: 'e',
+            gameInfo: getFakeGameCardDTO(),
+        };
+        expect(component.image).toEqual(component['data'].image);
+        expect(component.difference).toEqual(component['data'].difference);
+        expect(component.difficulty).toEqual(component['data'].difficulty);
     });
 });
 

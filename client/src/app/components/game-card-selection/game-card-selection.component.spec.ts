@@ -11,6 +11,8 @@ import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-di
 import { WaitingRoomComponent, WaitingRoomDataPassing } from '@app/modals/waiting-room/waiting-room.component';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { GameParametersService } from '@app/services/game-parameters/game-parameters.service';
+import { ImagesService } from '@app/services/images/images.service';
+import { IMAGE } from '@app/services/server-routes';
 import { SocketService } from '@app/services/socket/socket.service';
 import { MATCH_EVENTS, SoloGameCreation } from '@common/match-gateway-communication';
 import { JoinHostInWaitingRequest, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
@@ -20,8 +22,6 @@ import { GameCardSelectionComponent } from './game-card-selection.component';
 describe('GameCardSelectionComponent', () => {
     let component: GameCardSelectionComponent;
     let fixture: ComponentFixture<GameCardSelectionComponent>;
-    const gameCardServiceSpyObj = jasmine.createSpyObj('GameCardInformationService', ['resetBestTime']);
-    gameCardServiceSpyObj.resetBestTime.and.returnValue(of());
     let modalSpy: MatDialog;
     let choseNameAfterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
     let waitingRoomAfterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
@@ -46,12 +46,8 @@ describe('GameCardSelectionComponent', () => {
             imports: [MatIconModule, RouterTestingModule, HttpClientTestingModule],
             providers: [
                 { provide: MatDialog, useValue: modalSpy },
-                {
-                    provide: SocketService,
-                    useValue: socketServiceSpy,
-                },
+                { provide: SocketService, useValue: socketServiceSpy },
                 { provide: GameParametersService, useValue: gameParamService },
-                { provide: GameCardInformationService, useValue: gameCardServiceSpyObj },
             ],
             teardown: { destroyAfterEach: false },
         }).compileComponents();
@@ -60,6 +56,13 @@ describe('GameCardSelectionComponent', () => {
         component = fixture.componentInstance;
         component.gameCardInformation = GAMES[0];
         fixture.detectChanges();
+    });
+
+    it('ngOnInit should call set the image after the HTTP call', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn(TestBed.inject(ImagesService), 'getImageNames').and.returnValue(of({ originalImageName: 'image' }) as any);
+        component.ngOnInit();
+        expect(component.image).toEqual(`${IMAGE}/file/image`);
     });
 
     it('should create', () => {
@@ -72,8 +75,10 @@ describe('GameCardSelectionComponent', () => {
     });
 
     it('resetBestTimes() should call resetBestTime from the service', () => {
+        spyOn(TestBed.inject(GameCardInformationService), 'resetBestTime').and.returnValue(of(undefined));
+        const spy = spyOn(component.refreshGameCard, 'emit');
         component.resetBestTimes();
-        expect(gameCardServiceSpyObj.resetBestTime).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalled();
     });
 
     it('selectPlayerName should redirect to solo view after opening the modal if in soloGame', () => {

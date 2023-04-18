@@ -21,7 +21,7 @@ export class GameSelectionComponent implements OnInit, OnDestroy {
     index: number = 0;
     isConfig: boolean | null;
 
-    constructor(public gameCardService: GameCardInformationService, public router: Router, private socket: SocketService) {}
+    constructor(private gameCardService: GameCardInformationService, private router: Router, private socket: SocketService) {}
 
     ngOnInit(): void {
         this.isConfig = this.router.url === '/config';

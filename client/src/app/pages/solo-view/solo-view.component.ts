@@ -5,7 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { HEIGHT, MAX_EFFECT_TIME, WIDTH } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
-import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
+import { GameInfoModalComponent, GameInfoModalData } from '@app/modals/game-info-modal/game-info-modal.component';
 import { GameLoseModalComponent } from '@app/modals/game-lose-modal/game-lose-modal.component';
 import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal.component';
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
@@ -67,12 +67,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     // we have more than 3 services
     // eslint-disable-next-line max-params
     constructor(
-        public timerService: TimerSoloService,
+        private timerService: TimerSoloService,
         private gameCardInfoService: GameCardInformationService,
         private foundDifferenceService: FoundDifferenceService,
         private dialog: MatDialog,
         private router: Router,
-        public socketService: SocketService,
+        private socketService: SocketService,
         private gameConstantsService: GameConstantsService,
         private gameParamService: GameParametersService,
         private imagesService: ImagesService,
@@ -89,6 +89,10 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     get isMultiplayer(): boolean {
         return this.gameParamService.gameParameters.isMultiplayerGame;
+    }
+
+    get socketId(): string {
+        return this.socketService.socketId;
     }
 
     ngOnInit(): void {
@@ -248,10 +252,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     getRandomDifference(event: KeyboardEvent | null): void {
-        console.log(event);
-        console.log(this.isMultiplayer);
-        console.log(this.gameParamService.gameParameters.isMultiplayerGame);
-        console.log(this.gameHintService.hintsRemaining);
         if (event?.key === 'i' && !this.isMultiplayer && this.gameHintService.hintsRemaining > 0) {
             // TODO : Verifier que ca fonctionne avec temps limite
             if (!this.isLimitedTimeMode) this.timerService.restartTimer(1, this.gameConstants.hint);
@@ -381,7 +381,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 gameCardInfo: this.gameCardInfo,
                 numberOfDifferences: this.numberOfDifferences,
                 numberOfPlayers: this.isMultiplayer ? 2 : 1,
-            },
+            } as GameInfoModalData,
         });
     }
 

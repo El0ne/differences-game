@@ -36,4 +36,8 @@ describe('ConfirmationModalComponent', () => {
         component.confirm();
         expect(matDialogRefMock.close).toHaveBeenCalledWith(true);
     });
+
+    it('message getter should get the informations in data', () => {
+        expect(component.message).toBe('message');
+    });
 });
