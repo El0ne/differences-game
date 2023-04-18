@@ -34,6 +34,7 @@ export class GameCreationPageComponent implements OnInit {
 
     @ViewChild('drawingCanvas1') originalDrawnCanvas: ElementRef;
     @ViewChild('drawingCanvas2') differenceDrawnCanvas: ElementRef;
+
     @ViewChild('drawingCanvas3') differenceRectangleCanvas: ElementRef;
     @ViewChild('drawingCanvas4') originalRectangleCanvas: ElementRef;
 
