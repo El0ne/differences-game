@@ -226,6 +226,9 @@ describe('SoloViewComponent', () => {
                 case CHAT_EVENTS.Abandon: {
                     Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: true });
                     callback({ socketId: 'abandon', message: 'abandon' });
+                    component.left.endGame = true;
+                    callback({ socketId: 'abandon', message: 'abandon' });
+                    component.left.endGame = false;
                     Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: false });
                     callback({ socketId: 'abandon', message: 'abandon' });
                     break;

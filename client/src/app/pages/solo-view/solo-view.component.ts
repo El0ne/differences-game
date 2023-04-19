@@ -135,7 +135,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.limitedSoloDto = {
                     gameId: 'Limited',
                     gameName: 'Limited',
-                    gameMode: 'Temps Limitée',
+                    gameMode: 'Temps Limité',
                     gameDuration: Date.now(),
                     startTime: this.startTime,
                     isMultiplayer: this.isMultiplayer,
@@ -192,6 +192,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.messages.push(data);
         });
         this.socketService.listen<RoomMessage>(CHAT_EVENTS.Abandon, (message: RoomMessage) => {
+            if (this.left.endGame && this.isLimitedTimeMode) {
+                this.notifyEndGameLimitedTime();
+            }
             if (!this.left.endGame) {
                 message.message = `${message.message} - ${this.opponent} a abandonné la partie.`;
                 this.messages.push(message);
@@ -212,6 +215,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.gameCompletion(true, socketId);
         });
         this.socketService.listen<string>(MATCH_EVENTS.Lose, () => {
+            if (this.limitedSoloDto || (!this.isMultiplayer && this.limitedMultiDto)) {
+                this.notifyEndGameLimitedTime();
+            }
             this.gameCompletion(false);
         });
     }
