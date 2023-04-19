@@ -355,17 +355,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     getRandomDifference(event: KeyboardEvent | null): void {
         if (event?.key === 'i' && !this.isMultiplayer && this.gameHintService.hintsRemaining > 0) {
-            if (!this.isLimitedTimeMode) this.timerService.restartTimer(1, this.gameConstants.hint);
-            else {
-                const timeLeft = this.timerService.currentTime - this.gameConstants.hint;
-                if (timeLeft > 0) {
-                    this.socketService.send<number>(LIMITED_TIME_MODE_EVENTS.Timer, timeLeft);
-                } else {
-                    this.timerService.stopTimer();
-                    this.socketService.send(MATCH_EVENTS.Lose);
-                    return;
-                }
-            }
             if (this.hintsRemaining() > 0) this.socketService.send(CHAT_EVENTS.Hint);
             this.left.getDifferences(this.stageId).subscribe((data) => {
                 const pixelArray = this.foundDifferenceService.findPixelsFromDifference(data);
@@ -388,6 +377,18 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
                 this.setCurrentHint();
                 this.hintTimeouts();
+
+                if (!this.isLimitedTimeMode) this.timerService.restartTimer(1, this.gameConstants.hint);
+                else {
+                    const timeLeft = this.timerService.currentTime - this.gameConstants.hint;
+                    if (timeLeft > 0) {
+                        this.socketService.send<number>(LIMITED_TIME_MODE_EVENTS.Timer, timeLeft);
+                    } else {
+                        this.timerService.stopTimer();
+                        this.socketService.send(MATCH_EVENTS.Lose);
+                        return;
+                    }
+                }
             });
         }
     }
@@ -503,8 +504,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 });
                 dialogRef.afterClosed().subscribe((isReplaySelected) => {
                     if (isReplaySelected) {
-                        this.socketService.send<string>(MATCH_EVENTS.leaveRoom, this.socketService.gameRoom);
-                        this.socketService.send<string>(MATCH_EVENTS.joinReplayRoom, this.socketService.socketId);
+                        this.socketService.send<string>(MATCH_EVENTS.leaveAndJoinReplayRoom);
                         this.resetPropertiesForReplay();
                     }
                 });
@@ -693,9 +693,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     replayGame(): void {
+        console.log('replay-game');
         this.replayTimeoutId = setTimeout(() => {
             const command = this.invoker.commands[this.commandIndex];
             if (command.time <= this.timerService.eventTimer) {
+                console.log(command.action);
                 command.action.execute();
                 this.commandIndex++;
 

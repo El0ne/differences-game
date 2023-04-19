@@ -3,6 +3,7 @@
     <div class="nav-bar">
         <div class="options" *ngIf="showNavBar">
             <button
+                *ngIf="!isLimitedTimeMode"
                 id="infoButton"
                 class="normal-button option-buttons"
                 type="button"

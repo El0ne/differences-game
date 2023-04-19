@@ -7,8 +7,7 @@ export const enum MATCH_EVENTS {
     Win = 'Win',
     SoloGameInformation = 'SoloGameInformation',
     Time = 'Time',
-    leaveRoom = 'leaveRoom',
-    joinReplayRoom = 'joinReplayRoom',
+    leaveAndJoinReplayRoom = 'leaveAndJoinReplayRoom',
     TimeModification = 'TimeModification',
     Catch = 'Catch',
 
