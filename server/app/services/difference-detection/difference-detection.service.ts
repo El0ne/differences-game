@@ -3,12 +3,7 @@ import { ImageDimensionsService } from '@app/services/image-dimensions/image-dim
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { Injectable } from '@nestjs/common';
 import * as Jimp from 'jimp';
-
-export const RGBA_DATA_LENGTH = 4;
-const RGB_DATA_LENGTH = 3;
-export const BLACK = 0x00;
-const WHITE = 'white';
-const DIFFERENCE_IMAGE_PATH = 'assets/images/difference-image.bmp';
+import { BLACK, DIFFERENCE_IMAGE_PATH, RGBA_DATA_LENGTH, RGB_DATA_LENGTH, WHITE } from './difference-detection.const';
 
 @Injectable()
 export class DifferenceDetectionService {

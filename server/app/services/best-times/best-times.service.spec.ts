@@ -8,7 +8,8 @@ import { MongooseModule, getConnectionToken, getModelToken } from '@nestjs/mongo
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection, Model, Query } from 'mongoose';
-import { BestTimesService, GENERATED_NAME_LENGTH, MINIMUM_GENERATED_TIME, TIME_MULTIPLIER } from './best-times.service';
+import { GENERATED_NAME_LENGTH, MINIMUM_GENERATED_TIME, TIME_MULTIPLIER } from './best-times.const';
+import { BestTimesService } from './best-times.service';
 
 describe('BestTimesService', () => {
     let service: BestTimesService;
