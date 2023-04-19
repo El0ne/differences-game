@@ -1,10 +1,6 @@
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { Injectable } from '@nestjs/common';
-
-export const MIN_DIFF_NUMBER = 3;
-export const MAX_DIFF_NUMBER = 9;
-export const MIN_DIFF_NUMBER_HARD = 7;
-export const MAX_DIFF_SURFACE = 0.15;
+import { MAX_DIFF_NUMBER, MAX_DIFF_SURFACE, MIN_DIFF_NUMBER, MIN_DIFF_NUMBER_HARD } from './game-difficulty.const';
 
 @Injectable()
 export class GameDifficultyService {

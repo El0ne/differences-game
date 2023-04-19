@@ -24,7 +24,7 @@ import { GameHistoryService } from './services/game-history/game-history.service
 import { GameManagerService } from './services/game-manager/game-manager.service';
 import { ImageDimensionsService } from './services/image-dimensions/image-dimensions.service';
 import { ImageManagerService } from './services/image-manager/image-manager.service';
-import { PixelPositionService } from './services/pixel-position/pixel-position/pixel-position.service';
+import { PixelPositionService } from './services/pixel-position/pixel-position.service';
 import { PixelRadiusService } from './services/pixel-radius/pixel-radius.service';
 
 @Module({

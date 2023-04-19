@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { Test, TestingModule } from '@nestjs/testing';
-import { GameDifficultyService, MAX_DIFF_NUMBER, MAX_DIFF_SURFACE } from './game-difficulty.service';
+import { MAX_DIFF_NUMBER, MAX_DIFF_SURFACE } from './game-difficulty.const';
+import { GameDifficultyService } from './game-difficulty.service';
 
 describe('GameDifficultyService', () => {
     let service: GameDifficultyService;
