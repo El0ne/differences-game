@@ -7,7 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GameClickController } from './controllers/game-click/game-click.controller';
 import { GameConstantsController } from './controllers/game-constants/game-constants.controller';
-import { GameHistoryController } from './controllers/game-history/game-history/game-history.controller';
+import { GameHistoryController } from './controllers/game-history/game-history.controller';
 import { ImageController } from './controllers/image/image.controller';
 import { StageController } from './controllers/stage/stage.controller';
 import { MatchGateway } from './gateways/match/match.gateway';
