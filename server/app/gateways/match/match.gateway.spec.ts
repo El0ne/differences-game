@@ -4,6 +4,7 @@ import { GameManagerService } from '@app/services/game-manager/game-manager.serv
 import { PlayerDifference } from '@common/difference-information';
 import { GameHistoryDTO } from '@common/game-history.dto';
 import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND_MS } from '@common/match-gateway-communication';
+import { TimerModification } from '@common/timer-modification';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { BroadcastOperator, Server, Socket } from 'socket.io';
@@ -138,6 +139,20 @@ describe('MatchGateway', () => {
         expect(socket.data.isSolo).toBe(true);
     });
 
+    it('nextStage should get next stage and send it to user', () => {
+        const nextStageSpy = jest.spyOn(gameManagerServiceSpy, 'giveNextStage');
+        nextStageSpy.mockReturnValue(undefined);
+        const emitSpy = jest.spyOn(socket, 'emit');
+        server.to.returns({
+            emit: (event: string, data: string) => {
+                expect(event).toEqual(LIMITED_TIME_MODE_EVENTS.NewStageInformation);
+                expect(data).toEqual(undefined);
+            },
+        } as any);
+        gateway.nextStage(socket);
+        expect(emitSpy).toHaveBeenCalledWith(LIMITED_TIME_MODE_EVENTS.EndGame);
+    });
+
     it('limitedTimeLost should emit a lose event', () => {
         server.to.returns({
             emit: (event: string, data: string) => {
@@ -171,6 +186,32 @@ describe('MatchGateway', () => {
         expect(socket.data.isSolo).toBe(true);
     });
 
+    it('storeGameHistoryDtoafter should store data and set isLimitedSolo to true', () => {
+        gateway.storeGameHistoryDtoAfterOpponentAbandon(socket, FAKE_GAME_HISTORY_DTO);
+        expect(socket.data.limitedHistory).toBe(FAKE_GAME_HISTORY_DTO);
+        expect(socket.data.isLimitedSolo).toBeTruthy();
+    });
+
+    it('modifyTime should call changeTimeValue', () => {
+        const changeTimeSpy = jest.spyOn(gateway, 'changeTimeValue').mockImplementation();
+        gateway.modifiyTime(socket, FAKE_TIMER_MODIFICATION);
+        expect(changeTimeSpy).toHaveBeenCalled();
+    });
+
+    it('changeTimeValue should stop timer and set a new timer to the same room', async () => {
+        stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
+        server.to.returns({
+            emit: (event: string, data: number) => {
+                expect(event).toEqual(MATCH_EVENTS.Timer);
+                expect(data).toEqual(FAKE_TIMER_MODIFICATION.currentTime);
+            },
+        } as any);
+        const stopTimerSpy = jest.spyOn(gateway, 'stopTimer').mockImplementation();
+        gateway.changeTimeValue(socket, FAKE_TIMER_MODIFICATION);
+        jest.advanceTimersByTime(ONE_SECOND_MS);
+        expect(stopTimerSpy).toHaveBeenCalled();
+    });
+
     it('nextStage shoud emit nextStageInformations event', () => {
         server.to.returns({
             emit: (event: string, data: string) => {
@@ -201,4 +242,9 @@ const FAKE_GAME_HISTORY_DTO: GameHistoryDTO = {
         hasAbandon: false,
         hasWon: false,
     },
+};
+
+const FAKE_TIMER_MODIFICATION: TimerModification = {
+    currentTime: 101,
+    timeMultiplier: 2,
 };

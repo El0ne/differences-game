@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // CallBack function can be of any type and angular does not like it
 /* eslint-disable max-lines */
@@ -43,6 +44,7 @@ describe('SoloViewComponent', () => {
     let socketServiceMock: SocketService;
     let foundDifferenceServiceSpy: FoundDifferenceService;
     let gameHintServiceMock: GameHintService;
+
     let modalSpy: MatDialog;
     let clickEventServiceSpy: ClickEventService;
     let gameConstantsService: GameConstantsService;
@@ -157,15 +159,28 @@ describe('SoloViewComponent', () => {
     it('ngOnInit should listen to a new stage information if in limited time mode', fakeAsync(() => {
         Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: true });
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
+        const notifyEndGame = spyOn(component, 'notifyEndGameLimitedTime').and.callThrough();
         socketServiceMock.listen = (event: string, callback: any) => {
             if (event === LIMITED_TIME_MODE_EVENTS.NewStageInformation) {
                 callback(SERVICE_MOCK_IMAGE_OBJECT);
+            } else if (event === LIMITED_TIME_MODE_EVENTS.EndGame) {
+                callback();
             }
         };
         component.ngOnInit();
         tick(ONE_SECOND_MS);
-        expect(sendSpy).toHaveBeenCalledTimes(1);
+        expect(sendSpy).toHaveBeenCalledTimes(2);
+        expect(notifyEndGame).toHaveBeenCalled();
     }));
+
+    it('ngOnInit should create a solo time dto object if not multiplayer', () => {
+        Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: true });
+        Object.defineProperty(gameParamService.gameParameters, 'isMultiplayerGame', { value: false });
+        const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
+        component.ngOnInit();
+        expect(component.limitedSoloDto).toBeDefined();
+        expect(sendSpy).toHaveBeenCalled();
+    });
 
     it('ngOnInit should not call win game in case of end of game reached ', fakeAsync(() => {
         Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: true });
@@ -197,6 +212,7 @@ describe('SoloViewComponent', () => {
     });
 
     it('ConfigureSocketReactions should configure sockets correctly & react properly according to event', () => {
+        component.limitedMultiDto = MOCK_GAME_HISTORY;
         socketServiceMock.listen = (event: string, callback: any) => {
             switch (event) {
                 case CHAT_EVENTS.WordValidated: {
@@ -209,6 +225,12 @@ describe('SoloViewComponent', () => {
                     break;
                 }
                 case CHAT_EVENTS.Abandon: {
+                    Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: true });
+                    callback({ socketId: 'abandon', message: 'abandon' });
+                    component.left.endGame = true;
+                    callback({ socketId: 'abandon', message: 'abandon' });
+                    component.left.endGame = false;
+                    Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: false });
                     callback({ socketId: 'abandon', message: 'abandon' });
                     break;
                 }
@@ -234,7 +256,7 @@ describe('SoloViewComponent', () => {
         Object.defineProperty(socketServiceMock, 'socketId', { value: 'test' });
         component.configureSocketReactions();
         expect(listenSpy).toHaveBeenCalledTimes(6);
-        expect(component.messages.length).toEqual(3);
+        expect(component.messages.length).toEqual(4);
         expect(sendSpy).toHaveBeenCalled();
         expect(finishGameSpy).toHaveBeenCalled();
         expect(finishGameSpy).toHaveBeenCalled();
@@ -242,6 +264,7 @@ describe('SoloViewComponent', () => {
 
     it('Abandon scenario in limited time should not cause an end game event according to configureSocketReaction', () => {
         Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: true });
+        component.limitedMultiDto = MOCK_GAME_HISTORY_2;
         socketServiceMock.listen = (event: string, callback: any) => {
             if (event === CHAT_EVENTS.Abandon) callback({ socketId: 'abandon', message: 'abandon' });
         };
@@ -406,7 +429,7 @@ describe('SoloViewComponent', () => {
         const notifyBestTimeSpy = spyOn(component, 'notifyNewBestTime').and.callThrough();
         component.endGameVerification();
         expect(sendSpy).toHaveBeenCalledWith(MATCH_EVENTS.Win);
-        expect(notifyBestTimeSpy).toHaveBeenCalledWith(socketServiceMock.socketId, false, 'classique');
+        expect(notifyBestTimeSpy).toHaveBeenCalledWith(socketServiceMock.socketId, false, 'Classique');
     });
 
     it('endGameVerification should call winGame if currentScore of player is equal to number of differences', () => {
@@ -421,7 +444,7 @@ describe('SoloViewComponent', () => {
         component.endGameVerification();
         expect(component.gameCompletion).toHaveBeenCalled();
         expect(sendSpy).not.toHaveBeenCalled();
-        expect(notifyBestTimeSpy).toHaveBeenCalledWith(socketServiceMock.socketId, false, 'classique');
+        expect(notifyBestTimeSpy).toHaveBeenCalledWith(socketServiceMock.socketId, false, 'Classique');
     });
 
     it('winGame should set all end game related boolean and open gameWin modal with true to multiplayer and winner name in multiplayer', () => {
@@ -510,6 +533,16 @@ describe('SoloViewComponent', () => {
         expect(gameHintServiceMock.setColor).toHaveBeenCalled();
     });
 
+    it('getRandomDifference should not trigger if one of these conditons are not met', () => {
+        const hintTimeoutsSpy = spyOn(component, 'hintTimeouts').and.callThrough();
+
+        gameHintServiceMock.hintsRemaining = 0;
+        Object.defineProperty(gameParamService.gameParameters, 'isMultiplayerGame', { value: true });
+        component.getRandomDifference(null);
+
+        expect(hintTimeoutsSpy).not.toHaveBeenCalled();
+    });
+
     it('getRandomDifference should set hint positions and hintsRemaining on left component', () => {
         const mockDifference = [[1]];
         gameHintServiceMock.hintsRemaining = 2;
@@ -528,19 +561,48 @@ describe('SoloViewComponent', () => {
         expect(component.left.hintPosY).toBe(160);
     });
 
-    it('getRandomDifference should call activateThirdHint if the length of getPercentages is 0', () => {
-        const mockDifference = [[1]];
-        gameHintServiceMock.hintsRemaining = 1;
+    it('getRandomDifference should call end game if hint indice triggers a negative time', () => {
         Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: true });
         Object.defineProperty(gameParamService.gameParameters, 'isMultiplayerGame', { value: false });
-        const thirdHintSpy = spyOn(component, 'activateThirdHint');
-        spyOn(component.left, 'getDifferences').and.returnValue(of(mockDifference));
-        spyOn(foundDifferenceServiceSpy, 'findPixelsFromDifference').and.returnValue([4]);
-        spyOn(gameHintServiceMock, 'getPercentages').and.returnValue([]);
-
+        component['timerService'].currentTime = 10;
+        component.gameConstants.hint = 11;
+        gameHintServiceMock.hintsRemaining = 1;
+        const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
+        const stopTimerSpy = spyOn(component['timerService'], 'stopTimer').and.callThrough();
         component.getRandomDifference({ key: 'i' } as KeyboardEvent);
+        expect(sendSpy).toHaveBeenCalledTimes(2);
+        expect(stopTimerSpy).toHaveBeenCalled();
+    });
 
-        expect(thirdHintSpy).toHaveBeenCalled();
+    it('getRandomDifference should not call end game if hint still has time left', () => {
+        Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: true });
+        Object.defineProperty(gameParamService.gameParameters, 'isMultiplayerGame', { value: false });
+        component['timerService'].currentTime = 12;
+        component.gameConstants.hint = 11;
+        gameHintServiceMock.hintsRemaining = 1;
+        const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
+        const stopTimerSpy = spyOn(component['timerService'], 'stopTimer').and.callThrough();
+        component.getRandomDifference({ key: 'i' } as KeyboardEvent);
+        expect(sendSpy).toHaveBeenCalled();
+        expect(stopTimerSpy).not.toHaveBeenCalled();
+    });
+
+    it('getRandomDifference should call end game if hint indice triggers a negative time', () => {
+        Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: true });
+        Object.defineProperty(gameParamService.gameParameters, 'isMultiplayerGame', { value: false });
+        component['timerService'].currentTime = 12;
+        component.gameConstants.hint = 11;
+        gameHintServiceMock.hintsRemaining = 1;
+        gameHintServiceMock.getPercentages = () => {
+            return [];
+        };
+        const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
+        const stopTimerSpy = spyOn(component['timerService'], 'stopTimer').and.callThrough();
+        const activeThirdHintSpy = spyOn(component, 'activateThirdHint').and.callFake(() => {});
+        component.getRandomDifference({ key: 'i' } as KeyboardEvent);
+        expect(sendSpy).toHaveBeenCalled();
+        expect(stopTimerSpy).not.toHaveBeenCalled();
+        expect(activeThirdHintSpy).toHaveBeenCalled();
     });
 
     it('activateThirdHint should set hintFlag to false and thirdHint to true', () => {
@@ -556,6 +618,14 @@ describe('SoloViewComponent', () => {
         component.setCurrentHint();
         expect(component.left.firstHint).toBeTrue();
         expect(component.left.secondHint).toBeFalse();
+    });
+
+    it('notifyEndGameLimitedTime should send a dto depending on if it exists or not', () => {
+        component.limitedSoloDto = MOCK_GAME_HISTORY_2;
+        const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
+        component.notifyEndGameLimitedTime();
+        expect(component.limitedSoloDto.player1.hasAbandon).toBeFalse();
+        expect(sendSpy).toHaveBeenCalled();
     });
 
     it('setCurrentHint should set hints properly', () => {
@@ -611,7 +681,7 @@ describe('SoloViewComponent', () => {
         component.startTime = 'date';
         const sendSpy = spyOn(socketServiceMock, 'send');
         component.notifyNewBestTime('playerId', false, 'classique');
-        expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.BestTime, MOCK_GAME_HISTORY);
+        expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.BestTime, GAME_HISTORY);
     });
 
     it('notifyNewBestTime should send gameHistory information with correct names', () => {
@@ -622,7 +692,7 @@ describe('SoloViewComponent', () => {
         component.startTime = 'date';
         const sendSpy = spyOn(socketServiceMock, 'send');
         component.notifyNewBestTime('opponentId', false, 'classique');
-        expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.BestTime, MOCK_GAME_HISTORY_2);
+        expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.BestTime, GAME_HISTORY_2);
     });
 
     it('loseGame should open lose dialog component and set endGame conditions', () => {
@@ -698,6 +768,44 @@ const MOCK_GAME_HISTORY: GameHistoryDTO = {
     isMultiplayer: true,
     player1: {
         name: 'player',
+        hasAbandon: false,
+        hasWon: true,
+    },
+    player2: {
+        name: 'loser',
+        hasAbandon: false,
+        hasWon: false,
+    },
+};
+
+const GAME_HISTORY: GameHistoryDTO = {
+    gameId: '0',
+    gameName: 'game',
+    gameMode: 'classique',
+    gameDuration: 23,
+    startTime: 'date',
+    isMultiplayer: true,
+    player1: {
+        name: 'player',
+        hasAbandon: false,
+        hasWon: true,
+    },
+    player2: {
+        name: 'loser',
+        hasAbandon: false,
+        hasWon: false,
+    },
+};
+
+const GAME_HISTORY_2: GameHistoryDTO = {
+    gameId: '0',
+    gameName: 'game',
+    gameMode: 'classique',
+    gameDuration: 23,
+    startTime: 'date',
+    isMultiplayer: true,
+    player1: {
+        name: 'opponent',
         hasAbandon: false,
         hasWon: true,
     },
