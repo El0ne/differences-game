@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SocketService } from '@app/services/socket/socket.service';
 import { MATCH_EVENTS } from '@common/match-gateway-communication';
+import { TimerModification } from '@common/timer-modification';
 import { Subscription } from 'rxjs';
 import { SECONDS_IN_MINUTE, TEN } from './timer-solo.constants';
 
@@ -48,8 +49,7 @@ export class TimerSoloService {
 
     // TODO check with Jasper
     restartTimer(multiplier: number, timeModification: number): void {
-        const timerModification = {
-            room: this.socket.gameRoom,
+        const timerModification: TimerModification = {
             currentTime: this.currentTime + timeModification,
             timeMultiplier: multiplier,
         };

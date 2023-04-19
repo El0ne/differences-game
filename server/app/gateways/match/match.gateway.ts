@@ -9,8 +9,8 @@ import {
     ONE_SECOND_MS,
     SoloGameCreation,
 } from '@common/match-gateway-communication';
-import { ReplayTimerInformations } from '@common/replay-timer-informations';
 
+import { TimerModification } from '@common/timer-modification';
 import { Injectable } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -66,14 +66,9 @@ export class MatchGateway implements OnGatewayDisconnect {
     }
 
     @SubscribeMessage(MATCH_EVENTS.TimeModification)
-    updateTimer(socket: Socket, replayInformations: ReplayTimerInformations): void {
-        this.changeTimerValue(socket, replayInformations);
+    updateTimer(socket: Socket, timerModification: TimerModification): void {
+        this.changeTimerValue(socket, timerModification);
     }
-
-    // @SubscribeMessage(LIMITED_TIME_MODE_EVENTS.TimeModification)
-    // modifiyTime(@ConnectedSocket() socket: Socket, @MessageBody() data: TimerModification): void {
-    //     this.changeTimeValue(socket, data);
-    // }
 
     @SubscribeMessage(MATCH_EVENTS.Lose)
     limitedTimeLost(@ConnectedSocket() socket: Socket): void {
@@ -115,33 +110,22 @@ export class MatchGateway implements OnGatewayDisconnect {
         socket.data.limitedHistory = data;
         socket.data.isLimitedSolo = true;
     }
-    // limited
-    // changeTimeValue(socket: Socket, data: TimerModification): void {
-    //     this.stopTimer(socket);
-    //     this.server.to(socket.data.room).emit(MATCH_EVENTS.Timer, data.currentTime);
-    //     const timer = setInterval(() => {
-    //         data.currentTime++;
-    //         this.server.to(socket.data.room).emit(MATCH_EVENTS.Timer, data.currentTime);
-    //     }, ONE_SECOND_MS);
-    //     this.timers.set(socket.data.room, timer);
-    // }
 
-    // replay
-    changeTimerValue(socket: Socket, replayInformations: ReplayTimerInformations): void {
+    changeTimerValue(socket: Socket, timerModification: TimerModification): void {
         this.stopTimer(socket);
-        this.server.to(replayInformations.room).emit(MATCH_EVENTS.Timer, Math.max(replayInformations.currentTime, 0));
-        this.server.to(replayInformations.room).emit(MATCH_EVENTS.Catch, replayInformations.currentTime);
-        let time = replayInformations.currentTime;
+        this.server.to(socket.data.room).emit(MATCH_EVENTS.Timer, Math.max(timerModification.currentTime, 0));
+        this.server.to(socket.data.room).emit(MATCH_EVENTS.Catch, timerModification.currentTime);
+        let time = timerModification.currentTime;
         const timer = setInterval(() => {
-            replayInformations.currentTime++;
-            this.server.to(replayInformations.room).emit(MATCH_EVENTS.Timer, Math.max(replayInformations.currentTime, 0));
-        }, ONE_SECOND_MS * replayInformations.timeMultiplier);
+            timerModification.currentTime++;
+            this.server.to(socket.data.room).emit(MATCH_EVENTS.Timer, Math.max(timerModification.currentTime, 0));
+        }, ONE_SECOND_MS * timerModification.timeMultiplier);
         const eventTimer = setInterval(() => {
             time += EVENT_TIMER_INCREMENT;
-            this.server.to(replayInformations.room).emit(MATCH_EVENTS.Catch, time);
-        }, EVENT_TIMER_INTERVAL * replayInformations.timeMultiplier);
-        this.timers.set(replayInformations.room, timer);
-        this.eventTimers.set(replayInformations.room, eventTimer);
+            this.server.to(socket.data.room).emit(MATCH_EVENTS.Catch, time);
+        }, EVENT_TIMER_INTERVAL * timerModification.timeMultiplier);
+        this.timers.set(socket.data.room, timer);
+        this.eventTimers.set(socket.data.room, eventTimer);
     }
 
     timer(room: string): void {
