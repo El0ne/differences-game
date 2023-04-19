@@ -119,12 +119,19 @@
                 <button [ngStyle]="{ color: 'white' }" class="hint hint-button" type="button" (click)="getDiffFromClick()">
                     <mat-icon>search</mat-icon>
                 </button>
-                <div class="message">Indices restants: {{ hintsRemaining() }}</div>
-                <div class="message centered">Pénalité utilisation indice: {{ this.gameConstants.hint }} secondes</div>
+                <div class="player-name">{{ hintsRemaining() }}</div>
+                <div class="message centered">
+                    Temps perdu par indice utilisé: <br />
+                    {{ this.gameConstants.hint }} secondes
+                </div>
             </div>
             <div *ngIf="this.thirdHint" class="centered">
                 <div class="third-hint-box neon-border" [ngStyle]="{ 'background-color': this.hintColor }"></div>
                 <p class="message centered">Rouge: Proche<br />Bleu: Loin</p>
+            </div>
+            <div class="message centered" *ngIf="this.isLimitedTimeMode">
+                Temps gagné par différence trouvée: <br />
+                {{ this.gameConstants.difference }} secondes
             </div>
         </div>
 
