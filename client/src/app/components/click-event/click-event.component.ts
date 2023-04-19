@@ -144,7 +144,7 @@ export class ClickEventComponent implements OnInit, OnChanges {
         const sound = new Audio();
         if (!isErrorSound) sound.src = 'assets/ding.mp3';
         else sound.src = 'assets/Error.mp3';
-        // sound.play();
+        sound.play();
     }
 
     displayError(click: MouseEvent): void {

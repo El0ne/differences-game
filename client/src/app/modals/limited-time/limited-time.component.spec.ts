@@ -12,7 +12,8 @@ import { GameParametersService } from '@app/services/game-parameters/game-parame
 import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, SoloGameCreation } from '@common/match-gateway-communication';
 import { JoinHostInWaitingRequest, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 import { of } from 'rxjs';
-import { LIMITED_TIME_MODE_ID, LimitedTimeComponent } from './limited-time.component';
+import { LIMITED_TIME_MODE_ID } from './limited-time-mode.const';
+import { LimitedTimeComponent } from './limited-time.component';
 
 describe('LimitedTimeComponent', () => {
     let component: LimitedTimeComponent;

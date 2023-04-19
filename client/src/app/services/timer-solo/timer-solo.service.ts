@@ -23,8 +23,8 @@ export class TimerSoloService {
         });
     }
 
-    stopTimer(gameRoom: string = this.socket.gameRoom): void {
-        this.socket.send(MATCH_EVENTS.EndTime, gameRoom);
+    stopTimer(): void {
+        this.socket.send(MATCH_EVENTS.EndTime);
     }
 
     limitedTimeTimer(): void {

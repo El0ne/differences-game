@@ -717,10 +717,10 @@ describe('SoloViewComponent', () => {
         component.gameConstants.hint = 11;
         gameHintServiceMock.hintsRemaining = 1;
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
-        const stopTimerSpy = spyOn(component['timerService'], 'stopTimer').and.callThrough();
+        const stopTimerSpy = spyOn(component['timerService'], 'stopTimer');
         component.getRandomDifference({ key: 'i' } as KeyboardEvent);
-        expect(sendSpy).toHaveBeenCalledTimes(2);
         expect(stopTimerSpy).toHaveBeenCalled();
+        expect(sendSpy).toHaveBeenCalledTimes(2);
     });
 
     it('getRandomDifference should not call end game if hint still has time left', () => {

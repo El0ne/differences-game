@@ -9,7 +9,7 @@ import { Routes } from '@app/modules/routes';
     styleUrls: ['./quit-game-modal.component.scss'],
 })
 export class QuitGameModalComponent {
-    image: string = '../../../assets/crying-black-guy-meme.gif';
+    image: string = '@app/assets/crying-black-guy-meme.gif';
     constructor(
         @Inject(MAT_DIALOG_DATA)
         private data: {

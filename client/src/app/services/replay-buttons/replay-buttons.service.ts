@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { SocketService } from '@app/services/socket/socket.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 
 @Injectable({
@@ -8,12 +7,12 @@ import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 export class ReplayButtonsService {
     timeMultiplier: number = 1;
 
-    constructor(private socketService: SocketService, private timerService: TimerSoloService) {}
+    constructor(private timerService: TimerSoloService) {}
 
     pauseReplay(isReplayPaused: boolean): boolean {
         isReplayPaused = !isReplayPaused;
         if (isReplayPaused) {
-            this.timerService.stopTimer(this.socketService.socketId);
+            this.timerService.stopTimer();
         } else {
             this.timerService.restartTimer(this.timeMultiplier, 0);
         }

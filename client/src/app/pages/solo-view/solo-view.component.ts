@@ -41,9 +41,7 @@ import { ImageObject } from '@common/image-object';
 import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, TWO_MINUTES_SECONDS } from '@common/match-gateway-communication';
 import { PlayerGameInfo } from '@common/player-game-info';
 import { Subject } from 'rxjs';
-import { HINT_TIME_IN_MS, THIRD_HINT_TIME_IN_MS } from './solo-view-constants';
-
-const EXECUTE_COMMAND_DELAY = 100;
+import { EXECUTE_COMMAND_DELAY, HINT_TIME_IN_MS, THIRD_HINT_TIME_IN_MS } from './solo-view-constants';
 
 @Component({
     selector: 'app-solo-view',
@@ -476,7 +474,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     openReplayModal(): void {
-        this.timerService.stopTimer(this.socketService.socketId);
+        this.timerService.stopTimer();
         const dialogRef = this.dialog.open(ReplayGameModalComponent, {
             disableClose: true,
         });
@@ -575,7 +573,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             },
             disableClose: true,
         });
-        this.timerService.stopTimer(this.socketService.socketId);
+        this.timerService.stopTimer();
         dialogRef.afterClosed().subscribe(() => {
             this.timerService.restartTimer(this.replayButtonsService.timeMultiplier, 0);
         });
