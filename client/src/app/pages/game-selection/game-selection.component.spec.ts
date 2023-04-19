@@ -12,8 +12,8 @@ import { SocketService } from '@app/services/socket/socket.service';
 import { GameCardInformation } from '@common/game-card';
 import { WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 import { Subject, of } from 'rxjs';
-import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
-import { DELAY_BEFORE_REFRESH, GameSelectionComponent } from './game-selection.component';
+import { DELAY_BEFORE_REFRESH, GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
+import { GameSelectionComponent } from './game-selection.component';
 
 describe('GameSelectionComponent', () => {
     let component: GameSelectionComponent;

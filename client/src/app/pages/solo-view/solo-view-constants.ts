@@ -4,3 +4,4 @@ export const MESSAGES_LENGTH = {
 };
 export const HINT_TIME_IN_MS = 4000;
 export const THIRD_HINT_TIME_IN_MS = 5000;
+export const EXECUTE_COMMAND_DELAY = 100;

@@ -41,9 +41,7 @@ import { ImageObject } from '@common/image-object';
 import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, TWO_MINUTES_SECONDS } from '@common/match-gateway-communication';
 import { PlayerGameInfo } from '@common/player-game-info';
 import { Subject } from 'rxjs';
-import { HINT_TIME_IN_MS, THIRD_HINT_TIME_IN_MS } from './solo-view-constants';
-
-const EXECUTE_COMMAND_DELAY = 100;
+import { EXECUTE_COMMAND_DELAY, HINT_TIME_IN_MS, THIRD_HINT_TIME_IN_MS } from './solo-view-constants';
 
 @Component({
     selector: 'app-solo-view',

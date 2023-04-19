@@ -8,7 +8,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
-import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { BestTimeComponent } from './components/best-time/best-time.component';
 import { ClickEventComponent } from './components/click-event/click-event.component';
 import { GameCardSelectionComponent } from './components/game-card-selection/game-card-selection.component';
@@ -39,7 +38,6 @@ import { SoloViewComponent } from './pages/solo-view/solo-view.component';
     declarations: [
         AppComponent,
         HomePageComponent,
-        MaterialPageComponent,
         GameSelectionComponent,
         BestTimeComponent,
         GameCardSelectionComponent,

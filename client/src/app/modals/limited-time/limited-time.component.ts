@@ -7,8 +7,7 @@ import { GameParametersService } from '@app/services/game-parameters/game-parame
 import { SocketService } from '@app/services/socket/socket.service';
 import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, SoloGameCreation } from '@common/match-gateway-communication';
 import { JoinHostInWaitingRequest, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
-
-export const LIMITED_TIME_MODE_ID = 'limitedTimeMode';
+import { LIMITED_TIME_MODE_ID } from './limited-time-mode.const';
 
 @Component({
     selector: 'app-limited-time',
