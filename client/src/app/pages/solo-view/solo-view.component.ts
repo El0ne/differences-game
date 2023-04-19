@@ -381,20 +381,20 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                     this.right.hintPosX = this.left.hintPosX;
                     this.right.hintPosY = this.left.hintPosY;
                 }
-                const hintCommand = new HintCommand(this.left.hintPosX, this.left.hintPosY, this);
-                this.addCommand(hintCommand);
+                if (!this.isReplayMode) {
+                    const hintCommand = new HintCommand(this.left.hintPosX, this.left.hintPosY, this);
+                    this.addCommand(hintCommand);
+                }
+
                 this.setCurrentHint();
                 this.hintTimeouts();
-                this.handleHint();
             });
         }
     }
 
     handleHint(): void {
-        this.timerService.restartTimer(
-            this.replayButtonsService.timeMultiplier,
-            !this.isLimitedTimeMode ? this.gameConstants.hint : -this.gameConstants.hint,
-        );
+        const test = !this.isLimitedTimeMode ? this.gameConstants.hint : -this.gameConstants.hint;
+        this.timerService.restartTimer(this.replayButtonsService.timeMultiplier, test);
     }
 
     setCurrentHint(): void {
@@ -668,6 +668,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.endGameVerification();
         }
     }
+
     endGameVerification(): void {
         if (this.isMultiplayer) {
             const endGameVerification = this.numberOfDifferences / 2;
@@ -711,6 +712,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     resetPropertiesForReplay(): void {
+        console.log('weriogh;qerg');
         this.resetCanvas();
         this.closeModals();
         this.isReplayMode = true;
