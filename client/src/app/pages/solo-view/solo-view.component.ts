@@ -134,6 +134,10 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                     this.gameCompletion(false);
                     this.timerService.stopTimer();
                 }
+                const tKeyEvent: KeyboardEvent = new KeyboardEvent('keydown', { key: 't' });
+                if (this.left.toggleCheatMode) {
+                    this.resetDifferences(tKeyEvent);
+                }
             });
             if (!this.isMultiplayer) {
                 this.limitedSoloDto = {
