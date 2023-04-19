@@ -48,7 +48,7 @@ export class ChatGateway implements OnGatewayDisconnect {
         const dateFormatted = `${date} - Indice utilisé.`;
         this.server
             .to(socket.data.room)
-            .emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message: dateFormatted, event: 'abandon' } as RoomMessage);
+            .emit(CHAT_EVENTS.RoomMessage, { socketId: CHAT_EVENTS.Event, message: dateFormatted, event: 'notification' } as RoomMessage);
     }
 
     @SubscribeMessage(CHAT_EVENTS.RoomMessage)
