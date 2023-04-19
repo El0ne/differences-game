@@ -60,7 +60,7 @@ export class ChatGateway implements OnGatewayDisconnect {
     }
 
     @SubscribeMessage(CHAT_EVENTS.BestTime)
-    async endGameEvents(@ConnectedSocket() socket: Socket, @MessageBody() data: GameHistoryDTO) {
+    async endGameEvents(@ConnectedSocket() socket: Socket, @MessageBody() data: GameHistoryDTO): Promise<void> {
         if (await this.gameCardService.getGameCardById(data.gameId)) {
             if (!(data.player1.hasAbandon || data.player2?.hasAbandon)) {
                 const updatedGame = await this.updateBestTime(data);
