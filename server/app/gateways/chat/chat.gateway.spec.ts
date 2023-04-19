@@ -377,14 +377,8 @@ describe('ChatGateway', () => {
         expect(expectedDate.includes(minutes)).toBe(true);
     });
 
-    it('addGameTimeHistory should add game History', () => {
-        const addGameSpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockImplementation();
-        gateway.addGameTimeHistory(socket, FAKE_GAME_HISTORY_SINGLE);
-        expect(addGameSpy).toHaveBeenCalled();
-    });
-
     it('limitedEndGame should calculate time duration of limited game and call addGameTimeHistory ', () => {
-        const addGameTimeHistorySpy = jest.spyOn(gateway, 'addGameTimeHistory').mockImplementation();
+        const addGameTimeHistorySpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockImplementation();
         gateway.limitedEndGame(socket, FAKE_GAME_HISTORY_SINGLE);
         expect(addGameTimeHistorySpy).toHaveBeenCalled();
     });
@@ -400,7 +394,7 @@ describe('ChatGateway', () => {
                 expect(data.socketId).toEqual('id');
             },
         } as any);
-        const addGameTimeHistorySpy = jest.spyOn(gateway, 'addGameTimeHistory').mockImplementation();
+        const addGameTimeHistorySpy = jest.spyOn(gameHistoryService, 'addGameToHistory').mockImplementation();
         gateway.handleDisconnect(socket);
         expect(addGameTimeHistorySpy).toHaveBeenCalled();
     });

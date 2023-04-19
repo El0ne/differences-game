@@ -72,11 +72,6 @@ export class ChatGateway implements OnGatewayDisconnect {
         }
     }
 
-    @SubscribeMessage(LIMITED_TIME_MODE_EVENTS.GameHistory)
-    addGameTimeHistory(socket: Socket, data: GameHistoryDTO): void {
-        this.gameHistoryService.addGameToHistory(data);
-    }
-
     @SubscribeMessage(LIMITED_TIME_MODE_EVENTS.EndGame)
     limitedEndGame(socket: Socket, data: GameHistoryDTO): void {
         const endGameTime = Date.now();
@@ -85,7 +80,7 @@ export class ChatGateway implements OnGatewayDisconnect {
         socket.data.isLimitedSolo = false;
         socket.data.end = true;
         data.gameDuration = duration;
-        this.addGameTimeHistory(socket, data);
+        this.gameHistoryService.addGameToHistory(data);
     }
 
     async updateBestTime(data: GameHistoryDTO): Promise<GameCard> {
@@ -132,7 +127,7 @@ export class ChatGateway implements OnGatewayDisconnect {
             const duration = Math.floor((endGameTime - startTime) / SECOND_CONVERTION);
             socket.data.limitedHistory.gameDuration = duration;
             socket.data.limitedHistory.player1.hasAbandon = true;
-            this.addGameTimeHistory(socket, socket.data.limitedHistory);
+            this.gameHistoryService.addGameToHistory(socket.data.limitedHistory);
         }
     }
 
