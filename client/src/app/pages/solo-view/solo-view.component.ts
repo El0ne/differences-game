@@ -248,8 +248,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             }
         });
         this.socketService.listen<PlayerDifference>(MATCH_EVENTS.Difference, (data: PlayerDifference) => {
-            this.addCommand(new OpponentDifferenceCommand(this, data));
-            this.effectHandler(data);
+            if (!this.isReplayMode) {
+                this.addCommand(new OpponentDifferenceCommand(this, data));
+                console.log('effect handler socket');
+                this.effectHandler(data);
+            }
         });
         this.socketService.listen<string>(MATCH_EVENTS.Win, (socketId: string) => {
             this.gameCompletion(true, socketId);
@@ -390,8 +393,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     handleHint(): void {
-        const test = !this.isLimitedTimeMode ? this.gameConstants.hint : -this.gameConstants.hint;
-        this.timerService.restartTimer(this.replayButtonsService.timeMultiplier, test);
+        const isPositive = !this.isLimitedTimeMode ? this.gameConstants.hint : -this.gameConstants.hint;
+        this.timerService.restartTimer(this.replayButtonsService.timeMultiplier, isPositive);
     }
 
     setCurrentHint(): void {
@@ -634,6 +637,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 lastDifferences: information.lastDifferences,
                 socket: this.socketService.socketId,
             };
+            console.log('effect handler diffhandler');
 
             this.effectHandler(difference);
         }
@@ -651,6 +655,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     effectHandler(information: PlayerDifference): void {
+        console.log('effect handler called');
         if (!this.left.toggleCheatMode) {
             this.handleFlash(information.lastDifferences);
         }
