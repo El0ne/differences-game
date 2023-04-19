@@ -1,3 +1,4 @@
+// MangoDb requires underscore in front of id
 /* eslint-disable no-underscore-dangle */
 import { Component, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { Router } from '@angular/router';

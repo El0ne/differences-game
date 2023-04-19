@@ -1,3 +1,4 @@
+// need it because the id_ attribute from MongoDb
 /* eslint-disable no-underscore-dangle */
 import { GameCard } from '@app/schemas/game-cards.schemas';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';

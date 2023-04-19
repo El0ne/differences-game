@@ -1,3 +1,4 @@
+// We need magic numbers here because we are mocking data for the tests.
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
 const difference1: number[] = [];

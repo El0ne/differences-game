@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
+// it's file with constants, we need to use magic numbers for testing
+
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 
 export const DIFFERENCE_FOUND: ClickDifferenceVerification = {

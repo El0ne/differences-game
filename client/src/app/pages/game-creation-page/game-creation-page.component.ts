@@ -1,3 +1,4 @@
+// we have to disable this rule because exceeds 355 lines.
 /* eslint-disable max-lines */
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';

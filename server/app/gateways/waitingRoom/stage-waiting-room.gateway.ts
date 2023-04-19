@@ -1,4 +1,5 @@
-/* eslint-disable no-underscore-dangle */ // MongoDB requires _id property with underscore
+// MongoDB requires _id property with underscore
+/* eslint-disable no-underscore-dangle */
 import { MatchGateway } from '@app/gateways/match/match.gateway';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';

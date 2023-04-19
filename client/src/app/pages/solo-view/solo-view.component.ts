@@ -58,7 +58,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     @ViewChild('inputField') inputChat: ElementRef<HTMLInputElement>;
 
-    // isMultiplayer: boolean;
     showErrorMessage: boolean = false;
     showTextBox: boolean = false;
     showNavBar: boolean = true;
@@ -77,11 +76,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     limitedSoloDto: GameHistoryDTO;
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
     gameConstants: GameConstants;
-    // eslint-disable-next-line max-params -- need all parameters for constructor
     hintIcon: boolean;
     thirdHint: boolean;
     hintColor: string;
-    // isClassic: boolean;
     inputElement = document.querySelector('input');
     isWinner: boolean = false;
 
@@ -96,7 +93,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     isCanvasEnabled: boolean = true;
 
     boundGetRandomDifference: (event: KeyboardEvent) => void = this.getRandomDifference.bind(this);
-    // we have more than 3 services
+
+    // we need more than 3 services
     // eslint-disable-next-line max-params
     constructor(
         private timerService: TimerSoloService,

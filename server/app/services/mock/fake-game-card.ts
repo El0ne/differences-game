@@ -1,3 +1,4 @@
+// We set magic numbers because we are mocking data for the tests.
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { GameCard } from '@app/schemas/game-cards.schemas';
 import { ObjectId } from 'mongodb';

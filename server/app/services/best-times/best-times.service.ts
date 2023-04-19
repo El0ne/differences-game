@@ -1,4 +1,4 @@
-// using _id property
+// using _id property. Need to use underscore because of MangoDB
 /* eslint-disable no-underscore-dangle */
 
 import { GameCard, GameCardDocument } from '@app/schemas/game-cards.schemas';

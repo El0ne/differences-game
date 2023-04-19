@@ -1,4 +1,5 @@
-/* eslint-disable no-underscore-dangle */ // need it because the id_ attribute from MongoDb
+// need it because the id_ attribute from MongoDb
+/* eslint-disable no-underscore-dangle */
 import { GameCard, GameCardDocument } from '@app/schemas/game-cards.schemas';
 import { BestTimesService } from '@app/services/best-times/best-times.service';
 import { GameCardDto } from '@common/game-card.dto';
