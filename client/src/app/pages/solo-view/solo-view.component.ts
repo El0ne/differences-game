@@ -693,11 +693,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     replayGame(): void {
-        console.log('replay-game');
         this.replayTimeoutId = setTimeout(() => {
             const command = this.invoker.commands[this.commandIndex];
             if (command.time <= this.timerService.eventTimer) {
-                console.log(command.action);
                 command.action.execute();
                 this.commandIndex++;
 
@@ -714,7 +712,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     resetPropertiesForReplay(): void {
-        console.log('weriogh;qerg');
         this.resetCanvas();
         this.closeModals();
         this.isReplayMode = true;

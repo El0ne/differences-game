@@ -15,7 +15,6 @@ export class TimerSoloService {
     constructor(private socket: SocketService) {}
 
     startTimer(): void {
-        console.log('start timer');
         this.socket.listen<number>(MATCH_EVENTS.Timer, (timerValue: number) => {
             this.currentTime = timerValue;
         });
@@ -47,6 +46,7 @@ export class TimerSoloService {
         return seconds < TEN ? `${minute}:0${seconds}` : `${minute}:${seconds}`;
     }
 
+    // TODO check with Jasper
     restartTimer(multiplier: number, timeModification: number): void {
         const timerModification = {
             room: this.socket.gameRoom,
