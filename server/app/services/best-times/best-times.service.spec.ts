@@ -2,8 +2,9 @@
 /* eslint-disable no-underscore-dangle */
 import { GameCard, GameCardDocument, gameCardSchema } from '@app/schemas/game-cards.schemas';
 import { getFakeGameCard } from '@app/services/mock/fake-game-card';
+import { DELAY_BEFORE_CLOSING_CONNECTION } from '@app/tests/constants';
 import { RankingBoard } from '@common/ranking-board';
-import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
+import { MongooseModule, getConnectionToken, getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection, Model, Query } from 'mongoose';
@@ -35,8 +36,6 @@ describe('BestTimesService', () => {
         connection = await module.get(getConnectionToken());
         await gameCardModel.deleteMany({});
     });
-
-    const DELAY_BEFORE_CLOSING_CONNECTION = 200;
 
     afterEach((done) => {
         setTimeout(async () => {

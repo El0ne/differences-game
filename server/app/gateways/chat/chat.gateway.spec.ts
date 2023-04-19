@@ -1,11 +1,12 @@
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
-import { MatchGateway } from '@app/gateways/match/match/match.gateway';
+import { MatchGateway } from '@app/gateways/match/match.gateway';
 import { StageWaitingRoomGateway } from '@app/gateways/waitingRoom/stage-waiting-room.gateway';
 import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
 import { GameCard, gameCardSchema } from '@app/schemas/game-cards.schemas';
 import { GameHistory, gameHistorySchema } from '@app/schemas/game-history';
+import { Images, imagesSchema } from '@app/schemas/images.schema';
 import { BestTimesService } from '@app/services/best-times/best-times.service';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
@@ -20,20 +21,18 @@ import { ImageManagerService } from '@app/services/image-manager/image-manager.s
 import { getFakeGameCard } from '@app/services/mock/fake-game-card';
 import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
+import { DELAY_BEFORE_CLOSING_CONNECTION } from '@app/tests/constants';
 import { RoomMessage } from '@common/chat-gateway-constants';
 import { CHAT_EVENTS } from '@common/chat-gateway-events';
 import { FAKE_GAME_HISTORY, FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE, FAKE_GAME_HISTORY_SINGLE } from '@common/mock/game-history-mock';
-import { Logger } from '@nestjs/common';
-import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
+import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection } from 'mongoose';
-import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
+import { SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { Server, Socket } from 'socket.io';
-const DELAY_BEFORE_CLOSING_CONNECTION = 200;
 describe('ChatGateway', () => {
     let gateway: ChatGateway;
-    let logger: SinonStubbedInstance<Logger>;
     let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
     let gameCard: GameCard;
@@ -46,17 +45,17 @@ describe('ChatGateway', () => {
 
     beforeEach(async () => {
         mongoServer = await MongoMemoryServer.create();
-        const mongoUri = await mongoServer.getUri();
+        const mongoUri = mongoServer.getUri();
 
         gameCard = getFakeGameCard();
 
         gameCard.multiTimes = rankings.multiTimes;
         gameCard.soloTimes = rankings.soloTimes;
 
-        logger = createStubInstance(Logger);
         socket = createStubInstance<Socket>(Socket);
         server = createStubInstance<Server>(Server);
         socket.data = {};
+        socket.data.room = TEST_ROOM_ID;
         Object.defineProperty(socket, 'id', { value: 'id' });
         const module: TestingModule = await Test.createTestingModule({
             imports: [
@@ -64,15 +63,11 @@ describe('ChatGateway', () => {
                 MongooseModule.forFeature([{ name: GameCard.name, schema: gameCardSchema }]),
                 MongooseModule.forFeature([{ name: GameHistory.name, schema: gameHistorySchema }]),
                 MongooseModule.forFeature([{ name: Differences.name, schema: differencesSchema }]),
+                MongooseModule.forFeature([{ name: Images.name, schema: imagesSchema }]),
             ],
             providers: [
                 ChatGateway,
-                {
-                    provide: Logger,
-                    useValue: logger,
-                },
                 StageWaitingRoomGateway,
-                Logger,
                 GameCardService,
                 GameDifficultyService,
                 DifferenceClickService,
@@ -97,8 +92,6 @@ describe('ChatGateway', () => {
         connection = await module.get(getConnectionToken());
 
         gateway = module.get<ChatGateway>(ChatGateway);
-        // We want to assign a value to the private field
-        // eslint-disable-next-line dot-notation
         gateway['server'] = server;
     });
 
@@ -134,21 +127,14 @@ describe('ChatGateway', () => {
         expect(socket.emit.calledWith(CHAT_EVENTS.WordValidated, { isValidated: false, originalMessage: error })).toBeTruthy();
     });
 
-    it('roomMessage() should not send message if socket not in the room', () => {
-        stub(socket, 'rooms').value(new Set());
-        gateway.roomMessage(socket, { room: TEST_ROOM_ID, message: 'X' });
-        expect(server.to.called).toBeFalsy();
-    });
-
     it('roomMessage() should send message if socket in the room', () => {
-        stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
-            emit: (event: string, message) => {
+            emit: (event: string, message: RoomMessage) => {
                 expect(event).toEqual(CHAT_EVENTS.RoomMessage);
                 expect(message.message).toEqual('X');
             },
         } as any);
-        gateway.roomMessage(socket, { room: TEST_ROOM_ID, message: 'X' });
+        gateway.roomMessage(socket, 'X');
     });
 
     it('best time should add game history to mongoDB', async () => {
@@ -159,12 +145,12 @@ describe('ChatGateway', () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         const sendSpy = jest.spyOn(server, 'emit');
         server.to.returns({
-            emit: (event: string, data) => {
+            emit: (event: string, data: RoomMessage) => {
                 expect(event).toEqual(CHAT_EVENTS.RoomMessage);
                 expect(data.event).toEqual('abandon');
                 expect(data.socketId).toEqual(CHAT_EVENTS.Event);
                 expect(data.message.includes(FAKE_GAME_HISTORY[0].gameMode)).toBeTruthy();
-                expect(data.message.includes('solo').toBeTruthy());
+                expect(data.message.includes('solo')).toBeTruthy();
             },
         } as any);
         await gateway.bestTime(socket, FAKE_GAME_HISTORY_SINGLE);
@@ -181,12 +167,12 @@ describe('ChatGateway', () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         const sendSpy = jest.spyOn(server, 'emit');
         server.to.returns({
-            emit: (event: string, data) => {
+            emit: (event: string, data: RoomMessage) => {
                 expect(event).toEqual(CHAT_EVENTS.RoomMessage);
                 expect(data.event).toEqual('abandon');
                 expect(data.socketId).toEqual(CHAT_EVENTS.Event);
                 expect(data.message.includes(FAKE_GAME_HISTORY[0].gameMode)).toBeTruthy();
-                expect(data.message.includes('solo').toBeTruthy());
+                expect(data.message.includes('solo')).toBeTruthy();
             },
         } as any);
         FAKE_GAME_HISTORY_SINGLE.player1.hasWon = false;
@@ -204,27 +190,10 @@ describe('ChatGateway', () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         jest.spyOn(server, 'emit');
         server.to.returns({
-            emit: (event: string, data) => {
+            emit: (event: string, data: RoomMessage) => {
                 expect(event).toEqual(CHAT_EVENTS.RoomMessage);
                 expect(data.message.includes(FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE.gameMode)).toBeTruthy();
-                expect(data.message.includes('string').toBeTrue());
-            },
-        } as any);
-        gateway.bestTime(socket, FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE);
-    });
-
-    it('best time should properly assign player name', async () => {
-        jest.spyOn(gameCardService, 'getGameCardById').mockResolvedValue(gameCard);
-        jest.spyOn(gameHistoryService, 'addGameToHistory').mockImplementation();
-        jest.spyOn(gameCardService, 'updateGameCard').mockResolvedValue(gameCard);
-        FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE.player1.hasWon = false;
-        stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
-        jest.spyOn(server, 'emit');
-        server.to.returns({
-            emit: (event: string, data) => {
-                expect(event).toEqual(CHAT_EVENTS.RoomMessage);
-                expect(data.message.includes(FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE.gameMode)).toBeTruthy();
-                expect(data.message.includes('string').toBeTrue());
+                expect(data.message.includes('string')).toBeTruthy();
             },
         } as any);
         gateway.bestTime(socket, FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE);
@@ -238,11 +207,11 @@ describe('ChatGateway', () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         jest.spyOn(server, 'emit');
         server.to.returns({
-            emit: (event: string, data) => {
+            emit: (event: string, data: RoomMessage) => {
                 expect(event).toEqual(CHAT_EVENTS.RoomMessage);
                 expect(data.message.includes(FAKE_GAME_HISTORY_MULTIPLAYER_SINGLE.gameMode)).toBeTruthy();
-                expect(data.message.includes('string').toBeTrue());
-                expect(data.message.includes('solo').toBeTrue());
+                expect(data.message.includes('string')).toBeTruthy();
+                expect(data.message.includes('solo')).toBeTruthy();
             },
         } as any);
         gateway.bestTime(socket, FAKE_GAME_HISTORY_SINGLE);
@@ -259,14 +228,14 @@ describe('ChatGateway', () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         const sendSpy = jest.spyOn(server, 'emit');
         server.to.returns({
-            emit: (event: string, data) => {
+            emit: (event: string, data: RoomMessage) => {
                 expect(event).toEqual(CHAT_EVENTS.RoomMessage);
                 expect(data.event).toEqual('abandon');
                 expect(data.socketId).toEqual(CHAT_EVENTS.Event);
                 expect(data.message.includes(FAKE_GAME_HISTORY_SINGLE.gameMode)).toBeTruthy();
-                expect(data.message.includes('multiplayer').toBeTruthy());
-                expect(data.message.includes('string').toBeTrue());
-                expect(data.message.includes('2').toBeTrue());
+                expect(data.message.includes('multiplayer')).toBeTruthy();
+                expect(data.message.includes('string')).toBeTruthy();
+                expect(data.message.includes('2')).toBeTruthy();
             },
         } as any);
         await gateway.bestTime(socket, FAKE_GAME_HISTORY_SINGLE);
@@ -284,14 +253,14 @@ describe('ChatGateway', () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         const sendSpy = jest.spyOn(server, 'emit');
         server.to.returns({
-            emit: (event: string, data) => {
+            emit: (event: string, data: RoomMessage) => {
                 expect(event).toEqual(CHAT_EVENTS.RoomMessage);
                 expect(data.event).toEqual('abandon');
                 expect(data.socketId).toEqual(CHAT_EVENTS.Event);
                 expect(data.message.includes(FAKE_GAME_HISTORY_SINGLE.gameMode)).toBeTruthy();
-                expect(data.message.includes('solo').toBeTrue());
-                expect(data.message.includes('string').toBeTrue());
-                expect(data.message.includes('2').toBeTrue());
+                expect(data.message.includes('solo')).toBeTruthy();
+                expect(data.message.includes('string')).toBeTruthy();
+                expect(data.message.includes('2')).toBeTruthy();
             },
         } as any);
         await gateway.bestTime(socket, FAKE_GAME_HISTORY_SINGLE);
@@ -343,43 +312,42 @@ describe('ChatGateway', () => {
     });
 
     it('event() should emit RoomMessage and return a string containing event and par when multiplayer', () => {
-        stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
-            emit: (event: string, data) => {
+            emit: (event: string, data: RoomMessage) => {
                 expect(event).toEqual(CHAT_EVENTS.RoomMessage);
                 expect(data.message.includes('Error')).toBe(true);
                 expect(data.message.includes('par')).toBe(true);
             },
         } as any);
-        gateway.event(socket, { room: TEST_ROOM_ID, event: 'Error', isMultiplayer: true });
+        gateway.event(socket, { event: 'Error', isMultiplayer: true });
+        expect(server.to.calledWith(TEST_ROOM_ID)).toBeTruthy();
     });
 
     it('event() should emit RoomMessage and return a string containing event without par', () => {
-        stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
-            emit: (event: string, data) => {
+            emit: (event: string, data: RoomMessage) => {
                 expect(event).toEqual(CHAT_EVENTS.RoomMessage);
                 expect(data.message.includes('Différence')).toBe(true);
                 expect(data.message.includes('par')).toBe(false);
             },
         } as any);
-        gateway.event(socket, { room: TEST_ROOM_ID, event: 'Différence', isMultiplayer: false });
+        gateway.event(socket, { event: 'Différence', isMultiplayer: false });
+        expect(server.to.calledWith(TEST_ROOM_ID)).toBeTruthy();
     });
 
     it('hint should emit RoomMessage event and include a socketid called Event', () => {
-        stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
-            emit: (event: string, data) => {
+            emit: (event: string, data: RoomMessage) => {
                 expect(event).toEqual(CHAT_EVENTS.RoomMessage);
                 expect(data.message.includes('Indice')).toBe(true);
                 expect(data.socketId).toEqual('event');
             },
         } as any);
-        gateway.hint(socket, TEST_ROOM_ID);
+        gateway.hint(socket);
+        expect(server.to.calledWith(TEST_ROOM_ID)).toBeTruthy();
     });
 
     it('socket disconnection should emit a disconnect to rooms', () => {
-        socket.data.room = TEST_ROOM_ID;
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         server.to.returns({
             emit: (event: string, data: RoomMessage) => {
@@ -392,6 +360,7 @@ describe('ChatGateway', () => {
     });
 
     it('socket disconnection should call best time in case of a solo game', () => {
+        socket.data.room = undefined;
         socket.data.isSolo = true;
         socket.data.soloGame = FAKE_GAME_HISTORY_SINGLE;
         const bestTimeSpy = jest.spyOn(gateway, 'bestTime').mockImplementation();

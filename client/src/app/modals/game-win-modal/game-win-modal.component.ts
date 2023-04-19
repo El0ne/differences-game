@@ -1,6 +1,7 @@
 import { Component, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { Routes } from '@app/modules/routes';
 import { EndGame } from '@common/chat-dialog-constants';
 
 @Component({
@@ -9,10 +10,14 @@ import { EndGame } from '@common/chat-dialog-constants';
     styleUrls: ['./game-win-modal.component.scss'],
 })
 export class GameWinModalComponent {
-    constructor(private matDialogRef: MatDialogRef<GameWinModalComponent>, private router: Router, @Inject(MAT_DIALOG_DATA) public data: EndGame) {}
+    constructor(private matDialogRef: MatDialogRef<GameWinModalComponent>, private router: Router, @Inject(MAT_DIALOG_DATA) private data: EndGame) {}
+
+    get endGameInfo(): EndGame {
+        return this.data;
+    }
 
     confirm(): void {
         this.matDialogRef.close();
-        this.router.navigate(['/home']);
+        this.router.navigate([`/${Routes.Home}`]);
     }
 }

@@ -4,6 +4,7 @@
 import { Differences, differencesSchema } from '@app/schemas/differences.schemas';
 import { GameCard, gameCardSchema } from '@app/schemas/game-cards.schemas';
 import { GameHistory, gameHistorySchema } from '@app/schemas/game-history';
+import { Images, imagesSchema } from '@app/schemas/images.schema';
 import { BestTimesService } from '@app/services/best-times/best-times.service';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
@@ -18,15 +19,12 @@ import { PixelPositionService } from '@app/services/pixel-position/pixel-positio
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { HttpStatus } from '@nestjs/common';
-import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
+import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { assert } from 'console';
-import * as fs from 'fs';
-import * as Jimp from 'jimp';
 import { ObjectId } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection } from 'mongoose';
-import * as join from 'path';
 import Sinon, { stub } from 'sinon';
 import * as request from 'supertest';
 import { StageController } from './stage.controller';
@@ -38,7 +36,6 @@ describe('StageController', () => {
     let getGameCardsNumberStub;
     let getGameCardByIdStub;
     let gameCardService: GameCardService;
-    let imageManagerService: ImageManagerService;
     let bestTimesService: BestTimesService;
 
     let mongoServer: MongoMemoryServer;
@@ -54,6 +51,7 @@ describe('StageController', () => {
                 MongooseModule.forFeature([{ name: Differences.name, schema: differencesSchema }]),
                 MongooseModule.forFeature([{ name: GameCard.name, schema: gameCardSchema }]),
                 MongooseModule.forFeature([{ name: GameHistory.name, schema: gameHistorySchema }]),
+                MongooseModule.forFeature([{ name: Images.name, schema: imagesSchema }]),
             ],
             controllers: [StageController],
             providers: [
@@ -77,7 +75,6 @@ describe('StageController', () => {
         httpServer = app.getHttpServer();
         controller = module.get<StageController>(StageController);
         gameCardService = module.get<GameCardService>(GameCardService);
-        imageManagerService = module.get<ImageManagerService>(ImageManagerService);
         bestTimesService = module.get<BestTimesService>(BestTimesService);
         connection = await module.get(getConnectionToken());
         getGameCardStub = stub(gameCardService, 'getGameCards');
@@ -178,59 +175,38 @@ describe('StageController', () => {
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 
-    it('getImage() should return an image if the imageName is valid', async () => {
-        const image = new Jimp(1, 1, 'white', (err) => {
-            if (err) throw err;
-        });
+    it('resetAllBestTimes() should call resetAllGameCards', async () => {
+        const resetMock = jest.spyOn(bestTimesService, 'resetAllBestTimes');
+        const response = await request(httpServer).put('/stage/best-times');
 
-        image.write('assets/images/test.bmp');
-        const response = await request(httpServer).get('/stage/image/test.bmp');
-        expect(response.statusCode).toEqual(HttpStatus.OK);
-        fs.unlink('assets/images/test.bmp', (err) => {
-            if (err) throw err;
-        });
-    });
-
-    it('getImage() should return an  500 error if path is not functional', async () => {
-        jest.spyOn(join, 'join').mockImplementationOnce(() => {
-            throw new Error();
-        });
-
-        const image = new Jimp(1, 1, 'white', (err) => {
-            if (err) throw err;
-        });
-
-        image.write('assets/images/test.bmp');
-        const response = await request(httpServer).get('/stage/image/test.bmp');
-        expect(response.statusCode).toEqual(HttpStatus.INTERNAL_SERVER_ERROR);
-        fs.unlink('assets/images/test.bmp', (err) => {
-            if (err) throw err;
-        });
-    });
-
-    it('deleteImage() should call imageManagerService.deleteImage() with the image name as a parameter', async () => {
-        const image = new Jimp(1, 1, 'white', (err) => {
-            if (err) throw err;
-        });
-
-        image.write('assets/images/test.bmp');
-        jest.spyOn(imageManagerService, 'deleteImage');
-
-        const response = await request(httpServer).delete('/stage/image/test.bmp');
-
+        expect(resetMock).toHaveBeenCalled();
         expect(response.status).toBe(HttpStatus.NO_CONTENT);
-        expect(imageManagerService.deleteImage).toHaveBeenCalledWith('test.bmp');
     });
 
-    it('deleteImage() should return 500 if the request is invalid', async () => {
-        jest.spyOn(imageManagerService, 'deleteImage').mockImplementationOnce(() => {
+    it('resetAllBestTimes() should return 500 if the request is invalid', async () => {
+        jest.spyOn(bestTimesService, 'resetAllBestTimes').mockImplementationOnce(() => {
             throw new Error();
         });
-        const wrongImage = 'wrong_image.bmp';
-        const response = await request(httpServer).delete(`/stage/image/${wrongImage}`);
+        const response = await request(httpServer).put('/stage/best-times');
 
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
-        expect(imageManagerService.deleteImage).toHaveBeenCalledWith(wrongImage);
+    });
+
+    it('resetBestTimes() should call resetGameCard', async () => {
+        const resetMock = jest.spyOn(bestTimesService, 'resetBestTimes').mockImplementation();
+        const response = await request(httpServer).put('/stage/best-times/5');
+
+        expect(resetMock).toHaveBeenCalled();
+        expect(response.status).toBe(HttpStatus.NO_CONTENT);
+    });
+
+    it('resetBestTimes() should return 500 if the request is invalid', async () => {
+        jest.spyOn(bestTimesService, 'resetBestTimes').mockImplementationOnce(() => {
+            throw new Error();
+        });
+        const response = await request(httpServer).put('/stage/best-times/4');
+
+        expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 
     it('resetAllBestTimes() should call resetAllGameCards', async () => {
@@ -267,21 +243,37 @@ describe('StageController', () => {
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 
-    it('deleteAllGames() should call deleteAllGameCards', async () => {
-        const deleteAllGameMock = jest.spyOn(gameCardService, 'deleteAllGameCards').mockImplementation();
-        const response = await request(httpServer).delete('/stage');
+    it('resetAllBestTimes() should call resetAllGameCards', async () => {
+        const resetMock = jest.spyOn(bestTimesService, 'resetAllBestTimes');
+        const response = await request(httpServer).put('/stage/best-times');
 
-        expect(deleteAllGameMock).toHaveBeenCalled();
+        expect(resetMock).toHaveBeenCalled();
         expect(response.status).toBe(HttpStatus.NO_CONTENT);
     });
 
-    it('deleteAllGames() should return 500 if there is an error in the treatment', async () => {
-        const deleteAllGameMock = jest.spyOn(gameCardService, 'deleteAllGameCards').mockImplementationOnce(() => {
+    it('resetAllBestTimes() should return 500 if the request is invalid', async () => {
+        jest.spyOn(bestTimesService, 'resetAllBestTimes').mockImplementationOnce(() => {
             throw new Error();
         });
-        const response = await request(httpServer).delete('/stage');
+        const response = await request(httpServer).put('/stage/best-times');
 
-        expect(deleteAllGameMock).toHaveBeenCalled();
+        expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    });
+
+    it('resetBestTimes() should call resetGameCard', async () => {
+        const resetMock = jest.spyOn(bestTimesService, 'resetBestTimes').mockImplementation();
+        const response = await request(httpServer).put('/stage/best-times/5');
+
+        expect(resetMock).toHaveBeenCalled();
+        expect(response.status).toBe(HttpStatus.NO_CONTENT);
+    });
+
+    it('resetBestTimes() should return 500 if the request is invalid', async () => {
+        jest.spyOn(bestTimesService, 'resetBestTimes').mockImplementationOnce(() => {
+            throw new Error();
+        });
+        const response = await request(httpServer).put('/stage/best-times/4');
+
         expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     });
 });
@@ -290,8 +282,6 @@ const FAKE_GAME_INFO: GameCardDto = {
     _id: '0',
     name: 'game.name',
     difficulty: 'Facile',
-    baseImage: 'game.baseImage',
-    differenceImage: 'game.differenceImage',
     radius: 3,
     differenceNumber: 6,
 };
@@ -301,8 +291,6 @@ const FAKE_GAME_CARD: GameCard = {
     name: 'game.name',
     difficulty: 'Facile',
     differenceNumber: 6,
-    originalImageName: 'game.baseImage',
-    differenceImageName: 'game.differenceImage',
     soloTimes: [
         { time: 0, name: '--' },
         { time: 0, name: '--' },
@@ -317,7 +305,7 @@ const FAKE_GAME_CARD: GameCard = {
 
 const FAKE_GAME_CARD_ANSWER = {
     _id: '00000000773db8b853265f32',
-    differenceImageName: 'game.differenceImage',
+    name: 'game.name',
     differenceNumber: 6,
     difficulty: 'Facile',
     multiTimes: [
@@ -325,8 +313,6 @@ const FAKE_GAME_CARD_ANSWER = {
         { name: '--', time: 0 },
         { name: '--', time: 0 },
     ],
-    name: 'game.name',
-    originalImageName: 'game.baseImage',
     soloTimes: [
         { name: '--', time: 0 },
         { name: '--', time: 0 },

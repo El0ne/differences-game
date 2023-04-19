@@ -1,21 +1,83 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
+import { Images, ImagesDocument, imagesSchema } from '@app/schemas/images.schema';
+import { getFakeImages } from '@app/services/mock/fake-images';
+import { DELAY_BEFORE_CLOSING_CONNECTION } from '@app/tests/constants';
+import { MongooseModule, getConnectionToken, getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as fs from 'fs';
+import { ObjectId } from 'mongodb';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { Connection, Model } from 'mongoose';
 import * as sinon from 'sinon';
 import { ImageManagerService } from './image-manager.service';
+
 describe('ImageManagerService', () => {
     let service: ImageManagerService;
+    let mongoServer: MongoMemoryServer;
+    let imagesModel: Model<ImagesDocument>;
+    let connection: Connection;
 
     beforeEach(async () => {
+        mongoServer = await MongoMemoryServer.create();
+
         const module: TestingModule = await Test.createTestingModule({
+            imports: [
+                MongooseModule.forRootAsync({
+                    useFactory: () => ({
+                        uri: mongoServer.getUri(),
+                    }),
+                }),
+                MongooseModule.forFeature([{ name: Images.name, schema: imagesSchema }]),
+            ],
             providers: [ImageManagerService],
         }).compile();
 
         service = module.get<ImageManagerService>(ImageManagerService);
+        connection = await module.get(getConnectionToken());
+
+        imagesModel = module.get<Model<ImagesDocument>>(getModelToken(Images.name));
+    });
+
+    afterEach((done) => {
+        setTimeout(async () => {
+            await connection.close();
+            await mongoServer.stop();
+            done();
+        }, DELAY_BEFORE_CLOSING_CONNECTION);
     });
 
     it('should be defined', () => {
         expect(service).toBeDefined();
+    });
+
+    it('createImageObject should add an Image Object to the list of Image Objects', async () => {
+        const fakeImages = getFakeImages();
+        await service.createImageObject(fakeImages);
+        const response = await service.getImageObjectById(fakeImages._id.toHexString());
+        expect(response).toEqual(expect.objectContaining(fakeImages));
+    });
+
+    it('getGameCardById should call find by id', async () => {
+        jest.spyOn(imagesModel, 'findById').mockImplementation();
+        const id = new ObjectId(123);
+        await service.getImageObjectById(id.toHexString());
+        expect(imagesModel.findById).toBeCalledWith(id);
+    });
+
+    it('deleteImageObject should call findByIdAndDelete and deleteImage', async () => {
+        const fakeImages = getFakeImages();
+        jest.spyOn(imagesModel, 'findByIdAndDelete').mockImplementation(() => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            return fakeImages as any;
+        });
+        jest.spyOn(service, 'deleteImage').mockImplementation();
+
+        const id = new ObjectId(123);
+        await service.deleteImageObject(id.toHexString());
+        expect(imagesModel.findByIdAndDelete).toBeCalledWith(id);
+        expect(service.deleteImage).toBeCalledWith(fakeImages.originalImageName);
+        expect(service.deleteImage).toBeCalledWith(fakeImages.differenceImageName);
     });
 
     it('should delete the image at the provided path', () => {

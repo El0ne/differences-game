@@ -14,7 +14,6 @@ const DIFFERENCE_IMAGE_PATH = 'assets/images/difference-image.bmp';
 export class DifferenceDetectionService {
     firstImageArray: number[];
     secondImageArray: number[];
-    radius: number;
     differenceArray: boolean[];
 
     constructor(
@@ -30,10 +29,9 @@ export class DifferenceDetectionService {
         return numArray;
     }
 
-    async compareImages(pathToImage1: string, pathToImage2: string, radius: number): Promise<number[][]> {
+    async compareImages(pathToImage1: string, pathToImage2: string): Promise<number[][]> {
         this.firstImageArray = await this.createArray(pathToImage1);
         this.secondImageArray = await this.createArray(pathToImage2);
-        this.radius = radius;
         this.differenceArray = new Array(this.imageDimensionsService.getNumberOfPixels());
         this.differenceArray.fill(false);
         const image = new Jimp(this.imageDimensionsService.getWidth(), this.imageDimensionsService.getHeight(), WHITE);
@@ -55,7 +53,7 @@ export class DifferenceDetectionService {
                 radiusArray[i] = true;
                 this.setPixelBlack(image, i * RGBA_DATA_LENGTH);
                 if (this.hasWhiteNeighbor(i)) {
-                    for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(i, this.radius, true)) {
+                    for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(i, true)) {
                         radiusArray[adjacentPixel] = true;
                         this.setPixelBlack(image, adjacentPixel * RGBA_DATA_LENGTH);
                     }
@@ -69,7 +67,7 @@ export class DifferenceDetectionService {
     }
 
     hasWhiteNeighbor(pixelPosition: number): boolean {
-        for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(pixelPosition, 1, false)) {
+        for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(pixelPosition, false, 1)) {
             if (!this.differenceArray[adjacentPixel]) return true;
         }
         return false;

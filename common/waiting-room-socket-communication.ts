@@ -1,4 +1,4 @@
-export enum WAITING_ROOM_EVENTS {
+export const enum WAITING_ROOM_EVENTS {
     ScanForHost = 'scanForHost',
     HostGame = 'hostGame',
     UnhostGame = 'unhostGame',
@@ -14,6 +14,7 @@ export enum WAITING_ROOM_EVENTS {
     MatchRefused = 'matchRefused',
     MatchConfirmed = 'matchConfirmed',
     DeleteGame = 'deleteGame',
+    DeleteAllGames = 'deleteAllGames',
     GameDeleted = 'gameDeleted',
 }
 
@@ -29,4 +30,8 @@ export interface AcceptationInformation extends PlayerInformations {
 export interface JoinHostInWaitingRequest {
     stageId: string;
     playerName: string;
+}
+
+export interface AcceptOpponentInformation extends PlayerInformations {
+    isLimitedTimeMode: boolean;
 }

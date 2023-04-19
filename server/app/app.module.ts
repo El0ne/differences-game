@@ -8,10 +8,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { GameClickController } from './controllers/game-click/game-click.controller';
 import { GameConstantsController } from './controllers/game-constants/game-constants.controller';
 import { GameHistoryController } from './controllers/game-history/game-history/game-history.controller';
+import { ImageController } from './controllers/image/image.controller';
 import { StageController } from './controllers/stage/stage.controller';
-import { MatchGateway } from './gateways/match/match/match.gateway';
+import { MatchGateway } from './gateways/match/match.gateway';
 import { StageWaitingRoomGateway } from './gateways/waitingRoom/stage-waiting-room.gateway';
 import { GameHistory, gameHistorySchema } from './schemas/game-history';
+import { Images, imagesSchema } from './schemas/images.schema';
 import { BestTimesService } from './services/best-times/best-times.service';
 import { DifferenceClickService } from './services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from './services/difference-detection/difference-detection.service';
@@ -39,9 +41,10 @@ import { PixelRadiusService } from './services/pixel-radius/pixel-radius.service
             { name: Differences.name, schema: differencesSchema },
             { name: GameCard.name, schema: gameCardSchema },
             { name: GameHistory.name, schema: gameHistorySchema },
+            { name: Images.name, schema: imagesSchema },
         ]),
     ],
-    controllers: [GameClickController, StageController, GameConstantsController, GameHistoryController],
+    controllers: [GameClickController, StageController, GameConstantsController, GameHistoryController, ImageController],
     providers: [
         ChatGateway,
         StageWaitingRoomGateway,

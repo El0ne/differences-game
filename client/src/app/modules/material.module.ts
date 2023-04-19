@@ -67,7 +67,9 @@ const modules = [
 /**
  * Material module
  * IMPORTANT : IMPORT ONLY USED MODULES !!!!!!
+ *
  */
+// TODO remove all unused modules
 @NgModule({
     imports: [...modules],
     exports: [...modules],

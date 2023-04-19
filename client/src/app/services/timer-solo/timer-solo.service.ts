@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SocketService } from '@app/services/socket/socket.service';
-import { MATCH_EVENTS } from '@common/match-gateway-communication';
+import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS } from '@common/match-gateway-communication';
 import { TimerModification } from '@common/timer-modification';
 import { Subscription } from 'rxjs';
 import { SECONDS_IN_MINUTE, TEN } from './timer-solo.constants';
@@ -20,8 +20,18 @@ export class TimerSoloService {
         });
     }
 
+    limitedTimeTimer(): void {
+        this.socket.listen<number>(MATCH_EVENTS.LimitedTimeTimer, (timerValue: number) => {
+            if (timerValue === 0) {
+                this.stopTimer();
+                this.socket.send(MATCH_EVENTS.Lose);
+            }
+            this.currentTime = timerValue;
+        });
+    }
+
     stopTimer(): void {
-        this.socket.send(MATCH_EVENTS.EndTime, this.socket.gameRoom);
+        this.socket.send(MATCH_EVENTS.EndTime);
     }
 
     convert(seconds: number): string {
@@ -35,10 +45,9 @@ export class TimerSoloService {
 
     restartTimer(multiplier: number, timeModification: number): void {
         const timerModification: TimerModification = {
-            room: this.socket.gameRoom,
             currentTime: this.currentTime + timeModification,
             timeMultiplier: multiplier,
         };
-        this.socket.send(MATCH_EVENTS.TimeModification, timerModification);
+        this.socket.send(LIMITED_TIME_MODE_EVENTS.TimeModification, timerModification);
     }
 }

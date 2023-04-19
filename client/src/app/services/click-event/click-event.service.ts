@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
     providedIn: 'root',
 })
 export class ClickEventService {
-    constructor(public http: HttpClient) {}
+    constructor(private http: HttpClient) {}
 
     getDifferences(stageId: string): Observable<number[][]> {
         return this.http.get<number[][]>(`${CLICK}/${stageId}`);

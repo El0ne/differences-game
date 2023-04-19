@@ -1,14 +1,14 @@
 <div class="info modal-page">
-    <h1 class="title neon">{{ data.gameCardInfo.name }}</h1>
+    <h1 class="title neon">{{ gameInfo.gameCardInfo.name }}</h1>
     <div class="info-container">
         <h1 class="neon">
             Difficulté :
-            {{ data.gameCardInfo.difficulty }}
+            {{ gameInfo.gameCardInfo.difficulty }}
         </h1>
-        <h1 class="neon">Joueurs présents : {{ data.numberOfPlayers }}</h1>
+        <h1 class="neon">Joueurs présents : {{ gameInfo.numberOfPlayers }}</h1>
         <h1 class="neon">
             Nombre de différences :
-            {{ data.numberOfDifferences }}
+            {{ gameInfo.numberOfDifferences }}
         </h1>
         <!-- TODO add game mode -->
     </div>

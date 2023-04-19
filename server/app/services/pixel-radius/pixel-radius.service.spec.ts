@@ -34,36 +34,53 @@ describe('PixelRadiusService', () => {
 
     it('getAdjacentPixels function should return an array of pixels around a pixel', () => {
         const pixelLocation = 645;
-        const radiusSize = 1;
-        const returnedPixelsAroundMyPixel = service.getAdjacentPixels(pixelLocation, radiusSize, true);
+        service.radius = 1;
+        const returnedPixelsAroundMyPixel = service.getAdjacentPixels(pixelLocation, true);
         expect(returnedPixelsAroundMyPixel).toEqual(EXPECTED_PIXELS_WITH_RADIUS_OF_1);
     });
 
     it('getAdjacentPixels function should return a single pixel if radiusSize is 0', () => {
         const pixelLocation = 27;
-        const radiusSize = 0;
-        const returnedPixelsAroundMyPixel = service.getAdjacentPixels(pixelLocation, radiusSize, true);
+        service.radius = 0;
+        const returnedPixelsAroundMyPixel = service.getAdjacentPixels(pixelLocation, true);
         expect(returnedPixelsAroundMyPixel).toEqual(EXPECTED_PIXELS_WITH_RADIUS_OF_0);
     });
 
     it('getAdjacentPixels function should return an array of pixels around a pixel located near the top-left border of image', () => {
         const pixelLocation = 642;
-        const radiusSize = 3;
-        const returnedPixelsAroundMyPixel = service.getAdjacentPixels(pixelLocation, radiusSize, true);
+        service.radius = 3;
+        const returnedPixelsAroundMyPixel = service.getAdjacentPixels(pixelLocation, true);
         expect(returnedPixelsAroundMyPixel).toEqual(EXPECTED_PIXELS_WITH_RADIUS_OF_3);
     });
 
     it('getAdjacentPixels function should return an array of pixels around a pixel located near the bottom-right border of image', () => {
         const pixelLocation = 306558;
-        const radiusSize = 2;
-        const returnedPixelsAroundMyPixel = service.getAdjacentPixels(pixelLocation, radiusSize, true);
+        service.radius = 2;
+        const returnedPixelsAroundMyPixel = service.getAdjacentPixels(pixelLocation, true);
         expect(returnedPixelsAroundMyPixel).toEqual(EXPECTED_PIXELS_WITH_RADIUS_OF_2);
     });
 
     it('getAdjacentPixels function should return an square array of pixels around a pixel if isRound is false', () => {
         const pixelLocation = 645;
-        const radiusSize = 1;
-        const returnedPixelsAroundMyPixel = service.getAdjacentPixels(pixelLocation, radiusSize, false);
+        service.radius = 1;
+        const returnedPixelsAroundMyPixel = service.getAdjacentPixels(pixelLocation, false);
         expect(returnedPixelsAroundMyPixel).toEqual(EXPECTED_PIXELS_WITH_RADIUS_OF_1_AND_SQUARE);
+    });
+
+    it('set radius should set the radiusSquared to the square of the number', () => {
+        service.radius = 5;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        expect((service as any).radiusSquared).toEqual(25);
+    });
+
+    it('getAdjacentPixels should chose between radiusSquared property depending on parameters', () => {
+        let pixelLocation = 645;
+        service.radius = 3;
+        const radiusPixels1 = service.getAdjacentPixels(pixelLocation, true, 1);
+        expect(radiusPixels1).toEqual(EXPECTED_PIXELS_WITH_RADIUS_OF_1);
+
+        pixelLocation = 642;
+        const radiusPixels3 = service.getAdjacentPixels(pixelLocation, true);
+        expect(radiusPixels3).toEqual(EXPECTED_PIXELS_WITH_RADIUS_OF_3);
     });
 });

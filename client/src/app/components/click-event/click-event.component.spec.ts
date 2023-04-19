@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/naming-convention */
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MOCK_ARRAY } from '@app/pages/solo-view/mock-array';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
-import { STAGE } from '@app/services/server-routes';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { of, Subject } from 'rxjs';
 import { DIFFERENCE_FOUND, DIFFERENCE_NOT_FOUND, TEST_DIFFERENCES } from './click-event-constants-testing';
@@ -158,20 +157,13 @@ describe('ClickEventComponent', () => {
         expect(fillRectSpy).toHaveBeenCalledWith(2, 0, 1, 1);
     });
 
-    it('component should draw image on canvas on init', waitForAsync(async () => {
-        const imageSpyObj = jasmine.createSpyObj('Image', ['onload']);
-        spyOn(window, 'Image').and.returnValue(imageSpyObj);
-        spyOn(CanvasRenderingContext2D.prototype, 'drawImage').and.returnValue();
-
-        component.imagePath = 'test.png';
+    it('component should set the properties of the component correctly', () => {
         component.ngOnInit();
-
-        expect(window.Image).toHaveBeenCalledWith();
-        expect(imageSpyObj.src).toBe(`${STAGE}/image/test.png`);
-        expect(imageSpyObj.crossOrigin).toBe('Anonymous');
-        imageSpyObj.onload();
-        expect(CanvasRenderingContext2D.prototype.drawImage).toHaveBeenCalled();
-    }));
+        expect(component.toggleCheatMode).toBeFalsy();
+        expect(component.timeout).toBeFalsy();
+        expect(component.endGame).toBeFalsy();
+        expect(component.foundDifferences).toEqual([]);
+    });
 
     it('displayError should only display an error for 1 second', fakeAsync(() => {
         component.timeout = false;

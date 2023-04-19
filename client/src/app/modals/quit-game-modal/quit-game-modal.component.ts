@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { Routes } from '@app/modules/routes';
 
 @Component({
     selector: 'app-quit-game-modal',
@@ -8,12 +9,12 @@ import { Router } from '@angular/router';
     styleUrls: ['./quit-game-modal.component.scss'],
 })
 export class QuitGameModalComponent {
-    image: string = '../../../assets/crying-black-guy-meme.gif';
+    image: string = '@app/assets/crying-black-guy-meme.gif';
     constructor(private matDialogRef: MatDialogRef<QuitGameModalComponent>, private router: Router) {}
 
     confirm(): void {
         this.matDialogRef.close();
-        this.router.navigate(['/home']);
+        this.router.navigate([`/${Routes.Home}`]);
     }
 
     cancel(): void {

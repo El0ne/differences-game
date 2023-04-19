@@ -8,7 +8,7 @@ export const MAX_DIFF_SURFACE = 0.15;
 
 @Injectable()
 export class GameDifficultyService {
-    constructor(public imageDimensionsService: ImageDimensionsService) {}
+    constructor(private imageDimensionsService: ImageDimensionsService) {}
 
     isGameValid(differenceArray: number[][]): boolean {
         if (differenceArray.length >= MIN_DIFF_NUMBER && differenceArray.length <= MAX_DIFF_NUMBER) return true;

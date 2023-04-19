@@ -5,7 +5,8 @@
             <img [src]="this.image" class="photo" />
         </div>
         <div class="column">
-            <div class="difficulty-container" [ngClass]="gameCardInformation.difficulty === 'Difficile' ? 'difficult' : 'easy'">
+            <div class="difficulty-container"
+                [ngClass]="gameCardInformation.difficulty === 'Difficile' ? 'difficult' : 'easy'">
                 <p id="difficulty">
                     {{ gameCardInformation.difficulty }}
                 </p>
@@ -38,7 +39,8 @@
         <button class="normal-button option-button" (click)="resetBestTimes()">Réinitialiser</button>
     </div>
     <div class="row" *ngIf="!isConfig">
-        <button class="normal-button option-button" (click)="selectPlayerName(true)">Jouer</button>
-        <button class="normal-button option-button" (click)="selectPlayerName(false)">{{ createGameButton ? 'Créer' : 'Joindre' }}</button>
+        <button class="normal-button option-button" (click)="selectPlayerName(false)">Jouer</button>
+        <button class="normal-button option-button" (click)="selectPlayerName(true)">{{ createGameButton ? 'Créer' :
+            'Joindre' }}</button>
     </div>
 </div>
