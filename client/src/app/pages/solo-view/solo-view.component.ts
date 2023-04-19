@@ -5,7 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { HEIGHT, MAX_EFFECT_TIME, WIDTH } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
-import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
+import { GameInfoModalComponent, GameInfoModalData } from '@app/modals/game-info-modal/game-info-modal.component';
 import { GameLoseModalComponent } from '@app/modals/game-lose-modal/game-lose-modal.component';
 import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal.component';
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
@@ -26,7 +26,7 @@ import { GameCardInformation } from '@common/game-card';
 import { GameConstants } from '@common/game-constants';
 import { GameHistoryDTO } from '@common/game-history.dto';
 import { ImageObject } from '@common/image-object';
-import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, TWO_MINUTES } from '@common/match-gateway-communication';
+import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, TWO_MINUTES_SECONDS } from '@common/match-gateway-communication';
 import { PlayerGameInfo } from '@common/player-game-info';
 import { Subject } from 'rxjs';
 import { DOUBLE_HINT_TIME_IN_MS, HINT_TIME_IN_MS } from './solo-view-constants';
@@ -67,12 +67,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     // we have more than 3 services
     // eslint-disable-next-line max-params
     constructor(
-        public timerService: TimerSoloService,
+        private timerService: TimerSoloService,
         private gameCardInfoService: GameCardInformationService,
         private foundDifferenceService: FoundDifferenceService,
         private dialog: MatDialog,
         private router: Router,
-        public socketService: SocketService,
+        private socketService: SocketService,
         private gameConstantsService: GameConstantsService,
         private gameParamService: GameParametersService,
         private imagesService: ImagesService,
@@ -89,6 +89,10 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     get isMultiplayer(): boolean {
         return this.gameParamService.gameParameters.isMultiplayerGame;
+    }
+
+    get socketId(): string {
+        return this.socketService.socketId;
     }
 
     ngOnInit(): void {
@@ -135,7 +139,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.limitedSoloDto = {
                     gameId: 'Limited',
                     gameName: 'Limited',
-                    gameMode: 'Temps Limité',
+                    gameMode: 'Temps limité',
                     gameDuration: Date.now(),
                     startTime: this.startTime,
                     isMultiplayer: this.isMultiplayer,
@@ -434,7 +438,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 gameCardInfo: this.gameCardInfo,
                 numberOfDifferences: this.numberOfDifferences,
                 numberOfPlayers: this.isMultiplayer ? 2 : 1,
-            },
+            } as GameInfoModalData,
         });
     }
 
@@ -473,7 +477,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     addTimeToTimer(): void {
         this.socketService.send<number>(
             LIMITED_TIME_MODE_EVENTS.Timer,
-            Math.min(this.timerService.currentTime + this.gameConstants.difference, TWO_MINUTES),
+            Math.min(this.timerService.currentTime + this.gameConstants.difference, TWO_MINUTES_SECONDS),
         );
     }
 

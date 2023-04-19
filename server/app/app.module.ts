@@ -10,7 +10,7 @@ import { GameConstantsController } from './controllers/game-constants/game-const
 import { GameHistoryController } from './controllers/game-history/game-history/game-history.controller';
 import { ImageController } from './controllers/image/image.controller';
 import { StageController } from './controllers/stage/stage.controller';
-import { MatchGateway } from './gateways/match/match/match.gateway';
+import { MatchGateway } from './gateways/match/match.gateway';
 import { StageWaitingRoomGateway } from './gateways/waitingRoom/stage-waiting-room.gateway';
 import { GameHistory, gameHistorySchema } from './schemas/game-history';
 import { Images, imagesSchema } from './schemas/images.schema';

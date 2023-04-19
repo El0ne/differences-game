@@ -1,8 +1,7 @@
-/* eslint-disable no-underscore-dangle */
-import { MatchGateway } from '@app/gateways/match/match/match.gateway';
+/* eslint-disable no-underscore-dangle */ // MongoDB requires _id property with underscore
+import { MatchGateway } from '@app/gateways/match/match.gateway';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
-import { LIMITED_TIME_MODE_EVENTS } from '@common/match-gateway-communication';
 import {
     AcceptationInformation,
     AcceptOpponentInformation,
@@ -91,8 +90,7 @@ export class StageWaitingRoomGateway implements OnGatewayDisconnect, OnGatewayDi
 
         if (acceptation.isLimitedTimeMode) {
             this.matchGateway.timer(roomId);
-            await this.gameManagerService.startLimitedTimeGame(roomId, 2);
-            this.server.to(roomId).emit(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, this.gameManagerService.giveNextStage(roomId));
+            await this.matchGateway.createLimitedTimeGame(roomId, 2);
         } else {
             socket
                 .to(this.gameHosts.get(socket.data.stageInHosting).waitingRoom)

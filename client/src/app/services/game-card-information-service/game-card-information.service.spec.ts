@@ -44,21 +44,21 @@ describe('GameCardInformationService', () => {
         const mockString = 'Hello, this is a mock string';
         const mockBlob = new Blob([mockString], { type: 'text/plain' });
         const mockFile = new File([mockBlob], 'mock-file.txt');
-        const postSpy = spyOn(service.http, 'post');
+        const postSpy = spyOn(service['http'], 'post');
 
         service.uploadImages(mockFile, mockFile, 3);
         expect(postSpy).toHaveBeenCalled();
     });
 
     it('getGameCardInfo should call get on httpManager', () => {
-        const getSpy = spyOn(service.http, 'get');
+        const getSpy = spyOn(service['http'], 'get');
 
         service.getGameCardInfoFromId('');
         expect(getSpy).toHaveBeenCalled();
     });
 
     it('getGameCardInfo should call post on httpManager', () => {
-        const postSpy = spyOn(service.http, 'post');
+        const postSpy = spyOn(service['http'], 'post');
         const mock: GameCardDto = {
             _id: '1',
             name: 'name',
@@ -131,16 +131,6 @@ describe('GameCardInformationService', () => {
 
         const req = httpController.expectOne(`${STAGE}/best-times/${id}`);
         expect(req.request.method).toBe('PUT');
-        req.flush(null);
-    });
-
-    it('deleteAllGames() should delete all the game cards', () => {
-        service.deleteAllGames().subscribe(() => {
-            expect().nothing();
-        });
-
-        const req = httpController.expectOne(`${STAGE}`);
-        expect(req.request.method).toBe('DELETE');
         req.flush(null);
     });
 });

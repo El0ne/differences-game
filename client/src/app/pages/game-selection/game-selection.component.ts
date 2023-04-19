@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import { Component, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { Component, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameCardSelectionComponent } from '@app/components/game-card-selection/game-card-selection.component';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
@@ -14,14 +14,14 @@ const DELAY_BEFORE_REFRESH = 250;
     templateUrl: './game-selection.component.html',
     styleUrls: ['./game-selection.component.scss'],
 })
-export class GameSelectionComponent implements OnInit {
+export class GameSelectionComponent implements OnInit, OnDestroy {
     @ViewChildren('stages') stages: QueryList<GameCardSelectionComponent>;
     gameCardInformations: GameCardInformation[] = [];
     numberOfGameInformations = 0;
     index: number = 0;
     isConfig: boolean | null;
 
-    constructor(public gameCardService: GameCardInformationService, public router: Router, private socket: SocketService) {}
+    constructor(private gameCardService: GameCardInformationService, private router: Router, private socket: SocketService) {}
 
     ngOnInit(): void {
         this.isConfig = this.router.url === '/config';
@@ -40,6 +40,12 @@ export class GameSelectionComponent implements OnInit {
         });
 
         this.refreshGameCards();
+    }
+
+    ngOnDestroy(): void {
+        this.socket.delete(WAITING_ROOM_EVENTS.GameDeleted);
+        this.socket.delete(WAITING_ROOM_EVENTS.MatchDeleted);
+        this.socket.delete(WAITING_ROOM_EVENTS.MatchCreated);
     }
 
     selectGameCards(): void {

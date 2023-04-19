@@ -49,7 +49,7 @@ describe('GameDifficultyService', () => {
     });
 
     it('setGameDifficulty should return easy if array length is less than 15% of surface is difference', () => {
-        const MAX_PIXEL_COUNT_VALID: number = MAX_DIFF_SURFACE * service.imageDimensionsService.getNumberOfPixels();
+        const MAX_PIXEL_COUNT_VALID: number = MAX_DIFF_SURFACE * service['imageDimensionsService'].getNumberOfPixels();
 
         const diffArray = [[1], [2], [3], [4], [5], [6], [7], [8], [9]];
         for (let i = 0; i < MAX_PIXEL_COUNT_VALID; i++) diffArray.push([i]);

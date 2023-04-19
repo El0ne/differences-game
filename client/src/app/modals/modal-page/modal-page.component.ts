@@ -19,19 +19,31 @@ export class ModalPageComponent {
     // eslint-disable-next-line max-params
     constructor(
         @Inject(MAT_DIALOG_DATA)
-        public data: {
+        private data: {
             image: string;
             difference: number;
             difficulty: string;
             gameInfo: GameCardDto;
         },
-        public matDialogRef: MatDialogRef<ModalPageComponent>,
-        public router: Router,
+        private matDialogRef: MatDialogRef<ModalPageComponent>,
+        private router: Router,
         private gameCardService: GameCardInformationService,
         private clickService: ClickEventService,
         private ngZone: NgZone,
         private imagesServices: ImagesService,
     ) {}
+
+    get image(): string {
+        return this.data.image;
+    }
+
+    get difference(): number {
+        return this.data.difference;
+    }
+
+    get difficulty(): string {
+        return this.data.difficulty;
+    }
 
     createGame(): void {
         this.gameCardService.createGame(this.data.gameInfo).subscribe();

@@ -1,9 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { WaitingRoomComponent, WaitingRoomDataPassing } from '@app/modals/waiting-room/waiting-room.component';
-import { Routes } from '@app/modules/routes';
 import { GameParametersService } from '@app/services/game-parameters/game-parameters.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, SoloGameCreation } from '@common/match-gateway-communication';
@@ -21,6 +20,7 @@ export class LimitedTimeComponent implements OnInit, OnDestroy {
     // reason: needed more than 4 parameters for the constructor
     // eslint-disable-next-line max-params
     constructor(
+        private dialogRef: MatDialogRef<ChosePlayerNameDialogComponent>,
         private socketService: SocketService,
         private dialog: MatDialog,
         private router: Router,
@@ -37,11 +37,6 @@ export class LimitedTimeComponent implements OnInit, OnDestroy {
             this.createGameButton = true;
         });
 
-        this.socketService.listen<string>(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, (stageId: string) => {
-            this.gameParamService.gameParameters.stageId = stageId;
-            this.router.navigate([`/${Routes.Game}`]);
-        });
-
         this.socketService.send(WAITING_ROOM_EVENTS.ScanForHost, [LIMITED_TIME_MODE_ID]);
     }
 
@@ -49,6 +44,7 @@ export class LimitedTimeComponent implements OnInit, OnDestroy {
         this.socketService.delete(WAITING_ROOM_EVENTS.MatchCreated);
         this.socketService.delete(WAITING_ROOM_EVENTS.MatchDeleted);
         this.socketService.delete(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame);
+        this.socketService.delete(LIMITED_TIME_MODE_EVENTS.AbortLimitedTimeGame);
     }
 
     hostOrJoinGame(): void {
@@ -64,10 +60,21 @@ export class LimitedTimeComponent implements OnInit, OnDestroy {
         this.dialog.open(WaitingRoomComponent, { disableClose: true, data });
     }
 
+    configureSocketForGame(): void {
+        this.socketService.listen<string>(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, (stageId: string) => {
+            this.gameParamService.gameParameters.stageId = stageId;
+            this.router.navigate(['/game']);
+        });
+        this.socketService.listen(LIMITED_TIME_MODE_EVENTS.AbortLimitedTimeGame, () => {
+            alert("Il n'y a pas de parties disponibles pour jouer en mode temps limité");
+        });
+    }
+
     selectPlayerName(isMultiplayerGame: boolean): void {
         const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true });
         dialogRef.afterClosed().subscribe((isNameEntered: boolean) => {
             if (isNameEntered) {
+                this.configureSocketForGame();
                 this.gameParamService.gameParameters = {
                     isLimitedTimeGame: true,
                     isMultiplayerGame,
@@ -82,5 +89,9 @@ export class LimitedTimeComponent implements OnInit, OnDestroy {
                 } else this.hostOrJoinGame();
             }
         });
+    }
+
+    closeModal(): void {
+        this.dialogRef.close();
     }
 }

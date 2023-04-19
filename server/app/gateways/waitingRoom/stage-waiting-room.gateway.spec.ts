@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable no-unused-vars */
-import { MatchGateway } from '@app/gateways/match/match/match.gateway';
+import { MatchGateway } from '@app/gateways/match/match.gateway';
 import { GameCard } from '@app/schemas/game-cards.schemas';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
@@ -144,11 +144,9 @@ describe('StageWaitingRoomGateway', () => {
         expect(addGameSpy).toHaveBeenCalledWith('stage1', 2);
 
         socket.data.stageInHosting = 'limitedTimeModeTest';
-        const createLimitedTimeGameSpy = jest.spyOn(gameManagerService, 'startLimitedTimeGame').mockImplementation();
-        const giveNextStageIdSpy = jest.spyOn(gameManagerService, 'giveNextStage').mockReturnValue('limitedTimeModeTest');
+        const createLimitedTimeGameSpy = jest.spyOn(matchGatewayStub, 'createLimitedTimeGame').mockImplementation();
         await gateway.acceptOpponent(socket, { playerName: 'host1', playerSocketId: opponentSocketId, isLimitedTimeMode: true });
         expect(createLimitedTimeGameSpy).toHaveBeenCalledWith(socket.data.room, 2);
-        expect(giveNextStageIdSpy).toHaveBeenCalledWith(socket.data.room);
 
         expect(socket.data.room === opponentSocket.data.room).toBeTruthy();
     });

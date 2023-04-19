@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
     providedIn: 'root',
 })
 export class GameCardInformationService {
-    constructor(public http: HttpClient) {}
+    constructor(private http: HttpClient) {}
 
     getGameCardInfoFromId(id: string): Observable<GameCardInformation> {
         return this.http.get<GameCardInformation>(`${STAGE}/${id}`);
@@ -46,9 +46,5 @@ export class GameCardInformationService {
 
     resetBestTime(id: string): Observable<void> {
         return this.http.put<void>(`${STAGE}/best-times/${id}`, null);
-    }
-
-    deleteAllGames(): Observable<void> {
-        return this.http.delete<void>(`${STAGE}`);
     }
 }

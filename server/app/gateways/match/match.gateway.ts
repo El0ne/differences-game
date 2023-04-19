@@ -1,7 +1,7 @@
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { DifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameHistoryDTO } from '@common/game-history.dto';
-import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND, SoloGameCreation } from '@common/match-gateway-communication';
+import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND_MS, SoloGameCreation } from '@common/match-gateway-communication';
 
 import { TimerModification } from '@common/timer-modification';
 import { Injectable } from '@nestjs/common';
@@ -20,8 +20,7 @@ export class MatchGateway implements OnGatewayDisconnect {
         socket.data.stageId = gameInfo.stageId;
         socket.data.room = socket.id;
         if (gameInfo.isLimitedTimeMode) {
-            await this.gameManagerService.startLimitedTimeGame(socket.data.room, 1);
-            socket.emit(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, this.gameManagerService.giveNextStage(socket.data.room));
+            this.createLimitedTimeGame(socket.data.room, 1);
         } else {
             this.timer(socket.data.room);
             this.gameManagerService.addGame(gameInfo.stageId, 1);
@@ -77,7 +76,7 @@ export class MatchGateway implements OnGatewayDisconnect {
         const timer = setInterval(() => {
             time--;
             this.server.to(socket.data.room).emit(MATCH_EVENTS.LimitedTimeTimer, time);
-        }, ONE_SECOND);
+        }, ONE_SECOND_MS);
         if (!socket.data.time) {
             socket.data.time = true;
         }
@@ -101,7 +100,7 @@ export class MatchGateway implements OnGatewayDisconnect {
         const timer = setInterval(() => {
             data.currentTime++;
             this.server.to(socket.data.room).emit(MATCH_EVENTS.Timer, data.currentTime);
-        }, ONE_SECOND);
+        }, ONE_SECOND_MS);
         this.timers.set(socket.data.room, timer);
     }
 
@@ -110,8 +109,16 @@ export class MatchGateway implements OnGatewayDisconnect {
         const timer = setInterval(() => {
             timerCount++;
             this.server.to(room).emit(MATCH_EVENTS.Timer, timerCount);
-        }, ONE_SECOND);
+        }, ONE_SECOND_MS);
         this.timers.set(room, timer);
+    }
+
+    async createLimitedTimeGame(room: string, numberOfPlayers: number): Promise<void> {
+        if (await this.gameManagerService.startLimitedTimeGame(room, numberOfPlayers)) {
+            this.server.to(room).emit(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame, this.gameManagerService.giveNextStage(room));
+        } else {
+            this.server.to(room).emit(LIMITED_TIME_MODE_EVENTS.AbortLimitedTimeGame);
+        }
     }
 
     async handleDisconnect(socket: Socket): Promise<void> {

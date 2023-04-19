@@ -32,7 +32,7 @@ import { GameCardInformation } from '@common/game-card';
 import { GameConstants } from '@common/game-constants';
 import { GameHistoryDTO } from '@common/game-history.dto';
 import { ImageObject } from '@common/image-object';
-import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND, TWO_MINUTES } from '@common/match-gateway-communication';
+import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND_MS, TWO_MINUTES_SECONDS } from '@common/match-gateway-communication';
 import { of } from 'rxjs';
 import { SoloViewComponent } from './solo-view.component';
 
@@ -44,6 +44,7 @@ describe('SoloViewComponent', () => {
     let socketServiceMock: SocketService;
     let foundDifferenceServiceSpy: FoundDifferenceService;
     let gameHintServiceMock: GameHintService;
+
     let modalSpy: MatDialog;
     let clickEventServiceSpy: ClickEventService;
     let gameConstantsService: GameConstantsService;
@@ -150,7 +151,7 @@ describe('SoloViewComponent', () => {
         Object.defineProperty(mockRouter, 'url', { value: 'solo/234' });
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.ngOnInit();
-        tick(ONE_SECOND);
+        tick(ONE_SECOND_MS);
         expect(sendSpy).toHaveBeenCalledTimes(1);
         expect(component.gameConstants).toEqual(MOCK_GAME_CONSTANTS);
     }));
@@ -167,7 +168,7 @@ describe('SoloViewComponent', () => {
             }
         };
         component.ngOnInit();
-        tick(ONE_SECOND);
+        tick(ONE_SECOND_MS);
         expect(sendSpy).toHaveBeenCalledTimes(2);
         expect(notifyEndGame).toHaveBeenCalled();
     }));
@@ -191,7 +192,7 @@ describe('SoloViewComponent', () => {
             }
         };
         component.ngOnInit();
-        tick(ONE_SECOND);
+        tick(ONE_SECOND_MS);
         expect(winGameSpy).toHaveBeenCalled();
     }));
 
@@ -306,7 +307,7 @@ describe('SoloViewComponent', () => {
     });
 
     it('showTime should call startTimer of service', () => {
-        const startTimerSpy = spyOn(component.timerService, 'startTimer');
+        const startTimerSpy = spyOn(component['timerService'], 'startTimer');
 
         component.showTime();
 
@@ -563,11 +564,11 @@ describe('SoloViewComponent', () => {
     it('getRandomDifference should call end game if hint indice triggers a negative time', () => {
         Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: true });
         Object.defineProperty(gameParamService.gameParameters, 'isMultiplayerGame', { value: false });
-        component.timerService.currentTime = 10;
+        component['timerService'].currentTime = 10;
         component.gameConstants.hint = 11;
         gameHintServiceMock.hintsRemaining = 1;
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
-        const stopTimerSpy = spyOn(component.timerService, 'stopTimer').and.callThrough();
+        const stopTimerSpy = spyOn(component['timerService'], 'stopTimer').and.callThrough();
         component.getRandomDifference({ key: 'i' } as KeyboardEvent);
         expect(sendSpy).toHaveBeenCalledTimes(2);
         expect(stopTimerSpy).toHaveBeenCalled();
@@ -576,11 +577,11 @@ describe('SoloViewComponent', () => {
     it('getRandomDifference should not call end game if hint still has time left', () => {
         Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: true });
         Object.defineProperty(gameParamService.gameParameters, 'isMultiplayerGame', { value: false });
-        component.timerService.currentTime = 12;
+        component['timerService'].currentTime = 12;
         component.gameConstants.hint = 11;
         gameHintServiceMock.hintsRemaining = 1;
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
-        const stopTimerSpy = spyOn(component.timerService, 'stopTimer').and.callThrough();
+        const stopTimerSpy = spyOn(component['timerService'], 'stopTimer').and.callThrough();
         component.getRandomDifference({ key: 'i' } as KeyboardEvent);
         expect(sendSpy).toHaveBeenCalled();
         expect(stopTimerSpy).not.toHaveBeenCalled();
@@ -589,14 +590,14 @@ describe('SoloViewComponent', () => {
     it('getRandomDifference should call end game if hint indice triggers a negative time', () => {
         Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: true });
         Object.defineProperty(gameParamService.gameParameters, 'isMultiplayerGame', { value: false });
-        component.timerService.currentTime = 12;
+        component['timerService'].currentTime = 12;
         component.gameConstants.hint = 11;
         gameHintServiceMock.hintsRemaining = 1;
         gameHintServiceMock.getPercentages = () => {
             return [];
         };
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
-        const stopTimerSpy = spyOn(component.timerService, 'stopTimer').and.callThrough();
+        const stopTimerSpy = spyOn(component['timerService'], 'stopTimer').and.callThrough();
         const activeThirdHintSpy = spyOn(component, 'activateThirdHint').and.callFake(() => {});
         component.getRandomDifference({ key: 'i' } as KeyboardEvent);
         expect(sendSpy).toHaveBeenCalled();
@@ -676,7 +677,7 @@ describe('SoloViewComponent', () => {
         component.player = 'player';
         spyOnProperty(component, 'stageId', 'get').and.returnValue('0');
         component.opponent = 'loser';
-        component.timerService.currentTime = 23;
+        component['timerService'].currentTime = 23;
         component.startTime = 'date';
         const sendSpy = spyOn(socketServiceMock, 'send');
         component.notifyNewBestTime('playerId', false, 'classique');
@@ -687,7 +688,7 @@ describe('SoloViewComponent', () => {
         component.player = 'loser';
         spyOnProperty(component, 'stageId', 'get').and.returnValue('0');
         component.opponent = 'opponent';
-        component.timerService.currentTime = 23;
+        component['timerService'].currentTime = 23;
         component.startTime = 'date';
         const sendSpy = spyOn(socketServiceMock, 'send');
         component.notifyNewBestTime('opponentId', false, 'classique');
@@ -705,17 +706,22 @@ describe('SoloViewComponent', () => {
 
     it('effect handler should update time in limited time mode', () => {
         Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: true });
-        component.timerService.currentTime = 90;
+        component['timerService'].currentTime = 90;
         component.gameConstants.difference = 10;
         socketServiceMock.gameRoom = 'test';
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
         component.effectHandler(MOCK_PLAYER_DIFFERENCES);
         expect(sendSpy).toHaveBeenCalledWith(LIMITED_TIME_MODE_EVENTS.Timer, 100);
 
-        component.timerService.currentTime = 120;
+        component['timerService'].currentTime = 120;
         component.gameConstants.difference = 10;
         component.effectHandler(MOCK_PLAYER_DIFFERENCES);
-        expect(sendSpy).toHaveBeenCalledWith(LIMITED_TIME_MODE_EVENTS.Timer, TWO_MINUTES);
+        expect(sendSpy).toHaveBeenCalledWith(LIMITED_TIME_MODE_EVENTS.Timer, TWO_MINUTES_SECONDS);
+    });
+
+    it('getter of socketId should return the id in socketService', () => {
+        Object.defineProperty(socketServiceMock, 'socketId', { value: 'test' });
+        expect(component.socketId).toEqual('test');
     });
 });
 

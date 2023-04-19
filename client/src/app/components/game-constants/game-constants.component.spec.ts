@@ -45,10 +45,6 @@ describe('GameConstantsComponent', () => {
 
         dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
 
-        gameCardService.deleteAllGames = () => {
-            return of();
-        };
-
         gameHistoryService = jasmine.createSpyObj('GameHistoryService', ['deleteGameHistory']);
         gameHistoryService.deleteGameHistory = () => {
             return of();
@@ -110,11 +106,10 @@ describe('GameConstantsComponent', () => {
     });
 
     it('resetAllBestTimes() should call resetAllBestTimes from the service', () => {
-        spyOn(gameCardService, 'resetAllBestTimes').and.returnValue(new Observable<void>());
-
+        spyOn(gameCardService, 'resetAllBestTimes').and.returnValue(of(undefined));
+        const spy = spyOn(component.bestTimeReset, 'emit').and.returnValue();
         component.resetAllBestTimes();
-
-        expect(gameCardService.resetAllBestTimes).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalled();
     });
 
     it('deleteAllGames() should call socketService when confirmed', () => {
