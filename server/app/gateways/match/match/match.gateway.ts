@@ -1,7 +1,7 @@
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
-import { MultiplayerDifferenceInformation, PlayerDifference } from '@common/difference-information';
+import { DifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameHistoryDTO } from '@common/game-history.dto';
-import { EVENT_TIMER_INCREMENT, EVENT_TIMER_INTERVAL, MATCH_EVENTS, ONE_SECOND } from '@common/match-gateway-communication';
+import { EVENT_TIMER_INCREMENT, EVENT_TIMER_INTERVAL, MATCH_EVENTS, ONE_SECOND_MS } from '@common/match-gateway-communication';
 import { ReplayTimerInformations } from '@common/replay-timer-informations';
 import { Injectable } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -47,16 +47,13 @@ export class MatchGateway implements OnGatewayDisconnect {
         }
     }
 
-    @SubscribeMessage(MATCH_EVENTS.Difference)
-    difference(socket: Socket, data: MultiplayerDifferenceInformation): void {
-        if (socket.rooms.has(data.room)) {
-            const differenceInformation: PlayerDifference = {
-                differencesPosition: data.differencesPosition,
-                lastDifferences: data.lastDifferences,
-                socket: socket.id,
-            };
-            this.server.to(data.room).emit(MATCH_EVENTS.Difference, differenceInformation);
-        }
+    @SubscribeMessage(MATCH_EVENTS.Difference) difference(@ConnectedSocket() socket: Socket, @MessageBody() data: DifferenceInformation): void {
+        const differenceInformation: PlayerDifference = {
+            differencesPosition: data.differencesPosition,
+            lastDifferences: data.lastDifferences,
+            socket: socket.id,
+        };
+        this.server.to(socket.data.room).emit(MATCH_EVENTS.Difference, differenceInformation);
     }
 
     @SubscribeMessage(MATCH_EVENTS.TimeModification)
@@ -78,7 +75,7 @@ export class MatchGateway implements OnGatewayDisconnect {
         const timer = setInterval(() => {
             timerCount++;
             this.server.to(room).emit(MATCH_EVENTS.Timer, timerCount);
-        }, ONE_SECOND);
+        }, ONE_SECOND_MS);
         const eventTimer = setInterval(() => {
             eventTimerCount += EVENT_TIMER_INCREMENT;
             this.server.to(room).emit(MATCH_EVENTS.Catch, eventTimerCount);
@@ -95,7 +92,7 @@ export class MatchGateway implements OnGatewayDisconnect {
         const timer = setInterval(() => {
             replayInformations.currentTime++;
             this.server.to(replayInformations.room).emit(MATCH_EVENTS.Timer, Math.max(replayInformations.currentTime, 0));
-        }, ONE_SECOND * replayInformations.timeMultiplier);
+        }, ONE_SECOND_MS * replayInformations.timeMultiplier);
         const eventTimer = setInterval(() => {
             time += EVENT_TIMER_INCREMENT;
             this.server.to(replayInformations.room).emit(MATCH_EVENTS.Catch, time);

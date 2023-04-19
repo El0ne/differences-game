@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { GameCardInformation } from '@common/game-card';
+import { GAMES } from '@app/mock/game-cards';
 
 import { GameInfoModalComponent } from './game-info-modal.component';
 
@@ -12,7 +12,7 @@ describe('GameInfoModalComponent', () => {
         await TestBed.configureTestingModule({
             declarations: [GameInfoModalComponent],
             providers: [
-                { provide: MAT_DIALOG_DATA, useValue: { gameCardInfo: new GameCardInformation(), numberOfDifferences: 1 } },
+                { provide: MAT_DIALOG_DATA, useValue: { gameCardInfo: GAMES[0], numberOfDifferences: 1, numberOfPlayers: 2 } },
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 { provide: MatDialogRef, useValue: { close: () => {} } },
             ],
@@ -32,5 +32,12 @@ describe('GameInfoModalComponent', () => {
         const closeSpy = spyOn(matDialogRefMock, 'close');
         component.close();
         expect(closeSpy).toHaveBeenCalled();
+    });
+
+    it('should receive the proper values from constructor', () => {
+        expect(component.gameInfo.gameCardInfo).toEqual(GAMES[0]);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        expect(component.gameInfo.numberOfDifferences).toBe(1);
+        expect(component.gameInfo.numberOfPlayers).toBe(2);
     });
 });

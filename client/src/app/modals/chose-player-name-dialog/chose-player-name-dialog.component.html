@@ -1,6 +1,11 @@
-<div class="info-card name-input">
+<div class="modal-page container">
+    <div class="exit-button-container">
+        <button class="exit-button" type="button" (click)="cancelNameInput()">
+            <mat-icon class="icon">close</mat-icon>
+        </button>
+    </div>
     <div class="info">
-        <p class="title">Entrez votre nom</p>
+        <h1 class="neon name-entry-title">Entrez votre nom</h1>
     </div>
     <input
         maxlength="12"

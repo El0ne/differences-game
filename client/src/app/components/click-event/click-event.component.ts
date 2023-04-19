@@ -1,10 +1,10 @@
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { ClickCommand } from '@app/commands/click/click-command';
 import { Command } from '@app/commands/command';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { PixelModificationService } from '@app/services/pixel-modification/pixel-modification.service';
-import { STAGE } from '@app/services/server-routes';
+import { IMAGE } from '@app/services/server-routes';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { DifferenceInformation } from '@common/difference-information';
 import { Observable } from 'rxjs';
@@ -15,7 +15,7 @@ import { HEIGHT, WAIT_TIME_MS, WIDTH } from './click-event-constant';
     templateUrl: './click-event.component.html',
     styleUrls: ['./click-event.component.scss'],
 })
-export class ClickEventComponent implements OnInit {
+export class ClickEventComponent implements OnInit, OnChanges {
     @Input() differenceArray: number[][];
     @Input() events: Observable<void>;
     @Input() id: number;
@@ -57,16 +57,23 @@ export class ClickEventComponent implements OnInit {
         this.firstHint = false;
         this.secondHint = false;
         this.foundDifferences = [];
-
         this.modification.nativeElement.addEventListener('mousemove', this.handleMouseMove.bind(this));
+    }
 
+    loadImage(): void {
         const image = new Image();
         image.crossOrigin = 'Anonymous';
-        image.src = `${STAGE}/image/${this.imagePath}`;
+        image.src = `${IMAGE}/file/${this.imagePath}`;
         image.onload = () => {
             const context = this.picture.nativeElement.getContext('2d') as CanvasRenderingContext2D;
             context.drawImage(image, 0, 0);
         };
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['imagePath'].currentValue !== changes['imagePath'].previousValue) {
+            this.loadImage();
+        }
     }
 
     handleMouseMove(event: MouseEvent): void {

@@ -1,8 +1,6 @@
 /* eslint-disable no-underscore-dangle */ // need it because the id_ attribute from MongoDb
 import { GameCard, GameCardDocument } from '@app/schemas/game-cards.schemas';
 import { BestTimesService } from '@app/services/best-times/best-times.service';
-import { GameManagerService } from '@app/services/game-manager/game-manager.service';
-import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { RankingBoard } from '@common/ranking-board';
 import { Injectable } from '@nestjs/common';
@@ -12,14 +10,7 @@ import { Model } from 'mongoose';
 
 @Injectable()
 export class GameCardService {
-    // we need 3 services and one model for this service
-    // eslint-disable-next-line max-params
-    constructor(
-        @InjectModel(GameCard.name) private gameCardModel: Model<GameCardDocument>,
-        private imageManagerService: ImageManagerService,
-        private bestTimesService: BestTimesService,
-        private gameManagerService: GameManagerService,
-    ) {}
+    constructor(@InjectModel(GameCard.name) private gameCardModel: Model<GameCardDocument>, private bestTimesService: BestTimesService) {}
 
     async getAllGameCards(): Promise<GameCard[]> {
         return await this.gameCardModel.find({});
@@ -47,17 +38,7 @@ export class GameCardService {
     }
 
     async deleteGameCard(id: string): Promise<void> {
-        const deletedGameCard = await this.gameCardModel.findByIdAndDelete(new ObjectId(id));
-        this.imageManagerService.deleteImage(deletedGameCard.originalImageName);
-        this.imageManagerService.deleteImage(deletedGameCard.differenceImageName);
-    }
-
-    async deleteAllGameCards(): Promise<void> {
-        const allGameCards = await this.gameCardModel.find({});
-        allGameCards.forEach(async (gameCard) => {
-            await this.deleteGameCard(gameCard._id);
-            await this.gameManagerService.deleteGame(gameCard._id.toString());
-        });
+        await this.gameCardModel.findByIdAndDelete(new ObjectId(id));
     }
 
     generateGameCard(game: GameCardDto): GameCard {
@@ -66,8 +47,6 @@ export class GameCardService {
             name: game.name,
             difficulty: game.difficulty,
             differenceNumber: game.differenceNumber,
-            originalImageName: game.baseImage,
-            differenceImageName: game.differenceImage,
             soloTimes: this.bestTimesService.generateBestTimes(),
             multiTimes: this.bestTimesService.generateBestTimes(),
         };

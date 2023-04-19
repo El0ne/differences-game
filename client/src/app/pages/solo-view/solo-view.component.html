@@ -1,4 +1,4 @@
-<body>
+<body class="page-background" *ngIf="this.imagesInfo">
     <div *ngIf="isReplayMode" class="overlay"></div>
     <div class="nav-bar">
         <div class="options" *ngIf="showNavBar">
@@ -32,19 +32,18 @@
     </div>
 
     <div class="flex-game">
-        <div class="image-container neon-border" *ngIf="this.gameCardInfo">
+        <div class="image-container neon-border">
             <app-click-event
                 #left
                 [id]="1"
                 [original]="'original'"
-                [gameCardId]="this.currentGameId"
-                [imagePath]="this.gameCardInfo.originalImageName"
+                [gameCardId]="this.stageId"
+                [imagePath]="this.imagesInfo.originalImageName"
                 (differenceDetected)="differenceHandler($event)"
                 (mistake)="handleMistake()"
                 (cheatModeHandler)="resetDifferences($event)"
                 (command)="addCommand($event)"
                 (color)="setColor($event)"
-                *ngIf="this.gameCardInfo"
             ></app-click-event>
         </div>
         <div class="game-options">
@@ -113,7 +112,7 @@
                         (click)="removeCheatMode()"
                         (blur)="addCheatMode()"
                     />
-                    <button class="send-button" (click)="sendMessage()"></button>
+                    <button class="send-button" (click)="sendMessage()"><mat-icon>send</mat-icon></button>
                 </div>
             </div>
             <div class="centered" *ngIf="this.hintIcon && !this.isMultiplayer">
@@ -129,19 +128,18 @@
             </div>
         </div>
 
-        <div class="image-container neon-border" *ngIf="this.gameCardInfo">
+        <div class="image-container neon-border">
             <app-click-event
                 #right
                 [id]="2"
                 [original]="'different'"
-                [gameCardId]="this.currentGameId"
-                [imagePath]="this.gameCardInfo.differenceImageName"
+                [gameCardId]="this.stageId"
+                [imagePath]="this.imagesInfo.differenceImageName"
                 (differenceDetected)="differenceHandler($event)"
                 (mistake)="handleMistake()"
                 (cheatModeHandler)="resetDifferences($event)"
                 (command)="addCommand($event)"
                 (color)="setColor($event)"
-                *ngIf="this.gameCardInfo"
             ></app-click-event>
         </div>
     </div>
@@ -150,7 +148,7 @@
             <mat-icon class="icon">logout</mat-icon>
         </button>
 
-        <button class="replay-button normal-button" type="button" (click)="resetPropertiesForReplay(socketService.socketId)">
+        <button class="replay-button normal-button" type="button" (click)="resetPropertiesForReplay()">
             <mat-icon class="icon">replay</mat-icon>
         </button>
 

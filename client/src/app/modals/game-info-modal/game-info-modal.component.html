@@ -1,22 +1,22 @@
 <div class="info modal-page">
-    <h1 class="title neon">{{ gameData.gameCardInfo.name }}</h1>
+    <h1 class="title neon">{{ gameInfo.gameCardInfo.name }}</h1>
     <div class="info-container">
         <h1 class="neon">
             Difficulté :
-            {{ gameData.gameCardInfo.difficulty }}
+            {{ gameInfo.gameCardInfo.difficulty }}
         </h1>
-        <h1 class="neon">Joueurs présents : {{ gameData.numberOfPlayers }}</h1>
+        <h1 class="neon">Joueurs présents : {{ gameInfo.numberOfPlayers }}</h1>
         <h1 class="neon">
             Nombre de différences :
-            {{ gameData.numberOfDifferences }}
+            {{ gameInfo.numberOfDifferences }}
         </h1>
         <!-- TODO add game mode -->
     </div>
     <div class="button-container">
         <button
-            [disabled]="gameData.isReplayMode"
+            [disabled]="gameInfo.isReplayMode"
             class="normal-button"
-            [ngClass]="gameData.isReplayMode ? 'button-replay-disabled' : ''"
+            [ngClass]="gameInfo.isReplayMode ? 'button-replay-disabled' : ''"
             (click)="close()"
         >
             Fermer

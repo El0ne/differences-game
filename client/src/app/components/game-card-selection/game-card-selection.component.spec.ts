@@ -10,9 +10,11 @@ import { GAMES } from '@app/mock/game-cards';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { WaitingRoomComponent, WaitingRoomDataPassing } from '@app/modals/waiting-room/waiting-room.component';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
+import { GameParametersService } from '@app/services/game-parameters/game-parameters.service';
+import { ImagesService } from '@app/services/images/images.service';
+import { IMAGE } from '@app/services/server-routes';
 import { SocketService } from '@app/services/socket/socket.service';
-import { GameCardInformation } from '@common/game-card';
-import { MATCH_EVENTS } from '@common/match-gateway-communication';
+import { MATCH_EVENTS, SoloGameCreation } from '@common/match-gateway-communication';
 import { JoinHostInWaitingRequest, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 import { of } from 'rxjs';
 import { GameCardSelectionComponent } from './game-card-selection.component';
@@ -20,17 +22,16 @@ import { GameCardSelectionComponent } from './game-card-selection.component';
 describe('GameCardSelectionComponent', () => {
     let component: GameCardSelectionComponent;
     let fixture: ComponentFixture<GameCardSelectionComponent>;
-    const gameCardServiceSpyObj = jasmine.createSpyObj('GameCardInformationService', ['resetBestTime']);
-    gameCardServiceSpyObj.resetBestTime.and.returnValue(of());
     let modalSpy: MatDialog;
     let choseNameAfterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
     let waitingRoomAfterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
     let socketServiceSpy: SocketService;
+    let gameParamService: GameParametersService;
 
     beforeEach(async () => {
         modalSpy = jasmine.createSpyObj('MatDialog', ['open']);
         choseNameAfterClosedSpy = jasmine.createSpyObj('MatDialogRef<ChosePlayerNameDialogComponent>', ['afterClosed']);
-        choseNameAfterClosedSpy.afterClosed = () => of(undefined);
+        choseNameAfterClosedSpy.afterClosed = () => of(true);
 
         waitingRoomAfterClosedSpy = jasmine.createSpyObj('MatDialogRef<WaitingRoomComponent>', ['afterClosed']);
         waitingRoomAfterClosedSpy.afterClosed = () => of();
@@ -38,25 +39,30 @@ describe('GameCardSelectionComponent', () => {
         socketServiceSpy = jasmine.createSpyObj('SocketService', ['names', 'listen', 'delete', 'send', 'connect'], ['socketId']);
         socketServiceSpy.names = new Map<string, string>();
 
+        gameParamService = jasmine.createSpyObj('GameParametersService', ['gameParameters']);
+
         await TestBed.configureTestingModule({
             declarations: [GameCardSelectionComponent, BestTimeComponent, ChosePlayerNameDialogComponent, WaitingRoomComponent],
             imports: [MatIconModule, RouterTestingModule, HttpClientTestingModule],
             providers: [
                 { provide: MatDialog, useValue: modalSpy },
-                {
-                    provide: SocketService,
-                    useValue: socketServiceSpy,
-                },
-                { provide: GameCardInformationService, useValue: gameCardServiceSpyObj },
+                { provide: SocketService, useValue: socketServiceSpy },
+                { provide: GameParametersService, useValue: gameParamService },
             ],
             teardown: { destroyAfterEach: false },
         }).compileComponents();
 
         fixture = TestBed.createComponent(GameCardSelectionComponent);
         component = fixture.componentInstance;
-        component.gameCardInformation = new GameCardInformation();
         component.gameCardInformation = GAMES[0];
         fixture.detectChanges();
+    });
+
+    it('ngOnInit should call set the image after the HTTP call', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn(TestBed.inject(ImagesService), 'getImageNames').and.returnValue(of({ originalImageName: 'image' }) as any);
+        component.ngOnInit();
+        expect(component.image).toEqual(`${IMAGE}/file/image`);
     });
 
     it('should create', () => {
@@ -69,25 +75,44 @@ describe('GameCardSelectionComponent', () => {
     });
 
     it('resetBestTimes() should call resetBestTime from the service', () => {
-        // spyOn(gameCardServiceSpyObj, 'resetBestTime').and.returnValue(new Observable<void>());
-
+        spyOn(TestBed.inject(GameCardInformationService), 'resetBestTime').and.returnValue(of(undefined));
+        const spy = spyOn(component.refreshGameCard, 'emit');
         component.resetBestTimes();
-
-        expect(gameCardServiceSpyObj.resetBestTime).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalled();
     });
 
     it('selectPlayerName should redirect to solo view after opening the modal if in soloGame', () => {
         modalSpy.open = () => choseNameAfterClosedSpy;
         const routerSpy = spyOn(TestBed.inject(Router), 'navigate');
-        component.selectPlayerName(true);
-        expect(routerSpy).toHaveBeenCalledWith(['/solo/' + component.gameCardInformation._id]);
-        expect(socketServiceSpy.send).toHaveBeenCalledWith(MATCH_EVENTS.createSoloGame, '123');
+        const isMultiplayer = false;
+        component.selectPlayerName(isMultiplayer);
+        expect(routerSpy).toHaveBeenCalledWith(['/game']);
+        expect(gameParamService.gameParameters).toEqual({
+            stageId: GAMES[0]._id,
+            isLimitedTimeGame: false,
+            isMultiplayerGame: isMultiplayer,
+        });
+        expect(socketServiceSpy.send).toHaveBeenCalledWith(MATCH_EVENTS.createSoloGame, {
+            stageId: '123',
+            isLimitedTimeMode: false,
+        } as SoloGameCreation);
+    });
+
+    it('selectPlayerName should do nothing if isNameEntered is false', () => {
+        modalSpy.open = () => choseNameAfterClosedSpy;
+        const routerSpy = spyOn(TestBed.inject(Router), 'navigate');
+        const hostOrJoinGameSpy = spyOn(component, 'hostOrJoinGame');
+        const isMultiplayer = false;
+        choseNameAfterClosedSpy.afterClosed = () => of(isMultiplayer);
+        component.selectPlayerName(isMultiplayer);
+        expect(routerSpy).not.toHaveBeenCalled();
+        expect(hostOrJoinGameSpy).not.toHaveBeenCalled();
     });
 
     it('selectPlayerName should call hostOrJoinGame if in multiplayer', () => {
         modalSpy.open = () => choseNameAfterClosedSpy;
         const spy = spyOn(component, 'hostOrJoinGame').and.stub();
-        component.selectPlayerName(false);
+        component.selectPlayerName(true);
         expect(spy).toHaveBeenCalled();
     });
 
@@ -97,7 +122,7 @@ describe('GameCardSelectionComponent', () => {
         expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.HostGame, '123');
         expect(modalSpy.open).toHaveBeenCalledWith(WaitingRoomComponent, {
             disableClose: true,
-            data: { stageId: '123', isHost: true } as WaitingRoomDataPassing,
+            data: { stageId: '123', isHost: true, isLimitedTimeMode: false } as WaitingRoomDataPassing,
         });
     });
 
@@ -112,7 +137,7 @@ describe('GameCardSelectionComponent', () => {
         } as JoinHostInWaitingRequest);
         expect(modalSpy.open).toHaveBeenCalledWith(WaitingRoomComponent, {
             disableClose: true,
-            data: { stageId: '123', isHost: false } as WaitingRoomDataPassing,
+            data: { stageId: '123', isHost: false, isLimitedTimeMode: false } as WaitingRoomDataPassing,
         });
     });
 });

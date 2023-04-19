@@ -28,13 +28,12 @@ describe('TimerSoloService', () => {
     }));
 
     it('stopTimer should send a stop timer event', fakeAsync(() => {
-        mockSocketService.gameRoom = 'test';
         mockSocketService.send = () => {
             return;
         };
         const sendSpy = spyOn(mockSocketService, 'send').and.callThrough();
         service.stopTimer();
-        expect(sendSpy).toHaveBeenCalledWith(MATCH_EVENTS.EndTime, 'test');
+        expect(sendSpy).toHaveBeenCalledWith(MATCH_EVENTS.EndTime);
     }));
 
     it('restartTimer should send a restart timer event', fakeAsync(() => {
@@ -63,5 +62,20 @@ describe('TimerSoloService', () => {
 
     it('should have two digits even if we have less than 10 seconds', () => {
         expect(service.convert(SIXTY_SEVEN_SECONDS)).toEqual('1:07');
+    });
+
+    it('limitedTimeTimer should stop timer if it reaches 0 and set time value', () => {
+        mockSocketService.send = () => {
+            return;
+        };
+        const stopSpy = spyOn(service, 'stopTimer');
+        const sendSpy = spyOn(mockSocketService, 'send').and.callThrough();
+        mockSocketService.listen = (event: string, callback: any) => {
+            if (event === MATCH_EVENTS.LimitedTimeTimer) callback(0);
+        };
+        service.limitedTimeTimer();
+        expect(stopSpy).toHaveBeenCalled();
+        expect(sendSpy).toHaveBeenCalledWith(MATCH_EVENTS.Lose);
+        expect(service.currentTime).toEqual(0);
     });
 });

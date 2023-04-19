@@ -1,18 +1,30 @@
-<div>
-    <button (click)="handleCancel()">Annuler</button>
+<body class="modal-page container">
     <div *ngIf="waitingRoomInfo.isHost; else clientView">
-        <div *ngIf="clientsInWaitingRoom.size === 0; else opponents">En attente d'opposants</div>
+        <div *ngIf="clientsInWaitingRoom.size === 0; else opponents">
+            <h1 class="neon name-title-entry">En attente d'un joueur opposant...</h1>
+            <mat-icon class="hourglass-icon">hourglass_empty</mat-icon>
+        </div>
     </div>
-</div>
+    <button class="cancel-button" (click)="handleCancel()">Annuler</button>
+</body>
 
 <ng-template #opponents>
-    <div *ngFor="let opponentId of clientsInWaitingRoom.keys()" class="opponents-container">
-        <p class="text">"{{ clientsInWaitingRoom.get(opponentId) }}" veut rejoindre votre partie</p>
-        <div class="opponent-options">
-            <button (click)="acceptOpponent(opponentId)" class="normal-button button">Accepter</button>
-            <button (click)="declineOpponent(opponentId)" class="normal-button button">Refuser</button>
+    <div class="opponents-container">
+        <div *ngFor="let opponentId of clientsInWaitingRoom.keys()">
+            <div class="row">
+                <h2 class="neon">NOM : {{ clientsInWaitingRoom.get(opponentId) }}</h2>
+                <div class="buttons-container">
+                    <button (click)="acceptOpponent(opponentId)" class="normal-button">Accepter</button>
+                    <button (click)="declineOpponent(opponentId)" class="normal-button">Refuser</button>
+                </div>
+            </div>
         </div>
     </div>
 </ng-template>
 
-<ng-template #clientView> En attente de la confirmation de l'hôte </ng-template>
+<ng-template #clientView>
+    <div>
+        <h1 class="neon name-title-entry">En attente de la confirmation de l'hôte...</h1>
+        <mat-icon class="waiting-room-hourglass-icon">hourglass_empty</mat-icon>
+    </div>
+</ng-template>

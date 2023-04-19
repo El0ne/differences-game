@@ -1,35 +1,23 @@
 /* eslint-disable no-underscore-dangle */
 // using _id property causes linting warning
+import { Images } from '@app/schemas/images.schema';
 import { BestTimesService } from '@app/services/best-times/best-times.service';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
 import { DifferenceDetectionService } from '@app/services/difference-detection/difference-detection.service';
 import { GameCardService } from '@app/services/game-card/game-card.service';
 import { GameDifficultyService } from '@app/services/game-difficulty/game-difficulty.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
+import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { ImageUploadDto } from '@common/image-upload.dto';
 import { ImageDto } from '@common/image.dto';
 import { ServerGeneratedGameInfo } from '@common/server-generated-game-info';
-import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    HttpException,
-    HttpStatus,
-    Param,
-    Post,
-    Put,
-    Query,
-    Res,
-    UploadedFiles,
-    UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Put, Query, Res, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
+import { ObjectId } from 'mongodb';
 import { diskStorage } from 'multer';
 import * as path from 'path';
-import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 // based on https://www.youtube.com/watch?v=f-URVd2OKYc
 export const storage = diskStorage({
@@ -52,6 +40,7 @@ export class StageController {
         private differenceService: DifferenceDetectionService,
         private differenceClickService: DifferenceClickService,
         private bestTimesService: BestTimesService,
+        private pixelRadiusService: PixelRadiusService,
     ) {}
 
     @Get('/')
@@ -101,15 +90,20 @@ export class StageController {
         try {
             if (Object.keys(files).length) {
                 const fileArray: ImageDto[] = files.file;
-                const differencesArray = await this.differenceService.compareImages(fileArray[0].path, fileArray[1].path, param.radius);
+                this.pixelRadiusService.radius = param.radius;
+                const differencesArray = await this.differenceService.compareImages(fileArray[0].path, fileArray[1].path);
                 if (this.gameDifficultyService.isGameValid(differencesArray)) {
                     const differenceObjectId = await this.differenceClickService.createDifferenceArray(differencesArray);
+                    const imageData: Images = {
+                        _id: new ObjectId(differenceObjectId),
+                        originalImageName: fileArray[0].filename,
+                        differenceImageName: fileArray[1].filename,
+                    };
+                    await this.imageManagerService.createImageObject(imageData);
                     const difficulty = this.gameDifficultyService.setGameDifficulty(differencesArray);
 
                     const data: ServerGeneratedGameInfo = {
                         gameId: differenceObjectId,
-                        originalImageName: fileArray[0].filename,
-                        differenceImageName: fileArray[1].filename,
                         gameDifficulty: difficulty,
                         gameDifferenceNumber: differencesArray.length,
                     };
@@ -117,31 +111,11 @@ export class StageController {
                 } else {
                     this.imageManagerService.deleteImage(fileArray[0].filename);
                     this.imageManagerService.deleteImage(fileArray[1].filename);
-                    res.status(HttpStatus.OK).send([]);
+                    res.status(HttpStatus.OK).send();
                 }
             } else res.sendStatus(HttpStatus.BAD_REQUEST);
         } catch (err) {
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err);
-        }
-    }
-
-    @Get('/image/:imageName')
-    async getImage(@Param() param, @Res() res: Response): Promise<void> {
-        try {
-            const imagePath = join(process.cwd(), `assets/images/${param.imageName}`);
-            res.status(HttpStatus.OK).sendFile(imagePath);
-        } catch (err) {
-            res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @Delete('/image/:imageName')
-    async deleteImage(@Param() param, @Res() res: Response): Promise<void> {
-        try {
-            this.imageManagerService.deleteImage(param.imageName);
-            res.status(HttpStatus.NO_CONTENT).send([]);
-        } catch (err) {
-            res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -159,16 +133,6 @@ export class StageController {
     async resetBestTimes(@Param('id') id: string, @Res() res: Response): Promise<void> {
         try {
             await this.bestTimesService.resetBestTimes(id);
-            res.status(HttpStatus.NO_CONTENT).send();
-        } catch (err) {
-            res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @Delete('/')
-    async deleteAllGames(@Res() res: Response): Promise<void> {
-        try {
-            await this.gameCardService.deleteAllGameCards();
             res.status(HttpStatus.NO_CONTENT).send();
         } catch (err) {
             res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);

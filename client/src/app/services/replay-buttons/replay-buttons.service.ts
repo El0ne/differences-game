@@ -15,13 +15,13 @@ export class ReplayButtonsService {
         if (isReplayPaused) {
             this.timerService.stopTimer(this.socketService.socketId);
         } else {
-            this.timerService.restartTimer(this.timeMultiplier, this.socketService.socketId, 0);
+            this.timerService.restartTimer(this.timeMultiplier, 0);
         }
         return isReplayPaused;
     }
 
     fastForwardReplay(multiplier: number): void {
         this.timeMultiplier = multiplier;
-        this.timerService.restartTimer(this.timeMultiplier, this.socketService.socketId, 0);
+        this.timerService.restartTimer(this.timeMultiplier, 0);
     }
 }

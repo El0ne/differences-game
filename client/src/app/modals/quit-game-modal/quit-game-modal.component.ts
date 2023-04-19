@@ -1,6 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { Routes } from '@app/modules/routes';
 
 @Component({
     selector: 'app-quit-game-modal',
@@ -25,7 +26,7 @@ export class QuitGameModalComponent {
 
     confirm(): void {
         this.matDialogRef.close();
-        this.router.navigate(['/home']);
+        this.router.navigate([`/${Routes.Home}`]);
     }
 
     cancel(): void {

@@ -4,7 +4,7 @@ import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { SocketService } from '@app/services/socket/socket.service';
 
-import { ChosePlayerNameDialogComponent } from './chose-player-name-dialog.component';
+import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 
 describe('ChosePlayerNameDialogComponent', () => {
     let component: ChosePlayerNameDialogComponent;
@@ -51,5 +51,10 @@ describe('ChosePlayerNameDialogComponent', () => {
         component.validateName();
         expect(component.showNameErrorMessage).toBeFalsy();
         expect(namesMapSpy).toHaveBeenCalledWith('123', 'good name');
+    });
+
+    it('cancelNameInput should close dialog with false', () => {
+        component.cancelNameInput();
+        expect(matDialogSpy.close).toHaveBeenCalledWith(false);
     });
 });

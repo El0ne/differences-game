@@ -39,7 +39,7 @@ describe('ReplayButtonsService', () => {
     it('should call restartTimer when calling pauseReplay if isReplayPaused parameter is true', () => {
         const isReplayPaused = true;
         const bool = service.pauseReplay(isReplayPaused);
-        expect(timerServiceSpy.restartTimer).toHaveBeenCalledOnceWith(service.timeMultiplier, socketServiceSpy.socketId, 0);
+        expect(timerServiceSpy.restartTimer).toHaveBeenCalledOnceWith(service.timeMultiplier, 0);
         expect(bool).toEqual(!isReplayPaused);
     });
 
@@ -47,6 +47,6 @@ describe('ReplayButtonsService', () => {
         const multiplier = 2;
         service.fastForwardReplay(multiplier);
         expect(service.timeMultiplier).toEqual(multiplier);
-        expect(timerServiceSpy.restartTimer).toHaveBeenCalledOnceWith(multiplier, socketServiceSpy.socketId, 0);
+        expect(timerServiceSpy.restartTimer).toHaveBeenCalledOnceWith(multiplier, 0);
     });
 });

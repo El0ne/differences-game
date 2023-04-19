@@ -41,7 +41,7 @@ describe('ClickEventService', () => {
     });
 
     it('getDifferences() should call get', () => {
-        const getSpy = spyOn(service.http, 'get');
+        const getSpy = spyOn(service['http'], 'get');
 
         service.getDifferences('0');
         expect(getSpy).toHaveBeenCalled();
@@ -63,14 +63,14 @@ describe('ClickEventService', () => {
     });
 
     it('isADifference() should call get', () => {
-        const getSpy = spyOn(service.http, 'get');
+        const getSpy = spyOn(service['http'], 'get');
 
         service.isADifference(1, 1, '0');
         expect(getSpy).toHaveBeenCalled();
     });
 
     it('deleteDifferences() should call delete with an id', () => {
-        const deleteSpy = spyOn(service.http, 'delete');
+        const deleteSpy = spyOn(service['http'], 'delete');
         const id = 'owdfe';
         service.deleteDifferences(id);
         expect(deleteSpy).toHaveBeenCalledOnceWith(`${CLICK}/${id}`);

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,21 +18,18 @@ import { DELAY_BEFORE_REFRESH, GameSelectionComponent } from './game-selection.c
 describe('GameSelectionComponent', () => {
     let component: GameSelectionComponent;
     let fixture: ComponentFixture<GameSelectionComponent>;
-    let mockService: GameCardInformationService;
-    let testNumber: Subject<number>;
+    let gameCardInfoService: GameCardInformationService;
     let testGameCardsInformation: Subject<GameCardInformation[]>;
     let socketServiceSpy: SocketService;
 
     beforeEach(() => {
-        testNumber = new Subject<number>();
-        mockService = jasmine.createSpyObj('GameCardInformationService', ['getGameCardsInformation', 'getNumberOfGameCardInformation']);
-        mockService.getNumberOfGameCardInformation = () => {
-            testNumber.next(GAME_CARDS_TO_DISPLAY);
-            return testNumber.asObservable();
+        gameCardInfoService = jasmine.createSpyObj('GameCardInformationService', ['getGameCardsInformation', 'getNumberOfGameCardInformation']);
+        gameCardInfoService.getNumberOfGameCardInformation = () => {
+            return of(GAME_CARDS_TO_DISPLAY);
         };
 
         testGameCardsInformation = new Subject<GameCardInformation[]>();
-        mockService.getGameCardsInformations = () => {
+        gameCardInfoService.getGameCardsInformations = () => {
             testGameCardsInformation.next(GAMES.slice(0, GAME_CARDS_TO_DISPLAY));
             return testGameCardsInformation.asObservable();
         };
@@ -40,9 +38,9 @@ describe('GameSelectionComponent', () => {
 
         TestBed.configureTestingModule({
             declarations: [GameSelectionComponent, GameCardSelectionComponent, BestTimeComponent],
-            imports: [RouterTestingModule, MatIconModule, MatDialogModule],
+            imports: [RouterTestingModule, MatIconModule, MatDialogModule, HttpClientTestingModule],
             providers: [
-                { provide: GameCardInformationService, useValue: mockService },
+                { provide: GameCardInformationService, useValue: gameCardInfoService },
                 { provide: SocketService, useValue: socketServiceSpy },
             ],
         }).compileComponents();
@@ -57,28 +55,31 @@ describe('GameSelectionComponent', () => {
     });
 
     it('isConfig should be true if the route is /config', () => {
-        spyOnProperty(component.router, 'url', 'get').and.returnValue('/config');
+        spyOnProperty(component['router'], 'url', 'get').and.returnValue('/config');
         component.ngOnInit();
         expect(component.isConfig).toBeTruthy();
     });
 
     it('isConfig should be false if the route is /select-stage', () => {
-        spyOnProperty(component.router, 'url', 'get').and.returnValue('/select-stage');
+        spyOnProperty(component['router'], 'url', 'get').and.returnValue('/select-stage');
         component.ngOnInit();
         expect(component.isConfig).toBeFalsy();
     });
 
     it('selectGameCards() should put the end Index at 3 more than index unless there is less than 4 other gameCards to show', () => {
-        spyOn(component.gameCardService, 'getGameCardsInformations').and.returnValue(of(GAMES));
+        spyOn(component['gameCardService'], 'getGameCardsInformations').and.returnValue(of(GAMES));
         component.index = 0;
         component.numberOfGameInformations = 5;
         component.selectGameCards();
-        expect(component.gameCardService.getGameCardsInformations).toHaveBeenCalledWith(component.index, component.index + GAME_CARDS_TO_DISPLAY - 1);
+        expect(component['gameCardService'].getGameCardsInformations).toHaveBeenCalledWith(
+            component.index,
+            component.index + GAME_CARDS_TO_DISPLAY - 1,
+        );
 
         component.index = 3;
         component.numberOfGameInformations = 5;
         component.selectGameCards();
-        expect(component.gameCardService.getGameCardsInformations).toHaveBeenCalledWith(component.index, component.numberOfGameInformations - 1);
+        expect(component['gameCardService'].getGameCardsInformations).toHaveBeenCalledWith(component.index, component.numberOfGameInformations - 1);
     });
 
     it('previousCards() should not call selectGameCards() if index is 0', () => {
@@ -127,12 +128,12 @@ describe('GameSelectionComponent', () => {
 
     it('refreshGameCards() should call getNumberOfGameCardInformation and getGameCardsInformations', fakeAsync(() => {
         const fakeData = 5;
-        spyOn(component.gameCardService, 'getNumberOfGameCardInformation').and.returnValue(of(fakeData));
+        spyOn(component['gameCardService'], 'getNumberOfGameCardInformation').and.returnValue(of(fakeData));
         spyOn(component, 'selectGameCards');
         component.refreshGameCards();
         tick(DELAY_BEFORE_REFRESH);
         expect(component.numberOfGameInformations).toEqual(fakeData);
-        expect(component.gameCardService.getNumberOfGameCardInformation).toHaveBeenCalled();
+        expect(component['gameCardService'].getNumberOfGameCardInformation).toHaveBeenCalled();
         expect(component.selectGameCards).toHaveBeenCalled();
     }));
 
@@ -171,10 +172,22 @@ describe('GameSelectionComponent', () => {
     });
 
     it('selectGameCards() should put the end Index at 3 more than index unless there is less than 4 other gameCards to show', () => {
-        spyOn(component.gameCardService, 'getGameCardsInformations').and.returnValue(of(GAMES.slice(0, 1)));
+        spyOn(component['gameCardService'], 'getGameCardsInformations').and.returnValue(of(GAMES.slice(0, 1)));
         component.index = 0;
         component.numberOfGameInformations = 5;
         component.selectGameCards();
         expect(socketServiceSpy.send).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.ScanForHost, ['123']);
     });
+
+    it('refreshGameCards() should call selectGameCards() and getGameCardsInformations()', fakeAsync(() => {
+        spyOn(component, 'selectGameCards').and.returnValue();
+        spyOn(gameCardInfoService, 'getNumberOfGameCardInformation').and.returnValue(of(GAME_CARDS_TO_DISPLAY));
+
+        component.refreshGameCards();
+        tick(DELAY_BEFORE_REFRESH * 3);
+
+        expect(gameCardInfoService.getNumberOfGameCardInformation).toHaveBeenCalled();
+        expect(component.numberOfGameInformations).toEqual(GAME_CARDS_TO_DISPLAY);
+        expect(component.selectGameCards).toHaveBeenCalled();
+    }));
 });
