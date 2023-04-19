@@ -474,7 +474,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     openReplayModal(): void {
-        this.timerService.stopTimer(this.socketService.socketId);
+        this.timerService.stopTimer();
         const dialogRef = this.dialog.open(ReplayGameModalComponent, {
             disableClose: true,
         });
@@ -573,7 +573,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             },
             disableClose: true,
         });
-        this.timerService.stopTimer(this.socketService.socketId);
+        this.timerService.stopTimer();
         dialogRef.afterClosed().subscribe(() => {
             this.timerService.restartTimer(this.replayButtonsService.timeMultiplier, 0);
         });

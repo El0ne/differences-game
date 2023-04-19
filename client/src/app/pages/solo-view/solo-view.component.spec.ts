@@ -717,10 +717,10 @@ describe('SoloViewComponent', () => {
         component.gameConstants.hint = 11;
         gameHintServiceMock.hintsRemaining = 1;
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
-        const stopTimerSpy = spyOn(component['timerService'], 'stopTimer').and.callThrough();
+        const stopTimerSpy = spyOn(component['timerService'], 'stopTimer');
         component.getRandomDifference({ key: 'i' } as KeyboardEvent);
-        expect(sendSpy).toHaveBeenCalledTimes(2);
         expect(stopTimerSpy).toHaveBeenCalled();
+        expect(sendSpy).toHaveBeenCalledTimes(2);
     });
 
     it('getRandomDifference should not call end game if hint still has time left', () => {
@@ -913,34 +913,34 @@ describe('SoloViewComponent', () => {
         const command = new EndGameCommand(component);
         component.addCommand(command);
         expect(component.invoker.addCommand).toHaveBeenCalled();
-        it('loseGame should open lose dialog component and set endGame conditions', () => {
-            Object.defineProperty(modalSpy, 'openDialogs', { value: [] });
-            component.gameCompletion(false);
-            expect(modalSpy.open).toHaveBeenCalledWith(GameLoseModalComponent, { disableClose: true });
-            expect(component.showNavBar).toBeFalse();
-            expect(component.left.endGame).toBeTrue();
-            expect(component.right.endGame).toBeTrue();
-        });
+    });
+    it('loseGame should open lose dialog component and set endGame conditions', () => {
+        Object.defineProperty(modalSpy, 'openDialogs', { value: [] });
+        component.gameCompletion(false);
+        expect(modalSpy.open).toHaveBeenCalledWith(GameLoseModalComponent, { disableClose: true });
+        expect(component.showNavBar).toBeFalse();
+        expect(component.left.endGame).toBeTrue();
+        expect(component.right.endGame).toBeTrue();
+    });
 
-        it('effect handler should update time in limited time mode', () => {
-            Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: true });
-            component['timerService'].currentTime = 90;
-            component.gameConstants.difference = 10;
-            socketServiceMock.gameRoom = 'test';
-            const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
-            component.effectHandler(MOCK_PLAYER_DIFFERENCES);
-            expect(sendSpy).toHaveBeenCalledWith(LIMITED_TIME_MODE_EVENTS.Timer, 100);
+    it('effect handler should update time in limited time mode', () => {
+        Object.defineProperty(gameParamService.gameParameters, 'isLimitedTimeGame', { value: true });
+        component['timerService'].currentTime = 90;
+        component.gameConstants.difference = 10;
+        socketServiceMock.gameRoom = 'test';
+        const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
+        component.effectHandler(MOCK_PLAYER_DIFFERENCES);
+        expect(sendSpy).toHaveBeenCalledWith(LIMITED_TIME_MODE_EVENTS.Timer, 100);
 
-            component['timerService'].currentTime = 120;
-            component.gameConstants.difference = 10;
-            component.effectHandler(MOCK_PLAYER_DIFFERENCES);
-            expect(sendSpy).toHaveBeenCalledWith(LIMITED_TIME_MODE_EVENTS.Timer, TWO_MINUTES_SECONDS);
-        });
+        component['timerService'].currentTime = 120;
+        component.gameConstants.difference = 10;
+        component.effectHandler(MOCK_PLAYER_DIFFERENCES);
+        expect(sendSpy).toHaveBeenCalledWith(LIMITED_TIME_MODE_EVENTS.Timer, TWO_MINUTES_SECONDS);
+    });
 
-        it('getter of socketId should return the id in socketService', () => {
-            Object.defineProperty(socketServiceMock, 'socketId', { value: 'test' });
-            expect(component.socketId).toEqual('test');
-        });
+    it('getter of socketId should return the id in socketService', () => {
+        Object.defineProperty(socketServiceMock, 'socketId', { value: 'test' });
+        expect(component.socketId).toEqual('test');
     });
 });
 

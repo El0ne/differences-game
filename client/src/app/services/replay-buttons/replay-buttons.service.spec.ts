@@ -32,7 +32,7 @@ describe('ReplayButtonsService', () => {
     it('should call stopTimer when calling pauseReplay if isReplayPaused parameter is false', () => {
         const isReplayPaused = false;
         const bool = service.pauseReplay(isReplayPaused);
-        expect(timerServiceSpy.stopTimer).toHaveBeenCalledOnceWith(socketServiceSpy.socketId);
+        expect(timerServiceSpy.stopTimer).toHaveBeenCalledOnceWith();
         expect(bool).toEqual(!isReplayPaused);
     });
 
