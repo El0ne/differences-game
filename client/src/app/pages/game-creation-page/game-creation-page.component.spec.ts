@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
+import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { getFakeCanvasInformations } from '@app/services/canvas-informations.constants';
 import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
 import { DrawManipulationService } from '@app/services/draw-manipulation/draw-manipulation.service';
@@ -15,6 +16,7 @@ import { PenService } from '@app/services/pen-service/pen-service.service';
 import { RectangleService } from '@app/services/rectangle/rectangle.service';
 import { UndoRedoService } from '@app/services/undo-redo/undo-redo.service';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
+import { of } from 'rxjs';
 import { GameCreationPageComponent } from './game-creation-page.component';
 
 describe('GameCreationPageComponent', () => {
@@ -29,6 +31,7 @@ describe('GameCreationPageComponent', () => {
     let undoRedoService: UndoRedoService;
     let drawManipulationService: DrawManipulationService;
     let matDialog: MatDialog;
+    let choseNameAfterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
 
     beforeEach(async () => {
         penService = jasmine.createSpyObj('PenService', ['setProperties', 'startPen', 'stopPen', 'writing']);
@@ -49,12 +52,15 @@ describe('GameCreationPageComponent', () => {
         canvasSelectionService = jasmine.createSpyObj('CanvasSelectionService', ['setProperties', 'choseCanvas']);
         undoRedoService = jasmine.createSpyObj('UndoRedoService', ['setProperties', 'pushCanvas', 'undoAction', 'undo', 'redoAction', 'redo']);
         matDialog = jasmine.createSpyObj('MatDialog', ['open']);
+
+        choseNameAfterClosedSpy = jasmine.createSpyObj('MatDialogRef<ChosePlayerNameDialogComponent>', ['afterClosed']);
+
         await TestBed.configureTestingModule({
             declarations: [GameCreationPageComponent],
             imports: [HttpClientModule, FormsModule, MatDialogModule, RouterTestingModule, MatIconModule],
             providers: [
                 { provide: MAT_DIALOG_DATA, useValue: {} },
-                { provide: MatDialog, useValue: { matDialog } },
+                { provide: MatDialog, useValue: matDialog },
                 { provide: MatDialogRef, useValue: {} },
                 { provide: PenService, useValue: penService },
                 { provide: RectangleService, useValue: rectangleService },
@@ -388,5 +394,21 @@ describe('GameCreationPageComponent', () => {
 
         expect(undoRedoService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
         expect(undoRedoService.redo).toHaveBeenCalled();
+    });
+
+    it('choseGameTitle should call save after the name is chosen or put isSaveDisabled to false if no name was entered', async () => {
+        matDialog.open = () => choseNameAfterClosedSpy;
+        choseNameAfterClosedSpy.afterClosed = () => of(false);
+        component.isSaveDisabled = true;
+        const saveSpy = spyOn(component, 'save');
+        await component.choseGameTitle();
+        expect(saveSpy).not.toHaveBeenCalled();
+        expect(component.isSaveDisabled).toBeFalse();
+
+        choseNameAfterClosedSpy.afterClosed = () => of('test');
+        component.isSaveDisabled = true;
+        await component.choseGameTitle();
+        expect(saveSpy).toHaveBeenCalled();
+        expect(component.gameTitle).toEqual('test');
     });
 });
