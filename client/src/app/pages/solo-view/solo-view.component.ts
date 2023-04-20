@@ -230,9 +230,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.addCommand(new SendMessageCommand(this, data));
         });
         this.socketService.listen<RoomMessage>(CHAT_EVENTS.Abandon, (message: RoomMessage) => {
-            if (this.left.endGame && this.isLimitedTimeMode) {
-                this.notifyEndGameLimitedTime();
-            }
             if (!this.left.endGame) {
                 message.message = `${message.message} - ${this.opponent} a abandonné la partie.`;
                 this.messages.push(message);
