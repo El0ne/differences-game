@@ -4,7 +4,7 @@ import { GameManagerService } from '@app/services/game-manager/game-manager.serv
 import { PlayerDifference } from '@common/difference-information';
 import { GameHistoryDTO } from '@common/game-history.dto';
 import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND_MS } from '@common/match-gateway-communication';
-import { ReplayTimerInformations } from '@common/replay-timer-informations';
+import { TimerModification } from '@common/timer-modification';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStubbedInstance, createStubInstance, stub } from 'sinon';
 import { BroadcastOperator, Server, Socket } from 'socket.io';
@@ -194,14 +194,14 @@ describe('MatchGateway', () => {
 
     it('modifyTime should call changeTimerValue', () => {
         const changeTimerSpy = jest.spyOn(gateway, 'changeTimerValue').mockImplementation();
-        gateway.updateTimer(socket, FAKE_REPLAY_TIMER_MODIFICATION);
+        gateway.updateTimer(socket, FAKE_TIMER_MODIFICATION);
         expect(changeTimerSpy).toHaveBeenCalled();
     });
 
     it('changeTimerValue should stop timer and set a new timer to the same room', async () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
         const stopTimerSpy = jest.spyOn(gateway, 'stopTimer').mockImplementation();
-        gateway.changeTimerValue(socket, FAKE_REPLAY_TIMER_MODIFICATION);
+        gateway.changeTimerValue(socket, FAKE_TIMER_MODIFICATION);
         jest.advanceTimersByTime(ONE_SECOND_MS);
         expect(stopTimerSpy).toHaveBeenCalled();
     });
@@ -238,8 +238,7 @@ const FAKE_GAME_HISTORY_DTO: GameHistoryDTO = {
     },
 };
 
-const FAKE_REPLAY_TIMER_MODIFICATION: ReplayTimerInformations = {
-    room: 'erhwrth',
+const FAKE_TIMER_MODIFICATION: TimerModification = {
     currentTime: 101,
     timeMultiplier: 2,
 };
