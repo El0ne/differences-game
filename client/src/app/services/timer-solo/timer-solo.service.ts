@@ -47,7 +47,6 @@ export class TimerSoloService {
         return seconds < TEN ? `${minute}:0${seconds}` : `${minute}:${seconds}`;
     }
 
-    // TODO check with Jasper
     restartTimer(multiplier: number, timeModification: number): void {
         const timerModification: TimerModification = {
             currentTime: this.currentTime + timeModification,

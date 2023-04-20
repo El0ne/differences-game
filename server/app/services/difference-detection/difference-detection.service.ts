@@ -17,13 +17,6 @@ export class DifferenceDetectionService {
         private differencesCounterService: DifferencesCounterService,
     ) {}
 
-    async createArray(image: string): Promise<number[]> {
-        const numArray: number[] = [];
-        const img = await Jimp.read(image);
-        for (const rgbColor of img.bitmap.data) numArray.push(rgbColor);
-        return numArray;
-    }
-
     async compareImages(pathToImage1: string, pathToImage2: string): Promise<number[][]> {
         this.firstImageArray = await this.createArray(pathToImage1);
         this.secondImageArray = await this.createArray(pathToImage2);
@@ -33,7 +26,14 @@ export class DifferenceDetectionService {
         return this.createDifferenceImage(image);
     }
 
-    async createDifferenceImage(image: Jimp): Promise<number[][]> {
+    private async createArray(image: string): Promise<number[]> {
+        const numArray: number[] = [];
+        const img = await Jimp.read(image);
+        for (const rgbColor of img.bitmap.data) numArray.push(rgbColor);
+        return numArray;
+    }
+
+    private async createDifferenceImage(image: Jimp): Promise<number[][]> {
         for (const i of this.differenceArray.keys()) {
             if (!this.isPixelSameColor(i * RGBA_DATA_LENGTH)) {
                 this.differenceArray[i] = true;
@@ -61,20 +61,20 @@ export class DifferenceDetectionService {
         return this.differencesCounterService.getDifferencesList(radiusArray);
     }
 
-    hasWhiteNeighbor(pixelPosition: number): boolean {
+    private hasWhiteNeighbor(pixelPosition: number): boolean {
         for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(pixelPosition, false, ADJACENT_PIXELS_RADIUS)) {
             if (!this.differenceArray[adjacentPixel]) return true;
         }
         return false;
     }
 
-    setPixelBlack(image: Jimp, pixelIndex: number): void {
+    private setPixelBlack(image: Jimp, pixelIndex: number): void {
         for (let i = 0; i < RGB_DATA_LENGTH; i++) {
             image.bitmap.data[pixelIndex + i] = BLACK;
         }
     }
 
-    isPixelSameColor(pixelIndex: number): boolean {
+    private isPixelSameColor(pixelIndex: number): boolean {
         for (let i = pixelIndex; i < pixelIndex + RGBA_DATA_LENGTH; i++) {
             if (this.firstImageArray[i] !== this.secondImageArray[i]) {
                 return false;

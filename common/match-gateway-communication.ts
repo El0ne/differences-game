@@ -1,19 +1,18 @@
 export const enum MATCH_EVENTS {
     createSoloGame = 'createSoloGame',
-    Timer = 'Timer',
-    EndTime = 'EndTime',
-    StartTime = 'StartTime',
-    Difference = 'Difference',
-    Win = 'Win',
-    SoloGameInformation = 'SoloGameInformation',
-    Time = 'Time',
+    Timer = 'classicTimer',
+    EndTime = 'endTime',
+    StartTime = 'startTime',
+    Difference = 'difference',
+    Win = 'win',
+    SoloGameInformation = 'soloGameInformation',
+    Time = 'time',
     leaveAndJoinReplayRoom = 'leaveAndJoinReplayRoom',
-    TimeModification = 'TimeModification',
-    Catch = 'Catch',
-
-    IncrementTimer = 'IncrementTimer',
-    LimitedTimeTimer = 'LimitedTimeTimer',
-    Lose = 'Lose',
+    TimeModification = 'timeModification',
+    Catch = 'catch',
+    IncrementTimer = 'incrementTimer',
+    LimitedTimeTimer = 'limitedTimeTimer',
+    Lose = 'lose',
 }
 
 export const enum LIMITED_TIME_MODE_EVENTS {
@@ -21,12 +20,11 @@ export const enum LIMITED_TIME_MODE_EVENTS {
     NewStageInformation = 'newStageInformation',
     StartLimitedTimeGame = 'startLimitedTimeGame',
     AbortLimitedTimeGame = 'abortLimitedTimeGame',
-    Timer = 'timer',
+    Timer = 'limitedTimer',
     NextStage = 'nextStage',
-    GameHistory = 'GameHistory',
-    StoreLimitedGameInfo = 'StoreLimitedGameInfo',
-    EndGame = 'EndGame',
-    TimeModification = 'timeModification',
+    GameHistory = 'gameHistory',
+    StoreLimitedGameInfo = 'storeLimitedGameInfo',
+    EndGame = 'endGame',
 }
 
 export const ONE_SECOND_MS = 1000;
