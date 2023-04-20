@@ -30,8 +30,8 @@ export class FileManipulationService {
 
     clearFile(canvas: HTMLCanvasElement, id: string, file: File | null): void {
         // we just want to set the file to null because we clear it. It should not have a value anymore
-        // eslint-disable-next-line no-unused-vars
-        file = null;
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
+        file === this.originalFile ? (this.originalFile = null) : (this.differenceFile = null);
         const context = canvas.getContext('2d');
         const input = document.getElementById(id) as HTMLInputElement;
         const bothInput = document.getElementById('upload-both') as HTMLInputElement;

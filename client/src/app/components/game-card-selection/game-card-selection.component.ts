@@ -67,7 +67,7 @@ export class GameCardSelectionComponent implements OnInit {
     }
 
     selectPlayerName(isMultiplayer: boolean): void {
-        const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true });
+        const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true, data: { isChosingGameTitle: false } });
         dialogRef.afterClosed().subscribe((isNameEntered: boolean) => {
             if (isNameEntered) {
                 this.gameParamService.gameParameters = {

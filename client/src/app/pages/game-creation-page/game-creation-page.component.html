@@ -3,7 +3,9 @@
         <div class="left-header-container">
             <button id="previous" routerLink="/config">Retour</button>
         </div>
-        <button id="save" [disabled]="isSaveDisabled" (click)="save()"><mat-icon class="save-image">save</mat-icon></button>
+        <button class="normal-button" id="save" [disabled]="isSaveDisabled" (click)="choseGameTitle()">
+            <mat-icon class="save-image">save</mat-icon>
+        </button>
     </div>
     <div id="title-container">
         <div class="line title">____________</div>
@@ -11,14 +13,6 @@
         <div class="line title">____________</div>
     </div>
     <div class="central">
-        <input
-            type="text"
-            class="game-title game-container neon-border"
-            #title
-            (keyup)="getTitle(title.value)"
-            placeholder="Donnez un titre à votre partie"
-            maxlength="17"
-        />
         <div class="upload-container">
             <div class="original container neon-border">
                 <div class="original image">

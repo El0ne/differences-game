@@ -3,9 +3,10 @@
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
+import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { getFakeCanvasInformations } from '@app/services/canvas-informations.constants';
 import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
 import { DrawManipulationService } from '@app/services/draw-manipulation/draw-manipulation.service';
@@ -15,6 +16,7 @@ import { PenService } from '@app/services/pen-service/pen-service.service';
 import { RectangleService } from '@app/services/rectangle/rectangle.service';
 import { UndoRedoService } from '@app/services/undo-redo/undo-redo.service';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
+import { of } from 'rxjs';
 import { GameCreationPageComponent } from './game-creation-page.component';
 
 describe('GameCreationPageComponent', () => {
@@ -29,6 +31,7 @@ describe('GameCreationPageComponent', () => {
     let undoRedoService: UndoRedoService;
     let drawManipulationService: DrawManipulationService;
     let matDialog: MatDialog;
+    let choseNameAfterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
 
     beforeEach(async () => {
         penService = jasmine.createSpyObj('PenService', ['setProperties', 'startPen', 'stopPen', 'writing']);
@@ -49,12 +52,15 @@ describe('GameCreationPageComponent', () => {
         canvasSelectionService = jasmine.createSpyObj('CanvasSelectionService', ['setProperties', 'choseCanvas']);
         undoRedoService = jasmine.createSpyObj('UndoRedoService', ['setProperties', 'pushCanvas', 'undoAction', 'undo', 'redoAction', 'redo']);
         matDialog = jasmine.createSpyObj('MatDialog', ['open']);
+
+        choseNameAfterClosedSpy = jasmine.createSpyObj('MatDialogRef<ChosePlayerNameDialogComponent>', ['afterClosed']);
+
         await TestBed.configureTestingModule({
             declarations: [GameCreationPageComponent],
             imports: [HttpClientModule, FormsModule, MatDialogModule, RouterTestingModule, MatIconModule],
             providers: [
                 { provide: MAT_DIALOG_DATA, useValue: {} },
-                { provide: MatDialog, useValue: { matDialog } },
+                { provide: MatDialog, useValue: matDialog },
                 { provide: MatDialogRef, useValue: {} },
                 { provide: PenService, useValue: penService },
                 { provide: RectangleService, useValue: rectangleService },
@@ -175,64 +181,33 @@ describe('GameCreationPageComponent', () => {
         expect(fileManipulationService.fileValidation).toHaveBeenCalledWith(event);
     });
 
-    it('should verify and send an alert if the title and both images are missing', () => {
-        component.gameTitle = '';
-        component.originalFile = null;
-        component.differentFile = null;
-        const alertSpy = spyOn(window, 'alert');
+    it('should merge two canvases and return a blob', () => {
+        const canvas = document.createElement('canvas') as HTMLCanvasElement;
+        const canvas2 = document.createElement('canvas') as HTMLCanvasElement;
 
-        expect(component.saveVerification()).toBeFalse();
-        expect(alertSpy).toHaveBeenCalledWith('Il manque une image et un titre à votre jeu !');
-    });
+        const context = canvas.getContext('2d');
+        const context2 = canvas2.getContext('2d');
+        if (context && context2) {
+            spyOn(context, 'drawImage');
+            spyOn(context2, 'clearRect');
 
-    it('should verify and send an alert if the title is missing', () => {
-        component.gameTitle = '';
-        component.originalFile = new File([], 'test.png');
-        component.differentFile = new File([], 'test-diff.png');
-        const alertSpy = spyOn(window, 'alert');
+            component.mergeCanvas(canvas, canvas2);
 
-        expect(component.saveVerification()).toBeFalse();
-        expect(alertSpy).toHaveBeenCalledWith("N'oubliez pas d'ajouter un titre à votre jeu !");
-    });
-
-    it('should verify and send an alert if one of the images is missing', () => {
-        component.gameTitle = 'Test Game';
-        component.originalFile = null;
-        component.differentFile = new File([], 'test-diff.png');
-
-        expect(component.saveVerification()).toBeFalse();
-
-        component.originalFile = new File([], 'test.png');
-        component.differentFile = null;
-        const alertSpy = spyOn(window, 'alert');
-
-        expect(component.saveVerification()).toBeFalse();
-        expect(alertSpy).toHaveBeenCalledWith('Un jeu de différences sans image est pour ainsi dire... intéressant ? Ajoutez une image.');
-    });
-
-    it('should return true if all conditions are met', () => {
-        component.gameTitle = 'Test Game';
-        component.originalFile = new File([], 'test.png');
-        component.differentFile = new File([], 'test-diff.png');
-
-        expect(component.saveVerification()).toBeTrue();
-    });
-
-    it('should merge two canvases into a blob', () => {
-        const canvas1 = document.createElement('canvas');
-        const canvas2 = document.createElement('canvas');
-        const ctx1 = canvas1.getContext('2d');
-        const ctx2 = canvas2.getContext('2d');
-        if (ctx1) {
-            ctx1.fillStyle = '#FF0000';
-            ctx1.fillRect(0, 0, 50, 50);
+            expect(context.drawImage).toHaveBeenCalled();
+            expect(context2.clearRect).toHaveBeenCalled();
         }
-        if (ctx2) {
-            ctx2.fillStyle = '#00FF00';
-            ctx2.fillRect(25, 25, 50, 50);
+    });
+
+    it('should draw a white canvas', () => {
+        const canvas = document.createElement('canvas') as HTMLCanvasElement;
+        const context = canvas.getContext('2d');
+        if (context) {
+            spyOn(context, 'fillRect');
+
+            component.drawWhiteCanvas(canvas);
+
+            expect(context.fillRect).toHaveBeenCalledOnceWith(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
         }
-        const result = component.mergeCanvas(canvas1, canvas2);
-        expect(result).toBeInstanceOf(Blob);
     });
 
     it('should add event listeners when user draws on the canvases with a pen', () => {
@@ -448,5 +423,21 @@ describe('GameCreationPageComponent', () => {
 
         expect(undoRedoService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
         expect(undoRedoService.redo).toHaveBeenCalled();
+    });
+
+    it('choseGameTitle should call save after the name is chosen or put isSaveDisabled to false if no name was entered', async () => {
+        matDialog.open = () => choseNameAfterClosedSpy;
+        choseNameAfterClosedSpy.afterClosed = () => of(false);
+        component.isSaveDisabled = true;
+        const saveSpy = spyOn(component, 'save');
+        await component.choseGameTitle();
+        expect(saveSpy).not.toHaveBeenCalled();
+        expect(component.isSaveDisabled).toBeFalse();
+
+        choseNameAfterClosedSpy.afterClosed = () => of('test');
+        component.isSaveDisabled = true;
+        await component.choseGameTitle();
+        expect(saveSpy).toHaveBeenCalled();
+        expect(component.gameTitle).toEqual('test');
     });
 });

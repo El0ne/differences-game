@@ -33,6 +33,14 @@ export class DrawManipulationService {
         }
 
         if (originalRectangleContext) originalRectangleContext.clearRect(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+
+        this.canvasInformations.isInOriginalCanvas = true;
+        this.undoRedoService.setProperties(this.canvasInformations);
+        this.undoRedoService.pushCanvas(this.canvasInformations.drawingCanvas1);
+
+        this.canvasInformations.isInOriginalCanvas = false;
+        this.undoRedoService.setProperties(this.canvasInformations);
+        this.undoRedoService.pushCanvas(this.canvasInformations.drawingCanvas2);
     }
 
     duplicate(side: string): void {
@@ -41,9 +49,14 @@ export class DrawManipulationService {
 
         if (side === 'right' && differenceDrawingContext) {
             differenceDrawingContext.drawImage(this.canvasInformations.originalDrawnCanvas, 0, 0);
+            this.canvasInformations.isInOriginalCanvas = false;
         } else if (side === 'left' && originalDrawingContext) {
             originalDrawingContext.drawImage(this.canvasInformations.differenceDrawnCanvas, 0, 0);
+            this.canvasInformations.isInOriginalCanvas = true;
         }
+
+        this.undoRedoService.setProperties(this.canvasInformations);
+        this.undoRedoService.pushCanvas(this.canvasInformations.drawingCanvas1);
     }
 
     clearPainting(side: string): void {
