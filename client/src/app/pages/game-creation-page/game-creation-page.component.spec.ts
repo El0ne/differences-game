@@ -7,6 +7,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angu
 import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
+import { Routes } from '@app/modules/routes';
 import { getFakeCanvasInformations } from '@app/services/canvas-informations.constants';
 import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
 import { DrawManipulationService } from '@app/services/draw-manipulation/draw-manipulation.service';
@@ -18,7 +19,6 @@ import { UndoRedoService } from '@app/services/undo-redo/undo-redo.service';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 import { of } from 'rxjs';
 import { GameCreationPageComponent } from './game-creation-page.component';
-import { Routes } from '@app/modules/routes';
 
 describe('GameCreationPageComponent', () => {
     let component: GameCreationPageComponent;
@@ -199,6 +199,35 @@ describe('GameCreationPageComponent', () => {
         const event = new Event('change');
         await component.fileValidation(event);
         expect(fileManipulationService.fileValidation).toHaveBeenCalledWith(event);
+    });
+
+    it('should merge two canvases and return a blob', () => {
+        const canvas = document.createElement('canvas') as HTMLCanvasElement;
+        const canvas2 = document.createElement('canvas') as HTMLCanvasElement;
+
+        const context = canvas.getContext('2d');
+        const context2 = canvas2.getContext('2d');
+        if (context && context2) {
+            spyOn(context, 'drawImage');
+            spyOn(context2, 'clearRect');
+
+            component.mergeCanvas(canvas, canvas2);
+
+            expect(context.drawImage).toHaveBeenCalled();
+            expect(context2.clearRect).toHaveBeenCalled();
+        }
+    });
+
+    it('should draw a white canvas', () => {
+        const canvas = document.createElement('canvas') as HTMLCanvasElement;
+        const context = canvas.getContext('2d');
+        if (context) {
+            spyOn(context, 'fillRect');
+
+            component.drawWhiteCanvas(canvas);
+
+            expect(context.fillRect).toHaveBeenCalledOnceWith(0, 0, IMAGE_DIMENSIONS.width, IMAGE_DIMENSIONS.height);
+        }
     });
 
     it('should add event listeners when user draws on the canvases with a pen', () => {
