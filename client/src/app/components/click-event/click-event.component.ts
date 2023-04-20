@@ -58,6 +58,7 @@ export class ClickEventComponent implements OnInit, OnChanges {
         this.secondHint = false;
         this.foundDifferences = [];
         this.modification.nativeElement.addEventListener('mousemove', this.handleMouseMove.bind(this));
+        this.loadImage();
     }
 
     loadImage(): void {
