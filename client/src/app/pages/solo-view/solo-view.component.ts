@@ -246,9 +246,10 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                     if (this.limitedMultiDto.player2) this.limitedMultiDto.player2.hasAbandon = true;
                     this.socketService.send<GameHistoryDTO>(LIMITED_TIME_MODE_EVENTS.StoreLimitedGameInfo, this.limitedMultiDto);
                 } else {
+                    this.notifyNewBestTime(this.socketService.socketId, true, 'Classique');
                     this.gameCompletion(true, this.socketService.socketId);
-                    this.notifyNewBestTime(this.socketService.socketId, true, 'classique');
                     this.addCommand(new SendMessageCommand(this, message));
+                    this.addCommand(new EndGameCommand(this));
                 }
             }
         });
