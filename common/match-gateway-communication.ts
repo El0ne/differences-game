@@ -1,15 +1,15 @@
 export const enum MATCH_EVENTS {
     createSoloGame = 'createSoloGame',
-    Timer = 'Timer',
-    EndTime = 'EndTime',
-    StartTime = 'StartTime',
-    Difference = 'Difference',
-    Win = 'Win',
-    SoloGameInformation = 'SoloGameInformation',
-    Time = 'Time',
-    IncrementTimer = 'IncrementTimer',
-    LimitedTimeTimer = 'LimitedTimeTimer',
-    Lose = 'Lose',
+    Timer = 'timer',
+    EndTime = 'endTime',
+    StartTime = 'startTime',
+    Difference = 'difference',
+    Win = 'win',
+    SoloGameInformation = 'soloGameInformation',
+    Time = 'time',
+    IncrementTimer = 'incrementTimer',
+    LimitedTimeTimer = 'limitedTimeTimer',
+    Lose = 'lose',
 }
 
 export const enum LIMITED_TIME_MODE_EVENTS {
@@ -19,9 +19,9 @@ export const enum LIMITED_TIME_MODE_EVENTS {
     AbortLimitedTimeGame = 'abortLimitedTimeGame',
     Timer = 'timer',
     NextStage = 'nextStage',
-    GameHistory = 'GameHistory',
-    StoreLimitedGameInfo = 'StoreLimitedGameInfo',
-    EndGame = 'EndGame',
+    GameHistory = 'gameHistory',
+    StoreLimitedGameInfo = 'storeLimitedGameInfo',
+    EndGame = 'endGame',
     TimeModification = 'timeModification',
 }
 
