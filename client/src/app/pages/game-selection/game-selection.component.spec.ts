@@ -12,7 +12,7 @@ import { SocketService } from '@app/services/socket/socket.service';
 import { GameCardInformation } from '@common/game-card';
 import { WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 import { Subject, of } from 'rxjs';
-import { GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
+import { DELAY_BEFORE_REFRESH, GAME_CARDS_TO_DISPLAY } from './game-selection-constants';
 import { GameSelectionComponent } from './game-selection.component';
 
 describe('GameSelectionComponent', () => {
@@ -126,6 +126,17 @@ describe('GameSelectionComponent', () => {
         expect(component.isShowingLastCard()).toBeTruthy();
     });
 
+    it('refreshGameCards() should call getNumberOfGameCardInformation and getGameCardsInformations', fakeAsync(() => {
+        const fakeData = 5;
+        spyOn(component['gameCardService'], 'getNumberOfGameCardInformation').and.returnValue(of(fakeData));
+        spyOn(component, 'selectGameCards');
+        component.refreshGameCards();
+        tick(DELAY_BEFORE_REFRESH);
+        expect(component.numberOfGameInformations).toEqual(fakeData);
+        expect(component['gameCardService'].getNumberOfGameCardInformation).toHaveBeenCalled();
+        expect(component.selectGameCards).toHaveBeenCalled();
+    }));
+
     it('MatchCreated event should call setGameCardCreateOrJoin with isCreate at false', () => {
         socketServiceSpy.listen = (event: string, callback: any) => {
             if (event === WAITING_ROOM_EVENTS.MatchCreated) callback('stageId');
@@ -169,8 +180,6 @@ describe('GameSelectionComponent', () => {
     });
 
     it('refreshGameCards() should call selectGameCards() and getGameCardsInformations()', fakeAsync(() => {
-        const DELAY_BEFORE_REFRESH = 250;
-
         spyOn(component, 'selectGameCards').and.returnValue();
         spyOn(gameCardInfoService, 'getNumberOfGameCardInformation').and.returnValue(of(GAME_CARDS_TO_DISPLAY));
 

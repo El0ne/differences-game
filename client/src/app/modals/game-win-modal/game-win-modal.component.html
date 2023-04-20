@@ -1,12 +1,27 @@
-<div class="win neon modal-page">
-    <div *ngIf="endGameInfo.isMultiplayer" class="modal-title">
-        <p>{{ endGameInfo.winner }} est le vainqueur!</p>
-        <p>Bien joué!</p>
+<div class="win modal-page">
+    <div *ngIf="endGameInfo.isMultiplayer" class="text">
+        <p class="neon">{{ endGameInfo.winner }} est le vainqueur!</p>
+
+        <div *ngIf="endGameInfo.isWinner; else elseWinner">
+            <div class="endGameMessage">
+                <p>Vous Avez Gagné!</p>
+                <p>Bravo!</p>
+            </div>
+        </div>
+        <ng-template #elseWinner>
+            <div class="endGameMessage">
+                <p>Vous Avez Perdu.</p>
+                <p>Meilleure chance la prochaine fois.</p>
+            </div>
+        </ng-template>
     </div>
-    <div *ngIf="!endGameInfo.isMultiplayer" class="modal-title">
+    <div *ngIf="!endGameInfo.isMultiplayer" class="text neon">
         <p>Vous Avez Gagné!</p>
         <p>Bravo!</p>
     </div>
 
-    <button class="normal-button" (click)="confirm()">Continuer</button>
+    <div class="endGameButtons">
+        <button class="normal-button" (click)="confirm()">Continuer</button>
+        <button class="normal-button" (click)="replay()">Reprise vidéo</button>
+    </div>
 </div>

@@ -1,8 +1,8 @@
 .opponents-container {
     display: flex;
     flex-direction: column;
-    width: 400px;
-    height: 400px;
+    width: 23rem;
+    height: 20rem;
     overflow-y: auto;
     text-overflow: hidden;
 }
@@ -17,8 +17,9 @@ body {
 }
 
 .container {
-    width: 500px;
-    height: 500px;
+    width: 32rem;
+    height: 32rem;
+
     justify-content: space-around;
     align-items: center;
     border-radius: 25px;
@@ -28,6 +29,8 @@ body {
 
 .name-entry-title {
     font-size: 2.5em;
+    color: black;
+    font-weight: 500;
 }
 
 .normal-button {
@@ -95,4 +98,20 @@ body {
     display: flex;
     flex-direction: row;
     text-align: right;
+    align-items: center;
+}
+
+.client-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+img {
+    width: 16rem;
+}
+
+h2 {
+    color: #fff;
+    text-align: center;
 }

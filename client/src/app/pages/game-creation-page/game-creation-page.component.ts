@@ -1,3 +1,4 @@
+// we have to disable this rule because exceeds 355 lines.
 /* eslint-disable max-lines */
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -17,11 +18,8 @@ import { CanvasInformations } from '@common/canvas-informations';
 import { GameCardDto } from '@common/game-card.dto';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 import { Buffer } from 'buffer';
-import { GC_PATHS } from './game-creation-constants';
+import { ERASER_SIZE, GC_PATHS, ONLOAD_DELAY, PEN_SIZE } from './game-creation-constants';
 
-const PEN_SIZE = 10;
-const ERASER_SIZE = 50;
-const ONLOAD_DELAY = 50;
 @Component({
     selector: 'app-game-creation-page',
     templateUrl: './game-creation-page.component.html',

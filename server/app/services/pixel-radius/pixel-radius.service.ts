@@ -1,6 +1,7 @@
-/* eslint-disable no-underscore-dangle */ // -- need to use radius as a variable name
+// -- need to use radius as a variable name
+/* eslint-disable no-underscore-dangle */
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
-import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
+import { PixelPositionService } from '@app/services/pixel-position/pixel-position.service';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()

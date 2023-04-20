@@ -1,7 +1,6 @@
-import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Component } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
 import { SocketService } from '@app/services/socket/socket.service';
-import { GameConditions } from '@common/chat-dialog-constants';
 
 @Component({
     selector: 'app-chose-player-name-dialog',
@@ -11,11 +10,7 @@ import { GameConditions } from '@common/chat-dialog-constants';
 export class ChosePlayerNameDialogComponent {
     showNameErrorMessage: boolean = false;
     playerName: string = '';
-    constructor(
-        private dialogRef: MatDialogRef<ChosePlayerNameDialogComponent>,
-        private socketService: SocketService,
-        @Inject(MAT_DIALOG_DATA) public conditions: GameConditions,
-    ) {}
+    constructor(private dialogRef: MatDialogRef<ChosePlayerNameDialogComponent>, private socketService: SocketService) {}
 
     validateName(): void {
         const testName = this.playerName;

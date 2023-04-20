@@ -8,7 +8,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
-import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { BestTimeComponent } from './components/best-time/best-time.component';
 import { ClickEventComponent } from './components/click-event/click-event.component';
 import { GameCardSelectionComponent } from './components/game-card-selection/game-card-selection.component';
@@ -22,6 +21,7 @@ import { GameWinModalComponent } from './modals/game-win-modal/game-win-modal.co
 import { LimitedTimeComponent } from './modals/limited-time/limited-time.component';
 import { ModalPageComponent } from './modals/modal-page/modal-page.component';
 import { QuitGameModalComponent } from './modals/quit-game-modal/quit-game-modal.component';
+import { ReplayGameModalComponent } from './modals/replay-game-modal/replay-game-modal.component';
 import { WaitingRoomComponent } from './modals/waiting-room/waiting-room.component';
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 import { GameSelectionComponent } from './pages/game-selection/game-selection.component';
@@ -38,7 +38,6 @@ import { SoloViewComponent } from './pages/solo-view/solo-view.component';
     declarations: [
         AppComponent,
         HomePageComponent,
-        MaterialPageComponent,
         GameSelectionComponent,
         BestTimeComponent,
         GameCardSelectionComponent,
@@ -50,6 +49,8 @@ import { SoloViewComponent } from './pages/solo-view/solo-view.component';
         GameInfoModalComponent,
         QuitGameModalComponent,
         GameWinModalComponent,
+        ReplayGameModalComponent,
+        GameHistoryComponent,
         LimitedTimeComponent,
         GameConstantsComponent,
         GameLoseModalComponent,

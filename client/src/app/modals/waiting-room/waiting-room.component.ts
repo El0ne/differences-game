@@ -31,12 +31,11 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
         private dialogRef: MatDialogRef<WaitingRoomComponent>,
         private router: Router,
         private socket: SocketService,
-        @Inject(MAT_DIALOG_DATA) data: WaitingRoomDataPassing,
-    ) {
-        this.waitingRoomInfo = data;
-    }
+        @Inject(MAT_DIALOG_DATA) private data: WaitingRoomDataPassing,
+    ) {}
 
     ngOnInit(): void {
+        this.waitingRoomInfo = this.data;
         if (this.waitingRoomInfo.isHost) {
             this.socket.listen<PlayerInformations>(WAITING_ROOM_EVENTS.RequestMatch, (opponentInformations: PlayerInformations) => {
                 this.clientsInWaitingRoom.set(opponentInformations.playerSocketId, opponentInformations.playerName);

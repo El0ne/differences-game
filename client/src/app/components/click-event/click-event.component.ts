@@ -1,4 +1,6 @@
 import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { ClickCommand } from '@app/commands/click/click-command';
+import { Command } from '@app/commands/command';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { PixelModificationService } from '@app/services/pixel-modification/pixel-modification.service';
@@ -23,6 +25,7 @@ export class ClickEventComponent implements OnInit, OnChanges {
     @Output() differenceDetected: EventEmitter<DifferenceInformation> = new EventEmitter<DifferenceInformation>();
     @Output() mistake: EventEmitter<void> = new EventEmitter<void>();
     @Output() cheatModeHandler: EventEmitter<KeyboardEvent> = new EventEmitter<KeyboardEvent>();
+    @Output() command: EventEmitter<Command> = new EventEmitter<Command>();
     @Output() color: EventEmitter<number[]> = new EventEmitter<number[]>();
     @Output() thirdHint: EventEmitter<boolean> = new EventEmitter<boolean>();
     @ViewChild('picture', { static: true })
@@ -55,6 +58,7 @@ export class ClickEventComponent implements OnInit, OnChanges {
         this.secondHint = false;
         this.foundDifferences = [];
         this.modification.nativeElement.addEventListener('mousemove', this.handleMouseMove.bind(this));
+        this.loadImage();
     }
 
     loadImage(): void {
@@ -86,7 +90,9 @@ export class ClickEventComponent implements OnInit, OnChanges {
 
     getCoordInImage(mouseEvent: MouseEvent): number[] {
         const rect = this.modification.nativeElement.getBoundingClientRect();
-        return this.pixelModificationService.getCoordInImage(mouseEvent, rect);
+        const coordinates = this.pixelModificationService.getCoordInImage(mouseEvent, rect);
+
+        return coordinates;
     }
 
     convertPositionToPixel(toTransform: number): number[] {
@@ -97,24 +103,27 @@ export class ClickEventComponent implements OnInit, OnChanges {
         this.clickEventService
             .isADifference(this.getCoordInImage(mouseEvent)[0], this.getCoordInImage(mouseEvent)[1], this.gameCardId)
             .subscribe((data) => {
-                this.differenceData = data;
-                if (
-                    this.differenceData.isADifference &&
-                    !this.foundDifferenceService.foundDifferences.includes(this.differenceData.differencesPosition)
-                ) {
-                    this.differenceDetected.emit({
-                        differencesPosition: this.differenceData.differencesPosition,
-                        lastDifferences: this.differenceData.differenceArray,
-                    });
-                    if (this.toggleCheatMode) {
-                        const keyEvent: KeyboardEvent = new KeyboardEvent('keydown', { key: 't' });
-                        this.cheatModeHandler.emit(keyEvent);
-                    }
-                } else {
-                    this.displayError(mouseEvent);
-                    this.color.emit([this.getCoordInImage(mouseEvent)[0], this.getCoordInImage(mouseEvent)[1]]);
-                }
+                const clickCommand = new ClickCommand(this, data, mouseEvent);
+                this.command.emit(clickCommand);
+                this.emitToSoloView(data, mouseEvent);
             });
+    }
+
+    emitToSoloView(data: ClickDifferenceVerification, mouseEvent: MouseEvent): void {
+        this.differenceData = data;
+        if (this.differenceData.isADifference && !this.foundDifferenceService.foundDifferences.includes(this.differenceData.differencesPosition)) {
+            this.differenceDetected.emit({
+                differencesPosition: this.differenceData.differencesPosition,
+                lastDifferences: this.differenceData.differenceArray,
+            });
+            if (this.toggleCheatMode) {
+                const keyEvent: KeyboardEvent = new KeyboardEvent('keydown', { key: 't' });
+                this.cheatModeHandler.emit(keyEvent);
+            }
+        } else {
+            this.displayError(mouseEvent);
+            this.color.emit([this.getCoordInImage(mouseEvent)[0], this.getCoordInImage(mouseEvent)[1]]);
+        }
     }
 
     async clearEffect(): Promise<void> {

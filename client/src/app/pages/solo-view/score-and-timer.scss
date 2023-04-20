@@ -1,0 +1,49 @@
+#double-score {
+    display: flex;
+    flex-direction: row;
+    gap: 5%;
+}
+
+.score {
+    margin-top: 1.5rem;
+    align-self: center;
+    padding-top: 2%;
+    padding-bottom: 2%;
+}
+
+#timer {
+    align-self: center;
+    padding-top: 3%;
+    padding-bottom: 3%;
+}
+
+.timer-box {
+    align-self: center;
+    width: 360px;
+    height: 100px;
+    border: 0.2rem solid #eee;
+    box-shadow: 0 0 1px #eee, 0 0 1px #aaa, 0 0 2rem var(--basic-border), 0 0 0.8rem var(--basic-border), 0 0 2.8rem var(--basic-border),
+        inset 0 0 1.3rem var(--basic-border);
+    border-radius: 10px;
+}
+
+.display {
+    display: inline-block;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #1b1b1b;
+    width: 345px;
+    height: 85px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+#time {
+    line-height: 85px;
+    color: #fff;
+    font-size: 50px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}

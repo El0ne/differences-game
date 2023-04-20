@@ -1,7 +1,6 @@
+import { ADJACENT_PIXELS_RADIUS } from '@app/services/difference-detection/difference-detection.const';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { Injectable } from '@nestjs/common';
-
-const ADJACENT_PIXELS_RADIUS = 1;
 
 @Injectable()
 export class DifferencesCounterService {

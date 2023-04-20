@@ -1,14 +1,25 @@
 // we have to disable this rule because this file is too long
 /* eslint-disable max-lines */
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { CloseModalCommand } from '@app/commands/close-modal/close-modal-command';
+import { Command, Invoker } from '@app/commands/command';
+import { EndGameCommand } from '@app/commands/end-game/end-game-command';
+import { HintCommand } from '@app/commands/hint/hint-command';
+import { KeyPressCommand } from '@app/commands/key-press/key-press-command';
+import { OpenModalCommand } from '@app/commands/open-modal-command/open-modal-command';
+import { OpponentDifferenceCommand } from '@app/commands/opponent-difference/opponent-difference-command';
+import { SendMessageCommand } from '@app/commands/send-message/send-message-command';
+import { ThirdHintColorCommand } from '@app/commands/third-hint-color/third-hint-color-command';
+import { WriteMessageCommand } from '@app/commands/write-message/write-message';
 import { HEIGHT, MAX_EFFECT_TIME, WIDTH } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { GameInfoModalComponent, GameInfoModalData } from '@app/modals/game-info-modal/game-info-modal.component';
 import { GameLoseModalComponent } from '@app/modals/game-lose-modal/game-lose-modal.component';
 import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal.component';
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
+import { ReplayGameModalComponent } from '@app/modals/replay-game-modal/replay-game-modal.component';
 import { Routes } from '@app/modules/routes';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
@@ -16,6 +27,7 @@ import { GameConstantsService } from '@app/services/game-constants/game-constant
 import { GameHintService } from '@app/services/game-hint/game-hint.service';
 import { GameParametersService } from '@app/services/game-parameters/game-parameters.service';
 import { ImagesService } from '@app/services/images/images.service';
+import { ReplayButtonsService } from '@app/services/replay-buttons/replay-buttons.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { TimerSoloService } from '@app/services/timer-solo/timer-solo.service';
 import { EndGame } from '@common/chat-dialog-constants';
@@ -29,16 +41,21 @@ import { ImageObject } from '@common/image-object';
 import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, TWO_MINUTES_SECONDS } from '@common/match-gateway-communication';
 import { PlayerGameInfo } from '@common/player-game-info';
 import { Subject } from 'rxjs';
-import { DOUBLE_HINT_TIME_IN_MS, HINT_TIME_IN_MS } from './solo-view-constants';
+import { EXECUTE_COMMAND_DELAY, HINT_TIME_IN_MS, THIRD_HINT_TIME_IN_MS } from './solo-view-constants';
 
 @Component({
     selector: 'app-solo-view',
     templateUrl: './solo-view.component.html',
-    styleUrls: ['./solo-view.component.scss'],
+    styleUrls: ['./solo-view.component.scss', './score-and-timer.scss'],
 })
 export class SoloViewComponent implements OnInit, OnDestroy {
-    @ViewChild('left') left: ClickEventComponent;
-    @ViewChild('right') right: ClickEventComponent;
+    @ViewChild('left')
+    left: ClickEventComponent;
+    @ViewChild('right')
+    right: ClickEventComponent;
+
+    @ViewChild('inputField') inputChat: ElementRef<HTMLInputElement>;
+
     showErrorMessage: boolean = false;
     showTextBox: boolean = false;
     showNavBar: boolean = true;
@@ -57,14 +74,25 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     limitedSoloDto: GameHistoryDTO;
     boundActivateCheatMode: (event: KeyboardEvent) => void = this.activateCheatMode.bind(this);
     gameConstants: GameConstants;
-    // eslint-disable-next-line max-params -- need all parameters for constructor
-    currentRoom: string;
     hintIcon: boolean;
     thirdHint: boolean;
     hintColor: string;
+    inputElement = document.querySelector('input');
+    isWinner: boolean = false;
+
+    isReplayMode: boolean = false;
+    isReplayPaused: boolean = false;
+    replayTimeoutId: ReturnType<typeof setTimeout>;
+    previousTime: number = 0;
+
+    invoker: Invoker;
+    commandIndex: number = 0;
+
+    isCanvasEnabled: boolean = true;
+
     boundGetRandomDifference: (event: KeyboardEvent) => void = this.getRandomDifference.bind(this);
 
-    // we have more than 3 services
+    // we need more than 3 services
     // eslint-disable-next-line max-params
     constructor(
         private timerService: TimerSoloService,
@@ -77,6 +105,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private gameParamService: GameParametersService,
         private imagesService: ImagesService,
         private gameHintService: GameHintService,
+        private replayButtonsService: ReplayButtonsService,
     ) {}
 
     get stageId(): string {
@@ -95,7 +124,16 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         return this.socketService.socketId;
     }
 
+    get hintsRemaining(): number {
+        return this.gameHintService.hintsRemaining;
+    }
+
+    decreaseHintsRemaining(): void {
+        this.gameHintService.hintsRemaining--;
+    }
+
     ngOnInit(): void {
+        this.invoker = new Invoker();
         this.thirdHint = false;
         this.hintIcon = true;
 
@@ -105,7 +143,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         }
         this.player = this.socketService.names.get(this.socketService.socketId) as string;
         this.opponent = this.socketService.names.get(this.socketService.opponentSocket) as string;
-        this.currentRoom = this.socketService.gameRoom;
         this.startTime = new Date().toLocaleString('fr-FR');
         this.gameConstantsService.getGameConstants().subscribe((gameConstants: GameConstants) => {
             this.gameConstants = gameConstants;
@@ -198,11 +235,9 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         });
         this.socketService.listen<RoomMessage>(CHAT_EVENTS.RoomMessage, (data: RoomMessage) => {
             this.messages.push(data);
+            this.addCommand(new SendMessageCommand(this, data));
         });
         this.socketService.listen<RoomMessage>(CHAT_EVENTS.Abandon, (message: RoomMessage) => {
-            if (this.left.endGame && this.isLimitedTimeMode) {
-                this.notifyEndGameLimitedTime();
-            }
             if (!this.left.endGame) {
                 message.message = `${message.message} - ${this.opponent} a abandonné la partie.`;
                 this.messages.push(message);
@@ -213,11 +248,15 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 } else {
                     this.gameCompletion(true, this.socketService.socketId);
                     this.notifyNewBestTime(this.socketService.socketId, true, 'classique');
+                    this.addCommand(new SendMessageCommand(this, message));
                 }
             }
         });
         this.socketService.listen<PlayerDifference>(MATCH_EVENTS.Difference, (data: PlayerDifference) => {
-            this.effectHandler(data);
+            if (!this.isReplayMode) {
+                this.addCommand(new OpponentDifferenceCommand(this, data));
+                this.effectHandler(data);
+            }
         });
         this.socketService.listen<string>(MATCH_EVENTS.Win, (socketId: string) => {
             this.gameCompletion(true, socketId);
@@ -233,6 +272,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         this.gameHintService.hintsRemaining = 3;
         this.timerService.currentTime = 0;
+        this.timerService.eventTimer = 0;
         this.foundDifferenceService.clearDifferenceFound();
         this.socketService.disconnect();
         this.removeCheatMode();
@@ -279,6 +319,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         setTimeout(() => {
             this.activateCheatMode(event);
         }, MAX_EFFECT_TIME);
+
+        if (!this.isReplayMode) {
+            const cheatModeCommand = new KeyPressCommand(event, this);
+            this.addCommand(cheatModeCommand);
+        }
     }
 
     activateCheatMode(event: KeyboardEvent): void {
@@ -287,6 +332,11 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.left.getDifferences(this.stageId).subscribe((data) => {
                 if (this.left.toggleCheatMode) this.handleFlash(this.foundDifferenceService.findPixelsFromDifference(data));
             });
+
+            if (!this.isReplayMode) {
+                const cheatModeCommand = new KeyPressCommand(event, this);
+                this.addCommand(cheatModeCommand);
+            }
         }
     }
 
@@ -297,22 +347,18 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     setColor(clickPosition: number[]): void {
         this.hintColor = this.gameHintService.setColor(clickPosition, this.left.convertPositionToPixel(this.left.currentPixelHint));
+        if (!this.isReplayMode && this.thirdHint) {
+            if (this.timerService.eventTimer > this.previousTime) {
+                const thirdHintCommand = new ThirdHintColorCommand(this, this.hintColor);
+                this.addCommand(thirdHintCommand);
+                this.previousTime = this.timerService.eventTimer;
+            }
+        }
     }
 
     getRandomDifference(event: KeyboardEvent | null): void {
         if (event?.key === 'i' && !this.isMultiplayer && this.gameHintService.hintsRemaining > 0) {
-            if (!this.isLimitedTimeMode) this.timerService.restartTimer(1, this.gameConstants.hint);
-            else {
-                const timeLeft = this.timerService.currentTime - this.gameConstants.hint;
-                if (timeLeft > 0) {
-                    this.socketService.send<number>(LIMITED_TIME_MODE_EVENTS.Timer, timeLeft);
-                } else {
-                    this.timerService.stopTimer();
-                    this.socketService.send(MATCH_EVENTS.Lose);
-                    return;
-                }
-            }
-            if (this.hintsRemaining() > 0) this.socketService.send(CHAT_EVENTS.Hint, this.currentRoom);
+            if (this.hintsRemaining > 0) this.socketService.send(CHAT_EVENTS.Hint);
             this.left.getDifferences(this.stageId).subscribe((data) => {
                 const pixelArray = this.foundDifferenceService.findPixelsFromDifference(data);
                 const randomPixel = pixelArray[Math.floor(Math.random() * pixelArray.length)];
@@ -327,10 +373,32 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                     this.right.hintPosX = this.left.hintPosX;
                     this.right.hintPosY = this.left.hintPosY;
                 }
+                if (!this.isReplayMode) {
+                    const hintCommand = new HintCommand(this.left.hintPosX, this.left.hintPosY, this);
+                    this.addCommand(hintCommand);
+                }
+
                 this.setCurrentHint();
                 this.hintTimeouts();
+
+                if (!this.isLimitedTimeMode) this.timerService.restartTimer(1, this.gameConstants.hint);
+                else {
+                    const timeLeft = this.timerService.currentTime - this.gameConstants.hint;
+                    if (timeLeft > 0) {
+                        this.socketService.send<number>(LIMITED_TIME_MODE_EVENTS.Timer, timeLeft);
+                    } else {
+                        this.timerService.stopTimer();
+                        this.socketService.send(MATCH_EVENTS.Lose);
+                        return;
+                    }
+                }
             });
         }
+    }
+
+    handleHint(): void {
+        const isPositive = !this.isLimitedTimeMode ? this.gameConstants.hint : -this.gameConstants.hint;
+        this.timerService.restartTimer(this.replayButtonsService.timeMultiplier, isPositive);
     }
 
     setCurrentHint(): void {
@@ -355,7 +423,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         } else {
             setTimeout(() => {
                 this.thirdHint = false;
-            }, DOUBLE_HINT_TIME_IN_MS);
+            }, THIRD_HINT_TIME_IN_MS);
         }
     }
 
@@ -378,11 +446,8 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         } else if (this.limitedMultiDto) this.socketService.send<GameHistoryDTO>(LIMITED_TIME_MODE_EVENTS.EndGame, this.limitedMultiDto);
     }
 
-    hintsRemaining(): number {
-        return this.gameHintService.hintsRemaining;
-    }
-
     notifyNewBestTime(winnerId: string, isAbandon: boolean, mode: string): void {
+        this.isWinner = winnerId === this.socketService.socketId;
         const winnerName: string = this.socketService.names.get(winnerId) as string;
         const player1: PlayerGameInfo = {
             name: winnerName,
@@ -408,7 +473,21 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             };
             gameHistory.player2 = player2;
         }
-        this.socketService.send<GameHistoryDTO>(CHAT_EVENTS.BestTime, gameHistory);
+        if (!this.isReplayMode) this.socketService.send<GameHistoryDTO>(CHAT_EVENTS.BestTime, gameHistory);
+    }
+
+    openReplayModal(): void {
+        this.timerService.stopTimer();
+        const dialogRef = this.dialog.open(ReplayGameModalComponent, {
+            disableClose: true,
+        });
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                this.resetPropertiesForReplay();
+            } else {
+                clearTimeout(this.replayTimeoutId);
+            }
+        });
     }
 
     gameCompletion(classic: boolean, winnerId?: string): void {
@@ -417,10 +496,24 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         this.showNavBar = false;
         if (classic && !this.dialog.openDialogs.length && winnerId) {
             this.timerService.stopTimer();
-            this.dialog.open(GameWinModalComponent, {
-                disableClose: true,
-                data: { isMultiplayer: this.isMultiplayer, winner: this.socketService.names.get(winnerId) } as EndGame,
-            });
+            if (!this.isReplayMode) {
+                const dialogRef = this.dialog.open(GameWinModalComponent, {
+                    disableClose: true,
+                    data: { isMultiplayer: this.isMultiplayer, winner: this.socketService.names.get(winnerId), isWinner: this.isWinner } as EndGame,
+                });
+                dialogRef.afterClosed().subscribe((isReplaySelected) => {
+                    if (isReplaySelected) {
+                        this.socketService.send<string>(MATCH_EVENTS.leaveAndJoinReplayRoom);
+                        this.resetPropertiesForReplay();
+                    }
+                });
+                if (this.isMultiplayer && this.socketService.socketId !== winnerId) {
+                    const endGameCommand = new EndGameCommand(this);
+                    this.addCommand(endGameCommand);
+                }
+            } else {
+                this.openReplayModal();
+            }
         } else if (!this.dialog.openDialogs.length) {
             this.dialog.open(GameLoseModalComponent, {
                 disableClose: true,
@@ -437,19 +530,63 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     openInfoModal(): void {
-        this.dialog.open(GameInfoModalComponent, {
+        const dialogRef = this.dialog.open(GameInfoModalComponent, {
             data: {
                 gameCardInfo: this.gameCardInfo,
                 numberOfDifferences: this.numberOfDifferences,
                 numberOfPlayers: this.isMultiplayer ? 2 : 1,
+                isReplayMode: this.isReplayMode,
             } as GameInfoModalData,
+            disableClose: true,
+            hasBackdrop: !this.isReplayMode,
         });
+
+        if (!this.isReplayMode) {
+            this.addCommand(new OpenModalCommand(this, true));
+            dialogRef.afterClosed().subscribe(() => {
+                this.addCommand(new CloseModalCommand(this));
+            });
+        }
+    }
+
+    closeModals(): void {
+        this.dialog.closeAll();
     }
 
     quitGame(): void {
-        this.dialog.open(QuitGameModalComponent, {
+        const dialogRef = this.dialog.open(QuitGameModalComponent, {
+            data: {
+                isButtonDisabled: this.isReplayMode,
+            },
+            disableClose: true,
+            hasBackdrop: !this.isReplayMode,
+        });
+        if (!this.isReplayMode) {
+            this.addCommand(new OpenModalCommand(this, false));
+            dialogRef.afterClosed().subscribe(() => {
+                this.addCommand(new CloseModalCommand(this));
+            });
+        }
+    }
+
+    quitGameReplay(): void {
+        const dialogRef = this.dialog.open(QuitGameModalComponent, {
+            data: {
+                isButtonDisabled: false,
+            },
             disableClose: true,
         });
+        this.timerService.stopTimer();
+        dialogRef.afterClosed().subscribe(() => {
+            this.timerService.restartTimer(this.replayButtonsService.timeMultiplier, 0);
+        });
+    }
+
+    inputIsChanging(): void {
+        setTimeout(() => {
+            const writeMessageCommand = new WriteMessageCommand(this.inputChat.nativeElement, this.messageContent);
+            this.addCommand(writeMessageCommand);
+        }, EXECUTE_COMMAND_DELAY);
     }
 
     sendMessage(): void {
@@ -463,10 +600,12 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     handleMistake(): void {
-        this.socketService.send<RoomEvent>(CHAT_EVENTS.Event, {
-            isMultiplayer: this.isMultiplayer,
-            event: 'Erreur',
-        });
+        if (!this.isReplayMode) {
+            this.socketService.send<RoomEvent>(CHAT_EVENTS.Event, {
+                isMultiplayer: this.isMultiplayer,
+                event: 'Erreur',
+            });
+        }
     }
 
     hint(): void {
@@ -498,18 +637,22 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 lastDifferences: information.lastDifferences,
                 socket: this.socketService.socketId,
             };
+
             this.effectHandler(difference);
         }
         this.left.emitSound(false);
-        this.socketService.send<RoomEvent>(CHAT_EVENTS.Event, {
-            isMultiplayer: this.isMultiplayer,
-            event: 'Différence trouvée',
-        });
+        if (!this.isReplayMode) {
+            this.socketService.send<RoomEvent>(CHAT_EVENTS.Event, {
+                isMultiplayer: this.isMultiplayer,
+                event: 'Différence trouvée',
+            });
+        }
 
         if (this.isLimitedTimeMode) {
             this.socketService.send<void>(LIMITED_TIME_MODE_EVENTS.NextStage);
         }
     }
+
     effectHandler(information: PlayerDifference): void {
         if (!this.left.toggleCheatMode) {
             this.handleFlash(information.lastDifferences);
@@ -524,6 +667,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.endGameVerification();
         }
     }
+
     endGameVerification(): void {
         if (this.isMultiplayer) {
             const endGameVerification = this.numberOfDifferences / 2;
@@ -537,5 +681,59 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                 this.notifyNewBestTime(this.socketService.socketId, false, 'Classique');
             }
         }
+    }
+
+    pauseReplay(): boolean {
+        return this.replayButtonsService.pauseReplay(this.isReplayPaused);
+    }
+
+    fastForwardReplay(multiplier: number): void {
+        this.replayButtonsService.fastForwardReplay(multiplier);
+    }
+
+    replayGame(): void {
+        this.replayTimeoutId = setTimeout(() => {
+            const command = this.invoker.commands[this.commandIndex];
+            if (command.time <= this.timerService.eventTimer) {
+                command.action.execute();
+                this.commandIndex++;
+
+                this.replayGame();
+            } else {
+                this.replayGame();
+            }
+        }, EXECUTE_COMMAND_DELAY);
+    }
+
+    resetCanvas(): void {
+        this.left.ngOnInit();
+        this.right.ngOnInit();
+    }
+
+    resetPropertiesForReplay(): void {
+        this.resetCanvas();
+        this.closeModals();
+        this.isReplayMode = true;
+        this.isReplayPaused = false;
+        this.timerService.currentTime = 0;
+        this.timerService.eventTimer = 0;
+        this.messages = [];
+        this.currentScorePlayer = 0;
+        this.currentScoreOpponent = 0;
+        this.timerService.restartTimer(1, 0);
+        this.commandIndex = 0;
+        this.foundDifferenceService.clearDifferenceFound();
+        this.showNavBar = true;
+        this.left.endGame = false;
+        this.right.endGame = false;
+        this.hintIcon = true;
+        this.thirdHint = false;
+        this.gameHintService.hintsRemaining = 3;
+        this.replayButtonsService.timeMultiplier = 1;
+        this.replayGame();
+    }
+
+    addCommand(command: Command): void {
+        if (!this.isReplayMode) this.invoker.addCommand(command, this.timerService.eventTimer);
     }
 }

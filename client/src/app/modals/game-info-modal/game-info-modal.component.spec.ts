@@ -27,6 +27,13 @@ describe('GameInfoModalComponent', () => {
         expect(component).toBeTruthy();
     });
 
+    it('should close the modal page when calling close', () => {
+        const matDialogRefMock = TestBed.inject(MatDialogRef);
+        const closeSpy = spyOn(matDialogRefMock, 'close');
+        component.close();
+        expect(closeSpy).toHaveBeenCalled();
+    });
+
     it('should receive the proper values from constructor', () => {
         expect(component.gameInfo.gameCardInfo).toEqual(GAMES[0]);
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers

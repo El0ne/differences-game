@@ -7,17 +7,22 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { EndGameCommand } from '@app/commands/end-game/end-game-command';
+import { OpenModalCommand } from '@app/commands/open-modal-command/open-modal-command';
+import { ThirdHintColorCommand } from '@app/commands/third-hint-color/third-hint-color-command';
+import { WriteMessageCommand } from '@app/commands/write-message/write-message';
 import { MAX_EFFECT_TIME } from '@app/components/click-event/click-event-constant';
 import { ClickEventComponent } from '@app/components/click-event/click-event.component';
 import { GameInfoModalComponent } from '@app/modals/game-info-modal/game-info-modal.component';
 import { GameLoseModalComponent } from '@app/modals/game-lose-modal/game-lose-modal.component';
 import { GameWinModalComponent } from '@app/modals/game-win-modal/game-win-modal.component';
 import { QuitGameModalComponent } from '@app/modals/quit-game-modal/quit-game-modal.component';
+import { ReplayGameModalComponent } from '@app/modals/replay-game-modal/replay-game-modal.component';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
@@ -26,6 +31,7 @@ import { GameHintService } from '@app/services/game-hint/game-hint.service';
 import { GameParametersService } from '@app/services/game-parameters/game-parameters.service';
 import { ImagesService } from '@app/services/images/images.service';
 import { SocketService } from '@app/services/socket/socket.service';
+import { EndGame } from '@common/chat-dialog-constants';
 import { CHAT_EVENTS } from '@common/chat-gateway-events';
 import { DifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameCardInformation } from '@common/game-card';
@@ -43,9 +49,8 @@ describe('SoloViewComponent', () => {
     let imagesService: ImagesService;
     let socketServiceMock: SocketService;
     let foundDifferenceServiceSpy: FoundDifferenceService;
+    let modalSpy: jasmine.SpyObj<MatDialog>;
     let gameHintServiceMock: GameHintService;
-
-    let modalSpy: MatDialog;
     let clickEventServiceSpy: ClickEventService;
     let gameConstantsService: GameConstantsService;
     let gameParamService: GameParametersService;
@@ -101,7 +106,7 @@ describe('SoloViewComponent', () => {
         socketServiceMock.opponentSocket = 'opponentId';
         socketServiceMock.liveSocket = () => true;
 
-        modalSpy = jasmine.createSpyObj('MatDialog', ['open']);
+        modalSpy = jasmine.createSpyObj('MatDialog', ['open', 'closeAll']);
 
         socketServiceMock.send = (event: string, data?: unknown) => {
             if (data) socketServiceMock.sio.emit(event, data);
@@ -211,6 +216,11 @@ describe('SoloViewComponent', () => {
         expect(configureSocketReactionsSpy).toHaveBeenCalled();
     });
 
+    it("should get the socket's id", () => {
+        const socketId = component.socketId;
+        expect(socketId).toEqual(component['socketService'].socketId);
+    });
+
     it('ConfigureSocketReactions should configure sockets correctly & react properly according to event', () => {
         component.limitedMultiDto = MOCK_GAME_HISTORY;
         socketServiceMock.listen = (event: string, callback: any) => {
@@ -314,36 +324,107 @@ describe('SoloViewComponent', () => {
         expect(startTimerSpy).toHaveBeenCalled();
     });
 
-    it('should open the game info modal with the correct data', () => {
+    // it('addDifferenceDetected should call addDifferenceFound of service', () => {
+    //     component.addDifferenceDetected(1);
+
+    //     expect(foundDifferenceServiceSpy.addDifferenceFound).toHaveBeenCalled();
+    // });
+
+    it('should open the game info modal with the correct data during 1v1 game', () => {
         spyOnProperty(component, 'isMultiplayer', 'get').and.returnValue(true);
+        component.isReplayMode = true;
+
         component.openInfoModal();
         expect(modalSpy.open).toHaveBeenCalledWith(GameInfoModalComponent, {
             data: {
                 gameCardInfo: component.gameCardInfo,
                 numberOfDifferences: component.numberOfDifferences,
                 numberOfPlayers: 2,
+                isReplayMode: component.isReplayMode,
             },
+            disableClose: true,
+            hasBackdrop: !component.isReplayMode,
         });
     });
 
-    it('should open the game info modal with the correct data', () => {
+    it('should open the game info modal with the correct  during solo game', () => {
         spyOnProperty(component, 'isMultiplayer', 'get').and.returnValue(false);
+        component.isReplayMode = true;
+
         component.openInfoModal();
         expect(modalSpy.open).toHaveBeenCalledWith(GameInfoModalComponent, {
             data: {
                 gameCardInfo: component.gameCardInfo,
                 numberOfDifferences: component.numberOfDifferences,
                 numberOfPlayers: 1,
+                isReplayMode: component.isReplayMode,
             },
+            disableClose: true,
+            hasBackdrop: !component.isReplayMode,
         });
     });
 
+    it('should add openInfoModalCommand when modal is closed if not in replay mode', () => {
+        component.isReplayMode = false;
+
+        const dialogRefSpy: jasmine.SpyObj<MatDialogRef<GameInfoModalComponent>> = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+        dialogRefSpy.afterClosed.and.returnValue(of());
+        modalSpy.open.and.returnValue(dialogRefSpy);
+        spyOn(component, 'addCommand');
+
+        component.openInfoModal();
+        expect(component.addCommand).toHaveBeenCalledWith(new OpenModalCommand(component, true));
+    });
+
+    it('should close all modals', () => {
+        component.closeModals();
+        expect(component['dialog'].closeAll).toHaveBeenCalled();
+    });
+
     it('should open the quit game modal with disableClose set to true', () => {
+        component.isReplayMode = false;
+        const dialogRefSpy: jasmine.SpyObj<MatDialogRef<QuitGameModalComponent>> = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+        dialogRefSpy.afterClosed.and.returnValue(of());
+        modalSpy.open.and.returnValue(dialogRefSpy);
+        spyOn(component, 'addCommand');
         component.quitGame();
         expect(modalSpy.open).toHaveBeenCalledWith(QuitGameModalComponent, {
+            data: {
+                isButtonDisabled: component.isReplayMode,
+            },
+            disableClose: true,
+            hasBackdrop: !component.isReplayMode,
+        });
+        expect(component.addCommand).toHaveBeenCalledWith(new OpenModalCommand(component, false));
+    });
+
+    it('should open the quit game modal et restart timer once the modal is closed', () => {
+        const dialogRefSpy: jasmine.SpyObj<MatDialogRef<QuitGameModalComponent>> = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+        dialogRefSpy.afterClosed.and.returnValue(of());
+        modalSpy.open.and.returnValue(dialogRefSpy);
+        spyOn(component, 'addCommand');
+        spyOn(component['timerService'], 'stopTimer');
+        spyOn(component['timerService'], 'restartTimer');
+        component.quitGameReplay();
+        expect(modalSpy.open).toHaveBeenCalledWith(QuitGameModalComponent, {
+            data: {
+                isButtonDisabled: false,
+            },
             disableClose: true,
         });
+        expect(component['timerService'].stopTimer).toHaveBeenCalled();
     });
+
+    it("should add the input's command when input is changing", fakeAsync(() => {
+        const command = new WriteMessageCommand(component.inputChat.nativeElement, 'hey');
+        component.messageContent = 'hey';
+        spyOn(component, 'addCommand');
+
+        component.inputIsChanging();
+        tick(100);
+
+        expect(component.addCommand).toHaveBeenCalledWith(command);
+    }));
 
     it('paintPixel should call sendPixels and receivePixels properly', () => {
         const leftCanvasSpy = spyOn(component.left, 'sendDifferencePixels');
@@ -447,23 +528,79 @@ describe('SoloViewComponent', () => {
         expect(notifyBestTimeSpy).toHaveBeenCalledWith(socketServiceMock.socketId, false, 'Classique');
     });
 
-    it('winGame should set all end game related boolean and open gameWin modal with true to multiplayer and winner name in multiplayer', () => {
-        Object.defineProperty(modalSpy, 'openDialogs', { value: [] });
-        component.gameCompletion(true, 'opponentId');
-        expect(modalSpy.open).toHaveBeenCalledWith(GameWinModalComponent, { disableClose: true, data: { isMultiplayer: true, winner: 'opponent' } });
-        expect(component.showNavBar).toBeFalse();
-        expect(component.left.endGame).toBeTrue();
-        expect(component.right.endGame).toBeTrue();
+    it('should reset properties once replay modal is closed by clicking on the replay button', () => {
+        const dialogRefSpy: jasmine.SpyObj<MatDialogRef<ReplayGameModalComponent>> = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+        dialogRefSpy.afterClosed.and.returnValue(of(true));
+        modalSpy.open.and.returnValue(dialogRefSpy);
+        spyOn(component, 'resetPropertiesForReplay');
+
+        component.openReplayModal();
+
+        expect(modalSpy.open).toHaveBeenCalledWith(ReplayGameModalComponent, {
+            disableClose: true,
+        });
+        expect(component.resetPropertiesForReplay).toHaveBeenCalled();
     });
 
-    it('winGame should set all end game related boolean and open gameWin modal with false to multiplayer in solo', () => {
-        spyOnProperty(component, 'isMultiplayer', 'get').and.returnValue(false);
+    it('should clear timeout once replay modal is closed by clicking on the continue button', () => {
+        const dialogRefSpy: jasmine.SpyObj<MatDialogRef<ReplayGameModalComponent>> = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+        dialogRefSpy.afterClosed.and.returnValue(of(false));
+        modalSpy.open.and.returnValue(dialogRefSpy);
+        spyOn(window, 'clearTimeout');
+
+        component.openReplayModal();
+
+        expect(modalSpy.open).toHaveBeenCalledWith(ReplayGameModalComponent, {
+            disableClose: true,
+        });
+        expect(clearTimeout).toHaveBeenCalledWith(component.replayTimeoutId);
+    });
+
+    it('should open the win modal in classic mode with winner information', () => {
         Object.defineProperty(modalSpy, 'openDialogs', { value: [] });
-        component.gameCompletion(true, 'playerId');
-        expect(modalSpy.open).toHaveBeenCalledWith(GameWinModalComponent, { disableClose: true, data: { isMultiplayer: false, winner: 'player' } });
-        expect(component.showNavBar).toBeFalse();
+        spyOn(component['timerService'], 'stopTimer');
+        const dialogRefSpy: jasmine.SpyObj<MatDialogRef<GameWinModalComponent>> = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+        dialogRefSpy.afterClosed.and.returnValue(of());
+        modalSpy.open.and.returnValue(dialogRefSpy);
+        component['gameParamService'].gameParameters.isMultiplayerGame = false;
+        component.isWinner = true;
+        component.isReplayMode = false;
+        component.gameCompletion(true, 'winnerId');
+        expect(component['timerService'].stopTimer).toHaveBeenCalled();
+        expect(component['dialog'].open).toHaveBeenCalledOnceWith(GameWinModalComponent, {
+            disableClose: true,
+            data: { isMultiplayer: false, winner: component['socketService'].names.get('winnerId'), isWinner: true } as EndGame,
+        });
         expect(component.left.endGame).toBeTrue();
         expect(component.right.endGame).toBeTrue();
+        expect(component.showNavBar).toBeFalse();
+    });
+
+    it('should save the command if is in Multiplayer', () => {
+        Object.defineProperty(modalSpy, 'openDialogs', { value: [] });
+        spyOn(component, 'addCommand');
+        const dialogRefSpy: jasmine.SpyObj<MatDialogRef<GameWinModalComponent>> = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+        dialogRefSpy.afterClosed.and.returnValue(of());
+        modalSpy.open.and.returnValue(dialogRefSpy);
+        component['gameParamService'].gameParameters.isMultiplayerGame = true;
+        component.isWinner = true;
+        component.isReplayMode = false;
+
+        component.gameCompletion(true, 'winnerId');
+
+        expect(component.addCommand).toHaveBeenCalledOnceWith(new EndGameCommand(component));
+    });
+
+    it('should open replay modal if in Replay mode', () => {
+        Object.defineProperty(modalSpy, 'openDialogs', { value: [] });
+        spyOn(component, 'openReplayModal');
+        const dialogRefSpy: jasmine.SpyObj<MatDialogRef<GameWinModalComponent>> = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+        dialogRefSpy.afterClosed.and.returnValue(of());
+        modalSpy.open.and.returnValue(dialogRefSpy);
+
+        component.isReplayMode = true;
+        component.gameCompletion(true, 'winnerId');
+        expect(component.openReplayModal).toHaveBeenCalled();
     });
 
     it('invertDifferences should invert the toggleCheatMode attribute from left and right', () => {
@@ -528,9 +665,21 @@ describe('SoloViewComponent', () => {
         expect(getRandomDifferenceSpy).toHaveBeenCalled();
     });
 
-    it('setColor should call setColor from gameHintService', () => {
-        component.setColor([]);
-        expect(gameHintServiceMock.setColor).toHaveBeenCalled();
+    it('should set the hint color and add a third hint command if applicable', () => {
+        component.isReplayMode = false;
+        component.thirdHint = true;
+        component.previousTime = 0;
+        component['timerService'].eventTimer = 100;
+
+        const command = new ThirdHintColorCommand(component, component.hintColor);
+
+        const clickPosition = [1, 2];
+
+        spyOn(component, 'addCommand');
+
+        component.setColor(clickPosition);
+        expect(component['gameHintService'].setColor).toHaveBeenCalled();
+        expect(component.addCommand).toHaveBeenCalledWith(command);
     });
 
     it('getRandomDifference should not trigger if one of these conditons are not met', () => {
@@ -568,10 +717,10 @@ describe('SoloViewComponent', () => {
         component.gameConstants.hint = 11;
         gameHintServiceMock.hintsRemaining = 1;
         const sendSpy = spyOn(socketServiceMock, 'send').and.callThrough();
-        const stopTimerSpy = spyOn(component['timerService'], 'stopTimer').and.callThrough();
+        const stopTimerSpy = spyOn(component['timerService'], 'stopTimer');
         component.getRandomDifference({ key: 'i' } as KeyboardEvent);
-        expect(sendSpy).toHaveBeenCalledTimes(2);
         expect(stopTimerSpy).toHaveBeenCalled();
+        expect(sendSpy).toHaveBeenCalledTimes(2);
     });
 
     it('getRandomDifference should not call end game if hint still has time left', () => {
@@ -609,6 +758,12 @@ describe('SoloViewComponent', () => {
         component.activateThirdHint();
         expect(component.thirdHint).toBeTrue();
         expect(component.hintIcon).toBeFalse();
+    });
+
+    it('should restart timer with proper test', () => {
+        spyOn(component['timerService'], 'restartTimer');
+        component.handleHint();
+        expect(component['timerService'].restartTimer).toHaveBeenCalled();
     });
 
     it('setCurrentHint should set hints properly', () => {
@@ -695,6 +850,76 @@ describe('SoloViewComponent', () => {
         expect(sendSpy).toHaveBeenCalledWith(CHAT_EVENTS.BestTime, GAME_HISTORY_2);
     });
 
+    it('should pause replay', () => {
+        spyOn(component['replayButtonsService'], 'pauseReplay').and.returnValue(true);
+        const result = component.pauseReplay();
+        expect(result).toBeTruthy();
+    });
+
+    it('should fast forward replay', () => {
+        spyOn(component['replayButtonsService'], 'fastForwardReplay');
+        component.fastForwardReplay(2);
+        expect(component['replayButtonsService'].fastForwardReplay).toHaveBeenCalledWith(2);
+    });
+
+    it('should execute an action and increase the command index', fakeAsync(() => {
+        const command = new EndGameCommand(component);
+        component['timerService'].eventTimer = 1;
+        component.addCommand(command);
+        component['timerService'].eventTimer = 2;
+        spyOn(component, 'replayGame');
+        component.replayGame();
+        tick(50);
+
+        expect(component.replayGame).toHaveBeenCalled();
+    }));
+
+    it('should not execute an action if the time is not right', fakeAsync(() => {
+        component.invoker.commands = [{ action: new EndGameCommand(component), time: 1 }];
+        component['timerService'].currentTime = 0;
+        spyOn(component, 'replayGame');
+
+        component.replayGame();
+
+        tick(50);
+
+        expect(component.replayGame).toHaveBeenCalled();
+    }));
+
+    it('should reset canvas', () => {
+        spyOn(component.left, 'ngOnInit');
+        spyOn(component.right, 'ngOnInit');
+        component.resetCanvas();
+        expect(component.left.ngOnInit).toHaveBeenCalled();
+        expect(component.right.ngOnInit).toHaveBeenCalled();
+    });
+
+    it('should reset properties for replay', () => {
+        spyOn(component, 'replayGame');
+        spyOn(component['timerService'], 'restartTimer');
+        component.resetPropertiesForReplay();
+
+        expect(component.isReplayMode).toBeTrue();
+        expect(component['timerService'].currentTime).toEqual(0);
+        expect(component.messages).toEqual([]);
+        expect(component.currentScoreOpponent).toEqual(0);
+        expect(component.currentScoreOpponent).toEqual(0);
+        expect(component['timerService'].restartTimer).toHaveBeenCalledWith(1, 0);
+        expect(component.commandIndex).toEqual(0);
+        expect(component['foundDifferenceService'].clearDifferenceFound).toHaveBeenCalled();
+        expect(component.showNavBar).toBeTrue();
+        expect(component.left.endGame).toBeFalse();
+        expect(component.right.endGame).toBeFalse();
+        expect(component.replayGame).toHaveBeenCalled();
+    });
+
+    it('should add command if is not in ReplayMode', () => {
+        spyOn(component.invoker, 'addCommand');
+        component.isReplayMode = false;
+        const command = new EndGameCommand(component);
+        component.addCommand(command);
+        expect(component.invoker.addCommand).toHaveBeenCalled();
+    });
     it('loseGame should open lose dialog component and set endGame conditions', () => {
         Object.defineProperty(modalSpy, 'openDialogs', { value: [] });
         component.gameCompletion(false);

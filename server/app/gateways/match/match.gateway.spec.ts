@@ -83,7 +83,7 @@ describe('MatchGateway', () => {
         expect(createLimitedTimeGameSpy).toHaveBeenCalledWith('123', 1);
     });
 
-    it(`createLimitedTimeGame should call gameManagerService.startLimitedTimeGame 
+    it(`createLimitedTimeGame should call gameManagerService.startLimitedTimeGame
         and emit the good event depending of the return value`, async () => {
         server.to.returns({
             emit: (event: string, stageId: string) => {
@@ -192,27 +192,21 @@ describe('MatchGateway', () => {
         expect(socket.data.isLimitedSolo).toBeTruthy();
     });
 
-    it('modifyTime should call changeTimeValue', () => {
-        const changeTimeSpy = jest.spyOn(gateway, 'changeTimeValue').mockImplementation();
-        gateway.modifiyTime(socket, FAKE_TIMER_MODIFICATION);
-        expect(changeTimeSpy).toHaveBeenCalled();
+    it('modifyTime should call changeTimerValue', () => {
+        const changeTimerSpy = jest.spyOn(gateway, 'changeTimerValue').mockImplementation();
+        gateway.updateTimer(socket, FAKE_TIMER_MODIFICATION);
+        expect(changeTimerSpy).toHaveBeenCalled();
     });
 
-    it('changeTimeValue should stop timer and set a new timer to the same room', async () => {
+    it('changeTimerValue should stop timer and set a new timer to the same room', async () => {
         stub(socket, 'rooms').value(new Set([TEST_ROOM_ID]));
-        server.to.returns({
-            emit: (event: string, data: number) => {
-                expect(event).toEqual(MATCH_EVENTS.Timer);
-                expect(data).toEqual(FAKE_TIMER_MODIFICATION.currentTime);
-            },
-        } as any);
         const stopTimerSpy = jest.spyOn(gateway, 'stopTimer').mockImplementation();
-        gateway.changeTimeValue(socket, FAKE_TIMER_MODIFICATION);
+        gateway.changeTimerValue(socket, FAKE_TIMER_MODIFICATION);
         jest.advanceTimersByTime(ONE_SECOND_MS);
         expect(stopTimerSpy).toHaveBeenCalled();
     });
 
-    it('nextStage shoud emit nextStageInformations event', () => {
+    it('nextStage should emit nextStageInformations event', () => {
         server.to.returns({
             emit: (event: string, data: string) => {
                 expect(event).toEqual(LIMITED_TIME_MODE_EVENTS.NewStageInformation);

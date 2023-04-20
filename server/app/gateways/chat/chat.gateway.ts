@@ -66,10 +66,10 @@ export class ChatGateway implements OnGatewayDisconnect {
                 const updatedGame = await this.updateBestTime(data);
                 this.broadcastNewBestTime(data, updatedGame);
             }
-            socket.data.isSolo = false;
-
-            this.gameHistoryService.addGameToHistory(data);
         }
+        socket.data.isSolo = false;
+
+        this.gameHistoryService.addGameToHistory(data);
     }
 
     @SubscribeMessage(LIMITED_TIME_MODE_EVENTS.EndGame)

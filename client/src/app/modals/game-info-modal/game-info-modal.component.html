@@ -10,6 +10,15 @@
             Nombre de différences :
             {{ gameInfo.numberOfDifferences }}
         </h1>
-        <!-- TODO add game mode -->
+    </div>
+    <div class="button-container">
+        <button
+            [disabled]="gameInfo.isReplayMode"
+            class="normal-button"
+            [ngClass]="gameInfo.isReplayMode ? 'button-replay-disabled' : ''"
+            (click)="close()"
+        >
+            Fermer
+        </button>
     </div>
 </div>

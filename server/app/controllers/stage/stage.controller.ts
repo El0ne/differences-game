@@ -1,5 +1,5 @@
+// using _id property causes linting warning. We need _id because MangoDB.
 /* eslint-disable no-underscore-dangle */
-// using _id property causes linting warning
 import { Images } from '@app/schemas/images.schema';
 import { BestTimesService } from '@app/services/best-times/best-times.service';
 import { DifferenceClickService } from '@app/services/difference-click/difference-click.service';
@@ -19,6 +19,7 @@ import { ObjectId } from 'mongodb';
 import { diskStorage } from 'multer';
 import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
+
 // based on https://www.youtube.com/watch?v=f-URVd2OKYc
 export const storage = diskStorage({
     destination: './assets/images',

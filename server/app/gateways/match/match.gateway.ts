@@ -1,7 +1,14 @@
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { DifferenceInformation, PlayerDifference } from '@common/difference-information';
 import { GameHistoryDTO } from '@common/game-history.dto';
-import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, ONE_SECOND_MS, SoloGameCreation } from '@common/match-gateway-communication';
+import {
+    EVENT_TIMER_INCREMENT,
+    EVENT_TIMER_INTERVAL,
+    LIMITED_TIME_MODE_EVENTS,
+    MATCH_EVENTS,
+    ONE_SECOND_MS,
+    SoloGameCreation,
+} from '@common/match-gateway-communication';
 
 import { TimerModification } from '@common/timer-modification';
 import { Injectable } from '@nestjs/common';
@@ -13,6 +20,7 @@ import { Server, Socket } from 'socket.io';
 export class MatchGateway implements OnGatewayDisconnect {
     @WebSocketServer() private server: Server;
     timers: Map<string, ReturnType<typeof setInterval>> = new Map<string, ReturnType<typeof setInterval>>();
+    eventTimers: Map<string, ReturnType<typeof setInterval>> = new Map<string, ReturnType<typeof setInterval>>();
     constructor(private gameManagerService: GameManagerService) {}
 
     @SubscribeMessage(MATCH_EVENTS.createSoloGame)
@@ -27,10 +35,19 @@ export class MatchGateway implements OnGatewayDisconnect {
         }
     }
 
+    @SubscribeMessage(MATCH_EVENTS.leaveAndJoinReplayRoom)
+    leaveAndJoinReplayRoom(@ConnectedSocket() socket: Socket): void {
+        socket.leave(socket.data.room);
+        socket.data.room = socket.id;
+        socket.join(socket.data.room);
+    }
+
     @SubscribeMessage(MATCH_EVENTS.EndTime)
     stopTimer(@ConnectedSocket() socket: Socket): void {
         clearInterval(this.timers.get(socket.data.room));
+        clearInterval(this.eventTimers.get(socket.data.room));
         this.timers.delete(socket.data.room);
+        this.eventTimers.delete(socket.data.room);
     }
 
     @SubscribeMessage(MATCH_EVENTS.Win)
@@ -46,6 +63,11 @@ export class MatchGateway implements OnGatewayDisconnect {
             socket: socket.id,
         };
         this.server.to(socket.data.room).emit(MATCH_EVENTS.Difference, differenceInformation);
+    }
+
+    @SubscribeMessage(MATCH_EVENTS.TimeModification)
+    updateTimer(socket: Socket, timerModification: TimerModification): void {
+        this.changeTimerValue(socket, timerModification);
     }
 
     @SubscribeMessage(MATCH_EVENTS.Lose)
@@ -89,28 +111,37 @@ export class MatchGateway implements OnGatewayDisconnect {
         socket.data.isLimitedSolo = true;
     }
 
-    @SubscribeMessage(LIMITED_TIME_MODE_EVENTS.TimeModification)
-    modifiyTime(@ConnectedSocket() socket: Socket, @MessageBody() data: TimerModification): void {
-        this.changeTimeValue(socket, data);
-    }
-
-    changeTimeValue(socket: Socket, data: TimerModification): void {
+    changeTimerValue(socket: Socket, timerModification: TimerModification): void {
         this.stopTimer(socket);
-        this.server.to(socket.data.room).emit(MATCH_EVENTS.Timer, data.currentTime);
+        this.server.to(socket.data.room).emit(MATCH_EVENTS.Timer, Math.max(timerModification.currentTime, 0));
+        this.server.to(socket.data.room).emit(MATCH_EVENTS.Catch, timerModification.currentTime);
+        let time = timerModification.currentTime;
         const timer = setInterval(() => {
-            data.currentTime++;
-            this.server.to(socket.data.room).emit(MATCH_EVENTS.Timer, data.currentTime);
-        }, ONE_SECOND_MS);
+            timerModification.currentTime++;
+            this.server.to(socket.data.room).emit(MATCH_EVENTS.Timer, Math.max(timerModification.currentTime, 0));
+        }, ONE_SECOND_MS * timerModification.timeMultiplier);
+        const eventTimer = setInterval(() => {
+            time += EVENT_TIMER_INCREMENT;
+            this.server.to(socket.data.room).emit(MATCH_EVENTS.Catch, time);
+        }, EVENT_TIMER_INTERVAL * timerModification.timeMultiplier);
         this.timers.set(socket.data.room, timer);
+        this.eventTimers.set(socket.data.room, eventTimer);
     }
 
     timer(room: string): void {
         let timerCount = 0;
+        let eventTimerCount = 0;
+
         const timer = setInterval(() => {
             timerCount++;
             this.server.to(room).emit(MATCH_EVENTS.Timer, timerCount);
         }, ONE_SECOND_MS);
+        const eventTimer = setInterval(() => {
+            eventTimerCount += EVENT_TIMER_INCREMENT;
+            this.server.to(room).emit(MATCH_EVENTS.Catch, eventTimerCount);
+        }, EVENT_TIMER_INTERVAL);
         this.timers.set(room, timer);
+        this.eventTimers.set(room, eventTimer);
     }
 
     async createLimitedTimeGame(room: string, numberOfPlayers: number): Promise<void> {

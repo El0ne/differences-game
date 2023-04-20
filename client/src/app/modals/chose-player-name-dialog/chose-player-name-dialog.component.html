@@ -7,9 +7,17 @@
     <div class="info">
         <h1 class="neon name-entry-title">Entrez votre nom</h1>
     </div>
-    <input type="text" class="name-field" placeholder="Entrez votre nom" [(ngModel)]="playerName" cdkFocusInitial (keyup.enter)="validateName()" />
-    <h1 class="neon" *ngIf="showNameErrorMessage">Nom invalide</h1>
-    <button class="normal-button" type="button" (click)="validateName()">
+    <input
+        maxlength="12"
+        type="text"
+        class="name-field"
+        placeholder="Entrez votre nom"
+        [(ngModel)]="playerName"
+        cdkFocusInitial
+        (keyup.enter)="validateName()"
+    />
+    <p class="title" *ngIf="showNameErrorMessage">Nom invalide</p>
+    <button class="option-buttons win-button" type="button" (click)="validateName()">
         <mat-icon class="icon">check</mat-icon>
     </button>
 </div>

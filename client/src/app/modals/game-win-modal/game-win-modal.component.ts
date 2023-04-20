@@ -1,7 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { Routes } from '@app/modules/routes';
 import { EndGame } from '@common/chat-dialog-constants';
 
 @Component({
@@ -10,6 +9,7 @@ import { EndGame } from '@common/chat-dialog-constants';
     styleUrls: ['./game-win-modal.component.scss'],
 })
 export class GameWinModalComponent {
+    isReplaySelected: boolean = false;
     constructor(private matDialogRef: MatDialogRef<GameWinModalComponent>, private router: Router, @Inject(MAT_DIALOG_DATA) private data: EndGame) {}
 
     get endGameInfo(): EndGame {
@@ -17,7 +17,11 @@ export class GameWinModalComponent {
     }
 
     confirm(): void {
-        this.matDialogRef.close();
-        this.router.navigate([`/${Routes.Home}`]);
+        this.matDialogRef.close(false);
+        this.router.navigate(['/home']);
+    }
+
+    replay(): void {
+        this.matDialogRef.close(true);
     }
 }

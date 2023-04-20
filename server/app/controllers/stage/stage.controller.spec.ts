@@ -15,7 +15,7 @@ import { GameHistoryService } from '@app/services/game-history/game-history.serv
 import { GameManagerService } from '@app/services/game-manager/game-manager.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
-import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
+import { PixelPositionService } from '@app/services/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { GameCardDto } from '@common/game-card.dto';
 import { HttpStatus } from '@nestjs/common';

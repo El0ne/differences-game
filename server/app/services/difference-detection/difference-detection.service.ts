@@ -3,12 +3,7 @@ import { ImageDimensionsService } from '@app/services/image-dimensions/image-dim
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { Injectable } from '@nestjs/common';
 import * as Jimp from 'jimp';
-
-export const RGBA_DATA_LENGTH = 4;
-const RGB_DATA_LENGTH = 3;
-export const BLACK = 0x00;
-const WHITE = 'white';
-const DIFFERENCE_IMAGE_PATH = 'assets/images/difference-image.bmp';
+import { ADJACENT_PIXELS_RADIUS, BLACK, DIFFERENCE_IMAGE_PATH, RGBA_DATA_LENGTH, RGB_DATA_LENGTH, WHITE } from './difference-detection.const';
 
 @Injectable()
 export class DifferenceDetectionService {
@@ -67,7 +62,7 @@ export class DifferenceDetectionService {
     }
 
     private hasWhiteNeighbor(pixelPosition: number): boolean {
-        for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(pixelPosition, false, 1)) {
+        for (const adjacentPixel of this.pixelRadiusService.getAdjacentPixels(pixelPosition, false, ADJACENT_PIXELS_RADIUS)) {
             if (!this.differenceArray[adjacentPixel]) return true;
         }
         return false;
@@ -88,3 +83,4 @@ export class DifferenceDetectionService {
         return true;
     }
 }
+export { BLACK, RGBA_DATA_LENGTH };

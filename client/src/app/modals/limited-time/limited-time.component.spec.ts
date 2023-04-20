@@ -12,7 +12,8 @@ import { GameParametersService } from '@app/services/game-parameters/game-parame
 import { LIMITED_TIME_MODE_EVENTS, MATCH_EVENTS, SoloGameCreation } from '@common/match-gateway-communication';
 import { JoinHostInWaitingRequest, WAITING_ROOM_EVENTS } from '@common/waiting-room-socket-communication';
 import { of } from 'rxjs';
-import { LIMITED_TIME_MODE_ID, LimitedTimeComponent } from './limited-time.component';
+import { LIMITED_TIME_MODE_ID } from './limited-time-mode.const';
+import { LimitedTimeComponent } from './limited-time.component';
 
 describe('LimitedTimeComponent', () => {
     let component: LimitedTimeComponent;
@@ -113,13 +114,6 @@ describe('LimitedTimeComponent', () => {
         });
     });
 
-    it('ngOnDestroy should delete the listeners', () => {
-        component.ngOnDestroy();
-        expect(socketServiceSpy.delete).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.MatchCreated);
-        expect(socketServiceSpy.delete).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.MatchDeleted);
-        expect(socketServiceSpy.delete).toHaveBeenCalledWith(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame);
-    });
-
     it('MatchCreated event should set the createGameButton to false', () => {
         socketServiceSpy.listen = (event: string, callback: any) => {
             if (event === WAITING_ROOM_EVENTS.MatchCreated) callback('stageId');
@@ -161,5 +155,9 @@ describe('LimitedTimeComponent', () => {
     it('closeModal should close the dialog when closeModal() is called', () => {
         component.closeModal();
         expect(dialogMock.close).toHaveBeenCalled();
+        expect(socketServiceSpy.delete).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.MatchCreated);
+        expect(socketServiceSpy.delete).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.MatchDeleted);
+        expect(socketServiceSpy.delete).toHaveBeenCalledWith(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame);
+        expect(socketServiceSpy.delete).toHaveBeenCalledWith(LIMITED_TIME_MODE_EVENTS.AbortLimitedTimeGame);
     });
 });

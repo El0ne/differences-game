@@ -3,7 +3,7 @@
 import { Differences, DifferencesDocument, differencesSchema } from '@app/schemas/differences.schemas';
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
-import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
+import { PixelPositionService } from '@app/services/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { DELAY_BEFORE_CLOSING_CONNECTION } from '@app/tests/constants';
 import { MongooseModule, getConnectionToken, getModelToken } from '@nestjs/mongoose';

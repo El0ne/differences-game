@@ -24,6 +24,7 @@ export class DifferenceClickService {
             differences: differencesArray,
         };
         const differences = new this.differenceModel(newDifferenceArray);
+        // We need underscore dangle for id because of MangoDB
         // eslint-disable-next-line no-underscore-dangle
         return (await differences.save())._id;
     }

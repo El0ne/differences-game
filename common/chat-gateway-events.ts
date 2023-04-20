@@ -8,14 +8,12 @@ export const enum CHAT_EVENTS {
     JoinRoom = 'joinRoom',
     RoomMessage = 'roomMessage',
     RoomCheck = 'roomCheck',
-
     PlayerWaiting = 'playerWaiting',
     WaitingRoom = 'waitingRoom',
     WordValidated = 'wordValidated',
     MassMessage = 'massMessage',
     Hello = 'hello',
     Clock = 'clock',
-
     Disconnect = 'disconnect',
     BestTime = 'bestTime',
 }

@@ -13,7 +13,7 @@ import { GameManagerService } from '@app/services/game-manager/game-manager.serv
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { ImageManagerService } from '@app/services/image-manager/image-manager.service';
 import { getFakeGameCard } from '@app/services/mock/fake-game-card';
-import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
+import { PixelPositionService } from '@app/services/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
 import { DELAY_BEFORE_CLOSING_CONNECTION } from '@app/tests/constants';
 import { GameCardDto } from '@common/game-card.dto';
