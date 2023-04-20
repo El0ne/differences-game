@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
+import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
 import { getFakeCanvasInformations } from '@app/services/canvas-informations.constants';
 import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
 import { DrawManipulationService } from '@app/services/draw-manipulation/draw-manipulation.service';
@@ -15,7 +16,9 @@ import { PenService } from '@app/services/pen-service/pen-service.service';
 import { RectangleService } from '@app/services/rectangle/rectangle.service';
 import { UndoRedoService } from '@app/services/undo-redo/undo-redo.service';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
+import { of } from 'rxjs';
 import { GameCreationPageComponent } from './game-creation-page.component';
+import { Routes } from '@app/modules/routes';
 
 describe('GameCreationPageComponent', () => {
     let component: GameCreationPageComponent;
@@ -29,6 +32,7 @@ describe('GameCreationPageComponent', () => {
     let undoRedoService: UndoRedoService;
     let drawManipulationService: DrawManipulationService;
     let matDialog: MatDialog;
+    let modalSpy: jasmine.SpyObj<MatDialog>;
 
     beforeEach(async () => {
         penService = jasmine.createSpyObj('PenService', ['setProperties', 'startPen', 'stopPen', 'writing']);
@@ -73,6 +77,8 @@ describe('GameCreationPageComponent', () => {
         canvasOg.width = IMAGE_DIMENSIONS.width;
         canvasOg.height = IMAGE_DIMENSIONS.height;
         component.canvasInformations = getFakeCanvasInformations();
+
+        modalSpy = jasmine.createSpyObj('MatDialog', ['open']);
     });
 
     it('should create', () => {
@@ -127,6 +133,26 @@ describe('GameCreationPageComponent', () => {
         const input = 'Test title';
         component.getTitle(input);
         expect(component.gameTitle).toBe(input);
+    });
+
+    it('should open save modal and navigate on dialog close', () => {
+        const dialogRefSpy: jasmine.SpyObj<MatDialogRef<ModalPageComponent>> = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+        dialogRefSpy.afterClosed.and.returnValue(of());
+        modalSpy.open.and.returnValue(dialogRefSpy);
+
+        component.openSaveModal();
+        expect(modalSpy.open).toHaveBeenCalledWith(ModalPageComponent, {
+            disableClose: true,
+            data: {
+                image: component.differenceImage,
+                difference: component.differenceNumber,
+                difficulty: component.difficulty,
+                gameInfo: component.createdGameInfo,
+            },
+        });
+
+        expect(component.differenceImage).toEqual('');
+        expect(component['router'].navigate).toHaveBeenCalledWith([`/${Routes.Config}`]);
     });
 
     it('should call setDrawing and set the proper value to the canvas Informations', () => {
