@@ -6,8 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
-import { Routes } from '@app/modules/routes';
+import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { getFakeCanvasInformations } from '@app/services/canvas-informations.constants';
 import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
 import { DrawManipulationService } from '@app/services/draw-manipulation/draw-manipulation.service';
@@ -32,7 +31,7 @@ describe('GameCreationPageComponent', () => {
     let undoRedoService: UndoRedoService;
     let drawManipulationService: DrawManipulationService;
     let matDialog: MatDialog;
-    let modalSpy: jasmine.SpyObj<MatDialog>;
+    let choseNameAfterClosedSpy: MatDialogRef<ChosePlayerNameDialogComponent>;
 
     beforeEach(async () => {
         penService = jasmine.createSpyObj('PenService', ['setProperties', 'startPen', 'stopPen', 'writing']);
@@ -53,12 +52,15 @@ describe('GameCreationPageComponent', () => {
         canvasSelectionService = jasmine.createSpyObj('CanvasSelectionService', ['setProperties', 'choseCanvas']);
         undoRedoService = jasmine.createSpyObj('UndoRedoService', ['setProperties', 'pushCanvas', 'undoAction', 'undo', 'redoAction', 'redo']);
         matDialog = jasmine.createSpyObj('MatDialog', ['open']);
+
+        choseNameAfterClosedSpy = jasmine.createSpyObj('MatDialogRef<ChosePlayerNameDialogComponent>', ['afterClosed']);
+
         await TestBed.configureTestingModule({
             declarations: [GameCreationPageComponent],
             imports: [HttpClientModule, FormsModule, MatDialogModule, RouterTestingModule, MatIconModule],
             providers: [
                 { provide: MAT_DIALOG_DATA, useValue: {} },
-                { provide: MatDialog, useValue: { matDialog } },
+                { provide: MatDialog, useValue: matDialog },
                 { provide: MatDialogRef, useValue: {} },
                 { provide: PenService, useValue: penService },
                 { provide: RectangleService, useValue: rectangleService },
@@ -77,8 +79,6 @@ describe('GameCreationPageComponent', () => {
         canvasOg.width = IMAGE_DIMENSIONS.width;
         canvasOg.height = IMAGE_DIMENSIONS.height;
         component.canvasInformations = getFakeCanvasInformations();
-
-        modalSpy = jasmine.createSpyObj('MatDialog', ['open']);
     });
 
     it('should create', () => {
@@ -133,26 +133,6 @@ describe('GameCreationPageComponent', () => {
         const input = 'Test title';
         component.getTitle(input);
         expect(component.gameTitle).toBe(input);
-    });
-
-    it('should open save modal and navigate on dialog close', () => {
-        const dialogRefSpy: jasmine.SpyObj<MatDialogRef<ModalPageComponent>> = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
-        dialogRefSpy.afterClosed.and.returnValue(of());
-        modalSpy.open.and.returnValue(dialogRefSpy);
-
-        component.openSaveModal();
-        expect(modalSpy.open).toHaveBeenCalledWith(ModalPageComponent, {
-            disableClose: true,
-            data: {
-                image: component.differenceImage,
-                difference: component.differenceNumber,
-                difficulty: component.difficulty,
-                gameInfo: component.createdGameInfo,
-            },
-        });
-
-        expect(component.differenceImage).toEqual('');
-        expect(component['router'].navigate).toHaveBeenCalledWith([`/${Routes.Config}`]);
     });
 
     it('should call setDrawing and set the proper value to the canvas Informations', () => {
@@ -443,5 +423,21 @@ describe('GameCreationPageComponent', () => {
 
         expect(undoRedoService.setProperties).toHaveBeenCalledWith(component.canvasInformations);
         expect(undoRedoService.redo).toHaveBeenCalled();
+    });
+
+    it('choseGameTitle should call save after the name is chosen or put isSaveDisabled to false if no name was entered', async () => {
+        matDialog.open = () => choseNameAfterClosedSpy;
+        choseNameAfterClosedSpy.afterClosed = () => of(false);
+        component.isSaveDisabled = true;
+        const saveSpy = spyOn(component, 'save');
+        await component.choseGameTitle();
+        expect(saveSpy).not.toHaveBeenCalled();
+        expect(component.isSaveDisabled).toBeFalse();
+
+        choseNameAfterClosedSpy.afterClosed = () => of('test');
+        component.isSaveDisabled = true;
+        await component.choseGameTitle();
+        expect(saveSpy).toHaveBeenCalled();
+        expect(component.gameTitle).toEqual('test');
     });
 });

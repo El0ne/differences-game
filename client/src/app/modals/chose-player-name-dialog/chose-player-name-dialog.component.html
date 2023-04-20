@@ -5,18 +5,13 @@
         </button>
     </div>
     <div class="info">
-        <p class="neon name-entry-title">{{ this.isChosingGameTitle ? 'Entrez le nom de la partie' : 'Entrez votre nom' }}</p>
+        <p class="neon name-entry-title">{{ this.isChosingGameTitle ? 'Entrez le nom de la partie' : 'Entrez votre nom'
+            }}</p>
     </div>
-    <input
-        type="text"
-        class="name-field"
-        maxlength="12"
+    <input type="text" class="name-field" maxlength="12"
         placeholder="{{ this.isChosingGameTitle ? 'Entrez le nom de la partie' : 'Entrez votre nom' }}"
-        [(ngModel)]="playerName"
-        cdkFocusInitial
-        (keyup.enter)="validateName()"
-    />
-    <p class="title" *ngIf="showNameErrorMessage">Nom invalide</p>
+        [(ngModel)]="playerName" cdkFocusInitial (keyup.enter)="validateName()" />
+    <p class="invalid-name" *ngIf="showNameErrorMessage">Nom invalide</p>
     <button class="option-buttons win-button" type="button" (click)="validateName()">
         <mat-icon class="icon">check</mat-icon>
     </button>

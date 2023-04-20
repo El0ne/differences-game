@@ -22,9 +22,11 @@ describe('TimerSoloService', () => {
     it('should increment 10 seconds after 10 seconds properly', fakeAsync(() => {
         mockSocketService.listen = (event: string, callback: any) => {
             if (event === MATCH_EVENTS.Timer) callback(TEN_SECONDS);
+            if (event === MATCH_EVENTS.Catch) callback(TEN_SECONDS);
         };
         service.startTimer();
         expect(service.currentTime).toEqual(TEN_SECONDS);
+        expect(service.eventTimer).toEqual(TEN_SECONDS);
     }));
 
     it('stopTimer should send a stop timer event', fakeAsync(() => {

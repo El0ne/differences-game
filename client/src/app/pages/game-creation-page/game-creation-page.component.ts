@@ -239,9 +239,13 @@ export class GameCreationPageComponent implements OnInit {
         this.isSaveDisabled = true;
 
         const dialogRef = this.matDialog.open(ChosePlayerNameDialogComponent, { disableClose: true, data: { isChosingGameTitle: true } });
-        dialogRef.afterClosed().subscribe((gameTitle: string) => {
-            this.gameTitle = gameTitle;
-            this.save();
+        dialogRef.afterClosed().subscribe((gameTitle: string | boolean) => {
+            if (gameTitle) {
+                this.gameTitle = gameTitle.toString();
+                this.save();
+            } else {
+                this.isSaveDisabled = false;
+            }
         });
     }
 
@@ -271,7 +275,7 @@ export class GameCreationPageComponent implements OnInit {
         const differenceBlob = this.mergeCanvas(this.differenceCanvas.nativeElement, this.differenceDrawnCanvas.nativeElement);
 
         this.gameCardService.uploadImages(originalBlob, differenceBlob, this.differenceRadius).subscribe((data) => {
-            if (data.gameDifferenceNumber) {
+            if (data) {
                 this.createdGameInfo = {
                     _id: data.gameId,
                     name: this.gameTitle,
