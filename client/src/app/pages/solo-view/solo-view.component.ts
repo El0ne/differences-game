@@ -476,12 +476,13 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     openReplayModal(): void {
+        console.log('openReplayModal');
         this.timerService.stopTimer();
         const dialogRef = this.dialog.open(ReplayGameModalComponent, {
             disableClose: true,
         });
         dialogRef.afterClosed().subscribe((result) => {
-            if (result === true) {
+            if (result) {
                 this.resetPropertiesForReplay();
             } else {
                 clearTimeout(this.replayTimeoutId);
@@ -496,6 +497,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         if (classic && !this.dialog.openDialogs.length && winnerId) {
             this.timerService.stopTimer();
             if (!this.isReplayMode) {
+                console.log('gamewinmodal');
                 const dialogRef = this.dialog.open(GameWinModalComponent, {
                     disableClose: true,
                     data: { isMultiplayer: this.isMultiplayer, winner: this.socketService.names.get(winnerId), isWinner: this.isWinner } as EndGame,
@@ -506,14 +508,16 @@ export class SoloViewComponent implements OnInit, OnDestroy {
                         this.resetPropertiesForReplay();
                     }
                 });
-                if (this.isMultiplayer) {
+                if (this.isMultiplayer && this.socketService.socketId !== winnerId) {
                     const endGameCommand = new EndGameCommand(this);
                     this.addCommand(endGameCommand);
                 }
             } else {
+                console.log(this.isReplayMode);
                 this.openReplayModal();
             }
         } else if (!this.dialog.openDialogs.length) {
+            console.log('game lose modal');
             this.dialog.open(GameLoseModalComponent, {
                 disableClose: true,
             });
@@ -529,6 +533,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     openInfoModal(): void {
+        console.log('info modal');
         const dialogRef = this.dialog.open(GameInfoModalComponent, {
             data: {
                 gameCardInfo: this.gameCardInfo,
@@ -553,6 +558,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     quitGame(): void {
+        console.log('quit game modal');
         const dialogRef = this.dialog.open(QuitGameModalComponent, {
             data: {
                 isButtonDisabled: this.isReplayMode,
@@ -710,6 +716,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
     }
 
     resetPropertiesForReplay(): void {
+        console.log(this.invoker.commands);
         this.resetCanvas();
         this.closeModals();
         this.isReplayMode = true;
