@@ -121,7 +121,7 @@
                     <mat-icon>search</mat-icon>
                 </button>
                 <div class="player-name">{{ hintsRemaining() }}</div>
-                <div class="message centered">
+                <div class="message centered" *ngIf="!this.isReplayMode">
                     Temps perdu par indice utilisé: <br />
                     {{ this.gameConstants.hint }} secondes
                 </div>
