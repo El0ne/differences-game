@@ -114,13 +114,6 @@ describe('LimitedTimeComponent', () => {
         });
     });
 
-    it('ngOnDestroy should delete the listeners', () => {
-        component.ngOnDestroy();
-        expect(socketServiceSpy.delete).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.MatchCreated);
-        expect(socketServiceSpy.delete).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.MatchDeleted);
-        expect(socketServiceSpy.delete).toHaveBeenCalledWith(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame);
-    });
-
     it('MatchCreated event should set the createGameButton to false', () => {
         socketServiceSpy.listen = (event: string, callback: any) => {
             if (event === WAITING_ROOM_EVENTS.MatchCreated) callback('stageId');
@@ -162,5 +155,9 @@ describe('LimitedTimeComponent', () => {
     it('closeModal should close the dialog when closeModal() is called', () => {
         component.closeModal();
         expect(dialogMock.close).toHaveBeenCalled();
+        expect(socketServiceSpy.delete).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.MatchCreated);
+        expect(socketServiceSpy.delete).toHaveBeenCalledWith(WAITING_ROOM_EVENTS.MatchDeleted);
+        expect(socketServiceSpy.delete).toHaveBeenCalledWith(LIMITED_TIME_MODE_EVENTS.StartLimitedTimeGame);
+        expect(socketServiceSpy.delete).toHaveBeenCalledWith(LIMITED_TIME_MODE_EVENTS.AbortLimitedTimeGame);
     });
 });
