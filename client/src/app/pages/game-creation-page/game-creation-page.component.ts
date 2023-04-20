@@ -1,3 +1,4 @@
+// we have to disable this rule because exceeds 355 lines.
 /* eslint-disable max-lines */
 // Due to previous implementation, we have too many dependencies related to each other
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
@@ -5,6 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ChosePlayerNameDialogComponent } from '@app/modals/chose-player-name-dialog/chose-player-name-dialog.component';
 import { ModalPageComponent } from '@app/modals/modal-page/modal-page.component';
+import { Routes } from '@app/modules/routes';
 import { CanvasSelectionService } from '@app/services/canvas-selection/canvas-selection.service';
 import { DrawManipulationService } from '@app/services/draw-manipulation/draw-manipulation.service';
 import { EraserService } from '@app/services/eraser/eraser.service';
@@ -12,17 +14,14 @@ import { FileManipulationService } from '@app/services/file-manipulation/file-ma
 import { GameCardInformationService } from '@app/services/game-card-information-service/game-card-information.service';
 import { PenService } from '@app/services/pen-service/pen-service.service';
 import { RectangleService } from '@app/services/rectangle/rectangle.service';
-import { STAGE } from '@app/services/server-routes';
+import { IMAGE } from '@app/services/server-routes';
 import { UndoRedoService } from '@app/services/undo-redo/undo-redo.service';
 import { CanvasInformations } from '@common/canvas-informations';
 import { GameCardDto } from '@common/game-card.dto';
 import { IMAGE_DIMENSIONS } from '@common/image-dimensions';
 import { Buffer } from 'buffer';
-import { GC_PATHS } from './game-creation-constants';
+import { ERASER_SIZE, GC_PATHS, ONLOAD_DELAY, PEN_SIZE } from './game-creation-constants';
 
-const PEN_SIZE = 10;
-const ERASER_SIZE = 50;
-const ONLOAD_DELAY = 50;
 @Component({
     selector: 'app-game-creation-page',
     templateUrl: './game-creation-page.component.html',
@@ -107,8 +106,8 @@ export class GameCreationPageComponent implements OnInit {
     // eslint-disable-next-line max-params
     constructor(
         private gameCardService: GameCardInformationService,
-        public matDialog: MatDialog,
-        public router: Router,
+        private matDialog: MatDialog,
+        private router: Router,
         private fileManipulationService: FileManipulationService,
         private canvasSelectionService: CanvasSelectionService,
         private penService: PenService,
@@ -203,7 +202,7 @@ export class GameCreationPageComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe((result) => {
             result.image = '';
-            this.router.navigate(['/config']);
+            this.router.navigate([`/${Routes.Config}`]);
         });
     }
 
@@ -276,14 +275,12 @@ export class GameCreationPageComponent implements OnInit {
                     _id: data.gameId,
                     name: this.gameTitle,
                     difficulty: data.gameDifficulty,
-                    baseImage: data.originalImageName,
-                    differenceImage: data.differenceImageName,
                     radius: this.differenceRadius,
                     differenceNumber: data.gameDifferenceNumber,
                 };
                 this.difficulty = data.gameDifficulty;
                 this.differenceNumber = data.gameDifferenceNumber;
-                this.differenceImage = `${STAGE}/image/difference-image.bmp`;
+                this.differenceImage = `${IMAGE}/file/difference-image.bmp`;
                 this.openSaveModal();
             } else {
                 alert("La partie n'a pas été créée. Vous devez avoir entre 3 et 9 différences");

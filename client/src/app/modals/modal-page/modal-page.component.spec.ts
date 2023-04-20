@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GAMES } from '@app/mock/game-cards';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
@@ -9,6 +9,7 @@ import { GameCardInformationService } from '@app/services/game-card-information-
 import { GameCardDto } from '@common/game-card.dto';
 import { of } from 'rxjs';
 
+import { ImagesService } from '@app/services/images/images.service';
 import { ModalPageComponent } from './modal-page.component';
 
 describe('ModalPageComponent', () => {
@@ -16,6 +17,7 @@ describe('ModalPageComponent', () => {
     let fixture: ComponentFixture<ModalPageComponent>;
     let gameCardService: GameCardInformationService;
     let clickService: ClickEventService;
+    let imagesServices: ImagesService;
     let dialogRefSpyObject: MatDialogRef<ModalPageComponent>;
 
     beforeEach(async () => {
@@ -44,10 +46,11 @@ describe('ModalPageComponent', () => {
         dialogRefSpyObject = jasmine.createSpyObj({ afterClosed: of({}), close: null });
         fixture = TestBed.createComponent(ModalPageComponent);
         component = fixture.componentInstance;
-        component.matDialogRef = dialogRefSpyObject;
+        component['matDialogRef'] = dialogRefSpyObject;
         fixture.detectChanges();
         gameCardService = TestBed.inject(GameCardInformationService);
         clickService = TestBed.inject(ClickEventService);
+        imagesServices = TestBed.inject(ImagesService);
     });
 
     it('createGame should call create game from service and redirection', () => {
@@ -62,10 +65,10 @@ describe('ModalPageComponent', () => {
 
     it('drop game should call redirection', () => {
         const redirectionMock = spyOn(component, 'redirection');
-        const serviceDeleteImageMock = spyOn(gameCardService, 'deleteImage').and.returnValue(of());
         const deleteDifferencesMock = spyOn(clickService, 'deleteDifferences').and.returnValue(of());
+        const deleteImagesObjectMock = spyOn(imagesServices, 'deleteImageObjects').and.returnValue(of());
 
-        component.data = {
+        component['data'] = {
             image: 'string',
             difference: 0,
             difficulty: 'e',
@@ -73,10 +76,8 @@ describe('ModalPageComponent', () => {
         };
         component.dropGame();
 
-        expect(deleteDifferencesMock).toHaveBeenCalledOnceWith(component.data.gameInfo._id);
-        expect(serviceDeleteImageMock).toHaveBeenCalledTimes(2);
-        expect(serviceDeleteImageMock).toHaveBeenCalledWith(component.data.gameInfo.baseImage);
-        expect(serviceDeleteImageMock).toHaveBeenCalledWith(component.data.gameInfo.differenceImage);
+        expect(deleteDifferencesMock).toHaveBeenCalledOnceWith(component['data'].gameInfo._id);
+        expect(deleteImagesObjectMock).toHaveBeenCalledOnceWith(component['data'].gameInfo._id);
         expect(redirectionMock).toHaveBeenCalledOnceWith('/creatingGame');
     });
 
@@ -85,6 +86,18 @@ describe('ModalPageComponent', () => {
 
         expect(dialogRefSpyObject.close).toHaveBeenCalled();
     });
+
+    it('getter should return the good elements', () => {
+        component['data'] = {
+            image: 'string',
+            difference: 0,
+            difficulty: 'e',
+            gameInfo: getFakeGameCardDTO(),
+        };
+        expect(component.image).toEqual(component['data'].image);
+        expect(component.difference).toEqual(component['data'].difference);
+        expect(component.difficulty).toEqual(component['data'].difficulty);
+    });
 });
 
 const getFakeGameCardDTO = (): GameCardDto => {
@@ -92,8 +105,6 @@ const getFakeGameCardDTO = (): GameCardDto => {
         _id: 'string',
         name: 'string',
         difficulty: 'string',
-        baseImage: 'string',
-        differenceImage: 'string',
         radius: 3,
         differenceNumber: 3,
     };

@@ -1,6 +1,6 @@
 .win {
     width: 33rem;
-    height: 14rem;
+    height: 27rem;
     justify-content: space-evenly;
 }
 
@@ -11,9 +11,25 @@
     font-size: xx-large;
 }
 
+.endGameMessage {
+    margin-top: 5rem;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: smaller;
+}
+
 button {
     width: 6rem;
     height: 3rem;
     margin-left: 1rem;
     font-size: large;
+}
+
+.endGameButtons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    justify-content: space-evenly;
 }

@@ -5,21 +5,27 @@
     --error-message-color: rgb(177, 32, 32);
 }
 
-body {
-    background: linear-gradient(black, #7a04eb, #bd04eb);
-}
-
 .option-buttons {
     width: 13rem;
-    height: 4rem;
+    height: 5rem;
     margin-top: 1rem;
 }
 
+.icon {
+    transform: scale(1.75);
+}
+
+.play-button {
+    background-color: rgb(255, 160, 18);
+    color: white;
+}
 .nav-bar {
     display: flex;
     justify-content: space-between;
     padding: 0.5rem;
     height: 6%;
+    margin-left: 4rem;
+    margin-right: 4rem;
 }
 .home-button {
     margin-right: 5%;
@@ -51,8 +57,8 @@ body {
     position: relative;
     border-style: solid;
     background-color: white;
-    height: 80%;
     width: 90%;
+    height: 80%;
     margin-bottom: 5px;
     overflow-y: auto;
     overflow-x: hidden;
@@ -60,6 +66,11 @@ body {
     scroll-behavior: auto;
 }
 
+.text-box.neon-border {
+    min-height: 388px;
+    max-height: 388px;
+    margin-bottom: 20px;
+}
 .answer-area {
     margin-top: 5px;
     width: 95%;
@@ -111,7 +122,7 @@ body {
 }
 
 .flex-game {
-    height: 80%;
+    height: 74%;
     width: 100%;
     display: flex;
     flex-direction: row;
@@ -146,57 +157,8 @@ app-click-event {
     flex-direction: column;
     align-items: center;
     width: 29rem;
-    height: 100%;
-    margin-bottom: 10.75%;
-}
-#double-score {
-    display: flex;
-    flex-direction: row;
-    gap: 5%;
-}
-
-.score {
-    margin-top: 1.5rem;
-    align-self: center;
-    padding-top: 2%;
-    padding-bottom: 2%;
-}
-
-#timer {
-    align-self: center;
-    padding-top: 3%;
-    padding-bottom: 3%;
-}
-
-.timer-box {
-    align-self: center;
-    width: 360px;
-    height: 100px;
-    border: 0.2rem solid #eee;
-    box-shadow: 0 0 1px #eee, 0 0 1px #aaa, 0 0 2rem var(--basic-border), 0 0 0.8rem var(--basic-border), 0 0 2.8rem var(--basic-border),
-        inset 0 0 1.3rem var(--basic-border);
-    border-radius: 10px;
-}
-
-.display {
-    display: inline-block;
-    position: relative;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: #1b1b1b;
-    width: 345px;
-    height: 85px;
-    border-radius: 6px;
-    text-align: center;
-}
-
-#time {
-    line-height: 85px;
-    color: #fff;
-    font-size: 50px;
-    font-weight: 600;
-    letter-spacing: 1px;
+    height: 980px;
+    margin-bottom: 8%;
 }
 
 .third-hint-box {
@@ -235,9 +197,7 @@ app-click-event {
     align-self: center;
     justify-content: space-around;
     align-items: center;
-    color: white;
     padding: 68px 82px;
-    gap: 100px;
 }
 
 .row {
@@ -277,9 +237,8 @@ app-click-event {
     }
 }
 
-.playerName {
+.player-name {
     font-family: 'Verdana';
-    font-style: normal;
     font-weight: 700;
     font-size: 40px;
     line-height: 36px;
@@ -293,4 +252,32 @@ app-click-event {
 
 .player-name-container {
     width: 19em;
+}
+
+.replay-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.replay-button {
+    width: 10rem;
+    height: 5rem;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 13%;
+    background-color: rgba(0, 0, 0, 0);
+    pointer-events: auto;
+    z-index: 999;
 }

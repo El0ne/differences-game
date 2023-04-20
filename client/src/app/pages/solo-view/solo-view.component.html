@@ -1,15 +1,32 @@
-<body>
+<body class="page-background" *ngIf="this.imagesInfo">
+    <div *ngIf="isReplayMode" class="overlay"></div>
     <div class="nav-bar">
         <div class="options" *ngIf="showNavBar">
-            <button class="normal-button home-button option-buttons" type="button" routerLink="/home">
-                <mat-icon class="icon">home</mat-icon>
-            </button>
-            <button class="normal-button option-buttons" type="button" (click)="openInfoModal()">
+            <button
+                *ngIf="!isLimitedTimeMode"
+                id="infoButton"
+                class="normal-button option-buttons"
+                type="button"
+                (click)="openInfoModal()"
+                [ngStyle]="{
+                    'background-color': isReplayMode ? '#696565' : '#ff124f',
+                    color: isReplayMode ? '#E0E0E0' : '#fff'
+                }"
+            >
                 <mat-icon class="icon">info</mat-icon>
             </button>
         </div>
         <div class="info-option" *ngIf="showNavBar">
-            <button class="normal-button option-buttons" type="button" (click)="quitGame()">
+            <button
+                id="quitGame"
+                class="normal-button option-buttons"
+                type="button"
+                (click)="quitGame()"
+                [ngStyle]="{
+                    'background-color': isReplayMode ? '#696565' : '#ff124f',
+                    color: isReplayMode ? '#E0E0E0' : '#fff'
+                }"
+            >
                 <mat-icon class="icon">logout</mat-icon>
             </button>
         </div>
@@ -21,26 +38,26 @@
                 #left
                 [id]="1"
                 [original]="'original'"
-                [gameCardId]="this.currentGameId"
-                [imagePath]="this.gameCardInfo.originalImageName"
+                [gameCardId]="this.stageId"
+                [imagePath]="this.imagesInfo.originalImageName"
                 (differenceDetected)="differenceHandler($event)"
                 (mistake)="handleMistake()"
                 (cheatModeHandler)="resetDifferences($event)"
+                (command)="addCommand($event)"
                 (color)="setColor($event)"
-                *ngIf="this.gameCardInfo"
             ></app-click-event>
         </div>
         <div class="game-options">
             <div id="double-score">
                 <div class="score">
                     <div class="player-name-container">
-                        <div class="playerName">{{ player }}</div>
+                        <div class="player-name">{{ player }}</div>
                     </div>
                     <!-- référence : https://codepen.io/Vivekp1118/pen/YzLOOVG -->
                     <div class="container neon-border">
                         <div class="row">
-                            <div class="col col-heading neon">
-                                <div class="playerName">SCORE</div>
+                            <div class="col col-heading">
+                                <div class="player-name">SCORE</div>
                             </div>
                             <div class="col col-display" id="scoreHome">{{ currentScorePlayer }}</div>
                         </div>
@@ -48,13 +65,13 @@
                 </div>
                 <div class="score" *ngIf="isMultiplayer">
                     <div class="player-name-container">
-                        <div class="playerName">{{ opponent }}</div>
+                        <div class="player-name">{{ opponent }}</div>
                     </div>
                     <!-- référence : https://codepen.io/Vivekp1118/pen/YzLOOVG -->
                     <div class="container neon-border">
                         <div class="row">
-                            <div class="col col-heading neon">
-                                <div class="playerName">SCORE</div>
+                            <div class="col col-heading">
+                                <div class="player-name">SCORE</div>
                             </div>
                             <div class="col col-display" id="scoreHome">{{ currentScoreOpponent }}</div>
                         </div>
@@ -73,14 +90,11 @@
             <div class="text-box neon-border">
                 <div class="text-area" #scroll [scrollTop]="scroll.scrollHeight">
                     <div class="text-container" *ngFor="let data of messages">
-                        <div
-                            *ngIf="data.event === 'message'"
-                            [ngClass]="data.socketId === socketService.socketId ? 'player1 message' : 'player2 message'"
-                        >
+                        <div *ngIf="data.event === 'message'" [ngClass]="data.socketId === socketId ? 'player1 message' : 'player2 message'">
                             {{ data.message }}
                         </div>
                         <div *ngIf="data.event === 'event'" class="error message">
-                            {{ data.message }} {{ isMultiplayer && data.socketId === socketService.socketId ? player : opponent }}
+                            {{ data.message }} {{ isMultiplayer && data.socketId === socketId ? player : opponent }}
                         </div>
                         <div *ngIf="data.event === 'notification'" class="error message">
                             {{ data.message }}
@@ -89,27 +103,36 @@
                 </div>
                 <div class="answer-area" *ngIf="isMultiplayer">
                     <input
+                        #inputField
                         type="text"
                         (keydown.enter)="sendMessage()"
                         class="input-field"
                         placeholder="Entrez votre message"
                         [(ngModel)]="messageContent"
+                        (ngModelChange)="inputIsChanging()"
                         (click)="removeCheatMode()"
                         (blur)="addCheatMode()"
                     />
-                    <button class="send-button" (click)="sendMessage()"></button>
+                    <button class="send-button" (click)="sendMessage()"><mat-icon>send</mat-icon></button>
                 </div>
             </div>
             <div class="centered" *ngIf="this.hintIcon && !this.isMultiplayer">
-                <button class="hint hint-button" type="button" (click)="getDiffFromClick()">
+                <button [ngStyle]="{ color: 'white' }" class="hint hint-button" type="button" (click)="getDiffFromClick()">
                     <mat-icon>search</mat-icon>
                 </button>
-                <div class="playerName">{{ hintsRemaining() }}</div>
-                <div class="message centered">Temps par indice: {{ this.gameConstants.hint }} secondes</div>
+                <div class="player-name">{{ hintsRemaining }}</div>
+                <div class="message centered" *ngIf="!this.isReplayMode">
+                    Temps perdu par indice utilisé: <br />
+                    {{ this.gameConstants.hint }} secondes
+                </div>
             </div>
             <div *ngIf="this.thirdHint" class="centered">
                 <div class="third-hint-box neon-border" [ngStyle]="{ 'background-color': this.hintColor }"></div>
                 <p class="message centered">Rouge: Proche<br />Bleu: Loin</p>
+            </div>
+            <div class="message centered" *ngIf="this.isLimitedTimeMode">
+                Temps gagné par différence trouvée: <br />
+                {{ this.gameConstants.difference }} secondes
             </div>
         </div>
 
@@ -118,14 +141,53 @@
                 #right
                 [id]="2"
                 [original]="'different'"
-                [gameCardId]="this.currentGameId"
-                [imagePath]="this.gameCardInfo.differenceImageName"
+                [gameCardId]="this.stageId"
+                [imagePath]="this.imagesInfo.differenceImageName"
                 (differenceDetected)="differenceHandler($event)"
                 (mistake)="handleMistake()"
                 (cheatModeHandler)="resetDifferences($event)"
+                (command)="addCommand($event)"
                 (color)="setColor($event)"
-                *ngIf="this.gameCardInfo"
             ></app-click-event>
         </div>
+    </div>
+    <div *ngIf="isReplayMode" class="replay-container">
+        <button class="replay-button normal-button" type="button" (click)="quitGameReplay()">
+            <mat-icon class="icon">logout</mat-icon>
+        </button>
+
+        <button class="replay-button normal-button" type="button" (click)="resetPropertiesForReplay()">
+            <mat-icon class="icon">replay</mat-icon>
+        </button>
+
+        <button
+            class="replay-button normal-button"
+            type="button"
+            [ngClass]="{ 'play-button': isReplayPaused }"
+            (click)="isReplayPaused = pauseReplay()"
+        >
+            <mat-icon *ngIf="isReplayPaused; else play" class="icon">play_arrow</mat-icon>
+        </button>
+        <ng-template #play>
+            <mat-icon class="icon">pause</mat-icon>
+        </ng-template>
+        <button *ngIf="!isReplayPaused" class="replay-button fast-forward normal-button" type="button" (click)="fastForwardReplay(1)">
+            <div>
+                <mat-icon class="icon">fast_forward</mat-icon>
+                <p>1x</p>
+            </div>
+        </button>
+        <button *ngIf="!isReplayPaused" class="replay-button fast-forward normal-button" type="button" (click)="fastForwardReplay(0.5)">
+            <div>
+                <mat-icon class="icon">fast_forward</mat-icon>
+                <p>2x</p>
+            </div>
+        </button>
+        <button *ngIf="!isReplayPaused" class="replay-button fast-forward normal-button" type="button" (click)="fastForwardReplay(0.333333)">
+            <div>
+                <mat-icon class="icon">fast_forward</mat-icon>
+                <p>3x</p>
+            </div>
+        </button>
     </div>
 </body>

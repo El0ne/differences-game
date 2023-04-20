@@ -1,4 +1,4 @@
-// using _id property
+// using _id property. Need to use underscore because of MangoDB
 /* eslint-disable no-underscore-dangle */
 
 import { GameCard, GameCardDocument } from '@app/schemas/game-cards.schemas';
@@ -7,10 +7,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
 import { Model } from 'mongoose';
-
-export const TIME_MULTIPLIER = 200;
-export const MINIMUM_GENERATED_TIME = 30;
-export const GENERATED_NAME_LENGTH = 10;
+import { GENERATED_NAME_LENGTH, MINIMUM_GENERATED_TIME, TIME_MULTIPLIER } from './best-times.const';
 
 @Injectable()
 export class BestTimesService {

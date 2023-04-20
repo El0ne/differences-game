@@ -1,8 +1,10 @@
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { ClickCommand } from '@app/commands/click/click-command';
+import { Command } from '@app/commands/command';
 import { ClickEventService } from '@app/services/click-event/click-event.service';
 import { FoundDifferenceService } from '@app/services/found-differences/found-difference.service';
 import { PixelModificationService } from '@app/services/pixel-modification/pixel-modification.service';
-import { STAGE } from '@app/services/server-routes';
+import { IMAGE } from '@app/services/server-routes';
 import { ClickDifferenceVerification } from '@common/click-difference-verification';
 import { DifferenceInformation } from '@common/difference-information';
 import { Observable } from 'rxjs';
@@ -13,7 +15,7 @@ import { HEIGHT, WAIT_TIME_MS, WIDTH } from './click-event-constant';
     templateUrl: './click-event.component.html',
     styleUrls: ['./click-event.component.scss'],
 })
-export class ClickEventComponent implements OnInit {
+export class ClickEventComponent implements OnInit, OnChanges {
     @Input() differenceArray: number[][];
     @Input() events: Observable<void>;
     @Input() id: number;
@@ -23,6 +25,7 @@ export class ClickEventComponent implements OnInit {
     @Output() differenceDetected: EventEmitter<DifferenceInformation> = new EventEmitter<DifferenceInformation>();
     @Output() mistake: EventEmitter<void> = new EventEmitter<void>();
     @Output() cheatModeHandler: EventEmitter<KeyboardEvent> = new EventEmitter<KeyboardEvent>();
+    @Output() command: EventEmitter<Command> = new EventEmitter<Command>();
     @Output() color: EventEmitter<number[]> = new EventEmitter<number[]>();
     @Output() thirdHint: EventEmitter<boolean> = new EventEmitter<boolean>();
     @ViewChild('picture', { static: true })
@@ -54,16 +57,24 @@ export class ClickEventComponent implements OnInit {
         this.firstHint = false;
         this.secondHint = false;
         this.foundDifferences = [];
-
         this.modification.nativeElement.addEventListener('mousemove', this.handleMouseMove.bind(this));
+        this.loadImage();
+    }
 
+    loadImage(): void {
         const image = new Image();
         image.crossOrigin = 'Anonymous';
-        image.src = `${STAGE}/image/${this.imagePath}`;
+        image.src = `${IMAGE}/file/${this.imagePath}`;
         image.onload = () => {
             const context = this.picture.nativeElement.getContext('2d') as CanvasRenderingContext2D;
             context.drawImage(image, 0, 0);
         };
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['imagePath'].currentValue !== changes['imagePath'].previousValue) {
+            this.loadImage();
+        }
     }
 
     handleMouseMove(event: MouseEvent): void {
@@ -79,7 +90,9 @@ export class ClickEventComponent implements OnInit {
 
     getCoordInImage(mouseEvent: MouseEvent): number[] {
         const rect = this.modification.nativeElement.getBoundingClientRect();
-        return this.pixelModificationService.getCoordInImage(mouseEvent, rect);
+        const coordinates = this.pixelModificationService.getCoordInImage(mouseEvent, rect);
+
+        return coordinates;
     }
 
     convertPositionToPixel(toTransform: number): number[] {
@@ -90,29 +103,32 @@ export class ClickEventComponent implements OnInit {
         this.clickEventService
             .isADifference(this.getCoordInImage(mouseEvent)[0], this.getCoordInImage(mouseEvent)[1], this.gameCardId)
             .subscribe((data) => {
-                this.differenceData = data;
-                if (
-                    this.differenceData.isADifference &&
-                    !this.foundDifferenceService.foundDifferences.includes(this.differenceData.differencesPosition)
-                ) {
-                    this.differenceDetected.emit({
-                        differencesPosition: this.differenceData.differencesPosition,
-                        lastDifferences: this.differenceData.differenceArray,
-                    });
-                    if (this.toggleCheatMode) {
-                        const keyEvent: KeyboardEvent = new KeyboardEvent('keydown', { key: 't' });
-                        this.cheatModeHandler.emit(keyEvent);
-                    }
-                } else {
-                    this.displayError(mouseEvent);
-                    this.color.emit([this.getCoordInImage(mouseEvent)[0], this.getCoordInImage(mouseEvent)[1]]);
-                }
+                const clickCommand = new ClickCommand(this, data, mouseEvent);
+                this.command.emit(clickCommand);
+                this.emitToSoloView(data, mouseEvent);
             });
+    }
+
+    emitToSoloView(data: ClickDifferenceVerification, mouseEvent: MouseEvent): void {
+        this.differenceData = data;
+        if (this.differenceData.isADifference && !this.foundDifferenceService.foundDifferences.includes(this.differenceData.differencesPosition)) {
+            this.differenceDetected.emit({
+                differencesPosition: this.differenceData.differencesPosition,
+                lastDifferences: this.differenceData.differenceArray,
+            });
+            if (this.toggleCheatMode) {
+                const keyEvent: KeyboardEvent = new KeyboardEvent('keydown', { key: 't' });
+                this.cheatModeHandler.emit(keyEvent);
+            }
+        } else {
+            this.displayError(mouseEvent);
+            this.color.emit([this.getCoordInImage(mouseEvent)[0], this.getCoordInImage(mouseEvent)[1]]);
+        }
     }
 
     async clearEffect(): Promise<void> {
         const originalContext = this.modification.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-        await this.pixelModificationService.turnOffYellow(originalContext, this.foundDifferenceService.foundDifferences);
+        this.pixelModificationService.turnOffYellow(originalContext, this.foundDifferenceService.foundDifferences);
     }
 
     async differenceEffect(currentDifferences: number[]): Promise<void> {

@@ -3,9 +3,10 @@
 import { Differences, DifferencesDocument, differencesSchema } from '@app/schemas/differences.schemas';
 import { DifferencesCounterService } from '@app/services/differences-counter/differences-counter.service';
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
-import { PixelPositionService } from '@app/services/pixel-position/pixel-position/pixel-position.service';
+import { PixelPositionService } from '@app/services/pixel-position/pixel-position.service';
 import { PixelRadiusService } from '@app/services/pixel-radius/pixel-radius.service';
-import { getConnectionToken, getModelToken, MongooseModule } from '@nestjs/mongoose';
+import { DELAY_BEFORE_CLOSING_CONNECTION } from '@app/tests/constants';
+import { MongooseModule, getConnectionToken, getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ObjectId } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
@@ -43,8 +44,6 @@ describe('DifferenceClickService', () => {
         connection = await module.get(getConnectionToken());
         await differenceModel.deleteMany({});
     });
-
-    const DELAY_BEFORE_CLOSING_CONNECTION = 200;
 
     afterEach((done) => {
         setTimeout(async () => {

@@ -1,4 +1,4 @@
-export enum CHAT_EVENTS {
+export const enum CHAT_EVENTS {
     Abandon = 'abandon',
     Hint = 'hint',
     Event = 'event',
@@ -8,21 +8,14 @@ export enum CHAT_EVENTS {
     JoinRoom = 'joinRoom',
     RoomMessage = 'roomMessage',
     RoomCheck = 'roomCheck',
-
-    PlayerWaiting = 'PlayerWaiting',
-    WaitingRoom = 'WaitingRoom',
+    PlayerWaiting = 'playerWaiting',
+    WaitingRoom = 'waitingRoom',
     WordValidated = 'wordValidated',
     MassMessage = 'massMessage',
     Hello = 'hello',
     Clock = 'clock',
-
-    Disconnect = 'Disconnect',
-    BestTime = 'BestTime',
-}
-
-export interface RoomManagement {
-    room: string;
-    message: string;
+    Disconnect = 'disconnect',
+    BestTime = 'bestTime',
 }
 
 export interface Room {
@@ -37,7 +30,6 @@ export interface MultiplayerRequestInformation {
 }
 
 export interface RoomEvent {
-    room: string;
     event: string;
     isMultiplayer: boolean;
 }

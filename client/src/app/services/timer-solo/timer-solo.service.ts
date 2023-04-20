@@ -10,6 +10,7 @@ import { SECONDS_IN_MINUTE, TEN } from './timer-solo.constants';
 })
 export class TimerSoloService {
     currentTime: number = 0;
+    eventTimer: number = 0;
     subArray: Subscription[] = [];
 
     constructor(private socket: SocketService) {}
@@ -18,10 +19,23 @@ export class TimerSoloService {
         this.socket.listen<number>(MATCH_EVENTS.Timer, (timerValue: number) => {
             this.currentTime = timerValue;
         });
+        this.socket.listen<number>(MATCH_EVENTS.Catch, (timerValue: number) => {
+            this.eventTimer = timerValue;
+        });
     }
 
     stopTimer(): void {
-        this.socket.send(MATCH_EVENTS.EndTime, this.socket.gameRoom);
+        this.socket.send(MATCH_EVENTS.EndTime);
+    }
+
+    limitedTimeTimer(): void {
+        this.socket.listen<number>(MATCH_EVENTS.LimitedTimeTimer, (timerValue: number) => {
+            if (timerValue === 0) {
+                this.stopTimer();
+                this.socket.send(MATCH_EVENTS.Lose);
+            }
+            this.currentTime = timerValue;
+        });
     }
 
     convert(seconds: number): string {
@@ -35,7 +49,6 @@ export class TimerSoloService {
 
     restartTimer(multiplier: number, timeModification: number): void {
         const timerModification: TimerModification = {
-            room: this.socket.gameRoom,
             currentTime: this.currentTime + timeModification,
             timeMultiplier: multiplier,
         };

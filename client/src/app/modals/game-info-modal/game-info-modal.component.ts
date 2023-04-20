@@ -1,6 +1,13 @@
 import { Component, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { GameCardInformation } from '@common/game-card';
+
+export interface GameInfoModalData {
+    gameCardInfo: GameCardInformation;
+    numberOfDifferences: number;
+    numberOfPlayers: number;
+    isReplayMode: boolean;
+}
 
 @Component({
     selector: 'app-game-info-modal',
@@ -10,11 +17,15 @@ import { GameCardInformation } from '@common/game-card';
 export class GameInfoModalComponent {
     constructor(
         @Inject(MAT_DIALOG_DATA)
-        public data: {
-            gameCardInfo: GameCardInformation;
-            numberOfDifferences: number;
-            numberOfPlayers: number;
-        },
-        public matDialogRef: MatDialogRef<GameInfoModalComponent>,
+        private data: GameInfoModalData,
+        private matDialogRef: MatDialogRef<GameInfoModalComponent>,
     ) {}
+
+    get gameInfo(): GameInfoModalData {
+        return this.data;
+    }
+
+    close(): void {
+        this.matDialogRef.close();
+    }
 }

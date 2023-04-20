@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HEIGHT, WIDTH } from '@app/components/click-event/click-event-constant';
-import { APPROXIMATE_RADIUS, FIFTY_PERCENT, FOUR, MAX_RGB_VALUE, MINIMUM_RADIUS } from './game-hint-constants';
+import { APPROXIMATE_RADIUS, FOUR, MAX_RGB_VALUE, MINIMUM_RADIUS } from './game-hint-constants';
 
 @Injectable({
     providedIn: 'root',
@@ -27,20 +27,6 @@ export class GameHintService {
             }
         }
         return corners;
-    }
-
-    roundDown(toRoundDown: number): number {
-        const temp = toRoundDown * FOUR;
-        const roundedDownTemp = Math.floor(temp);
-        return roundedDownTemp / FOUR;
-    }
-
-    roundDownFour(toRoundDown: number): number {
-        if (toRoundDown < FIFTY_PERCENT) {
-            return 0;
-        } else {
-            return FIFTY_PERCENT;
-        }
     }
 
     setColor(clickPosition: number[], hintPosition: number[]): string {

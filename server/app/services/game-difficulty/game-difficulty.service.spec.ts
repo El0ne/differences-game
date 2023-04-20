@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { ImageDimensionsService } from '@app/services/image-dimensions/image-dimensions.service';
 import { Test, TestingModule } from '@nestjs/testing';
-import { GameDifficultyService, MAX_DIFF_NUMBER, MAX_DIFF_SURFACE } from './game-difficulty.service';
+import { MAX_DIFF_NUMBER, MAX_DIFF_SURFACE } from './game-difficulty.const';
+import { GameDifficultyService } from './game-difficulty.service';
 
 describe('GameDifficultyService', () => {
     let service: GameDifficultyService;
@@ -49,7 +50,7 @@ describe('GameDifficultyService', () => {
     });
 
     it('setGameDifficulty should return easy if array length is less than 15% of surface is difference', () => {
-        const MAX_PIXEL_COUNT_VALID: number = MAX_DIFF_SURFACE * service.imageDimensionsService.getNumberOfPixels();
+        const MAX_PIXEL_COUNT_VALID: number = MAX_DIFF_SURFACE * service['imageDimensionsService'].getNumberOfPixels();
 
         const diffArray = [[1], [2], [3], [4], [5], [6], [7], [8], [9]];
         for (let i = 0; i < MAX_PIXEL_COUNT_VALID; i++) diffArray.push([i]);

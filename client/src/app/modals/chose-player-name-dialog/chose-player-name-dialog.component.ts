@@ -32,4 +32,8 @@ export class ChosePlayerNameDialogComponent {
             this.showNameErrorMessage = true;
         }
     }
+
+    cancelNameInput(): void {
+        this.dialogRef.close(false);
+    }
 }

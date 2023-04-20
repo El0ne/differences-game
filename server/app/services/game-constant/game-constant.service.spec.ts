@@ -13,7 +13,7 @@ describe('GameConstantService', () => {
         }).compile();
 
         service = module.get<GameConstantService>(GameConstantService);
-        service.jsonPath = path.join(__dirname, '/game-constants-test.json');
+        Object.defineProperty(service, 'jsonPath', { value: path.join(__dirname, '/game-constants-test.json') });
     });
 
     it('should be defined', () => {

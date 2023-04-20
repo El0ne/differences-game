@@ -1,10 +1,21 @@
-<div class="info-card name-input">
-    <div class="info">
-        <p class="title">{{this.isChosingGameTitle ? 'Entrez le nom de la partie' : 'Entrez votre nom'}} </p>
+<div class="modal-page container">
+    <div class="exit-button-container">
+        <button class="exit-button" type="button" (click)="cancelNameInput()">
+            <mat-icon class="icon">close</mat-icon>
+        </button>
     </div>
-    <input type="text" class="name-field"
-        placeholder="{{this.isChosingGameTitle ? 'Entrez le nom de la partie' : 'Entrez votre nom'}}"
-        [(ngModel)]="playerName" cdkFocusInitial (keyup.enter)="validateName()" />
+    <div class="info">
+        <p class="neon name-entry-title">{{ this.isChosingGameTitle ? 'Entrez le nom de la partie' : 'Entrez votre nom' }}</p>
+    </div>
+    <input
+        type="text"
+        class="name-field"
+        maxlength="12"
+        placeholder="{{ this.isChosingGameTitle ? 'Entrez le nom de la partie' : 'Entrez votre nom' }}"
+        [(ngModel)]="playerName"
+        cdkFocusInitial
+        (keyup.enter)="validateName()"
+    />
     <p class="title" *ngIf="showNameErrorMessage">Nom invalide</p>
     <button class="option-buttons win-button" type="button" (click)="validateName()">
         <mat-icon class="icon">check</mat-icon>

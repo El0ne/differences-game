@@ -1,11 +1,9 @@
-.info-card {
-    display: flex;
-    flex-direction: column;
-    width: 23rem;
-    height: 15rem;
-    font-size: xx-large;
+.container {
+    width: 800px;
+    height: 400px;
+    justify-content: space-around;
     align-items: center;
-    justify-content: space-evenly;
+    border-radius: 25px;
 }
 
 .input {
@@ -14,7 +12,45 @@
 }
 
 .name-field {
-    width: 11rem;
-    height: 3rem;
+    width: 10em;
+    height: 2em;
     font-size: x-large;
+}
+
+.normal-button {
+    justify-content: center;
+    width: 100px;
+    height: 40px;
+}
+
+.exit-button-container {
+    width: 100%;
+}
+
+.exit-button {
+    cursor: pointer;
+    display: flexbox;
+    justify-content: left;
+    margin-left: 2rem;
+    text-align: center;
+    width: 80px;
+    height: 40px;
+    color: #fff;
+    background-color: #ff124f;
+    border-radius: 15px;
+    box-shadow: 0 5px #999;
+}
+
+.exit-button:enabled:active {
+    background-color: #ff124dc5;
+    box-shadow: 0 5px #666;
+    transform: translateY(4px);
+}
+
+.exit-button:hover {
+    background-color: #ff124dc5;
+}
+
+.name-entry-title {
+    font-size: 2.5em;
 }

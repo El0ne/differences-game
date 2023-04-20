@@ -1,9 +1,10 @@
 <body>
     <img id="logo" src="assets/image-title.png" />
     <div id="button-container">
-        <button [routerLink]="['/stage-selection']" class="buttons">Mode Classique</button>
-        <button [routerLink]="['/player-name']" class="buttons">Mode Temps Limité</button>
-        <button [routerLink]="['/config']" class="buttons">Configuration</button>
+        <button [routerLink]="['/' + routes.StageSelection]" class="buttons">Mode Classique</button>
+        <button (click)="openLimitedTimeDialog()" class="buttons">Mode Temps Limité</button>
+        <button [routerLink]="['/' + routes.Config]" class="buttons">Configuration</button>
     </div>
-    <p id="team-details">Équipe 103: Alexis Nicolas, Elouan Guyon, Jasper Lai, Julien Légaré, Taha-Chahine Hamitouche, Sam Younan</p>
+    <p id="team-details">Équipe 103: Alexis Nicolas, Elouan Guyon, Jasper Lai, Julien Légaré, Taha-Chahine Hamitouche,
+        Sam Younan</p>
 </body>
