@@ -63,7 +63,7 @@ export class LimitedTimeComponent implements OnInit {
     }
 
     selectPlayerName(isMultiplayerGame: boolean): void {
-        const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true });
+        const dialogRef = this.dialog.open(ChosePlayerNameDialogComponent, { disableClose: true, data: { isChosingGameTitle: false } });
         dialogRef.afterClosed().subscribe((isNameEntered: boolean) => {
             if (isNameEntered) {
                 this.closeModal();
