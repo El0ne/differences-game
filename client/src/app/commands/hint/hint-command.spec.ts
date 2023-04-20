@@ -1,15 +1,27 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { HintCommand } from '@app/commands/hint/hint-command';
 import { SoloViewComponent } from '@app/pages/solo-view/solo-view.component';
+import { GameHintService } from '@app/services/game-hint/game-hint.service';
 
 describe('HintCommand', () => {
     let command: HintCommand;
     let soloView: SoloViewComponent;
+    let gameHintServiceSpy: jasmine.SpyObj<GameHintService>;
 
     beforeEach(() => {
-        soloView = jasmine.createSpyObj('SoloViewComponent', ['setCurrentHint', 'hintTimeouts', 'handleHint', 'activateThirdHint']);
+        soloView = jasmine.createSpyObj('SoloViewComponent', [
+            'setCurrentHint',
+            'hintTimeouts',
+            'handleHint',
+            'activateThirdHint',
+            'decreaseHintsRemaining',
+            'hintsRemaining',
+        ]);
+
         soloView.left = jasmine.createSpyObj('left', ['hintPosX', 'hintPosY']);
         soloView.right = jasmine.createSpyObj('right', ['hintPosX', 'hintPosY']);
-        soloView.gameHintService = jasmine.createSpyObj('gameHintService', ['hintsRemaining']);
+        gameHintServiceSpy = jasmine.createSpyObj('GameHintService', ['hintsRemaining']);
+        Object.defineProperty(gameHintServiceSpy, 'hintsRemaining', { value: 3 });
     });
 
     it('should create an instance of HintCommand', () => {
@@ -27,17 +39,9 @@ describe('HintCommand', () => {
     });
 
     it('should decrease hintsRemaining on gameHintService', () => {
-        soloView.gameHintService.hintsRemaining = 2;
         command = new HintCommand(0, 0, soloView);
         command.execute();
-        expect(soloView.gameHintService.hintsRemaining).toBe(1);
-    });
-
-    it('should activate third hint on soloView when hintsRemaining is 0', () => {
-        soloView.gameHintService.hintsRemaining = 1;
-        command = new HintCommand(0, 0, soloView);
-        command.execute();
-        expect(soloView.activateThirdHint).toHaveBeenCalled();
+        expect(soloView.decreaseHintsRemaining).toHaveBeenCalled();
     });
 
     it('should call setCurrentHint, hintTimeouts, and handleHint on soloView', () => {

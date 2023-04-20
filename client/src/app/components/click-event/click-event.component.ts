@@ -46,7 +46,7 @@ export class ClickEventComponent implements OnInit, OnChanges {
 
     constructor(
         private clickEventService: ClickEventService,
-        public foundDifferenceService: FoundDifferenceService,
+        private foundDifferenceService: FoundDifferenceService,
         private pixelModificationService: PixelModificationService,
     ) {}
 

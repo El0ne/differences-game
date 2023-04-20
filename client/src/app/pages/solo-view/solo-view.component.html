@@ -120,7 +120,7 @@
                 <button [ngStyle]="{ color: 'white' }" class="hint hint-button" type="button" (click)="getDiffFromClick()">
                     <mat-icon>search</mat-icon>
                 </button>
-                <div class="player-name">{{ hintsRemaining() }}</div>
+                <div class="player-name">{{ hintsRemaining }}</div>
                 <div class="message centered" *ngIf="!this.isReplayMode">
                     Temps perdu par indice utilisé: <br />
                     {{ this.gameConstants.hint }} secondes

@@ -104,7 +104,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
         private gameConstantsService: GameConstantsService,
         private gameParamService: GameParametersService,
         private imagesService: ImagesService,
-        public gameHintService: GameHintService,
+        private gameHintService: GameHintService,
         private replayButtonsService: ReplayButtonsService,
     ) {}
 
@@ -122,6 +122,14 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     get socketId(): string {
         return this.socketService.socketId;
+    }
+
+    get hintsRemaining(): number {
+        return this.gameHintService.hintsRemaining;
+    }
+
+    decreaseHintsRemaining(): void {
+        this.gameHintService.hintsRemaining--;
     }
 
     ngOnInit(): void {
@@ -350,7 +358,7 @@ export class SoloViewComponent implements OnInit, OnDestroy {
 
     getRandomDifference(event: KeyboardEvent | null): void {
         if (event?.key === 'i' && !this.isMultiplayer && this.gameHintService.hintsRemaining > 0) {
-            if (this.hintsRemaining() > 0) this.socketService.send(CHAT_EVENTS.Hint);
+            if (this.hintsRemaining > 0) this.socketService.send(CHAT_EVENTS.Hint);
             this.left.getDifferences(this.stageId).subscribe((data) => {
                 const pixelArray = this.foundDifferenceService.findPixelsFromDifference(data);
                 const randomPixel = pixelArray[Math.floor(Math.random() * pixelArray.length)];
@@ -436,10 +444,6 @@ export class SoloViewComponent implements OnInit, OnDestroy {
             this.limitedSoloDto.player1.hasAbandon = false;
             this.socketService.send<GameHistoryDTO>(LIMITED_TIME_MODE_EVENTS.EndGame, this.limitedSoloDto);
         } else if (this.limitedMultiDto) this.socketService.send<GameHistoryDTO>(LIMITED_TIME_MODE_EVENTS.EndGame, this.limitedMultiDto);
-    }
-
-    hintsRemaining(): number {
-        return this.gameHintService.hintsRemaining;
     }
 
     notifyNewBestTime(winnerId: string, isAbandon: boolean, mode: string): void {

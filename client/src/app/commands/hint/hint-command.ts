@@ -18,9 +18,9 @@ export class HintCommand implements Command {
         this.soloView.right.hintPosX = this.hintPosX;
         this.soloView.right.hintPosY = this.hintPosY;
 
-        this.soloView.gameHintService.hintsRemaining--;
+        this.soloView.decreaseHintsRemaining();
 
-        if (this.soloView.gameHintService.hintsRemaining === 0) {
+        if (this.soloView.hintsRemaining === 0) {
             this.soloView.activateThirdHint();
         }
         this.soloView.setCurrentHint();
